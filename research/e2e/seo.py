@@ -1,5 +1,5 @@
 # SEO check of the built site: every page in dist/ has a unique title and description of sane length, one h1, a canonical
-# URL that matches its path, Open Graph tags, valid JSON-LD, alt on every image and a lang on Arabic text. The sitemap
+# URL that matches its path, Open Graph tags with its own share card, valid JSON-LD, alt on every image and a lang on Arabic text. The sitemap
 # lists every indexable page and nothing else. Writes research/e2e/out/seo.json.
 #   python3 -I research/e2e/seo.py [DIST]
 import json, pathlib, re, sys
@@ -53,6 +53,9 @@ for path, p in pages.items():
     check(path, 'canonical is this page', p.links.get('canonical') == SITE + path, p.links.get('canonical'))
     check(path, 'Open Graph title, description, image and url', all(p.meta.get(k) for k in ('og:title', 'og:description', 'og:image', 'og:url')))
     check(path, 'og:image is an absolute URL to a built file', (p.meta.get('og:image') or '').startswith(SITE + '/') and (DIST / p.meta['og:image'][len(SITE + '/'):]).is_file(), p.meta.get('og:image'))
+    card = DIST / 'og' / ((path.strip('/').replace('/', '-') or 'home') + '.png')
+    check(path, 'og:image is its own 1200 x 630 PNG card (run scripts/og/cards.py)', p.meta.get('og:image') == f'{SITE}/og/{card.name}' and card.is_file()
+          and card.read_bytes()[:24][16:] == (1200).to_bytes(4, 'big') + (630).to_bytes(4, 'big') and p.meta.get('og:image:width') == '1200', p.meta.get('og:image'))
     try:
         graph = json.loads(''.join(p.ld))['@graph']; types = [n['@type'] for n in graph]
         check(path, 'JSON-LD parses, with WebSite, Person and a page node', {'WebSite', 'Person'} <= set(types) and len(types) >= 3, types)
