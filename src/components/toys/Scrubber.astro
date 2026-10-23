@@ -1,0 +1,69 @@
+---
+// The shared play, pause, step and scrub control. Wire it with scrubber(root, onStep) from ./scrubber.ts.
+// Without JS it stays hidden: every diagram's default state is already complete.
+import '../../styles/explain.css';
+
+interface Props { n: number; at?: number; label: string; run?: boolean }
+const { n, at = 0, label, run = true } = Astro.props;
+---
+
+<div class="k-scrub" data-scrub data-n={n} data-at={at} hidden>
+  <div class="k-scrub-btns">
+    <button type="button" class="button k-btn" data-act="reset"><span class="hk" aria-hidden="true">^F2</span> Reset</button>
+    <button type="button" class="button k-btn" data-act="step"><span class="hk" aria-hidden="true">F7</span> Step</button>
+    {run && <button type="button" class="button button--primary k-btn" data-act="play" aria-pressed="false"><span class="hk" aria-hidden="true">F9</span> <span data-label>Run</span></button>}
+  </div>
+  <div class="k-scrub-bar">
+    <button type="button" class="k-scrub-arrow" data-act="back" aria-label="Step back">◄</button>
+    <input type="range" min="0" max={n - 1} value={at} step="1" aria-label={label} />
+    <button type="button" class="k-scrub-arrow" data-act="fwd" aria-label="Step forward">►</button>
+    <output>{at + 1} of {n}</output>
+  </div>
+</div>
+
+<style>
+  .k-scrub { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+  .k-scrub-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  /* The Borland scroll bar: dithered track, solid thumb, arrow buttons at both ends */
+  .k-scrub-bar { flex: 1 1 260px; display: flex; align-items: center; min-width: 0; }
+  .k-scrub-arrow {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    font: 700 12px/1 var(--font-code);
+    color: var(--surface);
+    background: var(--accent-2);
+    border: 0;
+    cursor: pointer;
+  }
+  .k-scrub-arrow:hover { background: var(--accent); }
+  .k-scrub-arrow[aria-disabled='true'] { opacity: 0.5; cursor: default; }
+  .k-scrub-arrow:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; z-index: 1; }
+  input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    flex: 1;
+    min-width: 60px;
+    height: 44px;
+    margin: 0;
+    background:
+      repeating-conic-gradient(var(--surface) 0 25%, transparent 0 50%) 0 0 / 4px 4px,
+      color-mix(in oklch, var(--accent-2) 70%, black);
+    cursor: pointer;
+  }
+  input[type='range']::-webkit-slider-runnable-track { height: 44px; }
+  input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 32px; height: 44px; background: var(--accent-2); border: 0; }
+  input[type='range']::-moz-range-thumb { width: 32px; height: 44px; background: var(--accent-2); border: 0; border-radius: 0; }
+  input[type='range']:hover::-webkit-slider-thumb { background: var(--accent); }
+  input[type='range']:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  output { min-width: 8.5ch; padding-left: 12px; font: 600 12px/1 var(--font-code); color: var(--accent-2); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  @media (max-width: 520px) {
+    .k-scrub-btns { width: 100%; }
+    .k-scrub-btns .k-btn { flex: 1; padding: 0 8px; }
+  }
+</style>
+
+<script>
+  // Shown only when JS runs; the owner calls scrubber() on it
+  document.querySelectorAll<HTMLElement>('.k-scrub[hidden]').forEach(el => (el.hidden = false));
+</script>

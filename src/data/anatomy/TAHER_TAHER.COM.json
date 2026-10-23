@@ -1,0 +1,128 @@
+{
+ "file": "TAHER/TAHER.COM",
+ "regions": [
+  {
+   "start": 0,
+   "end": 19,
+   "kind": "code",
+   "label": "Credit decoder",
+   "note": "Unfolds his signature: each of the 65 bytes at 01AB minus a key of 4, 5, 6 and on.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-sign"
+  },
+  {
+   "start": 19,
+   "end": 65,
+   "kind": "code",
+   "label": "Header reader",
+   "note": "EGA graphics, then the 5 header bytes go into the player's own code.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-gift"
+  },
+  {
+   "start": 65,
+   "end": 137,
+   "kind": "code",
+   "label": "Command decoder and stroke drawer",
+   "note": "His screensaver player, with two new commands: z and 88h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-words"
+  },
+  {
+   "start": 137,
+   "end": 148,
+   "kind": "code",
+   "label": "Pause (88h)",
+   "note": "A pause of 4,096 key checks, then EGA mode again for a clean screen and the next picture.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-words"
+  },
+  {
+   "start": 148,
+   "end": 171,
+   "kind": "code",
+   "label": "End (z)",
+   "note": "The same pause, text mode, his unfolded signature printed by DOS, then back to DOS.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-words"
+  },
+  {
+   "start": 171,
+   "end": 236,
+   "kind": "text",
+   "label": "Folded signature",
+   "note": "65 bytes that become \"K E M Y A M Software Corp., <c>1991 YASSER MOHAMED ALI.\" at start-up.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-sign"
+  },
+  {
+   "start": 236,
+   "end": 2345,
+   "kind": "image",
+   "label": "Script: the name",
+   "note": "طاهر ابراهيم الصرفي in one line: header 4B 43 00 07 04, 901 strokes, 297 column steps, then z.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#th-gift"
+  },
+  {
+   "start": 2345,
+   "end": 2346,
+   "kind": "unused",
+   "label": "End-of-file byte",
+   "note": "1Ah, the DOS end-of-file mark.",
+   "by": "yasser",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 0,
+   "end": 19,
+   "name": "decode_credit",
+   "note": "Each byte minus a key that grows by one.",
+   "link": "#th-sign",
+   "lines": [
+    {
+     "off": 10,
+     "note": "Byte minus key"
+    },
+    {
+     "off": 15,
+     "note": "Next key"
+    }
+   ]
+  },
+  {
+   "start": 65,
+   "end": 171,
+   "name": "draw_script",
+   "note": "The screensaver player with a pause, a next picture and an end.",
+   "link": "#th-words",
+   "lines": [
+    {
+     "off": 89,
+     "note": "z: the end"
+    },
+    {
+     "off": 94,
+     "note": "88h: the next picture"
+    },
+    {
+     "off": 140,
+     "note": "The pause: 4,096 key checks"
+    },
+    {
+     "off": 162,
+     "note": "Print his signature"
+    }
+   ]
+  }
+ ]
+}

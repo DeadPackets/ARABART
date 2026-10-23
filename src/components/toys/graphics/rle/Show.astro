@@ -1,0 +1,102 @@
+---
+// The whole KemYam splash, played by a line-by-line port of NAMES.COM on his own pictures: 15 scenes, each with the
+// effect and the pause he gave it. The cast list jumps to each member's card. Without JS: his last screen.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { memSync, png } from '../ssr.ts';
+import { kemyam, showScreens, SHOW, NAMES_PICS, NAMES } from './rle.ts';
+import './rle.css';
+
+const k = kemyam(memSync(NAMES));
+const screens = showScreens(k);
+const last = png(screens[screens.length - 1].pixels(), 320, 200);
+const label = (i: number) => {
+  const s = SHOW[i], m = NAMES_PICS.find(p => p.id === s.pic)!;
+  const again = s.pic === 'box' && i > 4 ? 'The KemYam box again' : m.name;
+  return `${i + 1}. ${s.pic === 'tile' ? 'The background' : again}`;
+};
+const CAST = SHOW.map((s, i) => [s.pic, i] as const).filter(([p]) => p.startsWith('c'));
+const scenes = SHOW.map((_, i) => label(i));
+---
+
+<div class="ky-show" data-kyshow data-scenes={JSON.stringify(scenes)}>
+  <Window title="NAMES.COM   320 x 200, 16 colors" kind="screen" class="g-win">
+    <div class="g-crt">
+      <img src={last} width="320" height="200" alt="The last screen of the KemYam splash: KEMYAM in red, Computer Group on purple, the black, white and red logo, and the blue KemYam box, over a gray tiled background." />
+      <canvas width="320" height="200" aria-hidden="true" hidden></canvas>
+    </div>
+  </Window>
+  <div class="ky-show-side">
+    <p class="ky-now" aria-live="polite" data-now>{scenes[scenes.length - 1]}</p>
+    <div class="ky-cast g-js" role="group" aria-label="Jump to a member's card">
+      {CAST.map(([p, i]) => (
+        <button type="button" class="button k-btn ky-member" data-scene={i} aria-pressed="false">{NAMES_PICS.find(m => m.id === p)!.name}</button>
+      ))}
+    </div>
+  </div>
+  <div class="ky-show-ctl"><Scrubber n={SHOW.length} at={SHOW.length - 1} label="Scenes of the KemYam splash" /></div>
+</div>
+
+<style>
+  .ky-show { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 20px 26px; align-items: start; }
+  .ky-show-side { display: grid; gap: 14px; align-content: start; }
+  .ky-now { margin: 0 !important; min-height: 2.6em; font: 700 1.125rem/1.3 var(--sans) !important; color: var(--accent) !important; }
+  .ky-cast { display: grid; gap: 10px; }
+  .ky-member { justify-content: flex-start; width: 100%; white-space: normal; text-align: left; padding: 8px 14px; line-height: 1.2; }
+  .ky-show-ctl { grid-column: 1 / -1; }
+  @media (max-width: 860px) {
+    .ky-show { grid-template-columns: minmax(0, 1fr); }
+    .ky-cast { grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); }
+  }
+</style>
+
+<script>
+  import { scrubber, type How } from '../../scrubber.ts';
+  import { names, paint, reduce, frames } from './view.ts';
+  import { Screen, effect, showScreens, SHOW } from './rle.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-kyshow]').forEach(async root => {
+    const k = await names();
+    const ends = showScreens(k), scenes: string[] = JSON.parse(root.dataset.scenes!);
+    const img = root.querySelector('img')!, cv = root.querySelector('canvas')!;
+    const now = root.querySelector<HTMLElement>('[data-now]')!;
+    const cast = [...root.querySelectorAll<HTMLButtonElement>('.ky-member')];
+    paint(cv, ends[ends.length - 1]);
+    cv.hidden = false; img.hidden = true;
+    let stop: (() => void) | null = null;
+
+    const show = (i: number, how: How) => {
+      stop?.(); stop = null;
+      now.textContent = scenes[i];
+      cast.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.scene! === i)));
+      if (how === 'jump' || how === 'scrub' || reduce()) return paint(cv, ends[i]);
+      // Play the scene from the screen before it: one effect step per wait, 70 screen refreshes a second
+      const s = new Screen(40, 200, i ? ends[i - 1] : undefined), v = k.view(SHOW[i].pic);
+      const steps = effect(SHOW[i].fx, v, k.order);
+      let t0 = 0, done = 0, due = 0;
+      paint(cv, s);
+      stop = frames(cv, t => {
+        t0 ||= t;
+        const refreshes = ((t - t0) / 1000) * 70;
+        while (done < steps.length && due <= refreshes) {
+          for (const [a, b, n] of steps[done].ops) s.blit(v.pic, a, b, n);
+          due += steps[done++].wait;
+        }
+        paint(cv, s);
+        return done < steps.length;
+      });
+    };
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 1.6 });
+    cast.forEach(b => b.addEventListener('click', () => { scrub.pause(); scrub.go(+b.dataset.scene!, 'step'); }));
+
+    // Plays once from a black screen the first time it comes into view
+    if (!reduce()) {
+      const io = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        if (scrub.i === scrub.n - 1 && !scrub.playing) { paint(cv, new Screen(40, 200)); scrub.go(0, 'step'); scrub.play(); }
+      }, { threshold: 0.6 });
+      io.observe(cv);
+    }
+  });
+</script>

@@ -1,0 +1,124 @@
+---
+// One key's journey through EDITOR.EXE and ARABART: key, buffer, table, joining, screen. It follows the last key typed
+// in EditorSim ('editorkey'), and its own buttons press keys there ('editor-press').
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { ssrBin } from '../arabart/ssr.ts';
+import { START } from './editor.ts';
+import { flow } from './keyflow.ts';
+
+interface Props { id?: string }
+const { id = 'keyflow' } = Astro.props;
+const before = { ...START, keys: '~gt' }, after = { ...before, keys: '~gtk' };
+const f = flow(ssrBin(), before, 'k', after);
+const NAMES = ['The key', 'His buffer', 'ARABART’s table', 'Joining', 'The screen'];
+const TRY: [string, string, string?][] = [['g', 'ل'], ['f', 'ب'], ['h', 'ا'], [' ', 'Space'], ['@', '@ Bold'], ['E', '⇧E Font 3'], ['C', '⇧C Color'], ['|', '| 3-D'], ['bs', 'Backspace']];
+---
+
+<div class="kf" id={id} data-keyflow>
+  <div class="kf-try" role="group" aria-label="Press a key in his editor">
+    <span class="kf-lab">Press a key in his editor:</span>
+    {TRY.map(([k, l]) => <button type="button" class="button k-btn" data-press={k}>{/^[؀-ۿ]/.test(l) ? <span lang="ar">{l}</span> : l}</button>)}
+  </div>
+  <Window title="ONE KEY, from your finger to the screen" kind="editor" active class="kf-win">
+    <div class="kf-row" data-row>
+      {f.stations.map((html, i) => (
+        <div class="kf-st" data-i={i}>
+          <span class="kf-n">{i + 1}. {NAMES[i]}</span>
+          <div class="kf-body" set:html={html} />
+        </div>
+      ))}
+    </div>
+    <div class="kf-say" aria-live="polite" data-say set:html={f.says[4]} />
+    <Scrubber n={5} at={4} label="Step through the key's journey" />
+  </Window>
+</div>
+
+<style is:global>
+  .kf { display: grid; gap: 16px; min-width: 0; }
+  .kf-try { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .kf-lab { font: 700 0.9375rem/1.3 var(--sans); color: var(--ink); margin-right: 4px; }
+  .kf-try [lang='ar'] { font: 700 1.25rem/1 var(--font-ar); }
+  .kf:not(.is-live) .kf-try { display: none; }
+  .kf-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 18px; }
+  .kf-st { position: relative; display: grid; grid-template-rows: auto 1fr; gap: 8px; min-height: 150px; padding: 10px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: opacity 0.35s var(--quart), box-shadow 0.25s var(--quart); }
+  .kf-st + .kf-st::before { content: '►'; position: absolute; left: -15px; top: 50%; translate: 0 -50%; font: 700 12px/1 var(--font-code); color: var(--accent-2); }
+  .kf.is-live .kf-st.later { opacity: 0.22; }
+  .kf.is-live .kf-st.now { box-shadow: inset 0 0 0 2px var(--accent); }
+  .kf-n { font: 600 11px/1.3 var(--font-code); color: var(--accent-2); }
+  .kf-body { display: grid; align-content: center; justify-items: center; gap: 8px; min-width: 0; text-align: center; }
+  .kf-cap { display: inline-grid; place-items: center; min-width: 56px; height: 56px; padding: 0 10px; font: 700 1.375rem/1 var(--font-code); color: var(--btn-ink); background: var(--btn-bg); box-shadow: 3px 3px 0 var(--black); }
+  .kf-code { font: 700 0.9375rem/1.3 var(--font-code); color: var(--accent); overflow-wrap: anywhere; }
+  .kf-t { font: 600 0.8125rem/1.3 var(--font-code); color: var(--ink-2); }
+  .kf-note { font: 500 0.875rem/1.4 var(--sans); color: var(--ink); }
+  .kf-note s { color: var(--ink-2); }
+  .kf-buf { display: flex; gap: 2px; }
+  .kf-buf > span { display: grid; justify-items: center; width: 24px; padding: 3px 0; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .kf-buf b { font: 700 13px/1.2 var(--font-code); color: var(--ink); white-space: pre; }
+  .kf-buf small { font: 500 9px/1.2 var(--font-code); color: var(--ink-2); }
+  .kf-buf .hi { background: var(--accent); }
+  .kf-buf .hi b, .kf-buf .hi small { color: var(--surface); }
+  .kf-buf .gone { opacity: 0.4; text-decoration: line-through; }
+  .kf-buf .i { box-shadow: inset 0 0 0 2px var(--accent-2); }
+  .kf-buf .i b { color: var(--accent-2); }
+  .kf-bits { display: flex; gap: 1px; font: 700 11px/1 var(--font-code); }
+  .kf-bits i { font-style: normal; width: 11px; padding: 3px 0; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .kf-bits i.on { color: var(--surface); background: var(--ink-2); }
+  .kf-bits i.h.on { background: var(--accent-2); }
+  .kf-bits i.h { box-shadow: inset 0 0 0 1px var(--accent-2); }
+  .kf-pair { display: flex; direction: rtl; gap: 6px; align-items: end; }
+  .kf-pair > span { display: grid; justify-items: center; gap: 4px; padding: 6px; background: var(--vga-0); }
+  .kf-pair > span.hi { box-shadow: inset 0 0 0 2px var(--accent); }
+  .kf-pair small { font: 600 10px/1 var(--font-code); color: var(--vga-11); direction: ltr; }
+  .kf-g { display: block; height: auto; max-width: 64px; }
+  .kf-scr { display: grid; place-items: center; width: 100%; padding: 8px 4px; background: var(--vga-0); overflow: hidden; }
+  .kf-line { display: block; width: auto; max-width: 100%; height: auto; max-height: 64px; }
+  .kf-say { margin: 16px 0 14px; min-height: 4.8em; font: 400 1rem/1.55 var(--sans); color: var(--ink); }
+  .kf-say b { color: var(--accent); }
+  .kf-say [lang='ar'] { font: 700 1.2em/1 var(--font-ar); color: var(--accent); }
+  @media (max-width: 860px) {
+    .kf-row { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+    .kf-st { grid-template-columns: 7.5rem minmax(0, 1fr); grid-template-rows: none; align-items: center; min-height: 72px; }
+    .kf-st + .kf-st::before { left: 1.6rem; top: -13px; translate: 0 0; rotate: 90deg; }
+    .kf-body { justify-items: start; text-align: left; }
+    .kf-line { max-height: 52px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .kf-st { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts } from '../arabart/core.ts';
+  import { scrubber } from '../scrubber.ts';
+  import { flow, type Flow } from './keyflow.ts';
+  import { reduce } from './vga.ts';
+  import type { Ed } from './editor.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-keyflow]').forEach(async root => {
+    const bin = await fonts();
+    const sts = [...root.querySelectorAll<HTMLElement>('.kf-st')], say = root.querySelector<HTMLElement>('[data-say]')!;
+    let f: Flow | null = null;
+    const go = (i: number, how: string) => {
+      sts.forEach((el, j) => { el.classList.toggle('later', j > i); el.classList.toggle('now', j === i); });
+      if (f) say.innerHTML = f.says[i];
+      if (how !== 'jump' && !reduce()) gsap.fromTo(sts[i].querySelector('.kf-body'), { y: 8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'expo.out' });
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, go, { speed: 1.4 });
+    let seen = false;
+    new IntersectionObserver(([e]) => (seen = e.isIntersecting), { threshold: 0.3 }).observe(root);
+    document.addEventListener('editorkey', e => {
+      const { before, after, key } = (e as CustomEvent).detail as { before: Ed; after: Ed; key: string };
+      if (!key) return;
+      f = flow(bin, before, key, after);
+      sts.forEach((el, i) => (el.querySelector('.kf-body')!.innerHTML = f!.stations[i]));
+      if (seen && !reduce()) { s.go(0, 'step'); s.play(); } else s.go(4, 'jump');
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-press]').forEach(b => b.addEventListener('click', () =>
+      document.dispatchEvent(new CustomEvent('editor-press', { detail: { key: b.dataset.press } }))));
+    // The server-rendered key is already shown; keep its words for stepping
+    const { START } = await import('./editor.ts');
+    f = flow(bin, { ...START, keys: '~gt' }, 'k', { ...START, keys: '~gtk' });
+    root.classList.add('is-live');
+    go(4, 'jump');
+  });
+</script>

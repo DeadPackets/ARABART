@@ -1,0 +1,48 @@
+/* Shared look of the script-player toys (SCREEN and TAHER pages). Global: the toys build their markup in JS too. */
+
+/* explain.css styles every list and paragraph inside .writeup; inside a toy the toy decides */
+.writeup .gp.gp :is(ol, ul) { margin: 0; padding: 0; list-style: none; }
+.writeup .gp.gp .k-code { display: block; }
+.writeup .gp.gp .gp-bytes { display: flex; gap: 4px; }
+.writeup .gp.gp .gpss-line { display: flex; gap: 4px; }
+.writeup .gp.gp :is(.gpcr-cells, .gpcc-sw) { gap: 3px; }
+.writeup .gp.gp .gphl-lines { gap: 2px; }
+.writeup .gp.gp .gpcc-lines { gap: 0; }
+.writeup .gp.gp li { max-width: none; font-size: inherit; line-height: inherit; }
+.writeup .gp.gp p { max-width: none; }
+
+.gp { min-width: 0; margin-top: 32px; }
+.gp-crt { position: relative; width: 100%; aspect-ratio: var(--gp-ar, 640 / 350); background: var(--vga-0); overflow: hidden; }
+.gp-crt > :is(img, canvas) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+.gp-crt > canvas { background: var(--vga-0); }
+/* Shrinking 1-pixel strokes with nearest-neighbor drops columns; on low-density small screens let the browser blend */
+@media (max-width: 700px) and (max-resolution: 1.5dppx) { .gp-crt > :is(img, canvas) { image-rendering: auto; } }
+.gp-text { position: absolute; inset: 0; margin: 0; padding: 4% 3%; font: 400 clamp(9px, 2.3cqw, 16px)/1.25 var(--font-dos); color: var(--vga-7); white-space: pre; background: var(--vga-0); }
+.gp-box { container-type: inline-size; }
+
+.gp-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin-top: 18px; }
+.gp-ctl[hidden] { display: none; }
+.gp-stat { margin: 0; font: 400 16px/1.4 var(--font-dos); color: var(--accent-2); min-height: 1.4em; overflow-wrap: anywhere; }
+.gp-say { margin-top: 14px; font-size: 1rem; line-height: 1.55; color: var(--ink-2); }
+.gp-say b { color: var(--accent); font-weight: 700; }
+
+/* Hex bytes as chips, the way a hex editor shows them */
+.gp-bytes { display: flex; flex-wrap: wrap; gap: 4px; font: 600 13px/1 var(--font-code); }
+.gp-bytes > * { display: grid; place-items: center; min-width: 2.6em; height: 26px; padding: 0 4px; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+.gp-bytes .is-hd { color: var(--surface); background: var(--accent-2); box-shadow: none; }
+.gp-bytes .is-org { color: var(--accent-2); }
+.gp-bytes .is-mv { color: var(--accent); }
+.gp-bytes .is-now { color: var(--surface); background: var(--accent); box-shadow: none; }
+
+/* 16 EGA color swatches as a radio group */
+.gp-sw { display: grid; grid-template-columns: repeat(8, 44px); gap: 4px; }
+.gp-sw button { width: 44px; height: 44px; padding: 0; border: 0; background: var(--c); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.25); cursor: pointer; position: relative; }
+.gp-sw button[aria-checked='true']::after { content: ''; position: absolute; inset: 6px; border: 3px solid var(--vga-15); outline: 2px solid var(--vga-0); }
+.gp-sw button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; z-index: 1; }
+@media (max-width: 420px) { .gp-sw { grid-template-columns: repeat(8, minmax(0, 1fr)); } .gp-sw button { width: 100%; } }
+
+.gp-field { display: grid; gap: 8px; min-width: 0; }
+.gp-field > span { font: 600 12px/1.3 var(--font-code); color: var(--accent-2); }
+.gp-seg { display: flex; flex-wrap: wrap; gap: 10px; }
+
+@media (prefers-reduced-motion: reduce) { .gp * { transition: none !important; } }

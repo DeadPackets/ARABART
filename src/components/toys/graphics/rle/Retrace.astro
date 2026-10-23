@@ -1,0 +1,163 @@
+---
+// His screen-refresh wait (NAMES.COM 0885): the status port's bit 3, slowed down, with every check the processor makes,
+// beside two runs of his Box effect: one paced by refreshes (his way), one by a counting loop. The speed slider changes
+// how often the processor checks, never when his wait ends.
+import Window from '../../../shell/Window.astro';
+import { memSync, png } from '../ssr.ts';
+import { kemyam, effect, Screen, NAMES } from './rle.ts';
+import './rle.css';
+
+const k = kemyam(memSync(NAMES));
+const v = { ...k.view('c1'), x: 0, y: 0 };
+const s = new Screen(26, 95);
+for (const st of effect('box', v, k.order, 26)) for (const [a, b, n] of st.ops) s.blit(v.pic, a, b, n);
+const card = png(s.pixels(), 208, 95);
+const CODE = [
+  { off: '0885', code: 'push ax / push dx', g: 0 },
+  { off: '0887', code: 'mov  dx,3DAh', note: 'the screen’s status port', g: 0 },
+  { off: '088A', code: 'in   al,dx', note: 'read it', g: 1 },
+  { off: '088B', code: 'and  al,8', note: 'bit 3: the beam is going back up', g: 1 },
+  { off: '088D', code: 'jne  088A', note: 'wait while it is still going back', g: 1 },
+  { off: '088F', code: 'in   al,dx', g: 2 },
+  { off: '0890', code: 'and  al,8', g: 2 },
+  { off: '0892', code: 'je   088F', note: 'wait for the next trip back up', g: 2 },
+  { off: '0894', code: 'pop  dx / pop ax', g: 3 },
+  { off: '0896', code: 'loop 0885', note: 'one refresh counted; CX more to go', g: 3 },
+  { off: '0898', code: 'ret', g: 3 },
+];
+// Two refreshes, 200 units each; bit 3 is high for the first 16 of each (the beam's trip back to the top)
+const wave = [0, 1].map(i => `M${i * 200} 64 V20 H${i * 200 + 16} V64 H${i * 200 + 200}`).join(' ');
+const SPEEDS = [1, 2, 4, 8, 16];
+---
+
+<div class="ky-rt" data-kyrt>
+  <div class="ky-rt-top">
+    <Window title="NAMES.COM  wait for the screen" kind="editor" class="ky-rt-code">
+      <div class="ky-rt-lines" role="list">
+        {CODE.map(l => (
+          <div class="ky-rt-l" role="listitem" data-g={l.g}><span class="off">{l.off}</span><code>{l.code}</code>{l.note && <span class="cm">; {l.note}</span>}</div>
+        ))}
+      </div>
+      <p class="g-note ky-rt-c">In C: <code>while (inp(0x3DA) &amp; 8); while (!(inp(0x3DA) &amp; 8));</code></p>
+    </Window>
+    <div class="ky-rt-right">
+      <Window title="THE REFRESH BIT, slowed down" kind="panel" class="ky-rt-sig">
+        <svg class="dg ky-rt-svg" viewBox="0 0 400 118" role="img" aria-labelledby="ky-rt-t">
+          <title id="ky-rt-t">Bit 3 of port 3DAh over two screen refreshes: high briefly while the beam goes back to the top, low while it draws. Below it, a tick for every time the processor checks the port. More speed means more ticks, but the refreshes stay where they are.</title>
+          <text class="t-sm" x="2" y="12">back to the top</text>
+          <text class="t-sm" x="60" y="56">drawing the picture</text>
+          <path class="wire-hi" d={wave} />
+          <path class="ky-rt-polls" data-polls d="" />
+          <g class="ky-rt-edges">{[0, 1].map(i => <line x1={i * 200} x2={i * 200} y1="14" y2="112" />)}</g>
+          <line class="ky-rt-cur" data-cur x1="0" x2="0" y1="8" y2="120" />
+        </svg>
+        <p class="g-note ky-rt-count" data-count>Each tick is one check of the port.</p>
+      </Window>
+      <div class="ky-rt-speed">
+        <label for="ky-rt-range">Processor speed</label>
+        <input id="ky-rt-range" type="range" min="0" max={SPEEDS.length - 1} step="1" value="0" data-speeds={JSON.stringify(SPEEDS)} aria-valuetext="1 times" />
+        <output for="ky-rt-range" data-x>×1</output>
+      </div>
+    </div>
+  </div>
+  <div class="ky-rt-race">
+    <figure class="ky-rt-run">
+      <div class="ky-rt-cv"><img src={card} width="208" height="95" alt="Yasser Mohamed Ali's name card." /><canvas width="208" height="95" hidden aria-hidden="true"></canvas></div>
+      <figcaption><b>His way: counting refreshes.</b> <span data-his>13 steps, 2 refreshes each: 26 refreshes on every PC.</span></figcaption>
+    </figure>
+    <figure class="ky-rt-run">
+      <div class="ky-rt-cv"><img src={card} width="208" height="95" alt="" /><canvas width="208" height="95" hidden aria-hidden="true"></canvas></div>
+      <figcaption><b>A loop that counts to a fixed number.</b> <span data-loop>The same 26 refreshes, on this PC.</span></figcaption>
+    </figure>
+  </div>
+</div>
+
+<style>
+  .ky-rt { display: grid; gap: 22px; }
+  .ky-rt-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .ky-rt-right { display: grid; gap: 18px; }
+  .ky-rt-lines { font: 500 clamp(12px, 0.25vw + 9.5px, 13.5px)/1.85 var(--font-code); }
+  .ky-rt-l { display: grid; grid-template-columns: 4.4ch 15ch 1fr; column-gap: 1.2ch; padding: 0 6px; color: var(--ink); }
+  .ky-rt-l .off { color: color-mix(in oklch, var(--accent-2) 75%, transparent); }
+  .ky-rt-l code { font: inherit; color: inherit; white-space: pre; }
+  .ky-rt-l .cm { color: var(--ink-2); }
+  .ky-rt-l.on { background: var(--accent-2); color: var(--surface); }
+  .ky-rt-l.on :is(.off, .cm) { color: var(--surface); }
+  .ky-rt-c { margin-top: 10px !important; }
+  .ky-rt-count { margin-top: 8px !important; }
+  .ky-rt-c code { font: inherit; color: var(--accent); }
+  .ky-rt-polls { fill: none; stroke: var(--ink); stroke-width: 1; opacity: 0.85; }
+  .ky-rt-edges line { stroke: var(--accent); stroke-width: 1.5; stroke-dasharray: 3 4; }
+  .ky-rt-cur { stroke: var(--vga-12); stroke-width: 2.5; }
+  .ky-rt-speed { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; font: 600 0.9375rem/1 var(--font-code); color: var(--accent-2); }
+  .ky-rt-speed input { flex: 1 1 220px; min-width: 0; height: 44px; accent-color: var(--vga-14); cursor: pointer; }
+  .ky-rt-speed input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .ky-rt-speed output { min-width: 4ch; font-size: 1.25rem; color: var(--accent); }
+  .ky-rt-race { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+  .ky-rt-run { margin: 0; display: grid; gap: 10px; }
+  .ky-rt-cv { position: relative; aspect-ratio: 208 / 95; background: #000; box-shadow: 0 0 0 1px var(--rule), 8px 8px 0 oklch(0 0 0 / 0.5); }
+  .ky-rt-cv > * { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .ky-rt-cv > [hidden] { display: none; }
+  .ky-rt-run figcaption { font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+  .ky-rt-run figcaption b { color: var(--ink); }
+  @media (max-width: 900px) { .ky-rt-top { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 640px) { .ky-rt-l { grid-template-columns: 4.4ch 1fr; } .ky-rt-l .cm { grid-column: 2; font-size: 0.92em; line-height: 1.4; } }
+  @media (max-width: 480px) { .ky-rt-race { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { names, paint, reduce, frames } from './view.ts';
+  import { Screen, effect } from './rle.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-kyrt]').forEach(async root => {
+    const range = root.querySelector<HTMLInputElement>('input[type=range]')!, out = root.querySelector('[data-x]')!;
+    const SPEEDS: number[] = JSON.parse(range.dataset.speeds!);
+    const polls = root.querySelector<SVGPathElement>('[data-polls]')!, cur = root.querySelector<SVGLineElement>('[data-cur]')!;
+    const count = root.querySelector('[data-count]')!, loopTxt = root.querySelector('[data-loop]')!;
+    const lines = [...root.querySelectorAll<HTMLElement>('.ky-rt-l')];
+    let speed = 1;
+
+    const setSpeed = () => {
+      speed = SPEEDS[+range.value];
+      out.textContent = `×${speed}`;
+      range.setAttribute('aria-valuetext', `${speed} times`);
+      // One tick per check of the port: 12 units apart on the slowest PC
+      const gap = 12 / speed;
+      let d = '';
+      for (let x = gap / 2; x < 400; x += gap) d += `M${x.toFixed(2)} 76V${(x % 200) < 16 ? 100 : 92}`;
+      polls.setAttribute('d', d);
+      count.textContent = speed === 1 ? 'Each tick is one check of the port.' : `${speed} times as many checks in every refresh. The refreshes do not move.`;
+      const r = 26 / speed;
+      loopTxt.textContent = speed === 1 ? 'Here it happens to match: 26 refreshes.' : `On a PC ${speed} times faster: ${Number.isInteger(r) ? r : r.toFixed(1)} refreshes. ${speed >= 8 ? 'A blink.' : 'Already too quick to enjoy.'}`;
+    };
+    range.addEventListener('input', setSpeed);
+    setSpeed();
+
+    const k = await names();
+    const v = { ...k.view('c1'), x: 0, y: 0 }, steps = effect('box', v, k.order, 26);
+    const at = (i: number) => {
+      const s = new Screen(26, 95);
+      for (let j = 0; j <= Math.min(i, steps.length - 1); j++) for (const [a, b, n] of steps[j].ops) s.blit(v.pic, a, b, n);
+      return s;
+    };
+    const cvs = [...root.querySelectorAll<HTMLCanvasElement>('.ky-rt-cv canvas')];
+    root.querySelectorAll<HTMLImageElement>('.ky-rt-cv img').forEach(i => (i.hidden = true));
+    cvs.forEach(c => { c.hidden = false; paint(c, at(99)); });
+    const light = (g: number) => lines.forEach(l => l.classList.toggle('on', +l.dataset.g! === g));
+    if (reduce()) { light(2); cur.setAttribute('x1', '120'); cur.setAttribute('x2', '120'); return; }
+
+    // The beam, slowed down: two refreshes across in 3 seconds. The race runs at the real 70 refreshes a second.
+    let t0 = 0;
+    frames(root, t => {
+      t0 ||= t;
+      const sec = (t - t0) / 1000;
+      const x = ((sec / 3) % 1) * 400, inHigh = x % 200 < 16;
+      cur.setAttribute('x1', x.toFixed(1)); cur.setAttribute('x2', x.toFixed(1));
+      light(x % 200 < 3 ? 3 : inHigh ? 1 : 2);
+      const refreshes = sec * 70, cycle = 26 + 64;
+      paint(cvs[0], at(Math.floor((refreshes % cycle) / 2)));
+      const fast = refreshes * speed;
+      paint(cvs[1], at(Math.floor((fast % cycle) / 2)));
+    });
+  });
+</script>

@@ -1,0 +1,67 @@
+<svg class="dg" viewBox="0 0 640 162" role="img" aria-labelledby="scr-cycle-t">
+<title id="scr-cycle-t">The 14 EGA colors that line 3 cycles through, 02h to 0Fh.</title>
+<text class="t-cy" x="10" y="22">Color byte at 0179, one value per frame</text>
+<rect class="box-bk" x="10" y="36" width="38" height="38" style="fill:#00AA00" />
+<text x="29" y="96" text-anchor="middle">02h</text>
+<rect class="box-bk" x="54" y="36" width="38" height="38" style="fill:#00AAAA" />
+<text x="73" y="96" text-anchor="middle">03h</text>
+<rect class="box-bk" x="98" y="36" width="38" height="38" style="fill:#AA0000" />
+<text x="117" y="96" text-anchor="middle">04h</text>
+<rect class="box-bk" x="142" y="36" width="38" height="38" style="fill:#AA00AA" />
+<text x="161" y="96" text-anchor="middle">05h</text>
+<rect class="box-bk" x="186" y="36" width="38" height="38" style="fill:#AA5500" />
+<text x="205" y="96" text-anchor="middle">06h</text>
+<rect class="box-bk" x="230" y="36" width="38" height="38" style="fill:#AAAAAA" />
+<text x="249" y="96" text-anchor="middle">07h</text>
+<rect class="box-bk" x="274" y="36" width="38" height="38" style="fill:#555555" />
+<text x="293" y="96" text-anchor="middle">08h</text>
+<rect class="box-bk" x="318" y="36" width="38" height="38" style="fill:#5555FF" />
+<text x="337" y="96" text-anchor="middle">09h</text>
+<rect class="box-bk" x="362" y="36" width="38" height="38" style="fill:#55FF55" />
+<text x="381" y="96" text-anchor="middle">0Ah</text>
+<rect class="box-bk" x="406" y="36" width="38" height="38" style="fill:#55FFFF" />
+<text x="425" y="96" text-anchor="middle">0Bh</text>
+<rect class="box-bk" x="450" y="36" width="38" height="38" style="fill:#FF5555" />
+<text x="469" y="96" text-anchor="middle">0Ch</text>
+<rect class="box-bk" x="494" y="36" width="38" height="38" style="fill:#FF55FF" />
+<text x="513" y="96" text-anchor="middle">0Dh</text>
+<rect class="box-bk" x="538" y="36" width="38" height="38" style="fill:#FFFF55" />
+<text x="557" y="96" text-anchor="middle">0Eh</text>
+<rect class="box-bk" x="582" y="36" width="38" height="38" style="fill:#FFFFFF" />
+<text x="601" y="96" text-anchor="middle">0Fh</text>
+<text x="10" y="128">Each frame redraws line 3 (319 strokes) in the</text>
+<text x="10" y="150">next color. After 0Fh it goes back to 02h.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 192" role="img" aria-labelledby="scr-cycle-tn">
+<title id="scr-cycle-tn">The 14 colors of the animation, 02h to 0Fh.</title>
+<text class="t-cy" x="10" y="18">Color byte at 0179</text>
+<rect class="box-bk" x="10" y="32" width="36" height="36" style="fill:#00AA00" />
+<text x="28" y="86" text-anchor="middle">02h</text>
+<rect class="box-bk" x="51" y="32" width="36" height="36" style="fill:#00AAAA" />
+<text x="69" y="86" text-anchor="middle">03h</text>
+<rect class="box-bk" x="92" y="32" width="36" height="36" style="fill:#AA0000" />
+<text x="110" y="86" text-anchor="middle">04h</text>
+<rect class="box-bk" x="133" y="32" width="36" height="36" style="fill:#AA00AA" />
+<text x="151" y="86" text-anchor="middle">05h</text>
+<rect class="box-bk" x="174" y="32" width="36" height="36" style="fill:#AA5500" />
+<text x="192" y="86" text-anchor="middle">06h</text>
+<rect class="box-bk" x="215" y="32" width="36" height="36" style="fill:#AAAAAA" />
+<text x="233" y="86" text-anchor="middle">07h</text>
+<rect class="box-bk" x="256" y="32" width="36" height="36" style="fill:#555555" />
+<text x="274" y="86" text-anchor="middle">08h</text>
+<rect class="box-bk" x="10" y="98" width="36" height="36" style="fill:#5555FF" />
+<text x="28" y="152" text-anchor="middle">09h</text>
+<rect class="box-bk" x="51" y="98" width="36" height="36" style="fill:#55FF55" />
+<text x="69" y="152" text-anchor="middle">0Ah</text>
+<rect class="box-bk" x="92" y="98" width="36" height="36" style="fill:#55FFFF" />
+<text x="110" y="152" text-anchor="middle">0Bh</text>
+<rect class="box-bk" x="133" y="98" width="36" height="36" style="fill:#FF5555" />
+<text x="151" y="152" text-anchor="middle">0Ch</text>
+<rect class="box-bk" x="174" y="98" width="36" height="36" style="fill:#FF55FF" />
+<text x="192" y="152" text-anchor="middle">0Dh</text>
+<rect class="box-bk" x="215" y="98" width="36" height="36" style="fill:#FFFF55" />
+<text x="233" y="152" text-anchor="middle">0Eh</text>
+<rect class="box-bk" x="256" y="98" width="36" height="36" style="fill:#FFFFFF" />
+<text x="274" y="152" text-anchor="middle">0Fh</text>
+<text x="10" y="180">After 0Fh, back to 02h.</text>
+</svg>

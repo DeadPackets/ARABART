@@ -1,0 +1,222 @@
+DIGI_T / MAIN.EXE (Digi-Test, 1993) - reverse-engineering notes (fork A)
+=====================================================================
+Image: scratchpad/re/programs/unpacked/DIGI_T_MAIN.EXE (DIET 1.00 unpacked; header 0x4230 bytes,
+image 185,776 bytes, 4,225 relocs). Addresses below are seg:off relative to load segment 0.
+All analysis is static (capstone linear sweep per segment, listings in digit/dis/<seg>.txt).
+The parent's lfarlc header fix does not change any offset used here (no emulation of MAIN.EXE was done).
+Tags: [V] verified, [S] strong inference, [?] speculation.
+
+0. SEGMENT MAP (code = 0000..2ad3, far data 2ad4..2aea, DGROUP 2af1)
+  0000 17,696 B  c0 startup + Borland RTL (_TEXT combined)                              [V]
+  270d 15,472 B  BGI graphics.lib (GRAPHICS_TEXT; 776 far calls into it)                [V]
+  1d2a,1dc6,1de6,1dfb,1e65,1eac,1ed0,1ed6,1f09,1f58  8,992 B  Borland container class
+       library (strings ABSTARRY.CPP, "Array", "SortedArray", "Error",
+       "Object must be sortable", "Attempting to expand a fixed size array")            [V]
+  1b74  2,016 B  module whose assert names "SPARR.CPP" (same assert text as ABSTARRY.CPP:
+       "newSize > arraySize()"); also holds a classlib-style operator new that returns
+       ZERO on failure. Not a Borland file name as far as I know.                       [?]
+  User modules (one C++ class per module, large model => one segment per .CPP):        [S]
+   0452   912 truth-table printer (DOS INT21/05)   048b 20,704 analysis engine (dictionary,
+   0999 16,192 netlist build / object helpers     0d8d  4,352 logic-element base, 5-valued ops
+   0e9d  1,568 main()                             0eff  3,040 Gate class (eval, .GAT save/load)
+   0fbd  5,888 drawing helpers (text sizing)      112d  4,368 IC class (.IC save/load)
+   123e  4,688 screen-object base / IC instance   1363  4,640 Wire (connector)
+   1485  8,864 circuit propagation helpers        16af  1,760 Node
+   171d    176 small ScreenImage helpers          1728  2,720 Prime I/O (P/I, P/O, VCC, GND)
+   17d2  6,800 ScreenImage (.CIR save/load)       197b  8,080 main frame/menu drawing (283 BGI calls)
+   1bf2  1,696 Technology (.TCK)                  1c5c  3,296 Group (catalog + FILn/BFLn files)
+   1f5c  9,456 IC symbol drawing (switch on 7400..7440)  21ab 3,056 file dialog ("Name:")
+   226a  8,192 dialogs/windows                    246a  1,696 IC tester + speaker siren
+   24d4  1,360 probe prompts                      2529  4,896 fault location, guided probe, BOARD I/O
+   265b  2,848 menu command dispatcher
+  Size split (code only, 175,424 B): user 131,248 B (74.8%), RTL 17,696 (10.1%),
+  BGI 15,472 (8.8%), classlib 8,992 (5.1%), SPARR 2,016 (1.1%).                        [V arithmetic]
+  Segment order puts classlib modules (1d2a..1f58) BETWEEN user modules, so the classlib
+  .CPP sources were most likely compiled/listed inside his project (a .LIB would link after
+  all user objs). Assertions compiled in (NDEBUG not defined).                         [S]
+  ~540 user functions (count of stack-check prologues).                                [V approx]
+
+1. TOOLCHAIN / MEMORY MODEL
+  - "Borland C++ - Copyright 1991 Borland Intl." at DS:0004 => BC++ 2.0 or 3.0 (3.1 says 1992). [V string, S version]
+  - LARGE model [V]: far calls everywhere; c0 calls main FAR with far argv/envp; DS=2af1 != SS.
+      0000:00e8  ff367300   push word ptr [0x73]     ; envp (seg)
+      0000:00ec  ff367100   push word ptr [0x71]     ; envp (off)
+      0000:00f0  ff366f00   push word ptr [0x6f]     ; argv (seg)
+      0000:00f4  ff366d00   push word ptr [0x6d]     ; argv (off)
+      0000:00f8  ff366b00   push word ptr [0x6b]     ; argc
+      0000:00fc  9a0f009d0e lcall 0x0e9d:0x000f      ; main()
+      0000:0101  50         push ax
+      0000:0102  9aec030000 lcall 0x0000:0x03ec      ; exit()
+  - main() = 0e9d:000f. Options visible in code: 80186 instructions (-1: enter, push imm, shl r,imm) =>
+    needs a 286-class CPU [V]; stack checking on (-N: every function starts "cmp [0x165c],sp; ja; call
+    overflow", "Stack overflow!" string) [V]; no optimisation (eb00 "jmp next", store/reload of the
+    same local) [S]. Some globals live in their own far segments (2ad4..2aea) [V].
+  - C++ evidence [V]: vtables at DS:0335 (Gate), 0381 (logic base), 04ee, 058a (Wire), 072e (Node),
+    0788 (Prime), 0842 (ScreenImage), 0972 (Technology), 0a33/0a47 (Group/entry);
+    "Pure virtual function called"; Borland 2.0/3.0-style constructors "if (this==0) this=operator new(size)":
+      0eff:000e 8b4606 mov ax,[bp+6] / 0b4608 or ax,[bp+8] / 7402 je / ... 6a1c push 0x1c /
+      9a5f00ac1e lcall 0x1eac:0x5f (operator new)
+  - Fonts/driver: EGAVGA.BGI and *.CHR are loaded from disk at run time (no "pk\x08\x08BGI"
+    signature inside the EXE; BGI driver table entries have null pointers; ".BGI"/".CHR" suffix strings) [V].
+    settextstyle constant args use font 1 (TRIPLEX -> TRIP.CHR) and 0 (built-in) [V]; one site in 0fbd
+    passes a variable font; GOTH/SANS/LITT may be unused [?].
+  - initgraph is called TWICE [V]: main 0e9d:0171 with driver=2 (MCGA -> CGA.BGI, absent) and an
+    UNINITIALISED mode variable, result never checked; then 197b:18c1 with DETECT, path "" (current dir),
+    graphresult checked -> exit(1). The first call is dead weight that fails harmlessly [S].
+    Frame coordinates 639x479 => VGA 640x480x16 (VGAHI) on a VGA card [S].
+  - No mouse (no INT 33h anywhere) [V]; keyboard via RTL bioskey (INT 16h at 0000:12a3) [V];
+    no direct video-memory writes in user code (only RTL conio has B800) [V].
+
+2. ASSEMBLY vs C++
+  Every user function has the compiler prologue + stack check [V], so there are no separate
+  hand-written .ASM modules. Assembly exists only as inline asm blocks. Fingerprint: the inline
+  assembler encodes reg,reg ops as 31/89/88 (e.g. 31db xor bx,bx; 89d8 mov ax,bx; 88e0 mov al,ah)
+  while the compiler and RTL always use 33/8b/8a [V]. Blocks found:
+   a) 2529:0b2c board output: bit-reverse a byte, OUT 301h, OUT 300h (see 3)
+   b) 246a:0018 two-tone siren on the PC speaker (PIT ch.2, ports 43h/42h/61h), CPU-speed delay
+      "mov cx,0ff00h; loop $" x20
+   c) 1c5c:001e/004a/0071 raw DOS open/write/read wrappers (push regs; int 21h; no error check).
+      Only the write (1c5c:003c) is used: 27 calls, all from the .CIR save (17d2). The open uses
+      AL=3 (invalid DOS access mode) but is dead code.
+   d) 0452:0029 printer: mov dl,c; mov ah,5; int 21h per character (DOS PRN output)
+  Total inline asm < 200 bytes of 131 KB user code [S].
+
+3. HARDWARE INTERFACE (the lost test board)
+  Only user port I/O is in 2529 (other "in al,dx" hits are mis-decoded 55 8b ec bytes) [V].
+  Ports 300h/301h = IBM "prototype card" I/O range => the board was an ISA card, not LPT/game port [S].
+      2529:0b20 c45e0a     les bx,[bp+0xa]          ; word *p (test vector)
+      2529:0b23 268b07     mov ax,es:[bx]
+      2529:0b2c b400       mov ah,0
+      2529:0b2e b90800     mov cx,8                  ; inline asm: reverse 8 bits
+      2529:0b31 31db       xor bx,bx
+      2529:0b33 d1e8       shr ax,1
+      2529:0b35 d1d3       rcl bx,1
+      2529:0b37 e2fa       loop 0xb33
+      2529:0b39 89d8       mov ax,bx
+      2529:0b3b ba0103     mov dx,0x301
+      2529:0b3e ee         out dx,al                 ; drive 8 probe inputs (bit-reversed)
+      2529:0b3f 86e0       xchg al,ah
+      2529:0b41 d1e8       shr ax,1
+      2529:0b43 ba0003     mov dx,0x300
+      2529:0b46 ee         out dx,al                 ; write 300h (strobe/latch?)  [?]
+      2529:0b4b..0b57      for(i=0;i<2000;i++) w = in(0x300)   ; settle delay + sample
+      2529:0b5f 268907     mov es:[bx],ax            ; response written back to *p
+  Protocol: write 8-bit stimulus (bit-reversed, probably to match board wiring) to 301h, write 300h,
+  then read 300h 2000 times and keep the last sample as the circuit response [V mechanism, ? meaning].
+  The stored word keeps junk in AH (AH = reversed>>1 from the stimulus) [V] - callers must mask.
+  2529:0b65 guided probe: prompts "Place the guided probe here", reads 300h 2001 times, tests bit 3:
+  returns 1 (low) or 2 (high) = the program's logic codes for 0/1 [V]. ISA reads take ~1 us each, so
+  the 2000-read loop is roughly CPU-independent (~2 ms) [S]; the speaker siren delay is not.
+
+4. ARABART
+  No INT 10h AH=36h anywhere (INT 10h only in RTL conio init with fixed AH), no int86/geninterrupt
+  with 36h, no Arabic text. programs.ts needsArabart:true is NOT needed for MAIN.EXE [V static].
+
+5. DATA FILE FORMATS (decoder: digit/decode_formats.py; output digit/decode_formats.out.txt;
+   all 70 .CIR/.GAT/.IC/.TCK files parse exactly to their trailer and all 170 wire paths re-trace
+   to their endpoints)
+  Common frame [V, code + all files]:
+    ASCII header "Copyright 1993 by KEMYAM (c) For <X> Save" padded to fixed length, then 0x1A
+    (Ctrl-Z, so DOS TYPE stops after the copyright), gap (lseek hole, uninitialised), payload,
+    then uint32 LE trailer = total file size. Load: filelength, seek -4, compare, else error 1.
+  Catalog "GROUP.<ext>" (Group class, 1c5c:07c9 save / 09d3 load):
+    0x00 "Copyright 1993 By KEMYAM (C) " (31 B) ; 0x1F 0x1A ; 0x32 u16 count ;
+    count x { char name[12]; u8 flag } ; trailer.  Member files are FIL<i>.<ext>, i = index.
+    Saving FILi first deletes BFLi and renames old FILi -> BFLi (one-level backup) [V 1c5c:021a-02a0].
+    GROUP.CIR: KEMYAM, CONECTINON, TEST2, TEST, NAND_2_INP, ANY_THING, NOTHING_1..3 (FIL0..8.CIR)
+    => README's "KEMYAM" circuit = FIL0.CIR [V].
+    GROUP.GAT: Nand2_1 Nor2_1 And2_1 Nand3_1 Nand4_1 And3_1 Nor3_1 Nand8_1 Or2_1 (FIL0..8.GAT)
+    GROUP.IC : 28 TTL parts 7400..7440 (FIL0..27.IC)   GROUP.TCK: TTL, TTLOpenC (FIL0..1.TCK)
+  .GAT (header 0x2D, data 0x32): u8 nIn, u8 nOut, u8 controlling value, u8 inversion, u16 dual-output.
+    Values use the logic codes (1 = '0', 2 = '1'): AND=(1,1) NAND=(1,2) OR=(2,1) NOR=(2,2) [V].
+  .IC (header 0x2D, data 0x3C): u8 npins; npins x {u8 gate#, u8 pin type (0x20 in, 0x40 out,
+    0x10 GND, 0x02 VCC, 0 = NC with gate 255), u8 0, u8 pin# within gate}; char gatetype[12];
+    u8 +24 (symbol class: 1 gate, 2 inverter, 3 buffer [S]); u8 +26 gates per package [V];
+    u8 +25 technology index (1 = TTLOpenC) [V: set on exactly 7401/03/05/06/07/09/12/16/17/33/38/39];
+    u16 +27 (always 0).
+  .TCK (header 0x34, data 0x3C): u8 +13, u16 +1c (=546 both), u8 +18, u8 +19, u8 +1a open-collector
+    flag (TTL 0, TTLOpenC 1) [V], 5 bytes, u16 n, n text bytes (empty).  "TCK" = "Tecknologies"
+    (logic family), NOT a clock [V].
+  .CIR "ScreenImage" (17d2:1585 save; header 0x34, data 0x3C): u16 N; non-wire objects first, then
+    wires; each {i16 x, i16 y, u8 type} + type data (grid units):
+      type 0 IC   : u8 +18, char part[12] ("7404"), u8 +1a (instance no.), u8 +19
+      type 3 NODE : u8 node no.
+      type 4 PRIME: u8 number, u8 side, u16 kind (0x20 P/I, 0x40 P/O, 0x02 VCC, 0x10 GND) - same bit
+                    codes as IC pin types [V]
+      type 2 WIRE : u16 endX, u16 endY, u8 pinA, u8 pinB, u16 x4 endpoint references, u16 n, n bytes path
+    WIRE path = numeric-keypad directions (8 up, 2 down, 4 left, 6 right, 7/9/1/3 diagonals) walked
+    from the end point back to (x,y); byte 0x60|(dir+4) = jump 7 cells; 0 terminator.
+    [V: 148 plain + 22 jump paths = 170/170 land exactly on the start point].
+    KEMYAM (FIL0.CIR): 7404, 7408, 7411, 7432; 8 inputs, 1 output, VCC, GND, 8 nodes, 38 wires [V].
+    FIL6..8.CIR ("NOTHING_1..3") are empty circuits.
+  Uninitialised memory written to disk [V]: name fields are strcpy'd into unzeroed 12-byte buffers
+    and the lseek gap is never written. GROUP.IC entries 8-16 contain fragments "streamb", "off@st",
+    "ambuf@s", "buffere", "@ios@", "se$qv" = Borland C++ mangled iostream names that MAIN.EXE itself
+    does not contain; GROUP.TCK holds "FDREAD  EXE" (an 8.3 directory-entry style name). So the files
+    captured leftover RAM from other programs run earlier on his machine (compiler/linker or a tool
+    called FDREAD) [S for origin].
+  HEADDER.PRN / FOOTTER.PRN: NOT Digi-Test files [V]. MAIN.EXE has no reference to them; they are
+    Epson ESC/P 8-pin bit-image streams (ESC 3 n line spacing, ESC Y n = 120-dpi graphics).
+    Rendered (digit/prn2png.py -> digit/headder.png, digit/footter.png): an Arabic medical-lab
+    letterhead: "Doctor Taher Ibrahim El-Sarafy, Professor of Medical Analysis, Faculty of Medicine"
+    and "Doctor Ferdous Ahmed Rizk, Specialist in Medical Analysis and Blood Diseases"; footer with
+    a Port Said street address, opening hours (5-8 pm, Thu/Fri closed) and a phone number.
+    => these belong to the TAHER lab-results printing job (README TAHER) and are the only surviving
+    output of that software [S]. The calligraphic names suggest ARABART fonts [?].
+    Privacy: suggest the site omits the phone number/address.
+
+6. SIMULATION / ANALYSIS ALGORITHMS
+  Logic values (0d8d:047a complement table) [V]: 1 = 0, 2 = 1, 6 = D-bar, 9 = D, 15 = X
+  (complement: 1<->2, 6<->9, else X). 5-valued D-calculus (Roth) AND/OR at 0d8d:034c/03e3 [V]:
+  AND: equal -> same; any 0 -> 0; 1 with v -> v; any X -> X; D with D-bar -> 0.
+  Gate model [V]: a gate is (controlling value c, inversion i). Gate::evaluate (0eff:0120, vtable
+  slot 13):
+      0eff:0178..01ce for each input v (slot si):
+         v == c          -> output determined
+         v == not c      -> ++nNonControlling
+         v == 6 / v == 9 -> ++nDbar / ++nD   (both present -> determined, D AND D-bar = 0)
+         else            -> ++nX
+      determined -> out = c ; all non-controlling -> out = not c ; only D/D-bar left -> out = D or D-bar;
+      X mixed with D/D-bar -> mark gate +0x16 |= 1 (D-frontier) and return.
+      out = XOR(out, i) built from the 5-valued AND/OR/NOT (0eff:0330). If the output pin changes,
+      set it (0d8d:0725, conflict check 0d8d:1090) and set event flag 0x40 on the pin. If +0x1a != 0 a
+      complementary second output is also driven.
+  Pin record = 6 bytes: 5 value slots + flag byte (0x40 changed, 0x08 ...). 0d8d:0654 copies slot 0
+  into slot k = save state for backtracking [S]. 048b:2a16 is recursive and resets values to X (0x0f)
+  on return => backtracking test generation (D-algorithm style) [S].
+  Fault model: D/D-bar values = stuck-at fault effects [S]; menu "make a dectionary" (048b:3bd8 then
+  048b:2666, a fixed pipeline of ~10 passes) builds a fault dictionary; "UNDETECTABLE" lists faults with
+  no test; "DETECT FAULT" (2529:0005) applies vectors through the board (2529:0b10), compares, then
+  traces D/D-bar back through gates (2529:03c9 recursive) and runs the guided probe ("Possible fault
+  locations", "Place the guided probe here") [S]; "IC TESTER" (2529:1251) [S].
+  Truth table (048b:24da) [V]: allocate nIn input codes = 1 (all 0), rows = 2^nIn (shl loop), for each
+  row: simulate (1485:0349 + virtual evaluate), print row, then increment an odometer of logic codes:
+      048b:25f4 26803801  cmp byte es:[bx+si],1   ; input is '0' ?
+      048b:25fd 26c60002  mov byte es:[bx+si],2   ;  -> becomes '1', stop
+      048b:2608 26c60001  mov byte es:[bx+si],1   ; else '1' -> '0', carry to next input
+  Output goes straight to the printer via DOS INT 21h AH=05 (0452:000f inline asm), text table with
+  "IP |", "OP |", "0 |", "1 |" cells. Row count is a 16-bit int => <= 15 inputs [S].
+
+7. BUGS / FRAGILITY
+  [V] Text-mode write corrupts files: _fmode default 0x4000 (O_TEXT) never changed; save opens with
+      open(name, 0x302 = O_WRONLY|O_CREAT|O_TRUNC, no O_BINARY) (1c5c:02a3) and Gate/IC/TCK fields
+      and the length trailer go through RTL write() which turns 0x0A into 0D 0A (0000:1113). Any saved
+      file whose size has a 0x0A byte (e.g. 266 or 2,570 bytes), or any data byte 0x0A in .GAT/.IC/.TCK,
+      becomes 1 byte longer and fails its own trailer check on load. .CIR bodies are immune (raw
+      inline-asm writes) but the trailer is not. None of the 75 shipped files hit it (no 0x0A in the
+      text-written parts).
+  [V] Library data errors: 7413/7420/7421/7440 share one copied pin map with pin 4 marked OUTPUT and
+      pin 9 assigned to gate 0 (should be inputs of gate 0 / gate 1); 7440 typed And4_1 (it is a NAND);
+      7426 (open-collector NAND) not flagged open-collector.
+  [V] ICs reference gate types "Not", "Buffer", "And4_1" that are not in GROUP.GAT (only 9 gates);
+      affected: 7(hidden), 7416, 7417, 7421, 7440. The CONECTINON circuit (FIL1) uses 7404s [?: effect].
+  [V] Uninitialised RAM saved into files (see 5).
+  [V] initgraph(MCGA, uninitialised mode) first call, unchecked.
+  [V] 286+ only (enter/push imm); no mouse; CPU-speed siren delay.
+  [V] Board read keeps junk high byte (AH) in the response word.
+  [S] Raw inline-asm writes ignore DOS errors (disk full) - but the trailer catches truncation on load.
+
+8. MUSEUM EXCERPTS (suggested): 3) board I/O block; 6) gate evaluation counting loop (0eff:0178-01ce)
+   or complement table; 6) truth-table odometer; 5) wire path = keypad arrows.
+Artifacts: digit/decode_formats.py (+ .out.txt), digit/prn2png.py, digit/headder.png, digit/footter.png,
+digit/farcalls.py, digit/segstrings.py, digit/segdis.py, digit/dis/*.txt.

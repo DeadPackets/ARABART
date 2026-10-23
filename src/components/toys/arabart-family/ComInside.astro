@@ -1,0 +1,185 @@
+---
+// His 152-byte player (DEMO.COM CS:0113-01AA) in the CodeStepper beside the C, run on the real first bytes of slide 1.
+// The linked view shows the script being read, the code bytes it rewrites, and the pixels as they land.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import CodeStepper from '../CodeStepper.astro';
+import Window from '../../shell/Window.astro';
+import { parse, SCRIPT_AT } from './com.ts';
+import { hex } from '../arabart/core.ts';
+import { NAMES } from './vga.ts';
+
+interface Props { id?: string }
+const { id = 'cominside' } = Astro.props;
+const com = new Uint8Array(readFileSync(join(process.cwd(), 'public/bytes/files/ARABIC_DEMO.COM.mem')));
+const line = parse(com).lines[0];
+
+type L = { k: string; off?: string; label?: string; code: string; note?: string };
+const ASM: L[] = [
+  { k: 'si', off: '0113', code: 'mov  si,01ECh', note: 'the script' },
+  { k: 'mode', off: '0116', code: 'mov  ax,0010h', note: '640 x 350' },
+  { k: 'int', off: '0119', code: 'int  10h', note: 'and a clean screen' },
+  { k: 'h0', off: '011E', code: 'mov  [0149h],al', note: 'write: step for x' },
+  { k: 'h1', off: '0124', code: 'mov  [0151h],al', note: 'write: step for w' },
+  { k: 'h2', off: '012A', code: 'mov  [0174h],al', note: 'write: shadow jump' },
+  { k: 'h3', off: '0130', code: 'mov  [016Dh],al', note: 'write: letter color' },
+  { k: 'h4', off: '0136', code: 'mov  [0176h],al', note: 'write: shadow color' },
+  { k: 'row', off: '0139', code: 'mov  di,[si]', note: 'start row' },
+  { k: 'col', off: '013D', code: 'mov  bx,[si]', note: 'start column' },
+  { k: 'next', off: '0141', label: 'next', code: 'mov  dl,[si]', note: 'one script byte' },
+  { k: 'isx', off: '0144', code: 'cmp  dl,78h', note: 'x?' },
+  { k: 'stepx', off: '0149', code: 'inc  bx', note: 'rewritten: dec bx' },
+  { k: 'isw', off: '014C', code: 'cmp  dl,77h', note: 'w?' },
+  { k: 'isy', off: '0154', code: 'cmp  dl,79h', note: 'y: next line' },
+  { k: 'isz', off: '0159', code: 'cmp  dl,7Ah', note: 'z: the end' },
+  { k: 'is88', off: '015E', code: 'cmp  dl,88h', note: 'next slide' },
+  { k: 'add', off: '0165', code: 'add  dx,di', note: 'the row' },
+  { k: 'len', off: '0167', code: 'mov  cl,[si]', note: 'how many pixels' },
+  { k: 'px', off: '016C', label: 'px', code: 'mov  ax,0C00h', note: 'rewritten: color' },
+  { k: 'x1', off: '016F', code: 'xchg bx,cx' },
+  { k: 'p1', off: '0171', code: 'int  10h', note: 'one pixel' },
+  { k: 'jmp', off: '0173', code: 'jmp  +0', note: 'rewritten: 0 or 0Dh' },
+  { k: 'sh', off: '0175', code: 'mov  ax,0C00h', note: 'rewritten: shadow' },
+  { k: 'mv', off: '0178', code: 'inc  cx / inc cx', note: 'x + 2' },
+  { k: 'mv2', off: '017A', code: 'inc  dx / inc dx', note: 'y + 2' },
+  { k: 'p2', off: '017C', code: 'int  10h', note: 'its shadow' },
+  { k: 'back', off: '017E', code: 'dec  cx / dec cx', note: 'back again' },
+  { k: 'down', off: '0182', code: 'inc  dx', note: 'one row down' },
+  { k: 'loop', off: '0185', code: 'loop px', note: 'the rest' },
+  { k: 'again', off: '0187', code: 'jmp  next' },
+];
+const C: L[] = [
+  { k: 'si', code: 'byte *s = script;' },
+  { k: 'mode', code: 'set_mode(0x10);', note: 'and clears' },
+  { k: 'h0', code: 'code[0x149] = *s++;', note: 'his code' },
+  { k: 'h1', code: 'code[0x151] = *s++;' },
+  { k: 'h2', code: 'code[0x174] = *s++;' },
+  { k: 'h3', code: 'code[0x16D] = *s++;' },
+  { k: 'h4', code: 'code[0x176] = *s++;' },
+  { k: 'row', code: 'row0 = word(s); s += 2;' },
+  { k: 'col', code: 'col = word(s); s += 2;' },
+  { k: 'for', code: 'for (;;) {' },
+  { k: 'next', code: '  b = *s++;' },
+  { k: 'isx', code: "  if (b == 'x') { col--; continue; }" },
+  { k: 'isw', code: "  if (b == 'w') { col++; continue; }" },
+  { k: 'isy', code: "  if (b == 'y' || b == 'z' || b == 0x88)" },
+  { k: 'brk', code: '    break;' },
+  { k: 'add', code: '  row = row0 + b; n = *s++;' },
+  { k: 'while', code: '  while (n--) {' },
+  { k: 'p1', code: '    plot(col, row, color);' },
+  { k: 'sh', code: '    if (shadow)' },
+  { k: 'p2', code: '      plot(col + 2, row + 2, shade);' },
+  { k: 'down', code: '    row++;' },
+  { k: 'close', code: '  }' },
+  { k: 'end', code: '}' },
+];
+const ai = (k: string) => ASM.findIndex(l => l.k === k), ci = (k: string) => C.findIndex(l => l.k === k);
+
+// Pixel operations in his order, and the steps that walk through the first strokes
+const ops: number[] = []; // x, y, color triples
+const steps: { a: number; c: number; say: string; regs: { name: string; value: string; means: string }[]; si: number; px: number; patch: number; col: number; row: number }[] = [];
+let si = SCRIPT_AT, px = 0, patch = 0, col = 0, row = 0, row0 = 0;
+const R = () => [
+  { name: 'SI', value: `${hex(si + 0x100, 4)}h`, means: 'where it is reading' },
+  { name: 'BX', value: String(col), means: 'the column' },
+  { name: 'DX', value: String(row), means: 'the row' },
+];
+const push = (a: string, c: string, say: string) => steps.push({ a: ai(a), c: ci(c), say, regs: R(), si, px, patch, col, row });
+push('si', 'si', 'His read pointer starts at the script: 25,653 bytes that hold all fifteen slides.');
+push('mode', 'mode', 'Graphics mode 10h: 640 by 350 pixels, 16 colors. Setting the mode also gives a clean, black screen.');
+const HS: [string, string][] = [
+  ['h0', `The first header byte, <b>4Bh</b>, is written over his own instruction at 0149h. <code>inc bx</code> becomes <code>dec bx</code>: from now on, the script byte “x” moves one column to the <b>left</b>. Arabic runs right to left.`],
+  ['h1', 'The second, <b>43h</b>, goes to 0151h: “w” now moves one column to the right.'],
+  ['h2', 'The third, <b>00h</b>, is the distance of a short jump at 0173h. A jump of 0 lands on the very next line, so the shadow <b>is</b> drawn. 0Dh would skip it.'],
+  ['h3', `The fourth, <b>${hex(line.face)}h</b>, becomes the color inside <code>mov ax,0C${hex(line.face)}h</code>: the letters will be ${NAMES[line.face]}.`],
+  ['h4', `The fifth, <b>${hex(line.shade)}h</b>, is the shadow’s color: ${NAMES[line.shade]}. Five bytes, and one loop is set up for this whole line of text.`],
+];
+for (const [k, say] of HS) { si++; patch++; push(k, k, say); }
+row0 = line.row0; si += 2; row = row0; push('row', 'row', `The line starts at row <b>${row0}</b>.`);
+col = line.col0; si += 2; push('col', 'col', `And at column <b>${col}</b>, its right edge.`);
+// Walk the script bytes for the first strokes
+let done = 0;
+for (let p = line.at + 9; done < 9; ) {
+  const b = com[p];
+  if (b === 0x78) {
+    si = ++p; col--; push('next', 'next', 'Next script byte: <b>78h</b>, the letter “x”.');
+    push('stepx', 'isx', `The rewritten <code>dec bx</code> runs: one column to the left, column <b>${col}</b>.`);
+    continue;
+  }
+  const n = com[p + 1];
+  si = ++p; push('next', 'next', `Next script byte: <b>${hex(b)}h</b>. Not a command, so it is the first half of a stroke.`);
+  row = row0 + b; si = ++p; push('len', 'add', `Row ${row0} + ${b} = <b>${row}</b>. The next byte says how long the stroke is: <b>${n} pixels</b>, straight down.`);
+  for (let k = 0; k < n; k++) {
+    ops.push(col, row, line.face);
+    if (line.shadow) ops.push(col + 2, row + 2, line.shade);
+    px = ops.length / 3;
+    if (done === 0 && k < 2) {
+      push('p1', 'p1', `One pixel in ${NAMES[line.face]} at (${col}, ${row}), through the video service.`);
+      push('p2', 'p2', `Then the same pixel two columns right and two rows down, in ${NAMES[line.shade]}: its shadow.`);
+      row++; push('down', 'down', 'One row down.');
+    } else row++;
+  }
+  if (done === 0) push('loop', 'while', `The rest of the stroke the same way: ${n} pixels, ${n * 2} calls.`);
+  else push('loop', 'while', `A stroke of ${n} pixels at column ${col}.`);
+  done++;
+}
+push('again', 'end', 'And so on, byte by byte: this line has 368 strokes, the whole show 9,023. Every slide of the commercial comes out of this one loop.');
+// The view: the script bytes it reads, and a close-up of the pixels
+const tape = [...com.subarray(line.at, line.at + 44)].map((b, i) => ({ b: hex(b), at: line.at + i }));
+const view = { x0: 476, y0: 160, w: 18, h: 26 };
+---
+
+<CodeStepper id={id} title="DEMO.COM  his player" cTitle="The same in C" asm={ASM.map(({ k, ...l }) => l)} c={C.map(({ k, ...l }) => l)} steps={steps} at={0} speed={0.6}>
+  <div slot="visual" class="comi" data-cominside data-for={id} data-ops={JSON.stringify(ops)} data-view={JSON.stringify(view)}>
+    <Window title="THE SCRIPT  bytes it reads" kind="panel" num="4" class="comi-tape-win">
+      <div class="comi-tape" data-tape>
+        {tape.map((t, i) => <span data-at={t.at} class:list={{ head: i < 9 }}>{t.b}</span>)}
+      </div>
+      <div class="comi-key"><span class="head">header: 5 code bytes, row, column</span><span>strokes: row, length</span><span class="x">x: next column</span></div>
+    </Window>
+    <Window title="VGA  close up" kind="screen" class="comi-scr-win">
+      <div class="comi-scr"><canvas width={view.w} height={view.h} aria-hidden="true" style={`aspect-ratio:${view.w}/${(view.h * 1.37).toFixed(1)}`}></canvas></div>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .comi { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .comi-tape { display: flex; flex-wrap: wrap; gap: 3px; font: 700 13px/1 var(--font-code); }
+  .comi-tape span { padding: 5px 4px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .comi-tape span.head { box-shadow: inset 0 0 0 1px var(--accent); }
+  .comi-tape span.x { color: var(--accent-2); }
+  .comi-tape span.read { color: var(--ink); }
+  .comi-tape span.now { color: var(--surface); background: var(--accent); box-shadow: none; }
+  .comi-key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font: 500 0.8125rem/1.4 var(--sans); color: var(--ink-2); }
+  .comi-key .head { color: var(--accent); }
+  .comi-key .x { color: var(--accent-2); }
+  .comi-scr { display: grid; place-items: center; height: 100%; min-height: 200px; background: var(--vga-0); }
+  .comi-scr canvas { width: auto; height: 100%; max-height: 320px; image-rendering: pixelated; }
+  @media (max-width: 1023px) { .comi { grid-template-columns: minmax(0, 1fr); } .comi-scr { min-height: 0; } .comi-scr canvas { height: 220px; } }
+</style>
+
+<script>
+  import { frame, show } from './vga.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-cominside]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!) as HTMLElement & { stepper?: { i: number } };
+    const ops: number[] = JSON.parse(vis.dataset.ops!), v = JSON.parse(vis.dataset.view!);
+    const cells = [...vis.querySelectorAll<HTMLElement>('[data-at]')], canvas = vis.querySelector('canvas')!;
+    const steps = JSON.parse(root.querySelector('[data-trace]')!.textContent!) as { si: number; px: number }[];
+    cells.forEach(c => { if (c.textContent === '78') c.classList.add('x'); });
+    const f = frame(v.w, v.h);
+    const paint = (i: number) => {
+      const s = steps[i];
+      cells.forEach(c => { const at = +c.dataset.at!; c.classList.toggle('read', at < s.si); c.classList.toggle('now', at === s.si - 1 && i > 1); });
+      f.data.fill(0);
+      for (let k = 0; k < s.px; k++) {
+        const x = ops[3 * k] - v.x0, y = ops[3 * k + 1] - v.y0;
+        if (x >= 0 && x < v.w && y >= 0 && y < v.h) f.data[y * v.w + x] = ops[3 * k + 2];
+      }
+      show(canvas, f);
+    };
+    root.addEventListener('stepper', e => paint((e as CustomEvent).detail.i));
+    paint(root.stepper?.i ?? 0);
+  });
+</script>

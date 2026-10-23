@@ -1,0 +1,85 @@
+---
+// PORTSAID.EXE, the Port Said Computer Systems boot screen (1993). Facts: research/programs.md section 7,
+// research/artifacts/programs/gfxprogs/NOTES.txt, portsaid_user.txt and his unpacked file
+// (public/bytes/files/PORTSAID_PORTSAID.EXE.mem). The toys play his pictures through a port of his code
+// (src/components/toys/graphics/rle/rle.ts) that matches the screenshot of the real program.
+import Boot from '../components/toys/graphics/rle/Boot.astro';
+import FlyIn from '../components/toys/graphics/rle/FlyIn.astro';
+import Bounce from '../components/toys/graphics/rle/Bounce.astro';
+import Finder from '../components/toys/graphics/rle/Finder.astro';
+import Twins from '../components/toys/graphics/rle/Twins.astro';
+import Term from '../components/explain/Term.astro';
+import Deep from '../components/explain/Deep.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+
+const base = import.meta.env.BASE_URL;
+const kemyam = `${base}/program/kemyam-splash/`;
+---
+
+<section id="ps-boot">
+  <h2>The screen every PC showed</h2>
+  <p class="lead">Every computer that Port Said Computer Systems sold greeted its owner with this screen. It is a small film, and his own code draws every frame.</p>
+  <Boot />
+  <div class="ps-cols">
+    <p>The four pieces of the red PCS logo fly in from the right. The company's Arabic name, <span lang="ar" dir="rtl">بورسعيد للحاسبات</span>, opens like a curtain, falls and bounces into place. Then the English name appears beneath it.</p>
+    <p>He wrote it in <Term id="turbo-c">Turbo C++</Term>, with the drawing done in <Term id="inline-asm">inline assembly</Term>: 2,318 bytes of his code and 24,993 bytes of pictures, all in one file. Drag the bar to any of its 659 draws, or pick a part and watch it again.</p>
+  </div>
+</section>
+
+<section id="ps-fly" aria-labelledby="ps-fly-h">
+  <h2 id="ps-fly-h">Four tiles, four straight lines</h2>
+  <p class="lead">The logo is four tiles, 64 by 79 pixels each. Each one flies on a straight line in 100 steps: two from the top right corner, two from below the bottom edge.</p>
+  <div class="ps-cols">
+    <p>The line is plain school math. Divide the distance by the number of steps, then add that much to x and y at every step. The steps are decimals, 5.12 pixels across for each row down, so the path stays perfectly straight. It is the way a CSS transition moves an element from one point to another.</p>
+    <p>Each step, x is cut to a whole pixel and then to a whole byte, x ÷ 8, because the screen stores eight pixels in a byte. So the tiles glide down a row at a time and across in hops of eight pixels. Nothing is erased between steps. The first tile paints a red ribbon across the screen, and the tile that follows the same path rolls it back up behind it. Step through his loop below and watch the numbers.</p>
+  </div>
+  <FlyIn />
+  <Deep title="For engineers: decimals in a tiny program">
+    <p>The decimals are C <code>double</code>s. Turbo C++ compiles each math instruction as a call to Borland's <Term id="float-emulator">floating-point emulator</Term>, which uses the math chip when the PC has one and does the work in software when it does not, so the logo flies on every PC. The emulator needs ten addresses that DOS fills in when the program loads, a <Term id="relocation">relocation</Term> table, so this tiny-model program ships as an <Term id="exe-file">EXE</Term> that starts like a .COM, at offset 100h.</p>
+  </Deep>
+</section>
+
+<section id="ps-drop" aria-labelledby="ps-drop-h">
+  <h2 id="ps-drop-h">A curtain, a drop, a bounce</h2>
+  <p class="lead">The Arabic name enters in three acts. It opens at the top of the screen, falls to its place, and bounces four times, each bounce smaller than the last.</p>
+  <Bounce />
+  <div class="ps-cols ps-after">
+    <p>The curtain takes 80 draws, one more byte of every row each time. Even rows slide in from the left, odd rows from the right, and they meet as a whole name. It is the comb effect from his <a href={kemyam}>KemYam splash</a>, now a C function.</p>
+    <p>The bounce has no physics engine. It is nine straight moves, each with numbers he chose: down to row 123, up 13 rows, down, up 6, down, up 4, down, up 1, down. Each bounce is lower and quicker than the one before, so the name slows as it settles, like an ease-out curve drawn by hand.</p>
+  </div>
+</section>
+
+<section id="ps-inside" aria-labelledby="ps-inside-h">
+  <h2 id="ps-inside-h">Pictures inside the code</h2>
+  <p class="lead">There are no picture files. All six pictures sit inside the program, between its functions, and the code points at each one by its own address.</p>
+  <Finder />
+  <div class="ps-cols ps-after">
+    <p>A PC address of the time has two parts, like a street and a house number: a <Term id="segment">segment and an offset</Term>. His code asks which street it is running on, then splits each picture's place in two. <Term id="hex">6375h</Term> becomes the street plus 637h, and house number 5. The house number stays small, so the decoder has room to read the whole picture. This pair is a <Term id="far-pointer">far pointer</Term>.</p>
+    <p>Each picture starts with its width and height, then his packed layers. The Arabic name packs from 18,560 bytes to 9,400. With the pictures inside, the program is one file: copy it to a new PC and nothing can go missing.</p>
+  </div>
+  <ThenNow
+    rows={[
+      { then: 'Pictures stored inside the program, between its functions', now: 'Images inlined in a JavaScript bundle as <code>data:</code> URLs', why: 'One file to ship, and nothing to lose on the way.' },
+      { then: 'A straight line with a decimal step added every frame', now: 'A CSS transition or a <code>gsap.to</code> tween with linear easing', why: 'Start, end and a number of steps; the math fills in the rest.' },
+      { then: 'Nine moves, smaller and smaller, to make a bounce', now: 'A keyframe animation with an ease-out bounce', why: 'Smaller and smaller rebounds read as weight settling.' },
+    ]}
+  />
+</section>
+
+<section id="ps-twins" aria-labelledby="ps-twins-h">
+  <h2 id="ps-twins-h">Code that moved house</h2>
+  <p class="lead">The heart of this boot screen came from his KemYam splash. He carried his assembly into C functions, and 153 bytes arrived exactly as he first wrote them.</p>
+  <Twins />
+  <div class="ps-cols ps-after">
+    <p>In the KemYam splash the decoder finds its input in fixed memory cells. Here it is a C function. Turbo C++ writes the entry and the exit, and his inline assembly reads its four arguments from the <Term id="stack-frame">stack frame</Term>. The middle, 22 bytes, is the same loop. It is what you do today when you move tested code into a shared package with a new interface.</p>
+    <p>The layer copy, the refresh wait, the key wait and his signature with its spark came along the same way. To see how the decoder, the color layers and the spark work, step through them on the <a href={kemyam}>KemYam splash page</a>.</p>
+  </div>
+</section>
+
+<style>
+  .ps-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px clamp(24px, 4vw, 48px); margin-top: 28px; }
+  .ps-cols p { margin: 0 !important; }
+  .ps-after { margin-top: 32px; }
+  #ps-boot :global(.ps-boot), #ps-fly :global(.k-cs), #ps-drop :global(.ps-bn), #ps-inside :global(.ps-fd), #ps-twins :global(.ps-tw) { margin-top: 32px; }
+  @media (max-width: 760px) { .ps-cols { grid-template-columns: minmax(0, 1fr); } }
+</style>

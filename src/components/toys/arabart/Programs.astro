@@ -1,0 +1,88 @@
+---
+// His programs that called ARABART, in a Norton Commander pair of panels: the files on the left, the selected one
+// on the right. Without JS every program shows, one under the other.
+import Window from '../../shell/Window.astro';
+
+interface Item { file: string; size: string; date: string; title: string; img: string; alt: string; href: string; body: string }
+interface Props { items: Item[]; dir?: string }
+const { items, dir = 'C:\\ARABART' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+
+<div class="pg" data-programs>
+  <Window title={dir} kind="panel" active class="pg-list">
+    <div class="pg-cols" aria-hidden="true"><span>Name</span><span>Size</span><span>Date</span></div>
+    <div role="tablist" aria-orientation="vertical" aria-label="His programs that call ARABART" class="pg-tabs" hidden>
+      {items.map((it, i) => (
+        <button type="button" role="tab" class="pg-tab" id={`pg-t${i}`} aria-controls={`pg-p${i}`} aria-selected={String(i === 0)} tabindex={i === 0 ? 0 : -1}>
+          <span class="pg-name">{it.file}</span><span>{it.size}</span><span>{it.date}</span>
+        </button>
+      ))}
+    </div>
+    <p class="pg-hint" hidden>↑ ↓ to choose, or tap</p>
+  </Window>
+  <div class="pg-views">
+    {items.map((it, i) => (
+      <Window title={it.file} kind="panel" class="pg-view" id={`pg-p${i}`} role="tabpanel" aria-labelledby={`pg-t${i}`}>
+        <img src={`${base}/images/${it.img}`} alt={it.alt} width="962" height="600" loading="lazy" decoding="async" />
+        <h3>{it.title}</h3>
+        <p set:html={it.body} />
+        <a class="button button--primary" href={`${base}${it.href}`}>Run {it.file} in your browser</a>
+      </Window>
+    ))}
+  </div>
+</div>
+
+<style is:global>
+  .pg { display: grid; grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.6fr); gap: 22px 26px; align-items: start; }
+  .pg-cols, .pg-tab { display: grid; grid-template-columns: minmax(0, 1fr) 7ch 9ch; gap: 10px; }
+  .pg-cols { padding: 0 10px 8px; font: 600 12px/1.4 var(--font-code); color: var(--accent); border-bottom: 1px solid var(--rule); }
+  .pg-tabs { display: grid; margin-top: 6px; }
+  .pg-tab { align-items: center; min-height: 44px; padding: 0 10px; font: 500 0.875rem/1 var(--font-code); color: var(--ink); text-align: left; background: none; border: 0; cursor: pointer; }
+  .pg-tab span:not(.pg-name) { color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+  .pg-tab[aria-selected='true'], .pg-tab[aria-selected='true'] span { color: var(--surface); background: var(--accent-2); }
+  .pg-tab:hover:not([aria-selected='true']) { background: color-mix(in oklch, var(--ink) 10%, transparent); }
+  .pg-tab:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .pg-hint { margin-top: 10px; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .pg-views { display: grid; gap: 22px; min-width: 0; }
+  .pg-view img { width: 100%; height: auto; aspect-ratio: 962 / 600; object-fit: contain; image-rendering: pixelated; background: var(--vga-0); }
+  .pg-view h3 { margin-top: 16px; font: 800 1.5rem/1.15 var(--font-display); font-stretch: 85%; color: var(--accent); }
+  .pg-view p { margin-top: 8px; max-width: 64ch; font-size: 1.0625rem; line-height: 1.6; color: var(--ink); }
+  .pg-view p b { color: var(--accent); }
+  .pg-view .button { margin-top: 16px; }
+  .pg.is-live .pg-views { display: block; }
+  .pg:not(.is-live) { grid-template-columns: minmax(0, 1fr); }
+  .pg:not(.is-live) .pg-list { display: none; }
+  @media (max-width: 900px) { .pg { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  document.querySelectorAll<HTMLElement>('[data-programs]').forEach(root => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const views = [...root.querySelectorAll<HTMLElement>('[role=tabpanel]')];
+    const pick = (t: HTMLButtonElement, focus = false) => {
+      tabs.forEach((x, i) => {
+        const on = x === t;
+        x.setAttribute('aria-selected', String(on));
+        x.tabIndex = on ? 0 : -1;
+        views[i].hidden = !on;
+        if (on && !matchMedia('(prefers-reduced-motion: reduce)').matches) gsap.fromTo(views[i], { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out' });
+      });
+      if (focus) t.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => pick(t));
+      t.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowDown' ? 1 : e.key === 'ArrowUp' ? -1 : 0;
+        if (e.key === 'Home') { e.preventDefault(); pick(tabs[0], true); }
+        else if (e.key === 'End') { e.preventDefault(); pick(tabs.at(-1)!, true); }
+        else if (d) { e.preventDefault(); pick(tabs[(i + d + tabs.length) % tabs.length], true); }
+      });
+    });
+    root.querySelectorAll<HTMLElement>('.pg-tabs, .pg-hint').forEach(el => (el.hidden = false));
+    root.classList.add('is-live');
+    pick(tabs[0]);
+  });
+</script>

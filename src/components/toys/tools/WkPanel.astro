@@ -1,0 +1,139 @@
+---
+// The WINKEY demo screen, redrawn from his button table and MENU2.DAT: replay main's 177 calls with the shared
+// Scrubber, or press any of the 8 buttons yourself. Without JS the final screen shows as an image.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { fb, panel, tokens, ICONS } from './wk.ts';
+import { menu2, png, b64 } from './wk-ssr.ts';
+
+const W = 210, H = 316;
+const dat = menu2();
+const f = fb(640, 350);
+panel(f, ICONS.map(i => tokens(dat, i.ofs)), 176);
+const img = png(f, 0, 0, W, H);
+const pct = (v: number, of: number) => `${((v / of) * 100).toFixed(3)}%`;
+---
+
+<div class="wk-pn" data-wkpanel data-dat={b64(dat)}>
+  <Window title="WINKEY.EXE  EGA 640 × 350" kind="screen" class="wk-pn-scr">
+    <div class="wk-pn-stage" style={`aspect-ratio:${W}/${H}`}>
+      <img src={img} width={W} height={H} alt="His demo's last screen: a gray panel with 8 raised icon buttons in a column: the DOS logo, a disk drive, a floppy with an arrow, a page and pen, a second floppy, and three pages with large colored letters." />
+      <canvas width={W} height={H} aria-hidden="true" hidden></canvas>
+      <div class="wk-pn-keys" hidden>
+        {ICONS.map((ic, i) => (
+          <button type="button" class="wk-pn-key" data-i={i} aria-pressed="false" aria-label={`Press the ${ic.name} button`}
+            style={`left:${pct(18, W)};top:${pct(18 + 35 * i, H)};width:${pct(48, W)};height:${pct(34, H)}`}></button>
+        ))}
+      </div>
+    </div>
+  </Window>
+  <div class="wk-pn-side">
+    <Window title="MAIN.C  the call that drew it" kind="editor" active class="wk-pn-log">
+      <pre class="wk-pn-code" data-code><code><span class="o">button</span>(18, 263, 48, 34, <b>0x60</b>, 7);
+<span class="o">icon</span>(0x0904, 20, 269, <b>0</b>);</code></pre>
+      <p class="wk-pn-say" data-say aria-live="polite">The end of the demo: button 8 of 8, press 11 of 11. Style 60h, raised, and all 8 icons in place.</p>
+      <ol class="wk-pn-dots" aria-hidden="true">
+        {ICONS.map(ic => <li><span>{ic.name}</span><b>{Array.from({ length: 11 }, () => <i class="on"></i>)}</b></li>)}
+      </ol>
+    </Window>
+    <p class="wk-pn-tip" hidden>Press <b>Run</b> to replay his demo, or press any button on the screen. Keyboard: <kbd>Tab</kbd> to a button, hold <kbd>Space</kbd>.</p>
+    <Scrubber n={177} at={176} label="Replay the demo, one call at a time" />
+  </div>
+</div>
+
+<style is:global>
+  .wk-pn { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr); gap: 22px 26px; align-items: start; }
+  .wk-pn-stage { position: relative; width: 100%; max-width: 420px; margin-inline: auto; background: #000; }
+  .wk-pn-stage img, .wk-pn-stage canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  .wk-pn-stage canvas { position: absolute; inset: 0; }
+  .wk-pn-keys { position: absolute; inset: 0; }
+  .wk-pn-key { position: absolute; padding: 0; background: none; border: 0; cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .wk-pn-key:hover { outline: 2px dashed var(--vga-14); outline-offset: 2px; }
+  .wk-pn-key:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .wk-pn-side { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; min-width: 0; }
+  .wk-pn-code { margin: 0; padding: 4px 2px 10px; font: 500 clamp(12px, 0.3vw + 10px, 14px)/1.8 var(--font-code); color: var(--ink); white-space: pre-wrap; }
+  .wk-pn-code code { font: inherit; color: inherit; }
+  .wk-pn-code .o { color: var(--accent-2); }
+  .wk-pn-code b { color: var(--accent); font-weight: 700; }
+  .wk-pn-code i { font-style: normal; color: var(--ink-2); }
+  .wk-pn-say { margin: 0 0 12px !important; font: 500 1rem/1.5 var(--sans) !important; color: var(--ink); min-height: 3em; }
+  .wk-pn-dots { display: grid; gap: 3px; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+  .wk-pn-dots li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; font: 500 12px/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  .wk-pn-dots li::marker { content: none; }
+  .wk-pn-dots span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .wk-pn-dots b { display: flex; gap: 3px; }
+  .wk-pn-dots b i { width: 9px; height: 12px; background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 50%, transparent); }
+  .wk-pn-dots b i.on { background: var(--accent-2); box-shadow: none; }
+  .wk-pn-dots li.on b i.on { background: var(--accent); }
+  .wk-pn-dots li.on, .wk-pn-dots li.on span { color: var(--accent) !important; }
+  .wk-pn-tip { margin: 0 !important; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  .wk-pn-tip kbd { font-size: 0.8125rem; }
+  @media (max-width: 860px) {
+    .wk-pn { grid-template-columns: minmax(0, 1fr); }
+    .wk-pn-stage { max-width: 360px; }
+  }
+</style>
+
+<script>
+  import { fb, panel, tokens, ICONS, CALLS, BTN, blit, bytesOf } from './wk.ts';
+  import { scrubber } from '../scrubber';
+
+  const hx = (n: number) => `0x${n.toString(16).toUpperCase().padStart(4, '0')}`;
+  const nm = (i: number) => (i === 0 ? ICONS[0].name : ICONS[i].name[0].toLowerCase() + ICONS[i].name.slice(1));
+  const call = (i: number, pressed: boolean) => { const b = BTN(i);
+    return `<span class="o">button</span>(18, ${b.y}, 48, 34, <b>${pressed ? '0x50' : '0x60'}</b>, 7);\n<span class="o">icon</span>(${hx(ICONS[i].ofs)}, 20, ${b.iy}, <b>${pressed ? 2 : 0}</b>);`; };
+  document.querySelectorAll<HTMLElement & { wk?: boolean }>('[data-wkpanel]').forEach(root => {
+    if (root.wk) return;
+    root.wk = true;
+    const icons = ICONS.map(i => tokens(bytesOf(root), i.ofs));
+    const cv = root.querySelector('canvas')!, code = root.querySelector('[data-code] code')!, say = root.querySelector('[data-say]')!;
+    const dots = [...root.querySelectorAll<HTMLElement>('.wk-pn-dots li')];
+    const keys = [...root.querySelectorAll<HTMLButtonElement>('.wk-pn-key')];
+    const f = fb(640, 350), held = new Set<number>();
+    let at = 176;
+
+    const draw = () => { panel(f, icons, at, held); blit(cv, f, 0, 0, 210, 316); };
+    const show = (k: number) => {
+      at = k;
+      draw();
+      // How many presses each button has had by this step
+      const n = new Array(8).fill(0);
+      for (let s = 0; s < k; s++) if (CALLS[s].pressed) n[CALLS[s].i]++;
+      dots.forEach((li, i) => { li.querySelectorAll('b i').forEach((t, j) => t.classList.toggle('on', j < n[i])); li.classList.toggle('on', k > 0 && CALLS[k - 1].i === i); });
+      if (k === 0) {
+        code.innerHTML = `<span class="o">button</span>(5, 5, 200, 306, <b>0x40</b>, 7);`;
+        say.textContent = 'First the panel: style 40h, raised, a flat band, then sunken. No buttons yet.';
+        return;
+      }
+      const c = CALLS[k - 1];
+      code.innerHTML = call(c.i, c.pressed);
+      say.textContent = `Button ${c.i + 1} of 8, the ${nm(c.i)}: press ${c.cycle} of 11. ${c.pressed ? 'Style 50h, pressed, and the icon 2 pixels down and to the right.' : 'Style 60h, raised, and the icon back in place.'}`;
+    };
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 0.09 });
+
+    // Press a button yourself: down draws style 50h with the icon moved 2 px, up draws 60h
+    const press = (b: HTMLButtonElement, on: boolean) => {
+      const i = +b.dataset.i!;
+      if (on === held.has(i)) return;
+      if (on) held.add(i); else held.delete(i);
+      b.setAttribute('aria-pressed', String(on));
+      code.innerHTML = call(i, on);
+      say.textContent = on ? `You are pressing the ${nm(i)}: style 50h, and the icon 2 pixels down and to the right.` : `You let go: style 60h, and the ${nm(i)} back in place.`;
+      draw();
+    };
+    for (const b of keys) {
+      b.addEventListener('pointerdown', e => { try { b.setPointerCapture(e.pointerId); } catch {} press(b, true); });
+      for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, () => press(b, false));
+      b.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); press(b, true); } });
+      b.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') press(b, false); });
+      b.addEventListener('blur', () => press(b, false));
+      b.addEventListener('click', e => e.preventDefault());
+    }
+
+    root.querySelector('img')!.hidden = true;
+    cv.hidden = false;
+    root.querySelector<HTMLElement>('.wk-pn-keys')!.hidden = false;
+    root.querySelector<HTMLElement>('.wk-pn-tip')!.hidden = false;
+    show(scrub.i);
+  });
+</script>

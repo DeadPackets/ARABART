@@ -1,0 +1,223 @@
+---
+// The 5620's CORBA interface as the network's public API. The phone company's own apps call through his interface
+// (read alarms, read the inventory, order a connection); when a node fails, one alarm goes into the event channel and
+// a copy reaches every app that listens. Two layouts of the same picture: wide, and stacked for phones.
+import Window from '../../shell/Window.astro';
+
+type Box = { x: number; y: number; w: number; h: number };
+const APPS = [['orders', 'Orders'], ['billing', 'Billing'], ['tickets', 'Trouble tickets']] as const;
+const SHORT = ['Orders', 'Billing', 'Tickets'];
+const NODES = ['7770', '7670', '7470', '7300'];
+const LAYOUTS: { id: string; vb: string; apps: Box[]; door: Box; chan: Box; nm: Box; nodes: Box[]; link: string; small: boolean }[] = [
+  {
+    id: 'wide', vb: '0 0 800 360', small: false,
+    apps: [0, 1, 2].map(i => ({ x: 8, y: 20 + i * 125, w: 172, h: 70 })),
+    door: { x: 250, y: 20, w: 160, h: 320 }, chan: { x: 262, y: 256, w: 136, h: 70 },
+    nm: { x: 480, y: 110, w: 150, h: 140 },
+    nodes: [0, 1, 2, 3].map(i => ({ x: 690, y: 18 + i * 85, w: 86, h: 56 })),
+    link: 'M776 46 C800 46 800 216 776 216',
+  },
+  {
+    id: 'narrow', vb: '0 0 360 590', small: true,
+    apps: [0, 1, 2].map(i => ({ x: 4 + i * 119, y: 6, w: 114, h: 70 })),
+    door: { x: 4, y: 130, w: 352, h: 120 }, chan: { x: 196, y: 158, w: 148, h: 70 },
+    nm: { x: 4, y: 316, w: 352, h: 92 },
+    nodes: [0, 1, 2, 3].map(i => ({ x: 4 + i * 89, y: 476, w: 84, h: 56 })),
+    link: 'M46 532 C46 584 224 584 224 532',
+  },
+];
+const c = (b: Box) => [b.x + b.w / 2, b.y + b.h / 2];
+const SUB = ['orders', 'tickets'];
+---
+
+<div class="cn" data-callnet>
+  <div class="cn-left">
+  <div class="cn-stage">
+    {LAYOUTS.map(L => (
+      <svg class:list={['dg', 'cn-svg', `cn-${L.id}`]} viewBox={L.vb} role="img" aria-label="The phone company's apps call the 5620 Network Manager through his CORBA interface; alarms come back through its event channel.">
+        {L.apps.map(a => <line class="wire" x1={c(a)[0]} y1={c(a)[1]} x2={c(L.door)[0]} y2={c(L.door)[1]} />)}
+        <line class="wire dash" x1={c(L.chan)[0]} y1={c(L.chan)[1]} x2={c(L.nm)[0]} y2={c(L.nm)[1]} />
+        <line class="wire" x1={c(L.door)[0]} y1={c(L.door)[1]} x2={c(L.nm)[0]} y2={c(L.nm)[1]} />
+        {L.nodes.map(n => <line class="wire" x1={c(L.nm)[0]} y1={c(L.nm)[1]} x2={c(n)[0]} y2={c(n)[1]} />)}
+        <path class="wire-hi cn-link" data-link d={L.link} />
+        {L.apps.map((a, i) => (
+          <g data-el={`app-${APPS[i][0]}`}>
+            <rect class="box" x={a.x} y={a.y} width={a.w} height={a.h} data-box />
+            <text x={a.x + 10} y={a.y + 26} class={L.small ? 'cn-strong' : ''}>{L.small ? SHORT[i] : APPS[i][1]}</text>
+            <text class="t-sm cn-cnt" x={a.x + (L.small ? 6 : 10)} y={a.y + 52} data-cnt={APPS[i][0]}>{SUB.includes(APPS[i][0]) ? 'listening' : 'not listening'}</text>
+          </g>
+        ))}
+        <g data-el="door">
+          <rect class="box-hi" x={L.door.x} y={L.door.y} width={L.door.w} height={L.door.h} data-box />
+          <text class="cn-w" x={L.door.x + 14} y={L.door.y + 34}>His CORBA</text>
+          <text class="cn-w" x={L.door.x + 14} y={L.door.y + 56}>interface</text>
+          <text class="cn-w t-sm" x={L.door.x + 14} y={L.door.y + 84}>the network’s</text>
+          <text class="cn-w t-sm" x={L.door.x + 14} y={L.door.y + 102}>public API</text>
+        </g>
+        <g data-el="chan">
+          <rect class="box" x={L.chan.x} y={L.chan.y} width={L.chan.w} height={L.chan.h} data-box />
+          <text x={L.chan.x + 10} y={L.chan.y + 28}>Event</text><text x={L.chan.x + 10} y={L.chan.y + 50}>channel</text>
+        </g>
+        <g data-el="nm">
+          <rect class="box" x={L.nm.x} y={L.nm.y} width={L.nm.w} height={L.nm.h} data-box />
+          <text class="t-lg" x={L.nm.x + 14} y={L.nm.y + 34}>5620</text>
+          <text x={L.nm.x + 14} y={L.nm.y + 60}>Network</text><text x={L.nm.x + 14} y={L.nm.y + 80}>Manager</text>
+        </g>
+        {L.nodes.map((n, i) => (
+          <g data-el={`node-${NODES[i]}`} class="cn-node" data-node={NODES[i]}>
+            <rect class="box" x={n.x} y={n.y} width={n.w} height={n.h} data-box />
+            <text x={n.x + n.w / 2} y={n.y + 34} text-anchor="middle">{NODES[i]}</text>
+          </g>
+        ))}
+        <g data-pk></g>
+      </svg>
+    ))}
+  </div>
+    <Window title="The call, then and now" kind="editor" class="cn-log">
+    <p class="cn-lab">CORBA, in his years (example names)</p>
+    <pre data-then>alarms-&gt;getActiveAlarms()</pre>
+    <p class="cn-lab">The same call today, as REST</p>
+    <pre data-now>GET /alarms?state=active</pre>
+    <p class="cn-say" aria-live="polite" data-say>Pick a call. It goes through his interface to the 5620, and the answer comes back the same way.</p>
+  </Window>
+  </div>
+  <div class="cn-side">
+    <Window title="Call the network" kind="dialog" active class="cn-ctl">
+      <div class="cn-btns">
+        <button type="button" class="button k-btn" data-op="alarms">Read the alarms</button>
+        <button type="button" class="button k-btn" data-op="inventory">Read the inventory</button>
+        <button type="button" class="button k-btn" data-op="order">Order a connection</button>
+        <button type="button" class="button k-btn" data-op="fail">Take a node down</button>
+        <button type="button" class="button k-btn" data-op="repair">Bring all back up</button>
+      </div>
+      <fieldset class="cn-sub">
+        <legend>Listening for alarms</legend>
+        {APPS.map(([id, name]) => <label><input type="checkbox" data-sub={id} checked={SUB.includes(id)} /> {name}</label>)}
+      </fieldset>
+    </Window>
+  </div>
+</div>
+
+<style>
+  .cn { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: 22px; align-items: start; }
+  .cn-left { display: grid; gap: 22px; min-width: 0; }
+  .cn-narrow :global(.cn-cnt) { font-size: 11.5px; }
+  .cn-stage { min-width: 0; padding: 14px; background: var(--w-white); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-black); color-scheme: light; --surface: var(--w-white); --surface-2: oklch(0.96 0 0); --ink: var(--w-black); --ink-2: oklch(0.35 0 0); --accent: var(--w-navy); --accent-2: var(--w-teal); }
+  .cn-narrow { display: none; }
+  .cn-svg :global(.cn-w) { fill: var(--w-white); }
+  .cn-svg :global(.cn-strong) { font-weight: 700; fill: var(--w-black); }
+  .cn-svg .cn-link { opacity: 0; }
+  .cn-svg .cn-link.on { opacity: 1; }
+  .cn-node { cursor: pointer; }
+  .cn-node.down [data-box] { fill: #ff4040; stroke: #800000; }
+  .cn-svg :global(g.flash [data-box]) { fill: var(--vga-14); }
+  .cn-svg :global(.pk) { fill: #e00000; stroke: var(--w-white); stroke-width: 3; filter: drop-shadow(0 0 4px #ff3030); }
+  .cn-svg :global(.pk.ev) { fill: #ff8c00; }
+  .cn-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .cn-btns .k-btn { white-space: normal; line-height: 1.2; padding: 6px 10px; }
+  .cn-sub { margin-top: 16px; padding: 10px 12px 8px; border: 0; box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-white), inset -2px -2px var(--w-gray); color-scheme: light; }
+  .cn-sub legend { padding: 0 4px; font: 400 0.9375rem/1 var(--font-ui); }
+  .cn-sub label { display: flex; align-items: center; gap: 8px; min-height: 44px; font: 400 0.9375rem/1.2 var(--font-ui); cursor: pointer; }
+  .cn-sub input { width: 18px; height: 18px; accent-color: var(--w-navy); }
+  .cn-lab { font: 600 0.75rem/1.4 var(--font-code); color: var(--ink-2); }
+  .cn-log pre { margin: 4px 0 12px; padding: 8px 10px; background: oklch(0.96 0 0); font: 500 0.875rem/1.5 var(--font-code); color: var(--w-navy); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .cn-say { font: 500 0.9375rem/1.55 var(--sans); color: var(--ink); min-height: 4.65em; }
+  @media (max-width: 1100px) { .cn { grid-template-columns: minmax(0, 1fr); } .cn-left { display: contents; } .cn-side { order: 1; } .cn-left > :global(.cn-log) { order: 2; } }
+  @media (max-width: 700px) { .cn-wide { display: none; } .cn-narrow { display: block; } .cn-stage { padding: 8px; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const OPS: Record<string, { app: string; then: string; now: string; say: (s: State) => string }> = {
+    alarms: { app: 'tickets', then: 'alarms->getActiveAlarms()', now: 'GET /alarms?state=active', say: s => `The trouble-ticket app asked for the active alarms. Answer: <b>${s.down.size || 'none'}</b>${s.down.size ? ` (node ${[...s.down].join(', ')})` : ''}.` },
+    inventory: { app: 'billing', then: 'inventory->getNodes()', now: 'GET /nodes', say: () => 'The billing app read the inventory: <b>4 nodes</b>, 7770, 7670, 7470 and 7300, each with its shelves, cards and ports.' },
+    order: { app: 'orders', then: 'paths->createPath(n7770, n7470)', now: 'POST /paths  {"from": "7770", "to": "7470"}', say: () => 'The orders app ordered a new connection. The 5620 set it up across the network, and the answer came back: <b>path ready</b>. No engineer typed a command.' },
+  };
+  type State = { down: Set<string>; sub: Set<string> };
+
+  document.querySelectorAll<HTMLElement>('[data-callnet]').forEach(root => {
+    const st: State = { down: new Set(), sub: new Set([...root.querySelectorAll<HTMLInputElement>('[data-sub]')].filter(i => i.checked).map(i => i.dataset.sub!)) };
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const thenEl = root.querySelector<HTMLElement>('[data-then]')!, nowEl = root.querySelector<HTMLElement>('[data-now]')!;
+    const counts: Record<string, number> = { orders: 0, billing: 0, tickets: 0 };
+    let tl: gsap.core.Timeline | null = null;
+
+    const svg = () => [...root.querySelectorAll<SVGSVGElement>('.cn-svg')].find(s => s.getBoundingClientRect().width > 0)!;
+    const at = (s: SVGSVGElement, el: string) => {
+      const r = s.querySelector<SVGRectElement>(`[data-el="${el}"] [data-box]`)!;
+      return { x: +r.getAttribute('x')! + +r.getAttribute('width')! / 2, y: +r.getAttribute('y')! + +r.getAttribute('height')! / 2 };
+    };
+    const label = (id: string) => {
+      root.querySelectorAll(`[data-cnt="${id}"]`).forEach(t => (t.textContent = !st.sub.has(id) ? 'not listening' : counts[id] ? `${counts[id]} alarm${counts[id] > 1 ? 's' : ''}` : 'listening'));
+    };
+    const flash = (el: string) => root.querySelectorAll(`[data-el="${el}"]`).forEach(g => { g.classList.add('flash'); setTimeout(() => g.classList.remove('flash'), 450); });
+
+    // One packet along a list of boxes, hop by hop
+    const trip = (s: SVGSVGElement, t: gsap.core.Timeline, stops: string[], pos: number | string, ev = false) => {
+      const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      c.setAttribute('r', '11');
+      c.setAttribute('class', ev ? 'pk ev' : 'pk');
+      const p0 = at(s, stops[0]);
+      gsap.set(c, { attr: { cx: p0.x, cy: p0.y }, opacity: 0 });
+      s.querySelector('[data-pk]')!.append(c);
+      const sub = gsap.timeline().to(c, { opacity: 1, duration: 0.1 });
+      stops.slice(1).forEach(id => { const p = at(s, id); sub.to(c, { attr: { cx: p.x, cy: p.y }, duration: 0.42, ease: 'power1.inOut' }).call(() => flash(id)); });
+      sub.to(c, { opacity: 0, duration: 0.15, onComplete: () => c.remove() });
+      t.add(sub, pos);
+      return sub;
+    };
+
+    const run = (op: string) => {
+      tl?.progress(1).kill();
+      const s = svg(), still = reduce();
+      root.querySelectorAll('[data-link]').forEach(l => l.classList.remove('on'));
+      if (op === 'repair') {
+        st.down.clear();
+        root.querySelectorAll('.cn-node').forEach(n => n.classList.remove('down'));
+        say.textContent = 'Every node is up again.';
+        return;
+      }
+      if (op === 'fail' || op.startsWith('node-')) {
+        const id = op.startsWith('node-') ? op.slice(5) : ['7670', '7300', '7770', '7470'].find(n => !st.down.has(n));
+        if (!id) { say.textContent = 'Every node is already down. Press Bring all back up.'; return; }
+        st.down.add(id);
+        root.querySelectorAll(`[data-node="${id}"]`).forEach(n => n.classList.add('down'));
+        thenEl.textContent = 'channel->push(alarm)   // to every listener';
+        nowEl.textContent = 'publish("alarms", {node: "' + id + '"})   // a pub/sub topic';
+        const to = [...st.sub];
+        const done = () => { to.forEach(a => { counts[a]++; label(a); }); };
+        say.innerHTML = `Node ${id} went down. One alarm went into the event channel, and the channel sent a copy to <b>${to.length ? to.length + ' listening app' + (to.length > 1 ? 's' : '') : 'nobody: no app is listening'}</b>. The sender never needs to know who listens.`;
+        if (still) { done(); return; }
+        tl = gsap.timeline({ onComplete: done });
+        trip(s, tl, [`node-${id}`, 'nm', 'chan'], 0, true);
+        to.forEach(a => trip(s, tl!, ['chan', `app-${a}`], 0.98, true));
+        return;
+      }
+      const o = OPS[op];
+      thenEl.textContent = o.then;
+      nowEl.textContent = o.now;
+      const fin = () => { say.innerHTML = o.say(st); if (op === 'order') root.querySelectorAll('[data-link]').forEach(l => l.classList.add('on')); };
+      if (still) { fin(); return; }
+      say.textContent = 'Calling...';
+      tl = gsap.timeline({ onComplete: fin });
+      const app = `app-${o.app}`;
+      trip(s, tl, [app, 'door', 'nm'], 0);
+      if (op === 'order') {
+        trip(s, tl, ['nm', 'node-7770'], '>');
+        trip(s, tl, ['nm', 'node-7470'], '<');
+        tl.call(() => { const l = s.querySelector('[data-link]')!; l.classList.add('on'); gsap.fromTo(l, { strokeDasharray: 400, strokeDashoffset: 400 }, { strokeDashoffset: 0, duration: 0.5, clearProps: 'strokeDasharray,strokeDashoffset' }); });
+      }
+      trip(s, tl, ['nm', 'door', app], '>');
+    };
+
+    root.querySelectorAll<HTMLButtonElement>('[data-op]').forEach(b => b.addEventListener('click', () => run(b.dataset.op!)));
+    root.querySelectorAll<SVGGElement>('.cn-node').forEach(g => g.addEventListener('click', () => run(`node-${g.dataset.node}`)));
+    root.querySelectorAll<HTMLInputElement>('[data-sub]').forEach(i => i.addEventListener('change', () => {
+      const id = i.dataset.sub!;
+      if (i.checked) st.sub.add(id); else { st.sub.delete(id); counts[id] = 0; }
+      label(id);
+    }));
+  });
+</script>

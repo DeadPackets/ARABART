@@ -1,0 +1,11 @@
+---
+import '../../styles/explain.css';
+
+interface Props { title: string; open?: boolean }
+const { title, open = false } = Astro.props;
+---
+
+<details class="deep" open={open}>
+  <summary><span>{title}</span></summary>
+  <div class="deep-in"><slot /></div>
+</details>

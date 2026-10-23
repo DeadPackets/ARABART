@@ -1,0 +1,221 @@
+---
+// A wire is the keys that drew it: one digit per step on the numeric keypad (8 up, 2 down, 4 left, 6 right,
+// 7 9 1 3 the diagonals), and one byte, 60h plus (direction + 4), for a resistor 7 cells long. Draw with the keypad,
+// the keyboard or a finger; the bytes appear as you go. "Play" replays three wires from KEMYAM (FIL0.CIR).
+import { circuit, KEYPAD } from './dt-data';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const C = circuit();
+const pick = (from: [number, number], to: [number, number]) => C.wires.find(w => w.from[0] === from[0] && w.from[1] === from[1] && w.to[0] === to[0] && w.to[1] === to[1])!;
+// Three of his wires, placed on this small sheet
+const HIS = [
+  { w: pick([64, 42], [70, 36]), at: [8, 12], say: 'From a node up to the 7404’s ground pin: 3 up, 3 diagonal, 3 right.' },
+  { w: pick([96, 28], [107, 30]), at: [4, 8], say: 'Into the 7432: one diagonal, a straight run, three diagonals down.' },
+  { w: pick([34, 43], [63, 43]), at: [1, 7], say: 'The ground line, with a resistor in it: 10 steps, one byte for 7 cells, 12 steps.' },
+].map(h => ({ bytes: h.w.path.filter(b => b), at: h.at, say: h.say }));
+const KEYS = [[7, '↖'], [8, '↑'], [9, '↗'], [4, '←'], [0, '⌫'], [6, '→'], [1, '↙'], [2, '↓'], [3, '↘']] as const;
+// The first of his wires is on the sheet from the start, so the page reads complete without JS
+const h0 = HIS[0];
+const pts0: number[][] = [h0.at];
+for (const b of h0.bytes) { const [x, y] = pts0[pts0.length - 1], [dx, dy] = KEYPAD[b]; pts0.push([x + dx, y + dy]); }
+const start = pts0[0], end = pts0[pts0.length - 1];
+const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
+---
+
+<div class="dtw" id={id} data-dtwire data-his={JSON.stringify(HIS)}>
+  <div class="dtw-stage">
+    <svg class="dtw-svg" viewBox="-0.5 -0.5 33 15" data-svg tabindex="0" aria-label="Drawing sheet. Use the arrow keys or the number keys 1 to 9 to draw, Backspace to undo, R for a resistor." aria-describedby={`${id}-bytes`}>
+      <defs><pattern id={`${id}-dots`} width="1" height="1" patternUnits="userSpaceOnUse"><rect x="-0.06" y="-0.06" width="0.12" height="0.12" fill="#2fa02f" /></pattern></defs>
+      <rect x="-0.5" y="-0.5" width="33" height="15" fill="#007900" />
+      <rect x="-0.06" y="-0.06" width="32.12" height="14.12" fill={`url(#${id}-dots)`} />
+      <polyline class="dtw-line" data-line points={pts0.map(p => p.join(',')).join(' ')} />
+      <g data-res></g>
+      <line class="dtw-hi" data-hi x1="0" y1="0" x2="0" y2="0" />
+      <rect class="dtw-node" x={start[0] - 0.6} y={start[1] - 0.6} width="1.2" height="1.2" data-node />
+      <g class="dtw-pen" data-pen transform={`translate(${end[0]} ${end[1]})`}><path d="M-0.9 0H0.9M0 -0.9V0.9" /></g>
+    </svg>
+  </div>
+  <div class="dtw-side">
+    <div class="dtw-pad" role="group" aria-label="Keypad">
+      {KEYS.map(([k, g]) => (
+        <button type="button" class="dtw-key" data-key={k} aria-label={k ? `${k}, ${['', 'down left', 'down', 'down right', 'left', '', 'right', 'up left', 'up', 'up right'][k]}` : 'Undo'} disabled>
+          <b>{k || ''}</b><span aria-hidden="true">{g}</span>
+        </button>
+      ))}
+    </div>
+    <div class="dtw-btns">
+      <button type="button" class="button k-btn" data-act="res" aria-pressed="false" disabled>Resistor</button>
+      <button type="button" class="button k-btn" data-act="clear" disabled>Clear</button>
+      <button type="button" class="button button--primary k-btn" data-act="his" disabled>Play his wire</button>
+    </div>
+  </div>
+  <div class="dtw-out" id={`${id}-bytes`}>
+    <p class="dtw-bytes" data-bytes aria-live="polite">{h0.bytes.map(b => <span>{hex(b)}</span>)}<span class="end">00</span></p>
+    <p class="dtw-meta" data-meta>{h0.say} {h0.bytes.length} bytes for {h0.bytes.length} cells. In his file this wire takes {21 + h0.bytes.length + 1} bytes: two end points, the pins it joins, then the path and the 00 that ends it.</p>
+    <p class="dtw-svgd"><span>The same wire as an SVG path:</span> <code data-d>M{start[0]} {start[1]} v-3 l3 -3 h3</code></p>
+  </div>
+</div>
+
+<style is:global>
+  .dtw { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 22px; align-items: start; }
+  .dtw-stage { min-width: 0; box-shadow: 0 0 0 2px #000, 0 0 0 4px #aaa, 8px 8px 0 4px var(--black); }
+  .dtw-svg { display: block; width: 100%; height: auto; touch-action: none; cursor: crosshair; }
+  .dtw-svg:focus-visible { outline: 3px solid var(--focus); outline-offset: 6px; }
+  .dtw-line { fill: none; stroke: #55ff55; stroke-width: 0.28; stroke-linejoin: round; stroke-linecap: round; }
+  .dtw-node { fill: #55ff55; }
+  .dtw-pen path { stroke: #ffff55; stroke-width: 0.22; }
+  .dtw-hi { stroke: #ffff55; stroke-width: 0.5; stroke-linecap: round; opacity: 0; }
+  .dtw-hi.on { opacity: 1; }
+  .dtw-r rect:first-child { fill: #aa0000; }
+  .dtw-r .b1 { fill: #ff5555; } .dtw-r .b2 { fill: #ffff55; }
+  .dtw-side { display: grid; gap: 12px; justify-items: start; }
+  .dtw-pad { display: grid; grid-template-columns: repeat(3, 52px); gap: 6px; }
+  .dtw-key { display: grid; place-items: center; height: 52px; padding: 2px 0; font: 700 1rem/1 var(--font-code); color: #000; background: #c8c8c8; border: 0;
+    box-shadow: inset -2px -2px 0 #777, inset 2px 2px 0 #fff; cursor: pointer; touch-action: manipulation; }
+  .dtw-key b { font-size: 0.75rem; color: #444; }
+  .dtw-key span { font-size: 1.25rem; }
+  .dtw-key:active, .dtw-key.hit { box-shadow: inset 2px 2px 0 #777, inset -2px -2px 0 #fff; background: #ffff55; }
+  .dtw-key:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .dtw-key[data-key='0'] { background: #8a8a8a; }
+  .dtw-btns { display: flex; flex-wrap: wrap; gap: 8px; max-width: 168px; }
+  .dtw-btns .k-btn { width: 100%; }
+  .dtw-out { grid-column: 1 / -1; display: grid; gap: 6px; }
+  .dtw-bytes { display: flex; flex-wrap: wrap; gap: 4px; min-height: 2.2em; margin: 0 !important; max-width: none !important; font: 600 0.9375rem/1.5 var(--font-code) !important; }
+  .dtw-bytes span { padding: 1px 5px; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); cursor: default; }
+  .dtw-bytes span.r { color: #fff; background: #aa0000; }
+  .dtw-bytes span.last { color: var(--surface); background: var(--accent); }
+  .dtw-bytes span.end { color: var(--ink-2); }
+  .dtw-bytes .dtw-none { background: none; box-shadow: none; color: var(--ink-2); font-family: var(--sans); font-weight: 400; }
+  .dtw-meta, .dtw-svgd { margin: 0 !important; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  .dtw-svgd code { overflow-wrap: anywhere; }
+  @media (max-width: 760px) {
+    .dtw { grid-template-columns: minmax(0, 1fr); }
+    .dtw-side { grid-template-columns: auto minmax(0, 1fr); align-items: start; width: 100%; }
+    .dtw-btns { max-width: none; flex-direction: column; }
+    .dtw-pad { grid-template-columns: repeat(3, 48px); }
+    .dtw-key { height: 48px; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const DIR: Record<number, [number, number]> = { 1: [-1, 1], 2: [0, 1], 3: [1, 1], 4: [-1, 0], 6: [1, 0], 7: [-1, -1], 8: [0, -1], 9: [1, -1] };
+  const W = 32, H = 14;
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
+  const NS = 'http://www.w3.org/2000/svg';
+
+  document.querySelectorAll<HTMLElement & { dtw?: boolean }>('[data-dtwire]').forEach(root => {
+    if (root.dtw) return;
+    root.dtw = true;
+    const HIS: { bytes: number[]; at: [number, number]; say: string }[] = JSON.parse(root.dataset.his!);
+    const svg = root.querySelector<SVGSVGElement>('[data-svg]')!;
+    const line = svg.querySelector<SVGPolylineElement>('[data-line]')!, resG = svg.querySelector<SVGGElement>('[data-res]')!;
+    const pen = svg.querySelector<SVGGElement>('[data-pen]')!, node = svg.querySelector<SVGRectElement>('[data-node]')!, hi = svg.querySelector<SVGLineElement>('[data-hi]')!;
+    const out = root.querySelector<HTMLElement>('[data-bytes]')!, meta = root.querySelector<HTMLElement>('[data-meta]')!, dEl = root.querySelector<HTMLElement>('[data-d]')!;
+    const resBtn = root.querySelector<HTMLButtonElement>('[data-act="res"]')!;
+    let bytes: number[] = [], pts: [number, number][] = [HIS[0].at], resNext = false, say = HIS[0].say, play: gsap.core.Tween | null = null;
+    for (const b of HIS[0].bytes) { const [x, y] = pts[pts.length - 1], [dx, dy] = DIR[b]; bytes.push(b); pts.push([x + dx, y + dy]); }
+
+    function render() {
+      line.setAttribute('points', pts.map(p => p.join(',')).join(' '));
+      const [x, y] = pts[pts.length - 1];
+      pen.setAttribute('transform', `translate(${x} ${y})`);
+      node.setAttribute('x', String(pts[0][0] - 0.6)); node.setAttribute('y', String(pts[0][1] - 0.6));
+      resG.replaceChildren(...bytes.flatMap((b, k) => {
+        if (b < 0x60) return [];
+        const [a, c] = [pts[k], pts[k + 1]], g = document.createElementNS(NS, 'g');
+        g.setAttribute('class', 'dtw-r');
+        g.setAttribute('transform', `translate(${(a[0] + c[0]) / 2} ${(a[1] + c[1]) / 2}) rotate(${Math.atan2(c[1] - a[1], c[0] - a[0]) * 180 / Math.PI})`);
+        g.innerHTML = '<rect x="-2.6" y="-0.6" width="5.2" height="1.2" rx="0.55"/><rect class="b1" x="-1" y="-0.6" width="0.4" height="1.2"/><rect class="b2" x="0" y="-0.6" width="0.4" height="1.2"/><rect class="b1" x="1" y="-0.6" width="0.4" height="1.2"/>';
+        return [g];
+      }));
+      out.replaceChildren(...(bytes.length ? [...bytes.map((b, k) => {
+        const s = document.createElement('span');
+        s.textContent = hex(b); s.dataset.k = String(k);
+        s.className = (b >= 0x60 ? 'r' : '') + (k === bytes.length - 1 ? ' last' : '');
+        return s;
+      }), Object.assign(document.createElement('span'), { textContent: '00', className: 'end' })] : [Object.assign(document.createElement('span'), { textContent: 'Draw: the bytes appear here.', className: 'dtw-none' })]));
+      const cells = bytes.reduce((n, b) => n + (b >= 0x60 ? 7 : 1), 0);
+      meta.textContent = (say ? say + ' ' : '') + `${bytes.length} ${bytes.length === 1 ? 'byte' : 'bytes'} for ${cells} ${cells === 1 ? 'cell' : 'cells'}. In his file this wire takes ${21 + bytes.length + 1} bytes: two end points, the pins it joins, then the path and the 00 that ends it.`;
+      // The same path in SVG: runs of one direction merged into one command
+      let d = `M${pts[0][0]} ${pts[0][1]}`, k = 0;
+      while (k < bytes.length) {
+        const b = bytes[k], [dx, dy] = DIR[b >= 0x60 ? (b & 0xf) - 4 : b];
+        let n = 0;
+        while (k < bytes.length && bytes[k] === b) { n += b >= 0x60 ? 7 : 1; k++; }
+        d += dy === 0 ? ` h${dx * n}` : dx === 0 ? ` v${dy * n}` : ` l${dx * n} ${dy * n}`;
+      }
+      dEl.textContent = d;
+    }
+    function move(k: number, quiet = false) {
+      if (!quiet) { play?.kill(); play = null; say = ''; }
+      if (k === 0) { if (bytes.length) { bytes.pop(); pts.pop(); } render(); return; }
+      const m = resNext ? 7 : 1, [dx, dy] = DIR[k], [x, y] = pts[pts.length - 1], nx = x + dx * m, ny = y + dy * m;
+      if (nx < 0 || ny < 0 || nx > W || ny > H || bytes.length >= 120) return;
+      bytes.push(resNext ? 0x60 | (k + 4) : k); pts.push([nx, ny]);
+      if (resNext) { resNext = false; resBtn.setAttribute('aria-pressed', 'false'); }
+      render();
+    }
+    const flash = (k: number) => { const b = root.querySelector<HTMLElement>(`[data-key="${k}"]`); b?.classList.add('hit'); setTimeout(() => b?.classList.remove('hit'), 120); };
+    root.querySelectorAll<HTMLButtonElement>('button').forEach(b => (b.disabled = false));
+    root.querySelectorAll<HTMLButtonElement>('[data-key]').forEach(b => b.addEventListener('click', () => move(+b.dataset.key!)));
+    resBtn.addEventListener('click', () => { resNext = !resNext; resBtn.setAttribute('aria-pressed', String(resNext)); });
+    root.querySelector('[data-act="clear"]')!.addEventListener('click', () => { play?.kill(); say = ''; bytes = []; pts = [pts[0]]; render(); });
+    let which = 1;
+    root.querySelector('[data-act="his"]')!.addEventListener('click', () => {
+      play?.kill();
+      const h = HIS[which++ % HIS.length];
+      bytes = []; pts = [h.at as [number, number]]; say = h.say; resNext = false;
+      if (reduce()) { for (const b of h.bytes) { resNext = b >= 0x60; move(b >= 0x60 ? (b & 0xf) - 4 : b, true); } return; }
+      const st = { i: 0 };
+      play = gsap.to(st, { i: h.bytes.length, duration: h.bytes.length * 0.11, ease: 'none', onUpdate: () => {
+        while (bytes.length < Math.floor(st.i)) { const b = h.bytes[bytes.length]; resNext = b >= 0x60; move(b >= 0x60 ? (b & 0xf) - 4 : b, true); }
+      } });
+      render();
+    });
+
+    const KEY: Record<string, number> = { ArrowUp: 8, ArrowDown: 2, ArrowLeft: 4, ArrowRight: 6, Home: 7, PageUp: 9, End: 1, PageDown: 3, Backspace: 0 };
+    svg.addEventListener('keydown', e => {
+      const k = /^[1-46-9]$/.test(e.key) ? +e.key : KEY[e.key];
+      if (e.key === 'r' || e.key === 'R') { resBtn.click(); e.preventDefault(); return; }
+      if (k === undefined) return;
+      e.preventDefault(); flash(k); move(k);
+    });
+    // Drag: step toward the finger one cell at a time, so every move is one keypad digit
+    const cell = (e: PointerEvent): [number, number] => {
+      const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM()!.inverse());
+      return [Math.max(0, Math.min(W, Math.round(p.x))), Math.max(0, Math.min(H, Math.round(p.y)))];
+    };
+    let drag = false;
+    const toward = (e: PointerEvent) => {
+      const [tx, ty] = cell(e);
+      for (let guard = 0; guard < 60; guard++) {
+        const [x, y] = pts[pts.length - 1], dx = Math.sign(tx - x), dy = Math.sign(ty - y);
+        if (!dx && !dy) break;
+        const k = Object.entries(DIR).find(([, v]) => v[0] === dx && v[1] === dy)![0];
+        const n = bytes.length; move(+k); if (bytes.length === n) break;
+      }
+    };
+    svg.addEventListener('pointerdown', e => {
+      play?.kill(); play = null; say = '';
+      const [x, y] = cell(e), [px, py] = pts[pts.length - 1];
+      if (!bytes.length && Math.max(Math.abs(x - px), Math.abs(y - py)) > 1) { pts = [[x, y]]; render(); }
+      drag = true; svg.setPointerCapture(e.pointerId); toward(e);
+    });
+    svg.addEventListener('pointermove', e => { if (drag) toward(e); });
+    for (const ev of ['pointerup', 'pointercancel']) svg.addEventListener(ev, () => (drag = false));
+    // Point at a byte to see its step
+    out.addEventListener('pointerover', e => {
+      const k = (e.target as HTMLElement).dataset?.k;
+      hi.classList.toggle('on', k !== undefined);
+      if (k === undefined) return;
+      const [a, c] = [pts[+k], pts[+k + 1]];
+      hi.setAttribute('x1', String(a[0])); hi.setAttribute('y1', String(a[1])); hi.setAttribute('x2', String(c[0])); hi.setAttribute('y2', String(c[1]));
+    });
+    out.addEventListener('pointerleave', () => hi.classList.remove('on'));
+    render();
+  });
+</script>

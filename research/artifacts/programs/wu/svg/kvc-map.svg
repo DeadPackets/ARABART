@@ -1,0 +1,38 @@
+<svg class="dg" viewBox="0 0 640 180" role="img" aria-labelledby="kvc-map-t">
+<title id="kvc-map-t">Map of KVC.EXE to scale: Borland start-up, his C, his Assembly, his help text, the Borland runtime and data.</title>
+<text class="t-cy" x="10" y="20">KVC.EXE unpacked, 16,864 bytes, to scale</text>
+<rect class="box-bk" x="10" y="32" width="19.4118" height="40" />
+<rect class="box-hi" x="29.4118" y="32" width="54.9265" height="40" />
+<rect class="box-ink" x="84.3382" y="32" width="100.551" height="40" />
+<rect class="box-dash" x="184.89" y="32" width="122.279" height="40" />
+<rect class="box-bk" x="307.169" y="32" width="225.184" height="40" />
+<rect class="box" x="532.353" y="32" width="97.6471" height="40" />
+<rect class="box-bk" x="10" y="86" width="18" height="18" />
+<text x="38" y="100">Borland start-up  528 B</text>
+<rect class="box-hi" x="330" y="86" width="18" height="18" />
+<text x="358" y="100">his C  1,494 B</text>
+<rect class="box-ink" x="10" y="116" width="18" height="18" />
+<text x="38" y="130">his Assembly  2,735 B</text>
+<rect class="box-dash" x="330" y="116" width="18" height="18" />
+<text x="358" y="130">his help text  3,326 B</text>
+<rect class="box-bk" x="10" y="146" width="18" height="18" />
+<text x="38" y="160">Borland runtime  6,125 B</text>
+<rect class="box" x="330" y="146" width="18" height="18" />
+<text x="358" y="160">data  2,656 B</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 226" role="img" aria-labelledby="kvc-map-tn">
+<title id="kvc-map-tn">KVC.EXE parts and their sizes in bytes.</title>
+<text class="t-cy" x="10" y="18">KVC.EXE, 16,864 bytes</text>
+<rect class="box-bk" x="10" y="32" width="6.03429" height="22" />
+<text x="88" y="49">Borland start-up 528</text>
+<rect class="box-hi" x="10" y="64" width="17.0743" height="22" />
+<text x="88" y="81">his C 1,494</text>
+<rect class="box-ink" x="10" y="96" width="31.2571" height="22" />
+<text x="88" y="113">his Assembly 2,735</text>
+<rect class="box-dash" x="10" y="128" width="38.0114" height="22" />
+<text x="88" y="145">his help text 3,326</text>
+<rect class="box-bk" x="10" y="160" width="70" height="22" />
+<text x="88" y="177">Borland runtime 6,125</text>
+<rect class="box" x="10" y="192" width="30.3543" height="22" />
+<text x="88" y="209">data 2,656</text>
+</svg>

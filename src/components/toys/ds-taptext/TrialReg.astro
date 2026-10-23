@@ -1,0 +1,86 @@
+---
+// TapText's trial (TapTextSetup.dll 0x1018A4 writes it, TapText.exe 0x17840 checks it): DinarSoft's 14-byte date
+// record, kept in the registry as a value named Plat+form under HKEY_CLASSES_ROOT\VB.register. Run days forward,
+// set the clock back, or reinstall, and watch the value.
+import { encode, hex } from '../ds-hijridate/trial.ts';
+interface Props { id: string }
+const { id } = Astro.props;
+const start = hex(encode(2006, 3, 1));
+---
+
+<div class="ttt-tr" id={id} data-tr>
+  <figure class="ttt-tr-reg" tabindex="0">
+    <figcaption>Registry: HKEY_CLASSES_ROOT \ VB.register</figcaption>
+    <table>
+      <thead><tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Data</th></tr></thead>
+      <tbody><tr><td>Platform</td><td>REG_BINARY</td><td data-val>{start}</td></tr></tbody>
+    </table>
+  </figure>
+  <div class="ttt-tr-ctl">
+    <label class="ttt-tr-days"><span>Days since TapText was installed on 1 March 2006: <output data-out>3</output></span>
+      <input type="range" min="0" max="20" step="1" value="3" data-days aria-valuetext="3 days" /></label>
+    <div class="ttt-tr-btns">
+      <button type="button" class="button k-btn" data-back>Set the clock back a week</button>
+      <button type="button" class="button k-btn" data-reinstall>Reinstall TapText</button>
+      <button type="button" class="button k-btn" data-reset>Start over</button>
+    </div>
+  </div>
+  <p class="ttt-tr-say" aria-live="polite" data-say>The trial version will expire after 12 day(s).</p>
+</div>
+
+<style>
+  .ttt-tr { display: grid; gap: 16px; min-width: 0; }
+  .ttt-tr-reg { margin: 0; overflow-x: auto; }
+  .ttt-tr-reg figcaption { margin-bottom: 6px; font: 600 0.875rem var(--font-code); }
+  .ttt-tr-reg table { width: 100%; border-collapse: collapse; background: #fff; color: #000; border: 1px solid #000; font: 12px Tahoma, Verdana, sans-serif; }
+  .ttt-tr-reg th, .ttt-tr-reg td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #ccc; white-space: nowrap; }
+  .ttt-tr-reg th { background: #d4d0c8; font-weight: 400; }
+  .ttt-tr-reg td:last-child { font-family: var(--font-code); }
+  .ttt-tr-reg td.is-junk { color: #b00; font-weight: 700; }
+  .ttt-tr-ctl { display: grid; gap: 12px; }
+  .ttt-tr-days { display: grid; gap: 6px; font-weight: 600; }
+  .ttt-tr-days input { width: 100%; max-width: 480px; min-height: 44px; accent-color: var(--accent); }
+  .ttt-tr-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .ttt-tr-btns .button { min-height: 44px; }
+  .ttt-tr-say { margin: 0; font-weight: 600; line-height: 1.5; }
+</style>
+
+<script>
+  import { encode, decode, dayNo, hex } from '../ds-hijridate/trial.ts';
+  const JUNK = [...'fslkj'].flatMap(c => [c.charCodeAt(0), 0]); // 10 bytes of L"fslkjreii"
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-tr]')) {
+    const range = root.querySelector<HTMLInputElement>('[data-days]')!, out = root.querySelector('[data-out]')!;
+    const val = root.querySelector<HTMLElement>('[data-val]')!, say = root.querySelector('[data-say]')!;
+    let value = encode(2006, 3, 1), offset = 0;
+    // What TapText does each time it starts, on the given day
+    const run = () => {
+      const days = +range.value + offset, now = new Date(Date.UTC(2006, 2, 1 + days));
+      out.textContent = String(+range.value); range.setAttribute('aria-valuetext', `${range.value} days`);
+      const r = decode(value);
+      if (r.good) {
+        const left = dayNo(r.y, r.m, r.d) + 15 - dayNo(now.getUTCFullYear(), now.getUTCMonth() + 1, now.getUTCDate());
+        if (left >= 0 && left <= 15) {
+          say.textContent = `${offset ? 'The clock reads ' + now.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', timeZone: 'UTC' }) + '. ' : ''}The trial version will expire after ${left} day(s).`;
+        } else {
+          value = JUNK;
+          say.textContent = left > 15
+            ? 'The clock is earlier than the day TapText was installed. TapText ends the trial and writes ten bytes of “fslkjreii” over its record.'
+            : 'Day 16: the trial is over. TapText writes ten bytes of “fslkjreii” over its record, so the date is gone for good.';
+        }
+      } else {
+        say.textContent = 'This trial version has expired, please register. The record no longer decodes, whatever the clock says.';
+      }
+      val.textContent = hex(value);
+      val.classList.toggle('is-junk', value === JUNK);
+    };
+    range.addEventListener('input', run);
+    root.querySelector('[data-back]')!.addEventListener('click', () => { offset -= 7; run(); });
+    root.querySelector('[data-reinstall]')!.addEventListener('click', () => {
+      run();
+      say.textContent = `Reinstalled. The installer writes the date only when the value is missing, so the record stays as it was: ${hex(value)}.`;
+    });
+    root.querySelector('[data-reset]')!.addEventListener('click', () => { value = encode(2006, 3, 1); offset = 0; range.value = '3'; run(); });
+    run();
+  }
+</script>

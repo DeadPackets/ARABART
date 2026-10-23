@@ -1,0 +1,1732 @@
+{
+ "builds": {
+  "1.5a": [
+   {
+    "case": "device key for A89EAGA4IFC9SEBI",
+    "key": "WVXJEMUDZVFQNCVF",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (V2EM9BE88BB6B7AE)",
+    "key": "HFGBBSQQJRGAWFUT",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for V2EM9BE88BB6B7AE",
+    "key": "HFGBBSQQJRGAWFUT",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (99EBGBF8FNCGMSR5)",
+    "key": "LWGGCSPQUDFNINLY",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 99EBGBF8FNCGMSR5",
+    "key": "LWGGCSPQUDFNINLY",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (GPI89CC86IPI6DHH)",
+    "key": "QZKRBRSQDYSCQBBG",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for GPI89CC86IPI6DHH",
+    "key": "QZKRBRSQDYSCQBBG",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9BBE4D73FAGR2DCJ)",
+    "key": "LKBJEQQEUQJAUBWE",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9BBE4D73FAGR2DCJ",
+    "key": "LKBJEQQEUQJAUBWE",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (B68FJR7BBG6N4A6J)",
+    "key": "VBYKXBQSQWMVNGAE",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for B68FJR7BBG6N4A6J",
+    "key": "VBYKXBQSQWMVNGAE",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9EAB22ENFC3E41D4)",
+    "key": "LFCGKFQWUSHQNLPZ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9EAB22ENFC3E41D4",
+    "key": "LFCGKFQWUSHQNLPZ",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (A89EAGA4IFC9SEBI)",
+    "key": "WVXJEMUDZVFQNCVF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key, device ID unavailable (code BC1118CCCSRBC9RG)",
+    "key": "VLPAJQSRPIQRXDLR",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "giveaway key",
+    "key": "DLKWWZMGLISYBCGX",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made from his name",
+    "key": "CDHGACZWNMGJQWEC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.72 way",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.73 way",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key of 2.3",
+    "key": "MRHLGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 2.3 way",
+    "key": "KBELGLJVQZBFCQFZ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 1 changed",
+    "key": "ELKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 2 changed",
+    "key": "DMKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 3 changed",
+    "key": "DLLWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 4 changed",
+    "key": "DLKXWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 5 changed",
+    "key": "DLKWXZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 6 changed",
+    "key": "DLKWW0MGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 7 changed",
+    "key": "DLKWWZNGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 8 changed",
+    "key": "DLKWWZMHLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 9 changed",
+    "key": "DLKWWZMGMISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 10 changed",
+    "key": "DLKWWZMGLJSYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 11 changed",
+    "key": "DLKWWZMGLITYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 12 changed",
+    "key": "DLKWWZMGLISZBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 13 changed",
+    "key": "DLKWWZMGLISYCCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 14 changed",
+    "key": "DLKWWZMGLISYBDGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 15 changed",
+    "key": "DLKWWZMGLISYBCHX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 16 changed",
+    "key": "DLKWWZMGLISYBCGY",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "M217J8C5GAT8XF0J",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "4LITLD0Y4WK7JM2Z",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "ITB99NSXVGWU3SCM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "RLL6UPTGVIDSMIES",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "QRRCTEYEMN5WYY3Z",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "8NGZ6Y7Q2YG2IB9M",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "FX6J9Z8CCQFUCA9G",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KBHNNYW15MAUAIUJ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "XB7G09RA24ZFVCC4",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "58I0HVT7MC8IBVXY",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "3T83J4YWJAE2I0MZ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "5Q66E79ICVPWE9TR",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "Y6503057U11BCV61",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "1990ILGM80X8BVGH",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "ZIAHJB2C4RTSTMQ2",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KV3QNHLH7DILV0HI",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "0RI275U12G6GG5H8",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "4EJUMM2BFLTDFDI6",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "SDZCBP4SXN0ZYKW4",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "JPBPTTNK8TSUN4PV",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "empty key",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "the plain word GIVEAWAYVERSION1",
+    "key": "GIVEAWAYVERSION1",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2006-03-23, today 2006-03-30",
+    "key": "",
+    "want_registered": false,
+    "verdict": 0,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2006-03-23, today 2006-04-08",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "no key, trial record with one byte changed",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   }
+  ],
+  "1.72": [
+   {
+    "case": "device key for A89EAGA4IFC9SEBI",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (V2EM9BE88BB6B7AE)",
+    "key": "TZTJWAEEFLRWEJNA",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for V2EM9BE88BB6B7AE",
+    "key": "TZTJWAEEFLRWEJNA",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (99EBGBF8FNCGMSR5)",
+    "key": "TITGHAHEYZSSTJDN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 99EBGBF8FNCGMSR5",
+    "key": "TITGHAHEYZSSTJDN",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (GPI89CC86IPI6DHH)",
+    "key": "KIXZWZKELACGFXXM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for GPI89CC86IPI6DHH",
+    "key": "KIXZWZKELACGFXXM",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9BBE4D73FAGR2DCJ)",
+    "key": "TQSBZGBTYIWEJXLP",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9BBE4D73FAGR2DCJ",
+    "key": "TQSBZGBTYIWEJXLP",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (B68FJR7BBG6N4A6J)",
+    "key": "FDHCCJBDCGAZHCGP",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for B68FJR7BBG6N4A6J",
+    "key": "FDHCCJBDCGAZHCGP",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9EAB22ENFC3E41D4)",
+    "key": "TVPGFFEHYKXUHQKM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9EAB22ENFC3E41D4",
+    "key": "TVPGFFEHYKXUHQKM",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (A89EAGA4IFC9SEBI)",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key, device ID unavailable (code BC1118CCCSRBC9RG)",
+    "key": "FPYSEZKCBBAVDHDC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "giveaway key",
+    "key": "DLKWWZMGLISYBCGX",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made from his name",
+    "key": "CDHGACZWNMGJQWEC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.5a way",
+    "key": "WVXJEMUDZVFQNCVF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key of 2.3",
+    "key": "MRHLGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 2.3 way",
+    "key": "KBELGLJVQZBFCQFZ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 1 changed",
+    "key": "ELKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 2 changed",
+    "key": "DMKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 3 changed",
+    "key": "DLLWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 4 changed",
+    "key": "DLKXWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 5 changed",
+    "key": "DLKWXZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 6 changed",
+    "key": "DLKWW0MGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 7 changed",
+    "key": "DLKWWZNGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 8 changed",
+    "key": "DLKWWZMHLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 9 changed",
+    "key": "DLKWWZMGMISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 10 changed",
+    "key": "DLKWWZMGLJSYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 11 changed",
+    "key": "DLKWWZMGLITYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 12 changed",
+    "key": "DLKWWZMGLISZBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 13 changed",
+    "key": "DLKWWZMGLISYCCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 14 changed",
+    "key": "DLKWWZMGLISYBDGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 15 changed",
+    "key": "DLKWWZMGLISYBCHX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 16 changed",
+    "key": "DLKWWZMGLISYBCGY",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "QX8MXWRLXHN72WTD",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "FGHF3Z2HQTBPGRP8",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "CBZ7NTS0S9HDKFAQ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "TLBFELFKL7YGLM26",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "VGZ3I5THN6VZCJ1R",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "ZQNQ5FBBYH1LQYHM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "0KV0X54QL4YWFHN3",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "6CVYM88IL25EX10B",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "ILG43006J0IQQ7RL",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "X00FBR0Z4W1U1LYF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "2RJG01WND6HC0VDC",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "VKVHZ40EEPMKQCP8",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "HKZP4NJ7YGU8F92X",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "B2ETAVY1R3PZ03WL",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KZRW58PXKXS969LF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "57TTY4DLHXISVBMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "F9SY1MCAXMZS2XW2",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "CA28XFW23LRLZ5XF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "JASVFN773GVT7X9S",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "QXUQIRDU6E5UDRA0",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "empty key",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "the plain word GIVEAWAYVERSION1",
+    "key": "GIVEAWAYVERSION1",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2006-07-20, today 2006-07-30",
+    "key": "",
+    "want_registered": false,
+    "verdict": 0,
+    "days_left": 5,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2006-07-20, today 2006-08-05",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   }
+  ],
+  "1.73": [
+   {
+    "case": "device key for A89EAGA4IFC9SEBI",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (V2EM9BE88BB6B7AE)",
+    "key": "TZTJWAEEFLRWEJNA",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for V2EM9BE88BB6B7AE",
+    "key": "TZTJWAEEFLRWEJNA",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (99EBGBF8FNCGMSR5)",
+    "key": "TITGHAHEYZSSTJDN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 99EBGBF8FNCGMSR5",
+    "key": "TITGHAHEYZSSTJDN",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (GPI89CC86IPI6DHH)",
+    "key": "KIXZWZKELACGFXXM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for GPI89CC86IPI6DHH",
+    "key": "KIXZWZKELACGFXXM",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9BBE4D73FAGR2DCJ)",
+    "key": "TQSBZGBTYIWEJXLP",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9BBE4D73FAGR2DCJ",
+    "key": "TQSBZGBTYIWEJXLP",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (B68FJR7BBG6N4A6J)",
+    "key": "FDHCCJBDCGAZHCGP",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for B68FJR7BBG6N4A6J",
+    "key": "FDHCCJBDCGAZHCGP",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9EAB22ENFC3E41D4)",
+    "key": "TVPGFFEHYKXUHQKM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9EAB22ENFC3E41D4",
+    "key": "TVPGFFEHYKXUHQKM",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (A89EAGA4IFC9SEBI)",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key, device ID unavailable (code BC1118CCCSRBC9RG)",
+    "key": "FPYSEZKCBBAVDHDC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "giveaway key",
+    "key": "DLKWWZMGLISYBCGX",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made from his name",
+    "key": "CDHGACZWNMGJQWEC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.5a way",
+    "key": "WVXJEMUDZVFQNCVF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key of 2.3",
+    "key": "MRHLGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 2.3 way",
+    "key": "KBELGLJVQZBFCQFZ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 1 changed",
+    "key": "ELKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 2 changed",
+    "key": "DMKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 3 changed",
+    "key": "DLLWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 4 changed",
+    "key": "DLKXWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 5 changed",
+    "key": "DLKWXZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 6 changed",
+    "key": "DLKWW0MGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 7 changed",
+    "key": "DLKWWZNGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 8 changed",
+    "key": "DLKWWZMHLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 9 changed",
+    "key": "DLKWWZMGMISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 10 changed",
+    "key": "DLKWWZMGLJSYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 11 changed",
+    "key": "DLKWWZMGLITYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 12 changed",
+    "key": "DLKWWZMGLISZBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 13 changed",
+    "key": "DLKWWZMGLISYCCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 14 changed",
+    "key": "DLKWWZMGLISYBDGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 15 changed",
+    "key": "DLKWWZMGLISYBCHX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 16 changed",
+    "key": "DLKWWZMGLISYBCGY",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "FZLCZD5W3RSZ5E1T",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "00VJAJDSFRZEVLFD",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "T66P4WEKALD03V2X",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "T2CYZ90K45K58KGW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KDZAMXSFQP8AAJTM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KCSALVKADVAFZKQQ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "09K0WRH0PR7HXLRS",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "J548K094X9FEGYAH",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "NIS8PSTNGIHI1S16",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "Z59LRSYT376UV1AS",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "E4XC488XU5PP40W3",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "XANDJ8VEMTQK7KHM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "27Q97EPTFPTD2TQT",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KRNPWV6XWAK73TXP",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "KFGBUVK79LFR4KQ6",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "Z8ZB27RIN1PJ6SE7",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "C5PN92N36S28WKXN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "ERPKCJPXA4BK8PNS",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "AKPP0RUIT6CSDSGC",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "LM9Q4F4ZBCF41DTJ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "empty key",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "the plain word GIVEAWAYVERSION1",
+    "key": "GIVEAWAYVERSION1",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2006-07-20, today 2006-07-30",
+    "key": "",
+    "want_registered": false,
+    "verdict": 0,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2006-07-20, today 2006-08-05",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   }
+  ],
+  "2.3": [
+   {
+    "case": "device key for A89EAGA4IFC9SEBI",
+    "key": "KBELGLJVQZBFCQFZ",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (V2EM9BE88BB6B7AE)",
+    "key": "EHBURIFRTDCGUQCV",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for V2EM9BE88BB6B7AE",
+    "key": "EHBURIFRTDCGUQCV",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (99EBGBF8FNCGMSR5)",
+    "key": "PABGMIIRKHBYDBPA",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 99EBGBF8FNCGMSR5",
+    "key": "PABGMIIRKHBYDBPA",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (GPI89CC86IPI6DHH)",
+    "key": "MRNTRHLRMMJWDRLA",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for GPI89CC86IPI6DHH",
+    "key": "MRNTRHLRMMJWDRLA",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9BBE4D73FAGR2DCJ)",
+    "key": "PYCLLPJCKEFSZREC",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9BBE4D73FAGR2DCJ",
+    "key": "PYCLLPJCKEFSZREC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (B68FJR7BBG6N4A6J)",
+    "key": "JLDKQZJPGYLPBUSC",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for B68FJR7BBG6N4A6J",
+    "key": "JLDKQZJPGYLPBUSC",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (9EAB22ENFC3E41D4)",
+    "key": "PDFGJGFCKCGABWZB",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key for 9EAB22ENFC3E41D4",
+    "key": "PDFGJGFCKCGABWZB",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made for another device (A89EAGA4IFC9SEBI)",
+    "key": "KBELGLJVQZBFCQFZ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key, device ID unavailable (code BC1118CCCSRBC9RG)",
+    "key": "JXWJIRLQFLLBTNPX",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "giveaway key",
+    "key": "MRHLGCJWUALTZFJW",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "key made from his name",
+    "key": "TZMPKZNDREVAWUHZ",
+    "want_registered": true,
+    "verdict": 13,
+    "ok": true
+   },
+   {
+    "case": "giveaway key of 1.5a",
+    "key": "DLKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.5a way",
+    "key": "WVXJEMUDZVFQNCVF",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key of 1.72",
+    "key": "DLKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.72 way",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key of 1.73",
+    "key": "DLKWWZMGLISYBCGX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "device key made the 1.73 way",
+    "key": "IJGBJDISRHSLMYMN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 1 changed",
+    "key": "NRHLGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 2 changed",
+    "key": "MSHLGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 3 changed",
+    "key": "MRILGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 4 changed",
+    "key": "MRHMGCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 5 changed",
+    "key": "MRHLHCJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 6 changed",
+    "key": "MRHLGDJWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 7 changed",
+    "key": "MRHLGCKWUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 8 changed",
+    "key": "MRHLGCJXUALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 9 changed",
+    "key": "MRHLGCJWVALTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 10 changed",
+    "key": "MRHLGCJWUBLTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 11 changed",
+    "key": "MRHLGCJWUAMTZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 12 changed",
+    "key": "MRHLGCJWUALUZFJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 13 changed",
+    "key": "MRHLGCJWUALT0FJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 14 changed",
+    "key": "MRHLGCJWUALTZGJW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 15 changed",
+    "key": "MRHLGCJWUALTZFKW",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "giveaway key, letter 16 changed",
+    "key": "MRHLGCJWUALTZFJX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "W528EP5JC8UFUIMT",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "YLLFKUP23HZ4NZWX",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "LMZ6TIT3HEZY3BGI",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "S723T5A1S88528LT",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "TAWNZ3UA269B8MLM",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "VGX136QXA75A39J4",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "AU1SNCE0A505J3LI",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "7L2696LQLPKDTIME",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "DL9CIDTTRL0CU1RU",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "22VFZT22TT0FMQHN",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "Y18UVYF1GTGJ73CJ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "MPEPFH5W1KGZF3TJ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "GLEAANXB57E5MFNJ",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "2WFY2EWA9WN29R79",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "X8KJ7WAMH6XBI62V",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "WXD57573VDK4SX1P",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "Y2FUEYSNT6X2NSIH",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "404T9F85YUX9WCCT",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "R916F195W5S5C2MA",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "random 16 letters",
+    "key": "L0BD966NUSQ193F1",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "empty key",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "the plain word GIVEAWAYVERSION1",
+    "key": "GIVEAWAYVERSION1",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2008-06-20, today 2008-06-23",
+    "key": "",
+    "want_registered": false,
+    "verdict": 0,
+    "days_left": 12,
+    "ok": true
+   },
+   {
+    "case": "no key, installed 2008-06-20, today 2008-07-06",
+    "key": "",
+    "want_registered": false,
+    "verdict": 7,
+    "ok": true
+   }
+  ]
+ },
+ "accepted": 40,
+ "rejected": 205,
+ "fails": 0
+}

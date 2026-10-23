@@ -1,0 +1,202 @@
+---
+// Build your own launcher: HandyLauncher's tray icon and two menus on the left, his own Shortcut Setup and Shortcut
+// Properties dialogs on the right (dialogs 502 and 103 from HandyLauncher.exe 3.4, rebuilt by pocket.ts).
+// The menus start as his setup program wrote them on install.
+import Window from '../../shell/Window.astro';
+import { renderDialog, type Dialog } from '../ds-handyswitcher/pocket.ts';
+import '../ds-handyswitcher/pocket.css';
+import './hl.css';
+import ui from './ui.json';
+import icon16 from './icon-175-16.png';
+import { MENU1, MENU2, MENU1_NAME, MENU2_NAME, ORIENT, GLYPH } from './hl.ts';
+import { menuHTML } from './launcher.ts';
+
+const D = ui['34'].dialogs as unknown as Record<string, Dialog>;
+const rows = (m: typeof MENU1) => m.map(it => ({ text: it.kind === 'sep' ? '----------------' : it.name }));
+const setup = renderDialog(D['502'], {
+  1031: { options: [MENU1_NAME, MENU2_NAME], attrs: 'aria-label="Menu name" data-hl="menu"' },
+  1000: { rows: rows(MENU1), attrs: 'data-hl="list"' },
+  1002: { attrs: 'aria-label="Add a shortcut" data-hl="add"' },
+  1004: { attrs: 'aria-label="Delete the selected item" data-hl="del"' },
+  1023: { attrs: 'aria-label="Edit the selected item" data-hl="edit"' },
+  1025: { attrs: 'aria-label="Rename this menu" disabled' },
+  1041: { checked: true, attrs: 'data-hl="first"' },
+  1042: { attrs: 'data-hl="rev"' },
+  23958: { checked: true },
+}, 'hlb-s');
+const props = renderDialog(D['103'], {
+  1033: { checked: true, attrs: 'data-hl="kind-sc"' },
+  1032: { attrs: 'data-hl="kind-sep"' },
+  1003: { attrs: 'aria-label="Name" data-hl="name"' },
+  1004: { attrs: 'aria-label="Target" list="hlb-targets" data-hl="target"' },
+  1005: { attrs: 'aria-label="Command line" data-hl="cmd"' },
+  1012: { attrs: 'aria-label="Pick a target" data-hl="pick"' },
+  1013: { attrs: 'aria-label="Pick a command line" disabled' },
+  1053: { options: ORIENT, attrs: 'aria-label="Orientation" data-hl="orient"' },
+  1030: { img: icon16.src },
+  2: { attrs: 'data-hl="cancel"' },
+}, 'hlb-p').replace(/name="hlb-p-r\d+"/g, 'name="hlb-p-r"');
+const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.exe', '\\My Documents\\Letter.psw', '\\My Documents\\My Music\\Song.mp3', '\\My Documents\\Pictures', '\\Windows\\Start Menu\\Programs\\Games', '\\'];
+---
+
+<div class="hl-build" data-hlbuild data-menus={JSON.stringify([MENU1, MENU2])} data-glyphs={JSON.stringify(GLYPH)}>
+  <div class="hl-build-grid">
+    <figure class="hl-build-fig">
+      <Window title="Today" kind="device" num="9:41" class="hl-dev" aria-label="A Pocket PC with HandyLauncher in its tray">
+        <div class="hl-scr" data-scr>
+          <ul class="hl-today" aria-hidden="true">
+            <li>Monday, March 20, 2006</li>
+            <li><i></i>Tap here to set owner information</li>
+            <li><i></i>No unread messages</li>
+            <li><i></i>No tasks</li>
+            <li><i></i>No upcoming appointments</li>
+          </ul>
+          <ul class="hl-menu" role="menu" aria-label={MENU1_NAME} data-menu set:html={menuHTML(MENU1, MENU1_NAME)} />
+          <div class="hl-splash" data-splash hidden><b data-splash-name></b><small data-splash-note></small></div>
+          <div class="hl-bar"><b aria-hidden="true">New</b>
+            <button type="button" class="hl-ticon" data-ticon aria-label="HandyLauncher: Enter for the first menu, Shift+F10 for the second"><img src={icon16.src} alt="" width="16" height="16" /></button>
+          </div>
+        </div>
+      </Window>
+      <figcaption class="hl-cap">His icon sits in the tray. Tap it, or tap and hold it.</figcaption>
+    </figure>
+    <figure class="hl-build-fig">
+      <Window title="HandyLauncher" kind="device" num="9:41" class="hl-dev" aria-label="HandyLauncher settings, rebuilt from his own dialogs">
+        <div class="ppc hl-set" data-set>
+          <div class="hl-set-in">
+            <div class="hl-page" data-page="setup" set:html={setup} />
+            <div class="hl-page" data-page="props" set:html={props} />
+          </div>
+        </div>
+        <p slot="status" class="ds-soft hl-soft"><button type="button" class="hl-ok" data-hl="ok" hidden>ok</button><span>Menu</span></p>
+      </Window>
+      <figcaption class="hl-cap">His Shortcut Setup page. Pick a menu, then tap + to add a shortcut.</figcaption>
+    </figure>
+  </div>
+  <datalist id="hlb-targets">{SAMPLES.map(s => <option value={s} />)}</datalist>
+  <div class="hl-row hl-build-ctl" hidden data-ctl>
+    <button type="button" class="button" data-act="tap">Tap the icon</button>
+    <button type="button" class="button" data-act="hold">Tap and hold</button>
+  </div>
+  <p class="hl-say" aria-live="polite" data-say>The first menu is open, as his setup program filled it. Tap a shortcut to launch it.</p>
+</div>
+
+<style is:global>
+  .hl-build { display: grid; gap: 16px; }
+  .hl-build-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 24px; justify-content: start; }
+  .hl-build-fig { display: grid; gap: 8px; margin: 0; min-width: 0; }
+  .hl-set { height: 100%; overflow: hidden auto; }
+  .hl-set .ppc-lv li { cursor: default; }
+  .hl-lvb { display: flex; align-items: center; gap: 4px; width: 100%; padding: 1px 2px; font: inherit; color: #000; text-align: left; background: none; border: 0; cursor: pointer; white-space: nowrap; }
+  .hl-lvb[aria-pressed='true'] { color: #fff; background: #316ac5; }
+  .hl-lvb svg { width: 12px; height: 12px; flex: none; }
+  .hl-lvb:focus-visible { outline: 2px solid #316ac5; outline-offset: -2px; }
+  .hl-build:not(.is-live) .hl-page + .hl-page { border-top: 2px solid #808080; }
+  .hl-build.is-live .hl-page[hidden] { display: none; }
+  .hl-soft .hl-ok { min-width: 44px; min-height: 28px; padding: 0 6px; font: inherit; color: #fff; background: none; border: 0; cursor: pointer; }
+  .hl-soft .hl-ok:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+  @media (max-width: 760px) { .hl-build-grid { grid-template-columns: minmax(0, 320px); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { menuHTML, tapOrHold, menuKeys } from './launcher.ts';
+  import { kindOf, reduce, ORIENT, MENU1_NAME, MENU2_NAME, type Item } from './hl.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-hlbuild]:not(.is-live)').forEach(root => {
+    const menus: Item[][] = JSON.parse(root.dataset.menus!);
+    const glyphs: Record<string, string> = JSON.parse(root.dataset.glyphs!);
+    const names = [MENU1_NAME, MENU2_NAME];
+    const $ = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const menu = $('[data-menu]'), ticon = $<HTMLButtonElement>('[data-ticon]'), say = $('[data-say]');
+    const splash = $('[data-splash]'), scr = $('[data-scr]');
+    const pages = [...root.querySelectorAll<HTMLElement>('[data-page]')];
+    const f = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-hl="${k}"]`)!;
+    const list = f('list'), pickMenu = f<HTMLSelectElement>('menu'), ok = f<HTMLButtonElement>('ok');
+    const rev = f<HTMLLabelElement>('rev').querySelector('input')!, first = f<HTMLLabelElement>('first').querySelector('input')!;
+    let cur = 0, sel = -1, editing = -1, open = -1;
+
+    const page = (p: string) => {
+      pages.forEach(el => (el.hidden = el.dataset.page !== p));
+      ok.hidden = p !== 'props';
+    };
+    const drawList = () => {
+      list.innerHTML = menus[cur].map((it, i) => `<li><button type="button" class="hl-lvb" aria-pressed="${i === sel}" data-row="${i}">${it.kind === 'sep' ? '<span>----------------</span>' : glyphs[it.kind] + '<span>' + it.name.replace(/</g, '&lt;') + '</span>'}</button></li>`).join('');
+    };
+    const closeMenu = (focus = false) => { menu.hidden = true; open = -1; if (focus) ticon.focus(); };
+    const showMenu = (k: number, how: string) => {
+      menu.innerHTML = menuHTML(menus[k], names[k]);
+      menu.setAttribute('aria-label', names[k]);
+      menu.hidden = false; open = k;
+      if (!reduce()) gsap.fromTo(menu, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.18, ease: 'power2.out' });
+      say.innerHTML = `${how}: <b>${names[k]}</b>, the ${k ? 'second' : 'first'} menu${rev.checked ? ' (Reverse is on, so the two swap)' : ''}.`;
+    };
+    const tap = () => (open >= 0 ? closeMenu() : showMenu(rev.checked ? 1 : 0, 'A tap'));
+    const hold = () => showMenu(rev.checked ? 0 : 1, 'Tap and hold');
+    tapOrHold(ticon, { tap, hold });
+    menuKeys(menu, () => closeMenu(true));
+    root.querySelector('[data-act="tap"]')!.addEventListener('click', tap);
+    root.querySelector('[data-act="hold"]')!.addEventListener('click', hold);
+    scr.addEventListener('pointerdown', e => { if (open >= 0 && !(e.target as Element).closest('[data-menu], [data-ticon]')) closeMenu(); });
+
+    menu.addEventListener('click', e => {
+      const b = (e.target as Element).closest<HTMLButtonElement>('[data-i]');
+      if (!b) return;
+      const it = menus[open][+b.dataset.i!];
+      closeMenu();
+      $('[data-splash-name]').textContent = it.name;
+      $('[data-splash-note]').textContent = (it.orient ? `Screen turned to ${ORIENT[it.orient]} first. ` : '') + (it.kind === 'folder' ? `File Explorer opens ${it.target}` : `Opening ${it.target}`);
+      splash.hidden = false;
+      say.innerHTML = `HandyLauncher opens <b>${it.name}</b>${it.orient ? `, after turning the screen to <b>${ORIENT[it.orient]}</b>` : ''}.`;
+      window.setTimeout(() => (splash.hidden = true), 1600);
+    });
+
+    // His Shortcut Setup page
+    pickMenu.addEventListener('change', () => { cur = pickMenu.selectedIndex; sel = -1; drawList(); });
+    list.addEventListener('click', e => {
+      const b = (e.target as Element).closest<HTMLElement>('[data-row]');
+      if (!b) return;
+      sel = +b.dataset.row!; drawList();
+      list.querySelector<HTMLElement>(`[data-row="${sel}"]`)?.focus();
+    });
+    const sync = () => { first.checked = !rev.checked; };
+    rev.addEventListener('change', () => { sync(); say.innerHTML = rev.checked ? 'Reverse is on: a tap now opens the second menu, a hold the first.' : 'Reverse is off: a tap opens the first menu, a hold the second.'; });
+    first.addEventListener('change', () => { rev.checked = !first.checked; });
+
+    const kindSc = f('kind-sc').querySelector('input')!, kindSep = f('kind-sep').querySelector('input')!;
+    const nameEd = f<HTMLInputElement>('name'), targetEd = f<HTMLInputElement>('target'), orient = f<HTMLSelectElement>('orient');
+    const fill = (it: Item | null) => {
+      kindSc.checked = !it || it.kind !== 'sep'; kindSep.checked = !kindSc.checked;
+      nameEd.value = it && it.kind !== 'sep' ? it.name : '';
+      targetEd.value = it && it.kind !== 'sep' ? it.target : '';
+      orient.selectedIndex = it ? it.orient : 0;
+      page('props');
+      (kindSep.checked ? kindSep : nameEd).focus();
+    };
+    f('add').addEventListener('click', () => { editing = -1; fill(null); });
+    f('edit').addEventListener('click', () => { if (sel < 0) { say.textContent = 'Pick an item in the list first.'; return; } editing = sel; fill(menus[cur][sel]); });
+    f('del').addEventListener('click', () => {
+      if (sel < 0) { say.textContent = 'Pick an item in the list first.'; return; }
+      const [gone] = menus[cur].splice(sel, 1);
+      say.innerHTML = `Deleted <b>${gone.kind === 'sep' ? 'a separator' : gone.name}</b> from ${names[cur]}.`;
+      sel = Math.min(sel, menus[cur].length - 1); drawList();
+      if (open === cur) showMenu(cur, 'Updated');
+    });
+    f('pick').addEventListener('click', () => { targetEd.focus(); targetEd.showPicker?.(); });
+    f('cancel').addEventListener('click', () => { page('setup'); f('add').focus(); });
+    ok.addEventListener('click', () => {
+      const target = targetEd.value.trim();
+      if (kindSc.checked && (!nameEd.value.trim() || !target)) { say.textContent = 'A shortcut needs a name and a target.'; (nameEd.value.trim() ? targetEd : nameEd).focus(); return; }
+      const it: Item = kindSep.checked ? { name: '', target: '', kind: 'sep', orient: 0 } : { name: nameEd.value.trim().slice(0, 32), target, kind: kindOf(target), orient: orient.selectedIndex };
+      if (editing >= 0) menus[cur][editing] = it; else { menus[cur].push(it); sel = menus[cur].length - 1; }
+      drawList(); page('setup');
+      showMenu(cur, 'Saved');
+      say.innerHTML = `Saved in <b>${names[cur]}</b>. ${it.kind === 'sep' ? 'A separator groups the items around it.' : `Its menu shows <b>${it.name}</b>${it.orient ? `, and the screen will turn to ${ORIENT[it.orient]} first` : ''}.`}`;
+      f('add').focus();
+    });
+
+    drawList(); page('setup'); sync();
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    root.classList.add('is-live');
+  });
+</script>

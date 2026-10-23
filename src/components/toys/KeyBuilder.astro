@@ -1,0 +1,159 @@
+---
+// The 32-bit equipment key from US 7,603,377: node, shelf, slot, card and port packed as 10/5/5/5/7 bits.
+// Drag any part; pick a level; the sorted index shows that everything inside it is one unbroken range.
+// Event: 'keybuilder' { key, lo, hi, level } on the root.
+import Window from '../shell/Window.astro';
+import BitField from './BitField.astro';
+import { range, rows, rowsHTML, sayHTML } from './key';
+
+interface Props { id?: string; values?: number[]; level?: number }
+const FIELDS = [
+  { name: 'Node', bits: 10 }, { name: 'Shelf', bits: 5 }, { name: 'Slot', bits: 5 }, { name: 'Card', bits: 5 }, { name: 'Port', bits: 7 },
+];
+const { id = 'keybuilder', values = [5, 2, 3, 1, 17], level = 2 } = Astro.props;
+
+const { key, lo, hi } = range(values, level);
+const inside = rows(values, level).filter(r => r.k >= lo && r.k < hi).length;
+const n = (x: number) => x.toLocaleString('en-US');
+---
+
+<div class="k-kb" id={id} data-keybuilder data-values={values.join(',')} data-level={level}>
+  <Window title="Equipment key" kind="dialog" class="k-kb-in">
+    <div class="k-kb-sl">
+      {FIELDS.map((f, i) => (
+        <label class="k-kb-f">
+          <span class="k-kb-name">{f.name}<small>{f.bits} bits</small></span>
+          <input type="range" min="1" max={2 ** f.bits - 1} value={values[i]} data-f={i} aria-label={`${f.name}, 1 to ${2 ** f.bits - 1}`} />
+          <output data-o={i}>{values[i]}</output>
+        </label>
+      ))}
+    </div>
+    <div class="k-kb-lv" role="radiogroup" aria-label="Find everything inside this">
+      <span class="k-kb-lab">Find everything in this</span>
+      {FIELDS.slice(0, 4).map((f, i) => (
+        <button type="button" role="radio" class="button k-btn" data-l={i + 1} aria-checked={String(i + 1 === level)} tabindex={i + 1 === level ? 0 : -1}>{f.name}</button>
+      ))}
+    </div>
+  </Window>
+  <Window title="KEY, 32 bits" kind="editor" num="1" class="k-kb-bits">
+    <BitField label="The key, 32 bits" bits={32} value={key} readonly size="sm" groups={FIELDS.map((f, i) => ({ bits: f.bits, label: f.name.toLowerCase(), tone: i < level ? 'a' : undefined }))} />
+    <p class="k-kb-path" data-path>{FIELDS.map((f, i) => `${f.name.toLowerCase()} ${values[i]}`).join(' › ')}</p>
+    <pre class="k-kb-sql"><code><span class="op">WHERE</span> key &gt;= <b data-lo>{n(lo)}</b>
+  <span class="op">AND</span> key &lt;  <b data-hi>{n(hi)}</b></code></pre>
+  </Window>
+  <Window title="INDEX, sorted by key" kind="panel" num="2" class="k-kb-idx">
+    <div class="k-kb-head" aria-hidden="true"><span>record</span><span>key</span></div>
+    <ol class="k-kb-rows" data-rows set:html={rowsHTML(values, level)} />
+    <p class="k-kb-say" data-say aria-live="polite" set:html={sayHTML(values, level, inside)} />
+  </Window>
+</div>
+
+<style>
+  .k-kb { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); grid-template-areas: 'in idx' 'bits idx'; gap: 22px 26px; align-items: start; }
+  .k-kb > :global(.k-kb-in) { grid-area: in; }
+  .k-kb > :global(.k-kb-bits) { grid-area: bits; }
+  .k-kb > :global(.k-kb-idx) { grid-area: idx; }
+  .k-kb-sl { display: grid; gap: 4px; }
+  .k-kb-f { display: grid; grid-template-columns: 5.5em minmax(0, 1fr) 4ch; align-items: center; gap: 12px; min-height: 44px; color: var(--ink); }
+  .k-kb-name { font: 700 0.9375rem/1.1 var(--sans); }
+  .k-kb-name small { display: block; font: 500 11px/1.3 var(--font-code); color: var(--ink-2); }
+  .k-kb-f input { width: 100%; min-height: 44px; accent-color: var(--accent); }
+  .k-kb-f output { font: 700 0.9375rem/1 var(--font-code); text-align: right; font-variant-numeric: tabular-nums; }
+  .k-kb-lv { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+  .k-kb-lab { width: 100%; font: 700 0.875rem/1.3 var(--sans); color: var(--ink); }
+  .k-kb-path { margin-top: 12px; font: 600 0.875rem/1.5 var(--font-code); color: var(--ink); }
+  .k-kb-sql { margin: 12px 0 0; padding: 10px 12px; background: var(--surface-2); font: 500 0.875rem/1.6 var(--font-code); color: var(--ink); white-space: pre-wrap; }
+  .k-kb-sql .op { color: var(--accent-2); }
+  .k-kb-sql b { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .k-kb-head { display: flex; justify-content: space-between; padding: 0 10px 6px; font: 600 12px/1.4 var(--font-code); color: var(--accent-2); }
+  .k-kb-rows { position: relative; list-style: none; margin: 0; padding: 0; font: 500 clamp(12px, 0.25vw + 9.5px, 13.5px)/1 var(--font-code); }
+  .k-kb-rows :global(li) { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 10px; height: 30px; padding: 0 10px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .k-kb-rows :global(li.in) { color: var(--surface); }
+  .k-kb-rows :global(li.me) { font-weight: 700; }
+  .k-kb-rows :global(li.me span:first-child::after) { content: '◄ yours'; margin-left: 1.5ch; font-size: 10px; }
+  .k-kb-rows :global(i) { font-style: normal; opacity: 0.75; margin-right: 0.8ch; }
+  .k-kb-rows :global(.band) { position: absolute; z-index: 0; left: 0; right: 0; top: 0; height: 30px; padding: 0; background: var(--accent); transform-origin: 0 0; }
+  .k-kb-rows :global(.mark) { position: absolute; z-index: 2; left: -8px; right: -8px; top: 0; height: 2px; padding: 0; background: var(--accent-2); }
+  .k-kb-rows :global(.mark span) { position: absolute; left: 0; top: -8px; padding: 0 5px; font: 700 10px/16px var(--font-code); color: var(--surface); background: var(--accent-2); }
+  .k-kb:not(.is-live) .k-kb-rows :global(:is(.band, .mark)) { display: none; }
+  .k-kb:not(.is-live) .k-kb-rows :global(li.in) { background: var(--accent); }
+  .k-kb-say { margin-top: 14px; font: 500 0.9375rem/1.55 var(--sans); color: var(--ink); min-height: 4.65em; }
+  .k-kb-say :global(b) { color: var(--accent); }
+  @media (max-width: 900px) {
+    .k-kb { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'in' 'bits' 'idx'; }
+    .k-kb-rows :global(li.me::after) { content: '◄'; right: -1.4em; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  import { FIELDS, range, rowsHTML, sayHTML } from './key';
+
+  const n = (x: number) => x.toLocaleString('en-US');
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ROW = 30;
+
+  document.querySelectorAll<HTMLElement>('[data-keybuilder]').forEach(root => {
+    const v = root.dataset.values!.split(',').map(Number);
+    let level = +root.dataset.level!;
+    const bf = root.querySelector<HTMLElement & { bitfield?: { set(v: number, q?: boolean): void } }>('[data-bitfield]')!;
+    const list = root.querySelector<HTMLElement>('[data-rows]')!, say = root.querySelector('[data-say]')!;
+    const groups = [...bf.querySelectorAll<HTMLElement>('.k-bits-g')];
+    const loEl = root.querySelector('[data-lo]')!, hiEl = root.querySelector('[data-hi]')!, path = root.querySelector('[data-path]')!;
+    const nums = { lo: 0, hi: 0 };
+    let first = true;
+
+    function update() {
+      const { key, free, lo, hi } = range(v, level);
+      bf.bitfield?.set(key, true);
+      groups.forEach((g, i) => (g.dataset.tone = i < level ? 'a' : ''));
+      path.textContent = FIELDS.map((f, i) => `${f[0]} ${v[i]}`).join(' › ');
+      const d = reduce() || first ? 0 : 0.5;
+      gsap.to(nums, { lo, hi, duration: d, ease: 'expo.out', overwrite: true, onUpdate: () => { loEl.textContent = n(Math.round(nums.lo)); hiEl.textContent = n(Math.round(nums.hi)); } });
+
+      // FLIP: remember where each key sat, rebuild, then slide rows from there
+      const before = new Map([...list.querySelectorAll<HTMLElement>('li[data-k]')].map(li => [li.dataset.k!, li.offsetTop]));
+      list.innerHTML = rowsHTML(v, level);
+      const lis = [...list.querySelectorAll<HTMLElement>('li[data-k]')];
+      const a = lis.findIndex(li => +li.dataset.k! >= lo), b = lis.findLastIndex(li => +li.dataset.k! < hi);
+      lis.forEach(li => {
+        const was = before.get(li.dataset.k!);
+        if (d && was !== undefined && was !== li.offsetTop) gsap.from(li, { y: was - li.offsetTop, duration: d, ease: 'expo.out' });
+        else if (d && was === undefined) gsap.from(li, { opacity: 0, x: -12, duration: d, ease: 'expo.out' });
+      });
+      const [band, m1, m2] = [...list.querySelectorAll<HTMLElement>('.band, .mark')];
+      gsap.set(band, { y: a * ROW, scaleY: b - a + 1 });
+      gsap.set(m1, { y: a * ROW });
+      gsap.set(m2, { y: (b + 1) * ROW });
+      if (d) gsap.from([band, m1, m2], { opacity: 0, duration: d * 0.6 });
+      say.innerHTML = sayHTML(v, level, b - a + 1);
+      root.dispatchEvent(new CustomEvent('keybuilder', { bubbles: true, detail: { key, lo, hi, level, free } }));
+      first = false;
+    }
+
+    root.querySelectorAll<HTMLInputElement>('input[type=range]').forEach(r => r.addEventListener('input', () => {
+      v[+r.dataset.f!] = +r.value;
+      root.querySelector(`[data-o="${r.dataset.f}"]`)!.textContent = r.value;
+      update();
+    }));
+    const radios = [...root.querySelectorAll<HTMLButtonElement>('[role=radio]')];
+    const pick = (btn: HTMLButtonElement) => {
+      level = +btn.dataset.l!;
+      radios.forEach(x => { x.setAttribute('aria-checked', String(x === btn)); x.tabIndex = x === btn ? 0 : -1; });
+      update();
+    };
+    radios.forEach((btn, i) => {
+      btn.addEventListener('click', () => pick(btn));
+      btn.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const t = radios[(i + d + radios.length) % radios.length];
+        pick(t); t.focus();
+      });
+    });
+    root.classList.add('is-live');
+    update();
+  });
+</script>

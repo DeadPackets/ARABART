@@ -1,0 +1,103 @@
+---
+// Sizes side by side, to scale. Tap any bar to measure all the others in it.
+import Window from '../../shell/Window.astro';
+
+interface Item { label: string; bytes: number; his?: boolean }
+interface Props { items: Item[]; unit?: number; title?: string }
+const { items, unit = 0, title = 'SIZES, to scale' } = Astro.props;
+const max = Math.max(...items.map(i => i.bytes));
+const n = (x: number) => x.toLocaleString('en-US');
+const times = (a: number, b: number) => (a >= b ? `${a / b >= 10 ? Math.round(a / b) : (a / b).toFixed(1)} ×` : `1/${Math.round(b / a)}`);
+---
+
+<div class="sb" data-sizebars data-unit={unit}>
+  <Window title={title} kind="panel" active>
+    <ol class="sb-list">
+      {items.map((it, i) => (
+        <li>
+          <button type="button" data-i={i} data-bytes={it.bytes} aria-pressed={String(i === unit)} class:list={['sb-row', { 'is-his': it.his }]}>
+            <span class="sb-label">{it.label}</span>
+            <span class="sb-num"><b data-n={it.bytes} style={`min-width:${n(it.bytes).length}ch`}>{n(it.bytes)}</b> bytes</span>
+            <span class="sb-bar" aria-hidden="true"><i style={`--w:${it.bytes / max}`}></i></span>
+            <span class="sb-x" data-x>{i === unit ? 'the unit' : times(it.bytes, items[unit].bytes)}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+    <p class="sb-say" aria-live="polite" data-say>Sizes in units of <b>{items[unit].label.toLowerCase()}</b>. Tap any bar to make it the unit.</p>
+  </Window>
+</div>
+
+<style is:global>
+  .sb-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .sb-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: 'label num' 'bar x';
+    align-items: center;
+    gap: 4px 16px;
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 10px;
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: none;
+    border: 0;
+    cursor: pointer;
+    transition: background-color 0.2s var(--quart);
+  }
+  .sb-row:hover { background: color-mix(in oklch, var(--ink) 8%, transparent); }
+  .sb-row[aria-pressed='true'] { background: color-mix(in oklch, var(--accent) 16%, transparent); }
+  .sb-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .sb-label { grid-area: label; font-size: 1rem; line-height: 1.35; }
+  .sb-num { grid-area: num; font: 500 0.8125rem/1 var(--font-code); color: var(--ink-2); text-align: right; white-space: nowrap; }
+  .sb-num b { display: inline-block; text-align: right; font-size: 1rem; color: var(--ink); font-variant-numeric: tabular-nums; } /* holds its final width while it counts up */
+  .sb-bar { grid-area: bar; position: relative; height: 18px; background: color-mix(in oklch, var(--ink) 8%, transparent); }
+  .sb-bar i { position: absolute; inset: 0 auto 0 0; width: max(2px, calc(var(--w) * 100%)); background: var(--ink-2); transform-origin: 0 50%; }
+  .sb-row.is-his .sb-bar i { background: var(--accent); }
+  .sb-row.is-his .sb-label { color: var(--accent); font-weight: 600; }
+  .sb-x { grid-area: x; min-width: 6ch; font: 700 0.875rem/1 var(--font-code); color: var(--accent-2); text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .sb-say { margin-top: 14px; font-size: 1rem; line-height: 1.5; color: var(--ink); }
+  .sb-say b { color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .sb-row { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const n = (x: number) => Math.round(x).toLocaleString('en-US');
+  const times = (a: number, b: number) => (a >= b ? `${a / b >= 10 ? Math.round(a / b) : (a / b).toFixed(1)} ×` : `1/${Math.round(b / a)}`);
+
+  document.querySelectorAll<HTMLElement>('[data-sizebars]').forEach(root => {
+    const rows = [...root.querySelectorAll<HTMLButtonElement>('.sb-row')];
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const pick = (u: number) => {
+      const ub = +rows[u].dataset.bytes!;
+      rows.forEach((r, i) => {
+        r.setAttribute('aria-pressed', String(i === u));
+        const x = r.querySelector<HTMLElement>('[data-x]')!;
+        x.textContent = i === u ? 'the unit' : times(+r.dataset.bytes!, ub);
+        if (!reduce()) gsap.fromTo(x, { opacity: 0, x: 8 }, { opacity: 1, x: 0, duration: 0.4, delay: i * 0.03, ease: 'expo.out' });
+      });
+      say.innerHTML = `Sizes in units of <b>${rows[u].querySelector('.sb-label')!.textContent!.toLowerCase()}</b>. Tap any bar to make it the unit.`;
+    };
+    rows.forEach((r, i) => r.addEventListener('click', () => pick(i)));
+
+    // The bars grow and the numbers count up the first time they come into view
+    if (reduce()) return;
+    const bars = rows.map(r => r.querySelector('.sb-bar i')!), nums = rows.map(r => r.querySelector<HTMLElement>('[data-n]')!);
+    gsap.set(bars, { scaleX: 0 });
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      gsap.to(bars, { scaleX: 1, duration: 1.1, ease: 'expo.out', stagger: 0.08 });
+      nums.forEach((el, i) => {
+        const o = { v: 0 }, to = +el.dataset.n!;
+        gsap.to(o, { v: to, duration: 1.1, delay: i * 0.08, ease: 'expo.out', onUpdate: () => (el.textContent = n(o.v)) });
+      });
+    }, { threshold: 0.4 });
+    io.observe(root);
+  });
+</script>

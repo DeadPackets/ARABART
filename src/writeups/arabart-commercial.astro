@@ -1,0 +1,98 @@
+---
+// ARABIC/DEMO.COM, the 1991 commercial. Facts: research/arabart.md, research/programs.md and the unpacked file
+// (public/bytes/files/ARABIC_DEMO.COM.mem; CS offset = file offset + 100h). Slide texts read from his own strokes.
+import ComPlayer from '../components/toys/arabart-family/ComPlayer.astro';
+import ComInside from '../components/toys/arabart-family/ComInside.astro';
+import ComScan from '../components/toys/arabart-family/ComScan.astro';
+import ComCredit from '../components/toys/arabart-family/ComCredit.astro';
+import SizeBars from '../components/toys/arabart/SizeBars.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import '../components/toys/arabart-family/writeup.css';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="player">
+  <h2>Fifteen slides, painted stroke by stroke</h2>
+  <p class="lead">In 1991 Yasser made a slide show for the Port Said Center for Computer Services: fifteen slides of Arabic in color, with 3-D shadows. A player of 152 bytes shows all of it.</p>
+  <p>Here the Arabic travels as pixels. Every line of text is a list of short vertical strokes, and his player paints them back one pixel at a time. For a 3-D line it paints each pixel twice: once in the letters’ color, then two pixels right and two down in the shadow’s. Press <b>Run</b> to play the whole show from his own bytes, or step slide by slide.</p>
+  <div class="af-toy"><ComPlayer id="com-player" /></div>
+  <div class="af-cols">
+    <p>Watch the window beside the screen. Before each line of text, the player reads five bytes and writes them straight into its own code: which way “x” moves, whether to draw the shadow, and both colors. One loop, rewritten on the fly, draws all 23 lines of the show. This is <Term id="self-modifying-code">self-modifying code</Term>.</p>
+    <p>The commercial is the step before ARABART. Its letters stand 34 pixels tall, the height of ARABART’s font 3, with the same two-pixel shadow. In ARABART that look became a single call: one line of code draws 3-D Arabic from any letters you type.</p>
+  </div>
+</section>
+
+<section id="inside">
+  <h2>Inside the player</h2>
+  <p class="lead">78 instructions, 152 bytes, draw the whole show. Step through the first strokes of slide 1 and watch his script bytes turn into pixels.</p>
+  <div class="af-toy"><ComInside id="com-inside" /></div>
+  <ThenNow
+    title="His player, and the same ideas today"
+    rows={[
+      { then: 'Five bytes written into his own loop before each line', now: 'Setting shader uniforms before a GPU draw call', why: 'One drawing program, with new settings for every draw.' },
+      { then: 'A jump of 0 or 13 bytes decides whether the shadow is drawn', now: 'A boolean flag passed to the shader', why: 'One switch turns a whole step on or off.' },
+      { then: 'Strokes stored as a row and a length', now: 'Run-length encoding, as in fax images and sprite formats', why: 'Store where the ink is, not every empty pixel.' },
+    ]}
+  />
+  <Deep title="For engineers: the whole player">
+    <Listing
+      title="ARABIC/DEMO.COM · player (CS:0113 to 01AA)"
+      lines={[
+        { off: '0116', code: 'mov  ax,0010h / int 10h', note: 'EGA 640×350, 16 colors; a clean screen' },
+        { off: '011B', code: 'mov  al,[si] / inc si / mov [0149h],al', note: 'five times: 0149, 0151, 0174, 016D, 0176', hi: true },
+        { off: '0139', code: 'mov  di,[si] / mov bx,[si+2]', note: 'start row, start column' },
+        { off: '0141', code: 'mov  dl,[si] / inc si', note: 'the next script byte' },
+        { off: '0144', code: 'cmp  dl,"x" / jne / inc bx', note: 'the step he rewrote' },
+        { off: '0154', code: 'cmp  dl,"y" / "z" / 88h', note: 'next line, the end, next slide' },
+        { off: '0163', code: 'mov  dh,0 / add dx,di / mov cl,[si]', note: 'row, stroke length' },
+        { off: '016F', code: 'xchg bx,cx / int 10h', note: 'CX = column, and BH = 0, the page', hi: true },
+        { off: '0178', code: 'inc cx / inc cx / inc dx / inc dx / int 10h', note: 'the shadow at +2, +2' },
+        { off: '0185', code: 'loop 016Ch', note: 'down the stroke' },
+        { off: '0189', code: 'mov  cx,1000h / mov ah,0Bh / int 21h / loop', note: 'a pause between slides' },
+        { off: '019D', code: 'mov  ax,3 / int 10h / mov ah,9 / int 21h', note: 'text mode, print the credit' },
+      ]}
+      foot="CS offsets; the file starts at CS:0100. The script starts at 01ECh and ends with its first z at 6620h."
+    />
+    <p>One small trick shows how carefully he packed it. <code>xchg bx,cx</code> moves the stroke counter into BX. The counter is always below 256, so BH is 0, which is exactly the video page number the BIOS pixel call needs. One instruction does two jobs. The pause between slides asks DOS 4,096 times whether a key was pressed, then setting the graphics mode again wipes the screen for the next slide. <a href={`${base}/bytes/?f=ARABIC_DEMO.COM&layer=memory&at=13`}>See the player in Every Byte</a>.</p>
+  </Deep>
+</section>
+
+<section id="small">
+  <h2>4,864 bytes for fifteen slides</h2>
+  <p class="lead">The whole commercial, player and pictures, is 4,864 bytes on disk. One plain screenshot of a single slide would take 112,000.</p>
+  <p>The secret is to store only the ink. A plain 16-color picture spends half a byte on every pixel, black or not. His script spends two bytes on each stroke, where it starts and how long it runs, plus one byte to move to the next column. Scan one word and watch the two counts.</p>
+  <div class="af-toy"><ComScan id="com-scan" /></div>
+  <div class="af-toy">
+    <SizeBars
+      title="BYTES, to scale"
+      items={[
+        { label: 'His player, the whole drawing program', bytes: 152, his: true },
+        { label: 'The script for all 15 slides', bytes: 25653, his: true },
+        { label: 'DEMO.COM on disk, as he shipped it', bytes: 4864, his: true },
+        { label: 'One slide as a plain 16-color picture', bytes: 112000 },
+        { label: 'All 15 slides as plain pictures', bytes: 1680000 },
+      ]}
+    />
+  </div>
+  <p class="af-after">In memory the program is 25,899 bytes. He shipped it packed with <Term id="diet">DIET</Term>, a compressor of the day, and it unpacks itself when it starts, like a self-extracting zip. That leaves 4,864 bytes on the floppy disk for fifteen slides of animated Arabic.</p>
+</section>
+
+<section id="signature">
+  <h2>His name, hidden in the bytes</h2>
+  <p class="lead">Open DEMO.COM in a file viewer and his name is nowhere to be found. It is there, scrambled, and the first 19 bytes of the program put it back together.</p>
+  <p>Each byte of the credit is stored a little higher than it should be. The first is 4 too high, the next 5, the next 6, and so on. His loop subtracts the same keys, one by one, and when the show ends the program prints the result. Step through it, then try it on your own name.</p>
+  <div class="af-toy"><ComCredit id="com-credit" /></div>
+  <div class="af-cols">
+    <p>The last slide signs the show in Arabic for every viewer: <span lang="ar">برمجة ياسر محمد على</span>, “Programmed by Yasser Mohamed Ali”. The scrambled lines are the signature inside the code: <b>KEMYAM Software Corp., &lt;c&gt;1991 YASSER MOHAMED ALI.</b></p>
+    <p>In paid work he hid his name this way so that nobody could remove it easily. Today we call this <Term id="obfuscation">obfuscation</Term>. A search of the file finds nothing, and a byte editor cannot change the name without knowing his rule.</p>
+  </div>
+</section>
+
+<style>
+  .af-after { margin-top: 28px; }
+</style>
+

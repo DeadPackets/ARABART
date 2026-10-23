@@ -1,0 +1,181 @@
+---
+// His real assembly beside the same idea in C (tabs on phones). Step, Run, Back, Reset and scrub; the current line
+// lights up in both; registers read as plain named values. Every change fires 'stepper' { i, step, how } on the
+// root, so a linked visual can follow. API: root.stepper.load(steps, at?), root.stepper.go(i).
+import Window from '../shell/Window.astro';
+import Scrubber from './Scrubber.astro';
+import { hl } from '../explain/hl';
+
+interface Line { off?: string; label?: string; code: string; note?: string }
+interface Reg { name: string; value: string; means: string; changed?: boolean }
+interface Step { a: number; c: number; say: string; regs?: Reg[]; [k: string]: unknown }
+interface Props { id: string; title: string; asm: Line[]; c: Line[]; steps: Step[]; at?: number; cTitle?: string; speed?: number }
+const { id, title, asm, c, steps, at = steps.length - 1, cTitle = 'The same in C', speed = 0.22 } = Astro.props;
+const s = steps[at];
+const json = JSON.stringify(steps).replace(/</g, '\\u003c');
+---
+
+<div class="k-cs" id={id} data-stepper data-speed={speed}>
+  <script type="application/json" data-trace set:html={json} />
+  <slot name="visual" />
+  <div class="k-cs-tabs" role="tablist" aria-label="Show the code as" hidden>
+    <button type="button" role="tab" class="button k-btn" id={`${id}-cs-ta`} aria-controls={`${id}-cs-a`} aria-selected="true">His assembly</button>
+    <button type="button" role="tab" class="button k-btn" id={`${id}-cs-tc`} aria-controls={`${id}-cs-c`} aria-selected="false" tabindex="-1">The same in C</button>
+  </div>
+  <div class="k-cs-panes">
+    <Window title={title} kind="editor" num="1" active class="k-cs-pane" id={`${id}-cs-a`} data-pane="a">
+      <div class="k-code-box" tabindex="0"><ol class="k-code k-code--asm">
+        {asm.map((l, i) => (
+          <li data-l={i} class:list={{ exec: s?.a === i }}>
+            <span class="off">{l.off}</span><span class="lab">{l.label && `${l.label}:`}</span><code set:html={hl(l.code)} />{l.note && <span class="cm">; {l.note}</span>}
+          </li>
+        ))}
+        <li class="k-xbar" aria-hidden="true"></li>
+      </ol></div>
+    </Window>
+    <Window title={cTitle} kind="editor" num="2" class="k-cs-pane" id={`${id}-cs-c`} data-pane="c">
+      <div class="k-code-box" tabindex="0"><ol class="k-code k-code--c">
+        {c.map((l, i) => (
+          <li data-l={i} class:list={{ exec: s?.c === i }}>
+            <code set:html={hl(l.code, 'c')} />{l.note && <span class="cm">// {l.note}</span>}
+          </li>
+        ))}
+        <li class="k-xbar" aria-hidden="true"></li>
+      </ol></div>
+    </Window>
+  </div>
+  <div class="k-cs-under">
+    <Window title="Watches" kind="panel" num="3" class="k-cs-watch">
+      <dl class="k-regs">
+        {s?.regs?.map(r => (
+          <div data-r={r.name}><dt>{r.name}</dt><dd><b>{r.value}</b> <span>{r.means}</span></dd></div>
+        ))}
+      </dl>
+    </Window>
+    <Window title="Help" kind="help" class="k-cs-help">
+      <p class="k-cs-say" aria-live="polite" set:html={s?.say} />
+    </Window>
+  </div>
+  <div class="k-cs-ctl"><Scrubber n={steps.length} at={at} label={`Step through ${title}`} /></div>
+</div>
+
+<style>
+  .k-cs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; min-width: 0; }
+  .k-cs-panes { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .k-cs-under { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .k-cs-tabs { display: none; gap: 10px; }
+  .k-cs-ctl { position: sticky; bottom: calc(var(--sl, 0px) + 8px); z-index: 2; padding: 10px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--rule), 8px 8px 0 oklch(0 0 0 / 0.55); margin-right: 14px; }
+
+  /* The editor's colors: text in the window's ink (yellow in Borland), mnemonics in its accent, numbers in accent-2 */
+  .k-code-box { position: relative; overflow-x: auto; }
+  .k-code { position: relative; list-style: none; margin: 0; padding: 0; font: 500 clamp(12px, 0.25vw + 9.5px, 13.5px)/1.85 var(--font-code); }
+  .k-code li { position: relative; z-index: 1; display: grid; column-gap: 1.2ch; padding: 0 8px; white-space: pre; color: var(--ink); transition: color 0.12s; }
+  .k-code--asm li { grid-template-columns: 4.4ch 6.2ch minmax(15ch, auto) 1fr; }
+  .k-code--c li { grid-template-columns: minmax(24ch, auto) 1fr; }
+  .k-code .off { color: color-mix(in oklch, var(--accent-2) 75%, transparent); }
+  :global([data-era='vs2005']) .k-code .off { color: var(--accent-2); } /* on white, the faded green falls under 4.5:1 */
+  .k-code .lab { color: var(--accent); }
+  .k-code code { font: inherit; color: inherit; }
+  .k-code :global(.op) { color: var(--accent); }
+  .k-code :global(.num) { color: var(--accent-2); }
+  .k-code .cm { color: var(--ink-2); white-space: pre-wrap; }
+  /* :global() inside :is() is not compiled by Astro and voided the whole rule, so each selector stands alone */
+  .k-code li.exec, .k-code li.exec :is(.off, .lab, .cm), .k-code li.exec :global(.op), .k-code li.exec :global(.num) { color: var(--surface); }
+  .k-xbar { position: absolute !important; inset: 0 0 auto 0; height: 1.85em; padding: 0 !important; background: var(--accent-2); z-index: 0 !important; opacity: 0; pointer-events: none; }
+  .k-cs:not(.is-live) .k-code li.exec { background: var(--accent-2); }
+
+  .k-regs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 2px 18px; margin: 0; font: 500 13px/1.5 var(--font-code); }
+  .k-regs :global(div) { display: grid; grid-template-columns: 3ch 1fr; gap: 1.2ch; padding: 3px 4px; }
+  .k-regs :global(dt) { color: var(--accent-2); font-weight: 700; }
+  .k-regs :global(dd) { margin: 0; color: var(--ink-2); }
+  .k-regs :global(b) { color: var(--ink); font-weight: 700; margin-right: 0.6ch; padding: 0 2px; }
+  .k-regs :global(.chg b) { animation: k-flash 0.7s var(--quart); }
+  @keyframes k-flash { from { background: var(--accent); color: var(--surface); } }
+  .k-cs-say { margin: 0; font: 500 1rem/1.55 var(--sans); color: var(--ink); min-height: 4.6em; text-wrap: pretty; }
+  .k-cs-say :global(b) { color: var(--accent); }
+
+  @media (max-width: 1023px) {
+    .k-cs-panes, .k-cs-under { grid-template-columns: minmax(0, 1fr); }
+    .k-code-box { max-height: min(56vh, 520px); overflow: auto; overscroll-behavior: contain; }
+    .k-cs.is-live .k-cs-tabs { display: flex; }
+    .k-cs.is-live :global(.k-cs-pane[data-hide]) { display: none; }
+    .k-cs-under > :global(.k-cs-help) { order: -1; }
+  }
+  @media (max-width: 640px) {
+    .k-code--asm li { grid-template-columns: 4.4ch 6.2ch 1fr; white-space: pre-wrap; }
+    .k-code--asm .cm { grid-column: 3; font-size: 0.92em; line-height: 1.4; padding-bottom: 3px; }
+    .k-code--c li { grid-template-columns: 1fr; }
+    .k-code--c .cm { font-size: 0.92em; line-height: 1.4; }
+    /* Not sticky on phones: it would cover the code. It sits right under the code instead */
+    .k-cs-ctl { position: static; order: 1; margin-right: 0; padding: 8px; }
+    .k-cs-under { order: 2; }
+  }
+  @media (prefers-reduced-motion: reduce) { .k-code li { transition: none; } .k-regs :global(.chg b) { animation: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from './scrubber';
+
+  type Reg = { name: string; value: string; means: string; changed?: boolean };
+  type Step = { a: number; c: number; say: string; regs?: Reg[] };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement & { stepper?: unknown }>('[data-stepper]').forEach(root => {
+    if (root.stepper) return;
+    let steps: Step[] = JSON.parse(root.querySelector("[data-trace]")!.textContent!);
+    const panes = (['a', 'c'] as const).map(k => {
+      const pane = root.querySelector<HTMLElement>(`[data-pane="${k}"]`)!;
+      const list = pane.querySelector('ol')!;
+      return { k, pane, list, bar: list.querySelector<HTMLElement>('.k-xbar')!, lines: [...list.querySelectorAll<HTMLElement>('li[data-l]')], at: -1 };
+    });
+    const regs = root.querySelector('.k-regs')!, say = root.querySelector('.k-cs-say')!;
+    const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+    const show = (i: number, how: How) => {
+      const s = steps[i];
+      const d = how === 'jump' || reduce() ? 0 : how === 'play' ? 0.14 : 0.24;
+      for (const p of panes) {
+        const line = p.k === 'a' ? s.a : s.c, li = p.lines[line];
+        p.lines.forEach((l, j) => l.classList.toggle('exec', j === line));
+        if (!li) { gsap.set(p.bar, { opacity: 0 }); continue; }
+        gsap.to(p.bar, { y: li.offsetTop, height: li.offsetHeight, opacity: 1, duration: d, ease: 'power3.out', overwrite: true });
+        // Keep the line in view inside a pane that scrolls, never the page
+        const box = p.pane.querySelector<HTMLElement>('.k-code-box')!;
+        if (box.scrollHeight > box.clientHeight + 4) {
+          const top = li.offsetTop - box.clientHeight / 2;
+          gsap.to(box, { scrollTop: Math.max(0, top), duration: d, ease: 'power2.out', overwrite: true });
+        }
+        p.at = line;
+      }
+      regs.innerHTML = (s.regs ?? []).map(r => `<div data-r="${r.name}"${r.changed ? ' class="chg"' : ''}><dt>${r.name}</dt><dd><b>${esc(r.value)}</b> <span>${esc(r.means)}</span></dd></div>`).join('');
+      say.innerHTML = s.say;
+      root.dispatchEvent(new CustomEvent('stepper', { bubbles: true, detail: { i, step: s, how } }));
+    };
+
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: +root.dataset.speed! });
+    root.stepper = {
+      get i() { return scrub.i; },
+      go: (i: number) => scrub.go(i, 'step'),
+      load(next: Step[], at = next.length - 1) { steps = next; scrub.resize(steps.length, at); },
+    };
+
+    // Tabs on phones: one pane at a time
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const pick = (t: HTMLButtonElement) => {
+      tabs.forEach(x => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; });
+      for (const p of panes) p.pane.toggleAttribute('data-hide', !t.getAttribute('aria-controls')!.endsWith(`-${p.k}`));
+      show(scrub.i, 'jump');
+    };
+    tabs.forEach(t => t.addEventListener('click', () => pick(t)));
+    root.querySelector<HTMLElement>('[role=tablist]')!.addEventListener('keydown', e => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      const k = tabs.indexOf(document.activeElement as HTMLButtonElement), t = tabs[(k + 1) % 2];
+      pick(t); t.focus();
+    });
+    root.querySelector<HTMLElement>('[role=tablist]')!.hidden = false;
+    pick(tabs[0]);
+    root.classList.add('is-live');
+    new ResizeObserver(() => show(scrub.i, 'jump')).observe(panes[0].list);
+  });
+</script>

@@ -1,0 +1,143 @@
+---
+// EDITOR.EXE ("TEST-EDITOR"): his second editor for the same interview, all new code, with a Windows 3 look.
+// Facts: research/programs.md section 5, research/artifacts/programs/editors/ (NOTES.txt, editor_user.asm, excerpts.txt),
+// programs/EDIT/EDITOR.PRJ and EDITOR.DSK, and the unpacked binary research/artifacts/programs/unpacked/EDIT_EDITOR.EXE.
+import '../components/toys/tools/tools.css';
+import Term from '../components/explain/Term.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import EdScreen from '../components/toys/tools/EdScreen.astro';
+import EdCursor from '../components/toys/tools/EdCursor.astro';
+import EdKeys from '../components/toys/tools/EdKeys.astro';
+import EdLines from '../components/toys/tools/EdLines.astro';
+import EdBuild from '../components/toys/tools/EdBuild.astro';
+---
+
+<section id="ed-screen">
+  <h2>Windows 3, drawn by hand</h2>
+  <p class="lead">In 1993 everyone wanted the look of Windows 3. His editor has it, yet it is a DOS program: every line of that window is a call he wrote.</p>
+  <div class="ed-cols">
+    <p>
+      He drew it with Borland’s graphics library, <Term id="bgi">BGI</Term>, on a 640 × 480 <Term id="vga">VGA</Term>
+      screen with 16 colors. First he changes five of those colors, the way you would set design tokens: pure red, a true
+      white, the two grays of Windows and a deeper blue. Then a few dozen calls draw the rest, each with coordinates he
+      worked out by hand.
+    </p>
+    <p>
+      Step through his calls below, or tap one in the list: the pixels it adds flash yellow. This is his code running
+      again, pixel for pixel, with his own font from the program folder. Switch to the standard colors to see what five
+      palette changes do.
+    </p>
+  </div>
+  <EdScreen />
+  <p class="ed-after">
+    The small things are what make it Windows. There is the gray system menu box with its white bar, and the notches
+    where the frame’s resize corners would be. There is even a one-pixel line under the F of File, because Alt+F really
+    opens the menu.
+    When the menu drops down, he first copies the screen under it with <code>getimage</code> and puts it back with
+    <code>putimage</code> when it closes. That is a <Term id="save-under">save-under</Term>, the trick window systems used
+    until compositors arrived.
+  </p>
+  <ThenNow
+    rows={[
+      { then: 'Five <code>setrgbpalette</code> calls, once, at start-up', now: 'Theme colors as CSS custom properties', why: 'Change a color in one place, and everything drawn with it follows.' },
+      { then: '<code>getimage</code> before the menu opens, <code>putimage</code> after', now: 'A compositor that keeps every window in its own buffer', why: 'Nothing behind a menu ever has to be drawn again.' },
+    ]}
+  />
+</section>
+
+<section id="ed-cursor">
+  <h2>A cursor that erases itself</h2>
+  <p class="lead">His red cursor is not saved anywhere. It is three thin rectangles drawn in XOR mode, and drawing it a second time wipes it away.</p>
+  <EdCursor />
+  <div class="ed-cols ed-after">
+    <p>
+      In <Term id="xor-drawing">XOR mode</Term> every new pixel is the old color XOR the pen color. He draws with color 3.
+      On the white paper, color 15, <code>1111</code> XOR <code>0011</code> gives <code>1100</code>: color 12, which he had
+      just made pure red. On a black letter, <code>0000</code> XOR <code>0011</code> gives <code>0011</code>, cyan, so the
+      letter under the cursor still shows through.
+    </p>
+    <p>
+      Draw it again and every bit flips back. So to move the cursor he draws it once where it was and once where it goes.
+      No copy of the screen, no redraw of the text, two calls. Today the cursor sits on its own layer, and the graphics card
+      blends it in on every frame. In 1993, a little arithmetic did the same job.
+    </p>
+  </div>
+</section>
+
+<section id="ed-keys">
+  <h2>22 keys, one table</h2>
+  <p class="lead">His main loop waits for a key and hands it to a <code>switch</code> with 22 cases. Borland C++ turned that switch into a table inside the program, and a search of five instructions.</p>
+  <EdKeys />
+  <p class="ed-after">
+    The table holds the 22 key codes, and 44 bytes further on, the 22 addresses of their handlers. The search walks the
+    keys with <code>loop</code>; when one matches, the jump reads the address 44 bytes past it. It is a switch statement
+    as data, the same idea as a JavaScript object of handlers: <code>handlers[key]()</code>. A key that is not in the table
+    but carries a letter goes into the line, and Tab types six spaces.
+  </p>
+</section>
+
+<section id="ed-buffer">
+  <h2>One pointer per line</h2>
+  <p class="lead">The text lives in a table of 601 pointers. Each line is its own 204-byte block, made with <code>new</code> only when the text needs it.</p>
+  <EdLines />
+  <div class="ed-cols ed-after">
+    <p>
+      Press Enter in the middle of a line and watch the two panels. The editor asks the <Term id="heap">heap</Term> for a
+      new block, moves the text after the cursor into it, and slides the pointers below it down one slot. Each pointer
+      is just 4 bytes, a <Term id="far-pointer">far pointer</Term>, so a whole new line costs a handful of bytes of
+      moving. The other lines’ letters never move at all.
+    </p>
+    <p>
+      VS Code keeps your file the same way at a far bigger scale. Its <Term id="piece-table">piece tree</Term> never moves
+      the text you loaded: edits become small pieces, and a balanced tree of pointers says in which order to read them.
+      Both designs keep typing fast by moving references instead of text.
+    </p>
+  </div>
+  <ThenNow
+    rows={[
+      { then: 'A table of 601 pointers, one per line', now: 'VS Code’s piece tree, a tree of pointers into the text', why: 'Move the small references, never the text they point to.' },
+      { then: '<code>new char[204]</code> for each line, when it is needed', now: 'Allocating a node only when a line is created', why: 'An empty document costs almost nothing.' },
+    ]}
+  />
+  <Deep title="For engineers: typing a letter, as compiled">
+    <Listing
+      title="EDITOR.EXE, FUNCTION.CPP, segment 027A"
+      lines={[
+        { off: '035D', code: 'mov  bx,[13E0h] / shl bx,2', note: 'the current line, times 4: its slot' },
+        { off: '036C', code: 'call far strlen', note: 'how long is the line?' },
+        { off: '0391', code: 'call 01CF', note: 'XOR the cursor away first' },
+        { off: '039B', code: 'mov  ax,0CCh / sub ax,[13DEh]', note: '204 minus the column' },
+        { off: '03CC', code: 'call far memmove', note: 'open a one-letter gap at the cursor', hi: true },
+        { off: '03F4', code: 'call far setmem', note: 'past the end? fill with spaces' },
+        { off: '0403', code: 'les  bx,[bx+0A72h]', note: 'the line’s address, from the table' },
+        { off: '040E', code: 'mov  es:[bx],al', note: 'store the letter', hi: true },
+        { off: '0411', code: 'cmp  word ptr [13DAh],4Ch', note: 'screen column 76? scroll 10 columns' },
+      ]}
+      foot="Two instructions share a line where marked with a slash. His variables: 13E0h the current line, 13DEh the column in the line, 13DAh the column on screen, 015Fh the number of lines, 015Eh insert mode. The table at 0A72h is 601 far pointers, 2,404 bytes."
+    />
+  </Deep>
+</section>
+
+<section id="ed-build">
+  <h2>Three evenings</h2>
+  <p class="lead">The job interview asked for an editor that loads, saves, scrolls, switches between insert and overwrite, and moves the cursor. His project file kept the time of every save.</p>
+  <EdBuild />
+  <p class="ed-after">
+    EDITOR.PRJ also says where everything lived: the project in <code>D:\EDITOR</code>, Borland C++ 2 in
+    <code>F:\BC2</code>, with the Turbo Assembler and Turbo Debugger one menu away. His include path even lists
+    <code>C:\SUN</code>, the folder of The Brave Sun. And the desktop file, EDITOR.DSK, remembers the three windows open in
+    the IDE at the end: EDITOR.CPP, WINGRAPH.CPP and a scratch file, X.CPP. Like an editor today that reopens your tabs.
+    The code sizes in the <Term id="project-file">project file</Term> match the program byte for byte. Its 1,718 + 393 +
+    4,598 bytes are exactly where each file’s code begins and ends in EDITOR.EXE.
+  </p>
+</section>
+
+<style>
+  .ed-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 48px); margin: 22px 0 28px; }
+  .ed-cols p { margin: 0 !important; }
+  .ed-after { margin-top: 28px !important; }
+  @media (max-width: 760px) { .ed-cols { grid-template-columns: minmax(0, 1fr); } }
+</style>
+

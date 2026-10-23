@@ -1,0 +1,546 @@
+---
+// ARABART, the flagship page. Facts: research/arabart.md, research/artifacts/arabart/port/HOW.md, research/programs.md,
+// src/data/programs.ts and his binaries. Every Arabic letter drawn on this page comes from his own engine (src/lib/arabart).
+import Typewriter from '../components/toys/Typewriter.astro';
+import DragWord from '../components/toys/arabart/DragWord.astro';
+import LetterByte from '../components/toys/arabart/LetterByte.astro';
+import ShapeLoop from '../components/toys/arabart/ShapeLoop.astro';
+import SizeBars from '../components/toys/arabart/SizeBars.astro';
+import GlyphRuns from '../components/toys/arabart/GlyphRuns.astro';
+import StyleLab from '../components/toys/arabart/StyleLab.astro';
+import ItalicJoin from '../components/toys/arabart/ItalicJoin.astro';
+import Programs from '../components/toys/arabart/Programs.astro';
+import Pix from '../components/toys/arabart/Pix.astro';
+import Window from '../components/shell/Window.astro';
+import Steps from '../components/explain/Steps.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import { render, draw, svgRuns, translate, FORMS } from '../components/toys/arabart/core.ts';
+import { ssrBin } from '../components/toys/arabart/ssr.ts';
+
+const bin = ssrBin();
+const base = import.meta.env.BASE_URL;
+const title = render(bin, '~gtk ~guvfd', { font: 4, mode: '3d', color: 14, shadow: 4 });
+// Small pictures for the diagrams, drawn by his engine
+const art = (keys: string, font: number, color = 14, mode: 'plain' | '3d' = 'plain') => {
+  const img = render(bin, keys, { font, color, mode, shadow: 4 });
+  return { w: img.width, h: img.height, paths: svgRuns(img) };
+};
+const screenArt = art('~gtk ~guvfd', 3, 14, '3d');
+const pesmArt = art('fsl hggi hgvplk hgvpdl', 1, 14);
+const ain = translate(bin, 'u')[0] & 0x3f;
+const forms = [0, 1, 2, 3].map(f => ({ form: FORMS[f], img: draw(bin, [ain | (f << 6)], { font: 3, color: 14 }) }));
+
+const CALL = [
+  { a: ['mov  ax,3603h', '; pick font 3'], p: 1 }, { a: ['mov  cx,3', ''], p: 1 }, { a: ['int  10h', ''], p: 1 },
+  { a: ['mov  ax,3601h', '; colors: red text, white shadow'], p: 2 }, { a: ['mov  cx,0F04h', ''], p: 2 }, { a: ['int  10h', ''], p: 2 },
+  { a: ['mov  ax,3608h', '; draw 3-D text'], p: 3 }, { a: ['mov  cx,639', '; right edge'], p: 3 }, { a: ['mov  bx,100', '; line bottom'], p: 3 },
+  { a: ['mov  dx,offset msg', "; msg db '~gtk ~guvfd',0"], p: 3 }, { a: ['int  10h', ''], p: 3 },
+];
+const WEB = [
+  { l: "const arabart = 'http://localhost/arabart';", p: 0 },
+  { l: "await post(`${arabart}/font`, { font: 3 });", p: 1 },
+  { l: "await post(`${arabart}/colors`, { text: 4, shadow: 15 });", p: 2 },
+  { l: "await post(`${arabart}/draw3d`, {", p: 3 },
+  { l: "  right: 639, bottom: 100, text: '~gtk ~guvfd' });", p: 3 },
+];
+const API = [
+  ['00', 'Are you there?', 'AX = 5944h, and BX = 040Fh: version 4.15'],
+  ['01', 'Set the colors', 'CL = text color, CH = shadow color'],
+  ['02', 'Get the colors', 'CL, CH'],
+  ['03', 'Pick a font', 'CX = 1 to 5'],
+  ['04', 'Which font?', 'CX = the current font, DX = its line height'],
+  ['05', 'Measure text', 'DS:DX = the text; CX comes back with its width in pixels'],
+  ['06', 'Measure 3-D text', 'DS:DX = the text'],
+  ['07', 'Draw text', 'DS:DX = the text, CX = right edge, BX = line bottom'],
+  ['08', 'Draw 3-D text', 'as 07, with the shadow drawn first'],
+  ['09', 'Move the pen', 'CX = x, BX = y'],
+  ['0A', 'Where is the pen?', 'CX = x, BX = y'],
+];
+const PROGRAMS = [
+  {
+    file: 'DEMO.EXE', size: '18,129', date: '1991', title: 'The ARABART demo', img: 'arabart-demo.png', href: '/program/arabart-demo/',
+    alt: 'His demo: الفن العربي ٤,١٥ in fonts 1 to 3 and twelve colors, on a black VGA screen.',
+    body: 'His showcase for the library: one line in fonts 1 to 4 and in 12 colors, with stretched letters, then all of it again in italic. It is written in Borland C++, and every call to ARABART is <b>a few lines of C: fill in four numbers, then make one call</b>.',
+  },
+  {
+    file: 'EDITOR.EXE', size: '17,492', date: '1991', title: 'The ARABART editor', img: 'arabart-editor.png', href: '/program/arabart-editor/',
+    alt: 'His editor: one line of Arabic, الفن العربي ٤,١٥, in yellow with a red 3-D shadow.',
+    body: 'A one-line Arabic typewriter. After every key it clears the screen and asks ARABART to draw the whole line again. <b>Shift+Q, W, E and R</b> pick fonts 1 to 4, <b>Shift+C</b> the text color, <b>Shift+V</b> the shadow color, and <b>Shift+\\</b> turns 3-D on and off. The typewriter at the top of this page is the same idea, on the same code.',
+  },
+  {
+    file: 'SUN.EXE', size: '47,709', date: '9-1993', title: 'The Brave Sun', img: 'brave-sun.png', href: '/program/brave-sun/',
+    alt: 'The Brave Sun title card: الشمس الجريئة, a line that calls it an educational program for young Arabic speakers, and his name.',
+    body: 'His entry to the PC Middle East competition for Arabic educational software, which won 3rd place. Every word of Arabic in it comes from ARABART. It picks a font 59 times, uses <b>font 5</b>, made just for it, and builds two effects of its own on top of ARABART: a shadow and an outline.',
+  },
+];
+---
+
+<article class="ab">
+  <section class="ab-hero" id="type" aria-labelledby="ab-h1">
+    <header class="ab-hero-head">
+      <h1 id="ab-h1">ARABART</h1>
+      <Pix img={title} scale={4} class="ab-hero-ar" label="الفن العربي, Arabic art, drawn by his engine" />
+      <p class="ab-hero-lead">The Arabic library Yasser Awad wrote in Port Said, Egypt, from 1991 to 1993: assembly code, five hand-drawn fonts, and no internet. Type below. His own code, running in your browser, joins every letter.</p>
+    </header>
+    <Typewriter />
+    <p class="ab-tip">On an English keyboard, press the key where the Arabic letter sits on an Arabic keyboard: <kbd>g</kbd> is <span lang="ar">ل</span>, <kbd>h</kbd> is <span lang="ar">ا</span>, <kbd>j</kbd> is <span lang="ar">ت</span>. <kbd>Shift</kbd>+<kbd>1</kbd> to <kbd>4</kbd> switch italic, bold, underline and double size in the middle of a line, as in his editor. <kbd>Shift</kbd>+<kbd>8</kbd> turns them all off.</p>
+  </section>
+
+  <section class="ab-sec" id="service" aria-labelledby="h-service">
+    <div class="ab-pair">
+    <div class="ab-text">
+      <h2 id="h-service">Load it once. Every program can write Arabic.</h2>
+      <p class="ab-lead">ARABART is a tiny service that lives in memory. Any program on the PC asks it to draw Arabic with a single call, the way an app today calls a local API.</p>
+      <p>Run ARABART.EXE and you get the DOS prompt straight back. But 30,110 bytes of it stay behind in memory, waiting for work. DOS called this a <Term id="tsr">TSR</Term>. Today we would call it a background service.</p>
+      <p>To be reachable from any program, Yasser plugged it into something every program already used: the PC's built-in video service, <Term id="int-10h">INT 10h</Term>. Ask that service for ARABART’s own function number, and ARABART answers. Ask for anything else, and ARABART checks it in three instructions and passes it on, untouched.</p>
+    </div>
+    <Steps
+      title="ARABART joins the video service"
+      steps={[
+        'Run ARABART.EXE once. When it ends, 30,110 bytes of it stay in memory, five fonts included.',
+        'It puts its own address in front of the video service, <code>INT 10h</code>, like a new route on a web server that is already running.',
+        'A program asks the video service for function <code>36h</code> with the text <code>~gtk ~guvfd</code>. ARABART answers: it joins the letters and draws them.',
+        'Any other request, like <code>0Ch</code> for one plain pixel, goes on to the PC’s own video code, as if ARABART were not there. It is middleware that calls <code>next()</code>.',
+      ]}
+    >
+      <svg class="dg" viewBox="0 0 640 336" role="img" aria-labelledby="ab-svc-t">
+        <title id="ab-svc-t">Three programs call INT 10h. ARABART sits in front of the video BIOS: it answers function 36h and draws Arabic on the screen, and passes every other call on.</title>
+        <rect class="box" x="10" y="20" width="150" height="44" /><text x="85" y="47" text-anchor="middle">DEMO.EXE</text>
+        <rect class="box" x="10" y="80" width="150" height="44" /><text x="85" y="107" text-anchor="middle">EDITOR.EXE</text>
+        <rect class="box" x="10" y="140" width="150" height="44" /><text x="85" y="167" text-anchor="middle">SUN.EXE</text>
+        <path class="wire" d="M160 42 C190 42 186 96 208 96" />
+        <path class="wire" d="M160 102 H208" />
+        <path class="wire" d="M160 162 C190 162 186 108 208 108" />
+        <rect class="box" x="210" y="80" width="140" height="44" /><text x="280" y="100" text-anchor="middle">INT 10h</text><text class="t-sm" x="280" y="117" text-anchor="middle">the video service</text>
+        <rect class="box" x="210" y="236" width="140" height="50" /><text x="280" y="258" text-anchor="middle">Video BIOS</text><text class="t-sm" x="280" y="276" text-anchor="middle">the PC's own code</text>
+        <path class="wire arrow" data-s="1" d="M280 124 V228" />
+        <g data-s="1+">
+          <rect class="box-hi" x="410" y="10" width="220" height="104" />
+          <text class="t-bk t-lg" x="520" y="42" text-anchor="middle">ARABART</text>
+          <text class="t-bk" x="520" y="68" text-anchor="middle">30,110 bytes</text>
+          <text class="t-bk" x="520" y="94" text-anchor="middle">AH = 36h? Draw Arabic</text>
+        </g>
+        <g data-s="2+"><path class="wire-hi arrow" d="M350 96 C376 96 376 62 402 62" /><text class="t-yl" x="356" y="54">hooked</text></g>
+        <g data-s="3"><path class="wire-hi" d="M160 42 C190 42 186 96 208 96" /><text class="t-yl" x="166" y="14">AH = 36h, AL = 07h: draw</text></g>
+        <path class="wire-hi arrow" data-s="3" d="M520 114 V190" />
+        <g data-s="3+">
+          <rect class="box-bk" x="410" y="198" width="220" height="126" />
+          <svg x={520 - screenArt.w} y="228" width={screenArt.w * 2} height={screenArt.h * 2} viewBox={`0 0 ${screenArt.w} ${screenArt.h}`} shape-rendering="crispEdges">{screenArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+        </g>
+        <g data-s="4"><path class="wire-hi" d="M160 102 H208" /><text class="t-yl" x="166" y="140">AH = 0Ch: one pixel</text></g>
+        <g data-s="4"><path class="wire arrow dash" d="M410 104 C372 150 372 262 358 262" /><text class="t-cy" x="376" y="176">not 36h:</text><text class="t-cy" x="376" y="194">passed on</text></g>
+      </svg>
+      <svg slot="narrow" class="dg" viewBox="0 0 360 520" role="img" aria-labelledby="ab-svc-tn">
+        <title id="ab-svc-tn">Programs call INT 10h; ARABART answers function 36h and draws, and passes other calls to the video BIOS.</title>
+        <rect class="box" x="6" y="10" width="110" height="40" /><text x="61" y="35" text-anchor="middle">DEMO</text>
+        <rect class="box" x="125" y="10" width="110" height="40" /><text x="180" y="35" text-anchor="middle">EDITOR</text>
+        <rect class="box" x="244" y="10" width="110" height="40" /><text x="299" y="35" text-anchor="middle">SUN</text>
+        <path class="wire" d="M61 50 C61 80 150 70 150 92" /><path class="wire" d="M180 50 V92" /><path class="wire" d="M299 50 C299 80 210 70 210 92" />
+        <rect class="box" x="110" y="94" width="140" height="44" /><text x="180" y="114" text-anchor="middle">INT 10h</text><text class="t-sm" x="180" y="131" text-anchor="middle">the video service</text>
+        <g data-s="1+">
+          <rect class="box-hi" x="6" y="200" width="348" height="80" />
+          <text class="t-bk t-lg" x="180" y="228" text-anchor="middle">ARABART</text>
+          <text class="t-bk" x="180" y="252" text-anchor="middle">30,110 bytes. AH = 36h? Draw</text>
+        </g>
+        <path class="wire arrow" data-s="1" d="M250 116 C340 116 340 300 300 336" />
+        <path class="wire-hi arrow" data-s="2+" d="M180 138 V192" /><text class="t-yl" x="190" y="172" data-s="2+">hooked</text>
+        <g data-s="3"><path class="wire-hi" d="M61 50 C61 80 150 70 150 92" /></g>
+        <path class="wire-hi arrow" data-s="3" d="M90 280 V330" />
+        <g data-s="3+">
+          <rect class="box-bk" x="6" y="338" width="176" height="110" />
+          <svg x="14" y="372" width="160" height={screenArt.h * 160 / screenArt.w} viewBox={`0 0 ${screenArt.w} ${screenArt.h}`} shape-rendering="crispEdges">{screenArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+        </g>
+        <rect class="box" x="200" y="338" width="154" height="50" /><text x="277" y="360" text-anchor="middle">Video BIOS</text><text class="t-sm" x="277" y="378" text-anchor="middle">the PC's own code</text>
+        <g data-s="4"><path class="wire-hi" d="M180 50 V92" /><path class="wire arrow dash" d="M277 280 V330" /><text class="t-cy" x="200" y="420">not 36h: passed on</text></g>
+      </svg>
+    </Steps>
+    </div>
+
+    <div class="ab-call">
+      <h3 class="ab-wide">One call, in 1993 and today</h3>
+      <Window title="CALL.ASM  his API" kind="editor" class="ab-code" data-pairs>
+        <ol class="ab-lines">{CALL.map(c => <li data-p={c.p}><code>{c.a[0]}</code><span>{c.a[1]}</span></li>)}</ol>
+      </Window>
+      <Window title="The same call as a local web API" kind="editor" class="ab-code" data-pairs>
+        <ol class="ab-lines ab-lines--js">{WEB.map(c => <li data-p={c.p}><code>{c.l}</code></li>)}</ol>
+      </Window>
+      <p class="ab-wide ab-note">Point at a line to see its partner. The string is plain ASCII: <code>~gtk ~guvfd</code> is <span lang="ar">الفن العربي</span>, typed on an English keyboard as if it had Arabic key caps.</p>
+    </div>
+
+    <ThenNow
+      title="Then and now"
+      rows={[
+        { then: 'A TSR: it ends, but stays in memory', now: 'A background service, always running', why: 'Started once, then there for every program.' },
+        { then: 'Its own function number on the video service, INT 10h', now: 'A local API endpoint', why: 'One address every program already knows.' },
+        { then: 'A second number: 7 draws, 5 measures, 3 picks a font', now: 'The routes of that API', why: 'A number picks the function.' },
+        { then: 'Inputs in four of the CPU’s own variables', now: 'The request’s parameters', why: 'The cheapest way to hand values to code you never linked with.' },
+        { then: '“This utility is already active in your RAM.”', now: 'A single-instance lock', why: 'Run it twice and it politely refuses to load again.' },
+      ]}
+    />
+    <Deep title="For engineers: the hook and the 11 functions">
+      <Listing
+        title="ARABART.EXE · install (CS:0000) and the handler (CS:003C)"
+        lines={[
+          { off: '0000', code: 'mov  ax,3510h', note: 'ask DOS: who answers INT 10h now?' },
+          { off: '0003', code: 'int  21h' },
+          { off: '0007', code: 'mov  si,003Ch', note: 'my own handler' },
+          { off: '000C', code: 'mov  cx,12' },
+          { off: '0010', code: 'repe cmpsb', note: 'the same 12 bytes, my name tag DALYASSER? then I am already here', hi: true },
+          { off: '0027', code: 'mov  [0051h],es', note: 'keep the old address inside my own jump' },
+          { off: '002B', code: 'mov  [004Fh],bx' },
+          { off: '002F', code: 'mov  ax,2510h / int 21h', note: 'INT 10h now comes to me first' },
+          { off: '0048', code: 'sti', note: 'every INT 10h call lands here, just after the name tag' },
+          { off: '0049', code: 'cmp  ah,36h', note: 'is it for ARABART?', hi: true },
+          { off: '004C', code: 'je   0053h', note: 'yes: AL picks one of 11 functions' },
+          { off: '004E', code: 'jmp  far old_int10', note: 'no: on to the video BIOS, untouched' },
+          { off: '74FC', code: 'int  27h', note: 'end, and keep 30,110 bytes resident' },
+        ]}
+        foot="Offsets are inside his unpacked program. The name tag DALYASSER sits at 003F, right after the first jump."
+      />
+      <div class="ab-api">
+        <table>
+          <caption>INT 10h, AH = 36h. AL picks the function</caption>
+          <thead><tr><th scope="col">AL</th><th scope="col">Function</th><th scope="col">Registers</th></tr></thead>
+          <tbody>{API.map(([al, f, r]) => <tr><td>{al}h</td><td>{f}</td><td>{r}</td></tr>)}</tbody>
+        </table>
+      </div>
+      <p>Style keys inside the text switch styles as it draws: <code>@</code> bold, <code>!</code> italic, <code>#</code> underline, <code>$</code> double size, <code>*</code> all off. So a whole formatted line is one ordinary C string, like markup.</p>
+    </Deep>
+  </section>
+
+  <section class="ab-sec" id="joining" aria-labelledby="h-joining">
+    <div class="ab-text">
+      <h2 id="h-joining">Two bits choose every shape</h2>
+      <p class="ab-lead">An Arabic letter changes shape with its neighbors. ARABART picks the right shape for every letter, as you type.</p>
+    </div>
+    <ol class="ab-forms" aria-label="The letter ع in its four shapes, drawn by his engine">
+      {forms.map(f => <li><Pix img={f.img} scale={3} /><span>{f.form}</span></li>)}
+    </ol>
+    <p class="ab-p">One letter, four shapes: on its own, at the start of a word, in the middle, at the end. Pull a letter out of the word below and watch its neighbors change. Every letter here is drawn by his engine from his own bytes, not by a modern font.</p>
+    <DragWord />
+
+    <h3 class="ab-h3">The keyboard is the alphabet</h3>
+    <div class="ab-cols">
+      <p>In 1993 a PC had no Unicode. So Yasser stored Arabic as the English keys a typist presses on an Arabic keyboard: <kbd>g</kbd> is <span lang="ar">ل</span>, <kbd>f</kbd> is <span lang="ar">ب</span>, <kbd>h</kbd> is <span lang="ar">ا</span>. A whole line of Arabic fits in a normal C string, in any editor. This is the <Term id="key-encoding">Arabic-keyboard encoding</Term>.</p>
+      <p>A 96-byte table turns each key into one byte. Think of it as a JavaScript object from key to number. And that number already knows how its letter joins. Its top bit says the letter can reach left, to the next letter. The bit below it says the letter can reach right, to the one before. Pick a key, then flip its bits.</p>
+    </div>
+    <LetterByte />
+    <p class="ab-p">The two bits are the shape: <code>00</code> isolated, <code>01</code> final, <code>10</code> initial, <code>11</code> medial. So the byte is the shape, and it is also the glyph’s number in the font. No lookup, no search: the code goes straight to the picture. The table stores every letter with all the hands it can ever use, and joining only ever takes hands away.</p>
+
+    <h3 class="ab-h3">His loop, line by line</h3>
+    <div class="ab-cols">
+      <p>One pass over the text does all the joining. For each letter and the next: if this letter reaches left and the next one reaches right, they stay joined. If not, both let go. In JavaScript the rule is one line:</p>
+      <pre class="ab-js"><code>if (!(code & 0x80 && next & 0x40)) {'{'} code &= 0x7f; next &= 0xbf; {'}'}</code></pre>
+    </div>
+    <ShapeLoop />
+    <div class="ab-cols ab-after">
+      <p>Style keys never break a word. The keys <code>@</code> bold, <code>!</code> italic, <code>#</code> underline, <code>$</code> double size and <code>*</code> reset all become codes he took from the middle shapes of the digits. Digits never join, so no letter can ever turn into a style key, and the loop simply steps over them. Run it on <span lang="ar">الفن</span> with <code>@</code> to watch a word stay joined across a style change.</p>
+      <p>Lam-alef, <span lang="ar">لا</span>, has its own key, <kbd>b</kbd>, just as on the Arabic keyboard. And the joining loop that shapes your letters at the top of this page is byte for byte the one inside PESM, his program from 1991.</p>
+    </div>
+  </section>
+
+  <section class="ab-sec" id="small" aria-labelledby="h-small">
+    <div class="ab-pair">
+    <div class="ab-text">
+      <h2 id="h-small" class="ab-big">1,448 bytes</h2>
+      <p class="ab-lead">That is all of ARABART’s code: 11 functions, the joining, the measuring and every style. Most of the rest is his five fonts.</p>
+      <ul class="ab-facts">
+        <li>Drawing <span lang="ar">الفن العربي ٤,١٥</span>, 16 keys in font 3, takes his code <strong>25,193 instructions</strong> for 1,357 pixels: 18.6 instructions a pixel.</li>
+        <li>Double size draws <strong>4 times the pixels</strong> for only 42% more work.</li>
+        <li>Joining the four letters of his own name, <span lang="ar">ياسر</span>, takes <strong>170 instructions</strong>.</li>
+        <li>It talks to the graphics card <strong>424 times</strong> for those 1,357 pixels, about 3 pixels a write.</li>
+        <li>It uses only <strong>8086 instructions</strong>, so it runs on the processor of the first IBM PC.</li>
+      </ul>
+    </div>
+    <SizeBars
+      title="BYTES, to scale"
+      items={[
+        { label: 'His code, all 11 functions', bytes: 1448, his: true },
+        { label: 'His keyboard table', bytes: 96, his: true },
+        { label: 'His five fonts', bytes: 27932, his: true },
+        { label: 'All of ARABART in memory', bytes: 30110, his: true },
+        { label: 'ARABART.EXE on disk, packed', bytes: 11183, his: true },
+        { label: 'The screenshot of his demo on this page', bytes: 36295 },
+        { label: 'gsap.min.js, the animation library this page uses', bytes: 72435 },
+      ]}
+    />
+    </div>
+    <div class="ab-text ab-wide-text">
+      <h3>One write, up to eight pixels</h3>
+      <p>The slow way to draw is to ask the PC’s built-in video code for one pixel at a time. ARABART skips that and talks to the graphics card itself. It tells the card the color once, in its <Term id="set-reset">Set/Reset</Term> setting. It marks which of eight pixels to paint, in the <Term id="bit-mask">Bit Mask</Term>. Then one write paints them all. In GPU terms, it is a fill through a stencil. When it is done, it puts the card’s settings back, so Borland’s graphics keep working on the same screen.</p>
+    </div>
+    <Steps
+      title="One byte of the screen, one write"
+      steps={[
+        'Tell the card the color once: <code>Set/Reset = 14</code>, yellow. All four of the card’s color layers take it.',
+        'Say which pixels of this byte to paint: <code>Bit Mask = 0011 1100</code>, the four in the middle.',
+        'Read the byte first. The card keeps a copy of it in a hidden buffer, so the pixels you do not paint keep their color.',
+        'Write. The card paints just the four chosen pixels, in every color layer at once: one write, up to eight pixels.',
+      ]}
+    >
+      <svg class="dg" viewBox="0 0 640 290" role="img" aria-labelledby="ab-vga-t">
+        <title id="ab-vga-t">The Set/Reset register holds yellow, the Bit Mask picks four of eight pixels, a read fills the latches, and one write paints the four pixels.</title>
+        <g data-s="1+"><rect class="box-hi" x="10" y="10" width="196" height="54" /><text class="t-bk" x="108" y="33" text-anchor="middle">Set/Reset = 14</text><text class="t-bk" x="108" y="53" text-anchor="middle">the color, once</text></g>
+        <g data-s="2+"><rect class="box-hi" x="222" y="10" width="196" height="54" /><text class="t-bk" x="320" y="33" text-anchor="middle">Bit Mask = 3Ch</text><text class="t-bk" x="320" y="53" text-anchor="middle">which pixels</text></g>
+        <g data-s="3+"><rect class="box" x="434" y="10" width="196" height="54" /><text x="532" y="33" text-anchor="middle">Latches</text><text class="t-sm" x="532" y="53" text-anchor="middle">the old byte, 4 planes</text></g>
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <text class="t-cy" x={128 + i * 56} y="102" text-anchor="middle" data-s="2+">{[0, 0, 1, 1, 1, 1, 0, 0][i]}</text>)}
+        <rect x="112" y="122" width="448" height="56" fill="none" stroke="currentColor" class="t-sm" opacity="0.35" transform="translate(9 -9)" />
+        <rect x="112" y="122" width="448" height="56" fill="none" stroke="currentColor" class="t-sm" opacity="0.5" transform="translate(6 -6)" />
+        <rect x="112" y="122" width="448" height="56" fill="none" stroke="currentColor" class="t-sm" opacity="0.7" transform="translate(3 -3)" />
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <rect class="box" x={102 + i * 56} y="128" width="52" height="52" />)}
+        {[2, 3, 4, 5].map(i => <rect class="box-hi" x={102 + i * 56} y="128" width="52" height="52" data-s="4" />)}
+        <text class="t-sm" x="102" y="206">one byte of the screen: 8 pixels, 4 color planes behind it</text>
+        <path class="wire-hi arrow" data-s="3" d="M560 140 C600 130 600 90 560 70" />
+        <g data-s="4"><text class="t-yl" x="102" y="240">One write: 4 pixels, 4 planes.</text><text class="t-sm" x="102" y="262">The other pixels come back from the latches unchanged.</text></g>
+      </svg>
+      <svg slot="narrow" class="dg" viewBox="0 0 360 380" role="img" aria-labelledby="ab-vga-tn">
+        <title id="ab-vga-tn">Set/Reset holds the color, the Bit Mask picks pixels, a read fills the latches, one write paints them.</title>
+        <g data-s="1+"><rect class="box-hi" x="6" y="6" width="348" height="44" /><text class="t-bk" x="180" y="34" text-anchor="middle">Set/Reset = 14: the color, once</text></g>
+        <g data-s="2+"><rect class="box-hi" x="6" y="58" width="348" height="44" /><text class="t-bk" x="180" y="86" text-anchor="middle">Bit Mask = 3Ch: which pixels</text></g>
+        <g data-s="3+"><rect class="box" x="6" y="110" width="348" height="44" /><text x="180" y="138" text-anchor="middle">Latches: the old byte</text></g>
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <text class="t-cy" x={40 + i * 40} y="190" text-anchor="middle" data-s="2+">{[0, 0, 1, 1, 1, 1, 0, 0][i]}</text>)}
+        {[0, 1, 2, 3, 4, 5, 6, 7].map(i => <rect class="box" x={22 + i * 40} y="200" width="36" height="44" />)}
+        {[2, 3, 4, 5].map(i => <rect class="box-hi" x={22 + i * 40} y="200" width="36" height="44" data-s="4" />)}
+        <text class="t-sm" x="22" y="268">one byte: 8 pixels</text>
+        <g data-s="4"><text class="t-yl" x="22" y="306">One write: 4 pixels, 4 planes.</text></g>
+      </svg>
+    </Steps>
+    <Deep title="For engineers: the two places it talks to the card">
+      <Listing
+        title="ARABART.EXE · the VGA Graphics Controller"
+        lines={[
+          { off: '02F9', code: 'mov  dx,3CEh', note: 'the Graphics Controller' },
+          { off: '02FC', code: 'mov  al,1 / out dx,al', note: 'register 1: Enable Set/Reset' },
+          { off: '02FF', code: 'inc  dx / mov al,0Fh / out dx,al', note: 'all 4 planes take their color from Set/Reset' },
+          { off: '0307', code: 'inc  dx / mov al,bl / out dx,al', note: 'register 0, Set/Reset: the color', hi: true },
+          { off: '0506', code: 'mov  ah,8', note: 'register 8, the Bit Mask' },
+          { off: '050B', code: 'xchg al,ah / out dx,ax', note: 'index and value in one 16-bit OUT' },
+          { off: '050E', code: 'mov  ah,es:[di]', note: 'read: fills the latches' },
+          { off: '0511', code: 'mov  es:[di],al', note: 'write: only the masked pixels change', hi: true },
+        ]}
+        foot="At the end of every call (055D) he sets Enable Set/Reset back to 0 and the Bit Mask to FFh, so Borland’s BGI graphics keep working on the same screen."
+      />
+    </Deep>
+  </section>
+
+  <section class="ab-sec" id="fonts" aria-labelledby="h-fonts">
+    <div class="ab-text">
+      <h2 id="h-fonts">Five fonts, drawn one run at a time</h2>
+      <p class="ab-lead">Yasser drew every letter of five fonts himself: 27,932 bytes of them. He stored each letter not as a grid of pixels but as runs, like pen strokes: skip this many pixels, paint that many.</p>
+    </div>
+    <GlyphRuns />
+    <div class="ab-cols ab-after">
+      <p>The drawing loop only ever visits strokes, never an empty pixel. And because a letter is a list of strokes, every style below is a small change to each stroke. Each font starts with a table of 256 glyph addresses, like the index at the front of a book. Slots 0 to 2 can never hold a letter. So he kept the font’s own sizes there: slot 1 holds the line height, slot 2 the depth of the 3-D shadow. Letters shared between fonts simply point to the same bytes.</p>
+      <p>Font 5 has just six glyphs of its own, 50 pixels tall, for the letters of <span lang="ar">الشمس</span>, The Sun. He made them for the title of The Brave Sun. Every other slot points back into font 1. Pick font 5 above and watch the sun’s letters paint themselves.</p>
+    </div>
+  </section>
+
+  <section class="ab-sec" id="effects" aria-labelledby="h-effects">
+    <div class="ab-text">
+      <h2 id="h-effects">Bold, italic, 3-D: one loop draws them all</h2>
+      <p class="ab-lead">Every style is a small change to a run, so one drawing loop handles all of them, and most cost almost nothing. Every number below is a count taken from his own program as it draws.</p>
+    </div>
+    <StyleLab />
+    <h3 class="ab-h3">Why the italic stays joined</h3>
+    <div class="ab-cols">
+      <p>His italic moves each row one pixel left of the row below. The clever part is where the slant starts: at the line, the same for every letter. The strokes that join the letters sit on that line, so the slant never pulls them apart.</p>
+      <p>Measure the slant from the top of each letter instead, and a tall <span lang="ar">ا</span> slides much further than a short <span lang="ar">ع</span>. The word breaks. Run both below.</p>
+    </div>
+    <ItalicJoin />
+  </section>
+
+  <section class="ab-sec" id="programs" aria-labelledby="h-programs">
+    <div class="ab-text">
+      <h2 id="h-programs">Where it went to work</h2>
+      <p class="ab-lead">His own programs called ARABART for every word of Arabic they show. Here are three of them, and each one runs in your browser.</p>
+    </div>
+    <Programs items={PROGRAMS} />
+  </section>
+
+  <section class="ab-sec" id="path" aria-labelledby="h-path">
+    <div class="ab-text">
+      <h2 id="h-path">From PESM to 7.15</h2>
+      <p class="ab-lead">ARABART grew from 1991 to 1993, version by version. Each step made it easier for the next program to write Arabic.</p>
+    </div>
+    <Steps
+      title="Three versions of one engine"
+      steps={[
+        '<b>1991, PESM.</b> The engine lives inside one program. PESM draws the Basmallah 16 times in different colors, sizes and styles, and it carries its own copy of the joining code and the glyphs. Like copying a library’s source into your project.',
+        '<b>1993, ARABART 4.15.</b> The engine moves into its own program that stays in memory: five fonts inside, 30,110 bytes in all. DEMO, EDITOR and The Brave Sun all call the same copy. Like a shared service every app on the machine uses.',
+        '<b>1993, ARAB-ART 7.15.</b> Made for The Brave Sun: the fonts move out into their own file, <code>ARAB-ART.FNT</code>, 20,264 bytes that begin with his signature, <code>YASSER DOT DESIGN</code>. Like loading a web font file instead of building the font into the page.',
+      ]}
+    >
+      <svg class="dg" viewBox="0 0 640 330" role="img" aria-labelledby="ab-path-t">
+        <title id="ab-path-t">1991: PESM carries its own engine. 1993: ARABART 4.15 is one resident engine for DEMO, EDITOR and SUN. 1993: ARAB-ART 7.15 keeps its fonts in ARAB-ART.FNT.</title>
+        <path class="wire" d="M40 30 H600" />
+        {[[105, '1991'], [320, '1993'], [535, '1993']].map(([x, y]) => <g><circle cx={x} cy="30" r="6" class="box-hi" /><text class="t-lg t-yl" x={x} y="22" text-anchor="middle" dy="-6">{y}</text></g>)}
+        <g data-s="1">
+          <text class="t-cy" x="105" y="60" text-anchor="middle">PESM</text>
+          <rect class="box" x="10" y="72" width="190" height="186" />
+          <text x="22" y="96">PESM.EXE</text>
+          <rect class="box-hi" x="22" y="108" width="166" height="36" /><text class="t-bk" x="105" y="131" text-anchor="middle">his engine</text>
+          <rect class="box-ink" x="22" y="152" width="166" height="36" /><text class="t-bk" x="105" y="175" text-anchor="middle">his glyphs</text>
+          <rect class="box-bk" x="22" y="196" width="166" height="50" />
+          <svg x={105 - pesmArt.w / 2} y="206" width={pesmArt.w} height={pesmArt.h} viewBox={`0 0 ${pesmArt.w} ${pesmArt.h}`} shape-rendering="crispEdges">{pesmArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+          <text class="t-sm" x="105" y="284" text-anchor="middle">its own engine</text>
+        </g>
+        <g data-s="2">
+          <text class="t-cy" x="320" y="60" text-anchor="middle">ARABART 4.15</text>
+          <rect class="box-hi" x="225" y="72" width="190" height="96" />
+          <text class="t-bk" x="320" y="98" text-anchor="middle">ARABART.EXE</text>
+          <text class="t-bk" x="320" y="122" text-anchor="middle">engine + 5 fonts</text>
+          <text class="t-bk" x="320" y="146" text-anchor="middle">30,110 bytes</text>
+          {[['DEMO', 225], ['EDITOR', 290], ['SUN', 355]].map(([nm, x]) => <g><rect class="box" x={x} y="214" width="60" height="40" /><text class="t-sm" x={+x + 30} y="238" text-anchor="middle">{nm}</text><path class="wire arrow" d={`M${+x + 30} 212 V176`} /></g>)}
+          <text class="t-sm" x="320" y="284" text-anchor="middle">one engine for all</text>
+        </g>
+        <g data-s="3">
+          <text class="t-cy" x="535" y="60" text-anchor="middle">ARAB-ART 7.15</text>
+          <rect class="box-hi" x="440" y="72" width="190" height="50" />
+          <text class="t-bk" x="535" y="94" text-anchor="middle">ARAB-ART.EXE</text>
+          <text class="t-bk" x="535" y="113" text-anchor="middle">the engine</text>
+          <rect class="box-ink" x="440" y="132" width="190" height="64" />
+          <text class="t-bk" x="535" y="154" text-anchor="middle">ARAB-ART.FNT</text>
+          <text class="t-bk" x="535" y="172" text-anchor="middle">20,264 bytes</text>
+          <text class="t-bk t-sm" x="535" y="189" text-anchor="middle">YASSER DOT DESIGN</text>
+          <rect class="box" x="505" y="214" width="60" height="40" /><text class="t-sm" x="535" y="238" text-anchor="middle">SUN</text><path class="wire arrow" d="M535 212 V204" />
+          <text class="t-sm" x="535" y="284" text-anchor="middle">fonts in a file</text>
+        </g>
+      </svg>
+      <svg slot="narrow" class="dg" viewBox="0 0 360 690" role="img" aria-labelledby="ab-path-tn">
+        <title id="ab-path-tn">PESM 1991 with its own engine; ARABART 4.15 for every program; ARAB-ART 7.15 with a font file.</title>
+        <g data-s="1">
+          <text class="t-lg t-yl" x="6" y="24">1991 · PESM</text>
+          <rect class="box" x="6" y="36" width="348" height="160" />
+          <text x="18" y="60">PESM.EXE</text>
+          <rect class="box-hi" x="18" y="72" width="160" height="36" /><text class="t-bk" x="98" y="95" text-anchor="middle">his engine</text>
+          <rect class="box-ink" x="186" y="72" width="156" height="36" /><text class="t-bk" x="264" y="95" text-anchor="middle">his glyphs</text>
+          <rect class="box-bk" x="18" y="118" width="324" height="66" />
+          <svg x={180 - pesmArt.w * 0.9} y="132" width={pesmArt.w * 1.8} height={pesmArt.h * 1.8} viewBox={`0 0 ${pesmArt.w} ${pesmArt.h}`} shape-rendering="crispEdges">{pesmArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+        </g>
+        <g data-s="2">
+          <text class="t-lg t-yl" x="6" y="250">1993 · ARABART 4.15</text>
+          <rect class="box-hi" x="6" y="262" width="348" height="70" />
+          <text class="t-bk" x="180" y="290" text-anchor="middle">ARABART.EXE: engine + 5 fonts</text>
+          <text class="t-bk" x="180" y="314" text-anchor="middle">30,110 bytes</text>
+          {[['DEMO', 6], ['EDITOR', 128], ['SUN', 250]].map(([nm, x]) => <g><rect class="box" x={x} y="372" width="104" height="38" /><text x={+x + 52} y="396" text-anchor="middle">{nm}</text><path class="wire arrow" d={`M${+x + 52} 370 V340`} /></g>)}
+        </g>
+        <g data-s="3">
+          <text class="t-lg t-yl" x="6" y="466">1993 · ARAB-ART 7.15</text>
+          <rect class="box-hi" x="6" y="478" width="348" height="44" />
+          <text class="t-bk" x="180" y="506" text-anchor="middle">ARAB-ART.EXE: the engine</text>
+          <rect class="box-ink" x="6" y="530" width="348" height="68" />
+          <text class="t-bk" x="180" y="556" text-anchor="middle">ARAB-ART.FNT: 20,264 bytes</text>
+          <text class="t-bk" x="180" y="582" text-anchor="middle">YASSER DOT DESIGN</text>
+          <rect class="box" x="128" y="634" width="104" height="38" /><text x="180" y="658" text-anchor="middle">SUN</text><path class="wire arrow" d="M180 632 V606" />
+        </g>
+      </svg>
+    </Steps>
+    <div class="ab-cols ab-after">
+      <p>PESM and ARABART 4.15 share 3,298 identical bytes: his glyph tables and his 136-byte joining routine. The routine was right in 1991, and it never needed to change. That same year he also made a <a href={`${base}/program/arabart-commercial/`}>slide show for a Port Said computer center</a>. It was the step before ARABART: its Arabic is stored as short runs of pixels, drawn with a shadow.</p>
+      <p>Every Arabic letter on this page, from the title to the typewriter, was drawn by his code. <a href={`${base}/program/arabic-basmallah/`}>Run PESM</a>, <a href={`${base}/program/arabart-demo/`}>the demo</a> or <a href={`${base}/program/brave-sun/`}>The Brave Sun</a> to see it on his own screens.</p>
+    </div>
+  </section>
+</article>
+
+<style>
+  .ab { display: grid; gap: clamp(96px, 12vw, 168px); padding-bottom: 24px; }
+  .ab > section { width: 100%; max-width: 1360px; margin-inline: auto; padding-inline: var(--gut); min-width: 0; }
+  .ab h2 { font-size: clamp(2.25rem, 2.6vw + 1rem, 3.75rem); font-stretch: 78%; color: var(--ink); max-width: 18ch; }
+  .ab h3 { font-size: clamp(1.5rem, 1vw + 1rem, 2rem); font-stretch: 85%; color: var(--ink); }
+  .ab p, .ab li { font-size: 1.0625rem; line-height: 1.7; color: var(--ink); text-wrap: pretty; }
+  .ab strong { color: var(--accent); }
+  .ab code { font: 500 0.9em var(--font-code); color: var(--accent); }
+  .ab kbd { font-size: 0.8125rem; }
+  .ab [lang='ar'] { font-weight: 700; font-size: 1.15em; color: var(--accent); }
+  .ab a:not(.button) { color: var(--accent-2); text-underline-offset: 3px; }
+  .ab a:not(.button):hover { color: var(--accent); }
+  .ab-lead { margin-top: 16px; max-width: 52ch; font-size: clamp(1.1875rem, 0.5vw + 1rem, 1.4375rem) !important; line-height: 1.5 !important; font-weight: 500; }
+  .ab-text { display: grid; gap: 14px; margin-bottom: clamp(28px, 3vw, 40px); }
+  .ab-text p { max-width: 64ch; }
+  .ab-text h3 { margin-top: 12px; }
+  .ab-p { max-width: 70ch; margin: 22px 0 28px; }
+  .ab-h3 { margin: clamp(64px, 7vw, 96px) 0 18px; }
+  .ab-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 56px); margin-bottom: 28px; align-items: start; }
+  .ab-cols p { max-width: 62ch; }
+  .ab-after { margin-top: 28px; margin-bottom: 0; }
+
+  /* Hero */
+  .ab-hero { padding-top: clamp(20px, 3vw, 40px); }
+  .ab-hero-head { display: grid; grid-template-columns: auto auto minmax(0, 1fr); align-items: end; gap: 8px clamp(20px, 3vw, 48px); margin-bottom: clamp(20px, 2.4vw, 32px); }
+  .ab-hero h1 { font-size: clamp(3rem, 5vw + 1rem, 6rem); font-stretch: 75%; letter-spacing: -0.02em; line-height: 0.85; color: var(--accent); }
+  .ab :global(.ab-hero-ar) { width: clamp(220px, 30vw, 420px); height: auto; align-self: center; }
+  .ab-hero-lead { max-width: 44ch; font-size: clamp(1.0625rem, 0.4vw + 0.95rem, 1.25rem) !important; line-height: 1.5 !important; justify-self: end; }
+  .ab-tip { margin-top: 18px; max-width: 90ch; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+
+  /* Text beside a toy */
+  .ab-pair { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 0 clamp(28px, 4vw, 64px); align-items: start; }
+  .ab-pair > :global(.k-fig) { margin-top: 0; }
+  #small :global(.k-fig .dg), #path :global(.k-fig .dg) { max-width: 920px; margin-inline: auto; }
+  .ab-wide-text { margin-top: clamp(56px, 6vw, 80px); max-width: 72ch; }
+  .ab-big { font-size: clamp(3.5rem, 6vw + 1rem, 6rem) !important; color: var(--accent) !important; line-height: 0.9; }
+  .ab-facts { display: grid; gap: 10px; margin-top: 6px; padding-left: 1.1em; list-style: square; }
+  .ab-facts li::marker { color: var(--accent-2); }
+
+  /* One call, then and now */
+  .ab-call { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 22px; margin-top: clamp(48px, 6vw, 72px); align-items: stretch; }
+  .ab-wide { grid-column: 1 / -1; }
+  .ab-lines { margin: 0; padding: 0; list-style: none; font: 500 clamp(12px, 0.25vw + 9.5px, 13.5px)/1.9 var(--font-code); }
+  .ab-lines li { display: grid; grid-template-columns: minmax(18ch, auto) 1fr; gap: 1.5ch; padding: 0 8px; color: var(--ink); white-space: pre; transition: background-color 0.15s, color 0.15s; }
+  .ab-lines--js li { grid-template-columns: minmax(0, 1fr); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ab-lines code { font: inherit; color: inherit; }
+  .ab-lines span { color: var(--ink-2); white-space: pre-wrap; }
+  .ab-lines li.on { background: var(--accent-2); color: var(--surface); }
+  .ab-lines li.on span { color: var(--surface); }
+  .ab-note { font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+
+  .ab-api { margin-top: 24px; overflow-x: auto; }
+  .ab-api table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+  .ab-api caption { text-align: left; padding-bottom: 8px; font: 700 1rem/1.3 var(--sans); color: var(--accent); }
+  .ab-api th { text-align: left; padding: 6px 12px 6px 0; font: 600 12px/1.4 var(--font-code); color: var(--accent-2); border-bottom: 2px solid var(--accent-2); }
+  .ab-api td { padding: 7px 12px 7px 0; border-bottom: 1px solid var(--rule); color: var(--ink); vertical-align: top; }
+  .ab-api td:first-child { font-family: var(--font-code); color: var(--accent); white-space: nowrap; }
+
+  /* The four shapes of ع */
+  .ab-forms { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 0; padding: 0; list-style: none; direction: rtl; }
+  .ab-forms li { display: grid; justify-items: center; gap: 8px; min-width: 120px; padding: 14px 16px 10px; background: var(--vga-0); }
+  .ab-forms :global(svg) { height: 102px; width: auto; }
+  .ab-forms span { font: 600 12px/1 var(--font-code); color: var(--vga-11); direction: ltr; }
+
+  .ab-js { margin: 0; padding: 14px 16px; white-space: pre-wrap; background: var(--surface-2); font: 500 0.875rem/1.6 var(--font-code); color: var(--ink); }
+  .ab-js code { color: var(--accent); }
+
+  @media (max-width: 1100px) {
+    .ab-hero-head { grid-template-columns: auto minmax(0, 1fr); }
+    .ab-hero-lead { grid-column: 1 / -1; justify-self: start; }
+    .ab-pair { grid-template-columns: minmax(0, 1fr); }
+    .ab-call { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .ab-cols { grid-template-columns: minmax(0, 1fr); }
+    .ab-lines li { grid-template-columns: 1fr; white-space: pre-wrap; }
+    .ab-lines span { padding-left: 2ch; font-size: 0.92em; }
+  }
+  @media (max-width: 560px) {
+    .ab-hero-head { grid-template-columns: 1fr; }
+    .ab :global(.ab-hero-ar) { width: min(100%, 300px); }
+    .ab-forms li { min-width: 0; flex: 1 1 40%; }
+    .ab-forms :global(svg) { height: 72px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ab-lines li { transition: none; } }
+</style>
+
+<script>
+  // One call, then and now: pointing at a line lights its partner in the other window
+  const wins = [...document.querySelectorAll<HTMLElement>('[data-pairs]')];
+  const light = (p: string | null) => wins.forEach(w => w.querySelectorAll<HTMLElement>('li[data-p]').forEach(li => li.classList.toggle('on', li.dataset.p === p)));
+  for (const w of wins) {
+    w.querySelectorAll<HTMLElement>('li[data-p]').forEach(li => {
+      li.tabIndex = 0;
+      for (const ev of ['pointerenter', 'focus']) li.addEventListener(ev, () => light(li.dataset.p!));
+      for (const ev of ['pointerleave', 'blur']) li.addEventListener(ev, () => light(null));
+    });
+  }
+</script>

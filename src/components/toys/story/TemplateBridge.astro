@@ -1,0 +1,144 @@
+---
+// The second filing (US 2007/0130192): a phone company's system configures a router through the standard door it
+// already speaks. The network manager turns a script template into the router's own commands. Pick a router and a
+// value, press Execute, and the shared Steps diagram plays the filing's sequence (FIG. 4, steps 402 to 406).
+import Window from '../../shell/Window.astro';
+import Steps from '../../explain/Steps.astro';
+
+const ROUTERS = [
+  { id: 'a', name: 'Router A', tpl: 'vlan <vlanId|2-4094|100>', out: 'vlan ' },
+  { id: 'b', name: 'Router B', tpl: 'set vlan <vlanId|2-4094|100>', out: 'set vlan ' },
+];
+const V = 210;
+const X = [92, 290, 480, 668];
+const lanes = ['Phone company', 'Standard door', 'Network manager', 'Router'];
+const sub = ['its own system (OSS)', 'CORBA or CMIP', 'holds the templates', 'its own commands'];
+const NX = [44, 136, 226, 316];
+const nlanes = ['OSS', 'Door', 'Manager', 'Router'];
+---
+
+<div class="tb" data-bridge>
+  <Window title="Configure a router" kind="dialog" active class="tb-ctl">
+    <fieldset class="tb-rt">
+      <legend>Which router?</legend>
+      {ROUTERS.map((r, i) => (
+        <label><input type="radio" name="tb-router" value={r.id} checked={i === 0} data-tpl={r.tpl} data-out={r.out} /> {r.name} <code>{r.tpl}</code></label>
+      ))}
+    </fieldset>
+    <label class="tb-v"><span>VLAN number, 2 to 4094</span>
+      <span class="tb-vrow"><input type="range" min="2" max="4094" value={V} data-v /><input type="number" min="2" max="4094" value={V} inputmode="numeric" data-vn aria-label="VLAN number" /></span>
+    </label>
+    <label class="tb-def"><input type="checkbox" data-def /> Leave it blank: the template's default, 100</label>
+    <button type="button" class="button button--primary k-btn tb-go" data-go hidden>Execute</button>
+  </Window>
+
+  <Steps
+    title="One request, the router's own language"
+    steps={[
+      'The phone company’s system fills in the blank through the standard door it already speaks: <code>vlanId = <span data-tb-val>210</span></code>. To it, the template is one more ordinary object with settings.',
+      'It asks that object to run. That is all it needs to know about this router.',
+      'The network manager fills the template written for this router: <code data-tb-tpl>vlan &lt;vlanId|2-4094|100&gt;</code> becomes <code data-tb-out>vlan 210</code>.',
+      'It sends the finished command to the router, in the router’s own language.',
+      'The router runs it and answers.',
+      'The network manager tells the system the job is done: <b>Execute Complete</b>. Nobody held a line open while the router worked.',
+      'The system reads the router’s answer when it is ready: <b>Get Response</b>.',
+    ]}
+  >
+    <svg class="dg tb-svg" viewBox="0 0 760 430" role="img" aria-labelledby="tb-t">
+      <title id="tb-t">The phone company's system sets a value on the standard door and asks to execute. The network manager fills the router's template, sends the command, gets the answer, and notifies the system, which then reads the response.</title>
+      {X.map((x, i) => (
+        <g>
+          <rect class={i === 1 ? 'box-hi' : 'box'} x={x - 86} y="8" width="172" height="56" />
+          <text class={i === 1 ? 'tb-w' : ''} x={x} y="32" text-anchor="middle">{lanes[i]}</text>
+          <text class={i === 1 ? 'tb-w t-sm' : 't-sm'} x={x} y="52" text-anchor="middle">{sub[i]}</text>
+          <path class="wire dash" d={`M${x} 64 V420`} />
+        </g>
+      ))}
+      <g data-s="1"><path class="wire-hi arrow" d={`M${X[0]} 100 H${X[1] - 8}`} /><text class="t-yl" x={(X[0] + X[1]) / 2} y="92" text-anchor="middle">set vlanId = <tspan data-tb-val>210</tspan></text></g>
+      <g data-s="2"><path class="wire-hi arrow" d={`M${X[1]} 142 H${X[2] - 8}`} /><text class="t-yl" x={(X[1] + X[2]) / 2} y="134" text-anchor="middle">execute</text></g>
+      <g data-s="3+">
+        <rect class="box" x={X[2] - 140} y="164" width="280" height="64" />
+        <text class="t-sm" x={X[2] - 128} y="186" data-tb-tpl>vlan &lt;vlanId|2-4094|100&gt;</text>
+        <text class="t-yl" x={X[2] - 128} y="214">→ <tspan data-tb-out>vlan 210</tspan></text>
+      </g>
+      <g data-s="4"><path class="wire-hi arrow" d={`M${X[2]} 262 H${X[3] - 8}`} /><text class="t-yl" x={(X[2] + X[3]) / 2} y="254" text-anchor="middle" data-tb-out>vlan 210</text></g>
+      <g data-s="5"><path class="wire-hi arrow" d={`M${X[3]} 302 H${X[2] + 8}`} /><text class="t-yl" x={(X[2] + X[3]) / 2} y="294" text-anchor="middle">ok</text></g>
+      <g data-s="6"><path class="wire-hi arrow" d={`M${X[2]} 344 H${X[0] + 8}`} /><text class="t-yl" x={(X[0] + X[2]) / 2} y="336" text-anchor="middle">Execute Complete</text></g>
+      <g data-s="7"><path class="wire-hi arrow" d={`M${X[0]} 386 H${X[1] - 8}`} /><text class="t-yl" x={(X[0] + X[1]) / 2} y="378" text-anchor="middle">Get Response</text><path class="wire arrow" d={`M${X[1]} 408 H${X[0] + 8}`} /><text x={(X[0] + X[1]) / 2} y="424" text-anchor="middle">ok</text></g>
+    </svg>
+    <svg slot="narrow" class="dg tb-svg" viewBox="0 0 360 520" role="img" aria-labelledby="tb-tn">
+      <title id="tb-tn">The system sets a value and asks to execute; the manager fills the router's template, sends it, gets the answer and notifies the system.</title>
+      {NX.map((x, i) => (
+        <g>
+          <rect class={i === 1 ? 'box-hi' : 'box'} x={x - 42} y="6" width="84" height="40" />
+          <text class={i === 1 ? 'tb-w' : ''} x={x} y="31" text-anchor="middle">{nlanes[i]}</text>
+          <path class="wire dash" d={`M${x} 46 V512`} />
+        </g>
+      ))}
+      <g data-s="1"><path class="wire-hi arrow" d={`M${NX[0]} 84 H${NX[1] - 6}`} /><text class="t-yl t-sm" x={NX[0] + 4} y="74">vlanId=<tspan data-tb-val>210</tspan></text></g>
+      <g data-s="2"><path class="wire-hi arrow" d={`M${NX[1]} 128 H${NX[2] - 6}`} /><text class="t-yl t-sm" x={NX[1] + 6} y="118">execute</text></g>
+      <g data-s="3+">
+        <rect class="box" x="8" y="152" width="344" height="64" />
+        <text class="t-sm" x="18" y="176" data-tb-tpl>vlan &lt;vlanId|2-4094|100&gt;</text>
+        <text class="t-yl" x="18" y="204">→ <tspan data-tb-out>vlan 210</tspan></text>
+      </g>
+      <g data-s="4"><path class="wire-hi arrow" d={`M${NX[2]} 258 H${NX[3] - 6}`} /><text class="t-yl t-sm" x={NX[2] + 4} y="248">send</text></g>
+      <g data-s="5"><path class="wire-hi arrow" d={`M${NX[3]} 300 H${NX[2] + 6}`} /><text class="t-yl t-sm" x={NX[2] + 30} y="290">ok</text></g>
+      <g data-s="6"><path class="wire-hi arrow" d={`M${NX[2]} 350 H${NX[0] + 6}`} /><text class="t-yl t-sm" x={NX[0] + 8} y="340">Execute Complete</text></g>
+      <g data-s="7"><path class="wire-hi arrow" d={`M${NX[0]} 410 H${NX[1] - 6}`} /><text class="t-yl t-sm" x={NX[0] + 4} y="400">get</text><path class="wire arrow" d={`M${NX[1]} 446 H${NX[0] + 6}`} /><text x={NX[0] + 8} y="470">ok</text></g>
+    </svg>
+  </Steps>
+</div>
+
+<style>
+  .tb-ctl { color-scheme: light; }
+  .tb-svg .tb-w { fill: var(--surface); }
+  .tb { display: grid; grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.6fr); gap: 0 26px; align-items: start; }
+  .tb > :global(.k-fig) { margin: 0; }
+  .tb-rt { border: 0; padding: 0; margin: 0 0 14px; display: grid; gap: 4px; }
+  .tb-rt legend, .tb-v > span:first-child { font: 400 0.9375rem/1.4 var(--font-ui); margin-bottom: 4px; }
+  .tb-rt label { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-height: 44px; font: 400 0.9375rem/1.3 var(--font-ui); cursor: pointer; }
+  .tb-rt input, .tb-def input { width: 18px; height: 18px; accent-color: var(--w-navy); }
+  .tb-rt code { font: 500 0.8125rem/1.3 var(--font-code); color: var(--w-navy); }
+  .tb-v { display: grid; gap: 4px; }
+  .tb-vrow { display: grid; grid-template-columns: minmax(0, 1fr) 6.5ch; gap: 10px; align-items: center; }
+  .tb-vrow input[type='range'] { width: 100%; min-height: 44px; accent-color: var(--w-navy); }
+  .tb-vrow input[type='number'] { min-height: 44px; padding: 0 6px; font: 500 1rem/1 var(--font-code); color: var(--w-black); border: 0; background: var(--w-white); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-black), inset -2px -2px var(--w-silver); }
+  .tb-def { display: flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 6px; font: 400 0.9375rem/1.3 var(--font-ui); cursor: pointer; }
+  .tb-go { margin-top: 12px; width: 100%; }
+  .tb-svg { max-width: 860px; }
+  @media (max-width: 1000px) { .tb { grid-template-columns: minmax(0, 1fr); gap: 22px; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-bridge]').forEach(root => {
+    const steps = root.querySelector<HTMLElement>('[data-steps]')!;
+    const range = root.querySelector<HTMLInputElement>('[data-v]')!, num = root.querySelector<HTMLInputElement>('[data-vn]')!;
+    const def = root.querySelector<HTMLInputElement>('[data-def]')!;
+    const radios = [...root.querySelectorAll<HTMLInputElement>('input[name="tb-router"]')];
+    const go = root.querySelector<HTMLButtonElement>('[data-go]')!;
+
+    const sync = () => {
+      const r = radios.find(x => x.checked)!;
+      const v = def.checked ? 100 : Math.max(2, Math.min(4094, Math.round(+num.value || 2)));
+      range.disabled = num.disabled = def.checked;
+      root.querySelectorAll('[data-tb-val]').forEach(el => (el.textContent = def.checked ? '(blank)' : String(v)));
+      root.querySelectorAll('[data-tb-tpl]').forEach(el => (el.textContent = r.dataset.tpl!));
+      root.querySelectorAll('[data-tb-out]').forEach(el => (el.textContent = r.dataset.out! + v));
+    };
+    range.addEventListener('input', () => { num.value = range.value; sync(); });
+    num.addEventListener('change', () => { num.value = String(Math.max(2, Math.min(4094, Math.round(+num.value || 2)))); range.value = num.value; sync(); });
+    def.addEventListener('change', sync);
+    radios.forEach(r => r.addEventListener('change', sync));
+    go.hidden = false;
+    go.addEventListener('click', () => {
+      sync();
+      // Bring the player into view first: it pauses itself whenever it is off screen
+      steps.querySelector('[data-scrub]')!.scrollIntoView({ block: 'nearest' });
+      requestAnimationFrame(() => {
+        steps.querySelector<HTMLButtonElement>('[data-act="reset"]')?.click();
+        steps.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+      });
+    });
+  });
+</script>

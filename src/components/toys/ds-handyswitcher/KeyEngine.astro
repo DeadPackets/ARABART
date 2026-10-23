@@ -1,0 +1,156 @@
+---
+// The key engine all three Handy apps share (HandySwitcher 2.7 at 0x124A0): a deck of 120 numbers shuffled by the
+// product name, then dealt over the 16 letters of the Pocket PC code. Type any code and step it.
+import CodeStepper from '../CodeStepper.astro';
+import { keySteps } from './hs.ts';
+import { groups, UNIVERSAL } from '../../../lib/dinarsoft/handyswitcher.ts';
+
+const CODE = UNIVERSAL, PRODUCT = 'HandySwitcher3';
+const steps = keySteps(CODE, PRODUCT);
+const end = steps[steps.length - 1];
+const ASM = [
+  { off: '124F8', label: 'fill', code: 'strh r3,[r1]', note: 'S[i] = i, 120 times' },
+  { off: '12534', code: 'strh r3,[r1]', note: 'K[i] = name[i mod length]' },
+  { off: '1255C', code: 'mov  r0,#120', note: 'j = (S[i] + K[i] + j) mod 120' },
+  { off: '1258C', code: 'strh r7,[r0]', note: 'swap S[i], S[j]: the shuffle' },
+  { off: '125AC', label: 'next', code: 'add  r1,r7,#1', note: 'i = (i + 1) mod 120' },
+  { off: '125D0', code: 'ldrh r5,[r4]', note: 'the card at i' },
+  { off: '125DC', code: 'add  r1,r8,r5', note: 'j = (j + S[i]) mod 120' },
+  { off: '125FC', code: 'strh r3,[r4]', note: 'swap: S[i] = S[j]' },
+  { off: '12600', code: 'strh r5,[r0]', note: '      S[j] = the old S[i]' },
+  { off: '1260C', code: 'add  r1,r3,r2,lsr #16', note: 't = (S[i] + S[j]) mod 120' },
+  { off: '12630', code: 'mov  r0,#25', note: 'keep 0 to 24 (mod 25)' },
+  { off: '12634', code: 'eor  r1,r2,r3', note: 'code letter XOR S[t]' },
+  { off: '12650', code: 'add  r0,r3,#65', note: '+ A' },
+  { off: '12658', code: 'strh r0,[r6]', note: 'write the key letter' },
+  { off: '12660', code: 'cmp  r3,#79', note: 'O or later?' },
+  { off: '12664', code: 'addhs r3,r0,#1', note: 'then one up: no O' },
+  { off: '12678', code: 'bhi  next', note: 'next letter' },
+];
+const C = [
+  { code: 'unsigned short S[120];' },
+  { code: 'for (i = 0; i < 120; i++) S[i] = i;' },
+  { code: 'for (i = 0, j = 0; i < 120; i++) {' },
+  { code: '  j = (S[i] + name[i % len] + j) % 120;' },
+  { code: '  swap(&S[i], &S[j]);', note: 'shuffle' },
+  { code: '}' },
+  { code: 'for (k = 0, i = 0, j = 0; k < 16; k++) {' },
+  { code: '  i = (i + 1) % 120;' },
+  { code: '  j = (j + S[i]) % 120;' },
+  { code: '  swap(&S[i], &S[j]);' },
+  { code: '  t = (S[i] + S[j]) % 120;' },
+  { code: "  c = (code[k] ^ S[t]) % 25 + 'A';" },
+  { code: "  if (c >= 'O') c++;", note: 'no O' },
+  { code: '  key[k] = c;' },
+  { code: '}' },
+];
+---
+
+<div class="hs-key" data-hskey>
+  <div class="hs-key-in" hidden>
+    <label><span>Your Pocket PC Code</span>
+      <input type="text" value={CODE} maxlength="19" spellcheck="false" autocomplete="off" autocapitalize="characters" data-code aria-describedby="hs-key-hint" />
+    </label>
+    <label><span>Product</span>
+      <select data-product>
+        <option value="HandySwitcher3" selected>HandySwitcher 3</option>
+        <option value="HandySwitcher">HandySwitcher 2</option>
+        <option value="HandyMenu">HandyMenu</option>
+        <option value="HandyLauncher3">HandyLauncher 3</option>
+      </select>
+    </label>
+    <p id="hs-key-hint" class="hs-key-hint" data-hint>16 letters or digits. Dashes and spaces are fine.</p>
+  </div>
+  <CodeStepper id="hs-keystep" title="HANDYSWITCHER.EXE  the key engine (0x124A0)" asm={ASM} c={C} steps={steps} speed={0.32}>
+    <div slot="visual" class="hs-key-vis" data-vis>
+      <div class="hs-deck" aria-hidden="true" data-deck>
+        {end.S.map((v, n) => <span data-n={n} class:list={{ i: n === end.i, j: n === end.j, t: n === end.t }}>{v}</span>)}
+      </div>
+      <div class="hs-key-rows">
+        <p><span class="hs-key-lab">code</span><span class="hs-key-cells" data-coderow>{[...CODE].map((c, n) => <i class:list={{ on: n === end.k }}>{c}</i>)}</span></p>
+        <p><span class="hs-key-lab">key</span><span class="hs-key-cells hs-key-out" data-keyrow>{[...end.key].map((c, n) => <i class:list={{ on: n === end.k }}>{c}</i>)}</span></p>
+      </div>
+      <p class="hs-key-res" aria-live="polite" data-res>Key: <b>{groups(end.key)}</b></p>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hs-key { display: grid; gap: 16px; }
+  .hs-key-in { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 18px; }
+  .hs-key-in label { display: grid; gap: 6px; font: 600 0.875rem/1.2 var(--sans); color: var(--ink-2); }
+  .hs-key-in input, .hs-key-in select { height: 44px; min-width: 0; padding: 0 10px; font: 600 1rem/1 var(--font-code); color: var(--ink); background: #fff; border: 1px solid var(--xp-line, #7f9db9); border-radius: 2px; }
+  .hs-key-in input { width: min(100%, 24ch); letter-spacing: 0.06em; text-transform: uppercase; }
+  .hs-key-in :is(input, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hs-key-hint { flex-basis: 100%; margin: 0 !important; font-size: 0.875rem !important; color: var(--ink-2); }
+  .hs-key-hint.bad { color: var(--hot); font-weight: 600; }
+  .hs-key-vis { display: grid; gap: 14px; padding: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--rule); container-type: inline-size; }
+  .hs-deck { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+  .hs-deck span { display: grid; place-items: center; height: clamp(20px, 4.2cqw, 30px); font: 500 clamp(10px, 1.9cqw, 13px)/1 var(--font-code); color: var(--ink-2); background: var(--surface); border-radius: 2px; font-variant-numeric: tabular-nums; }
+  .hs-deck span.i { background: oklch(0.55 0.17 258); color: #fff; font-weight: 700; }
+  .hs-deck span.j { background: oklch(0.55 0.15 150); color: #fff; font-weight: 700; }
+  .hs-deck span.t { background: oklch(0.8 0.16 85); color: #000; font-weight: 700; box-shadow: 0 0 0 2px oklch(0.55 0.16 60); }
+  .hs-key-rows { display: grid; gap: 6px; }
+  .hs-key-rows p { display: flex; align-items: center; gap: 10px; margin: 0 !important; }
+  .hs-key-lab { width: 4ch; flex: none; font: 700 12px/1 var(--font-code); color: var(--ink-2); }
+  .hs-key-cells { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; flex: 1; min-width: 0; }
+  .hs-key-cells i { display: grid; place-items: center; height: 28px; font: 700 clamp(11px, 2.4cqw, 15px)/1 var(--font-code); font-style: normal; color: var(--ink); background: var(--surface); }
+  .hs-key-cells i.on { background: oklch(0.8 0.16 85); color: #000; }
+  .hs-key-out i:empty { background: repeating-linear-gradient(45deg, var(--surface) 0 4px, #fff 0 8px); }
+  .hs-key-res { margin: 0 !important; font: 500 1rem/1.4 var(--sans) !important; }
+  .hs-key-res b { font: 700 1.125rem/1 var(--font-code); color: var(--accent); letter-spacing: 0.04em; }
+  .hs-key .k-cs-say b { color: var(--accent); }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { keySteps, reduce, type KeyStep } from './hs.ts';
+  import { groups } from '../../../lib/dinarsoft/handyswitcher.ts';
+
+  document.querySelectorAll<HTMLElement & { hs?: boolean }>('[data-hskey]').forEach(root => {
+    if (root.hs) return;
+    root.hs = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void } }>('[data-stepper]')!;
+    const cells = [...root.querySelectorAll<HTMLElement>('[data-deck] span')];
+    const codeRow = root.querySelector<HTMLElement>('[data-coderow]')!, keyRow = root.querySelector<HTMLElement>('[data-keyrow]')!;
+    const res = root.querySelector<HTMLElement>('[data-res]')!, hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const input = root.querySelector<HTMLInputElement>('[data-code]')!, product = root.querySelector<HTMLSelectElement>('[data-product]')!;
+    let code = input.value, last: KeyStep | null = null;
+
+    const row = (el: HTMLElement, s: string, k: number) => {
+      el.innerHTML = Array.from({ length: 16 }, (_, n) => `<i class="${n === k ? 'on' : ''}">${s[n] ?? ''}</i>`).join('');
+    };
+    const paint = (s: KeyStep, how: string) => {
+      cells.forEach((c, n) => {
+        c.textContent = String(s.S[n]);
+        c.className = n === s.t ? 't' : n === s.j ? 'j' : n === s.i ? 'i' : '';
+      });
+      row(codeRow, code, s.k);
+      row(keyRow, s.key, s.k);
+      res.innerHTML = s.key.length === 16 ? `Key: <b>${groups(s.key)}</b>` : `Key so far: <b>${s.key || '…'}</b>`;
+      if (reduce() || how === 'jump' || how === 'scrub') { last = s; return; }
+      if (s.phase === 'mix' && last?.phase === 'fill') gsap.fromTo(cells, { opacity: 0.2, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.5, stagger: { each: 0.004, from: 'random' }, ease: 'power2.out' });
+      if (s.phase === 'swap' && s.i !== s.j) gsap.fromTo([cells[s.i], cells[s.j]], { y: -6 }, { y: 0, duration: 0.35, ease: 'back.out(3)' });
+      if (s.phase === 'out') gsap.fromTo(keyRow.children[s.k], { scale: 1.5 }, { scale: 1, duration: 0.35, ease: 'back.out(2)' });
+      last = s;
+    };
+    cs.addEventListener('stepper', e => { const d = (e as CustomEvent).detail; paint(d.step as KeyStep, d.how); });
+
+    const update = () => {
+      const c = input.value.toUpperCase().replace(/[\s-]/g, '');
+      if (!/^[0-9A-Z]{16}$/.test(c)) {
+        hint.textContent = `${c.length} of 16 letters or digits. Dashes and spaces are fine.`;
+        hint.classList.add('bad');
+        return;
+      }
+      hint.textContent = '16 letters or digits. Dashes and spaces are fine.';
+      hint.classList.remove('bad');
+      code = c;
+      const st = keySteps(code, product.value);
+      cs.stepper?.load(st, st.length - 1);
+    };
+    input.addEventListener('input', update);
+    product.addEventListener('change', update);
+    root.querySelector<HTMLElement>('.hs-key-in')!.hidden = false;
+  });
+</script>

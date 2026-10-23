@@ -1,0 +1,100 @@
+---
+// DEMO.EXE. Facts: research/arabart.md, research/programs.md, DEMO_EXE.img (main 2163-2315, binding 206B-2162,
+// strings at DS:0092 and DS:00AE). Every Arabic letter drawn here comes from his engine (src/lib/arabart).
+import Typewriter from '../components/toys/Typewriter.astro';
+import DemoScreens from '../components/toys/arabart-family/DemoScreens.astro';
+import DemoCall from '../components/toys/arabart-family/DemoCall.astro';
+import KeyLine from '../components/toys/arabart-family/KeyLine.astro';
+import { S1, S2, patch } from '../components/toys/arabart-family/demo.ts';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import '../components/toys/arabart-family/writeup.css';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="screens">
+  <h2>One line, a hundred and twenty times</h2>
+  <p class="lead">DEMO.EXE shows off everything ARABART can do with one short line: <span lang="ar">الفن العربي ٤,١٥</span>, “Arabic Art 4.15”. A loop of a dozen lines of C draws it again and again, until four screens are full.</p>
+  <p>Here is that loop, rebuilt in your browser on his own engine. Press <b>Run</b> and watch it fill the screen line by line, the way his PC did. Step back and forth to see each call.</p>
+  <DemoScreens id="demo-screens" tw="demo-tw" />
+  <div class="af-cols">
+    <p>No position on these screens is typed in by hand. Before each line, his loop asks ARABART how tall the font is and moves down by exactly that much. After twelve lines it asks how wide the line came out and starts the next column that far to the left. Turn on <b>Show the measuring</b> to see it.</p>
+    <p>That is why the columns fit so snugly, whatever the font. A browser does the same today when it sizes a box to fit its text.</p>
+  </div>
+</section>
+
+<section id="your-line">
+  <h2>Put your words in his demo</h2>
+  <p class="lead">Type any Arabic below. His demo loop picks up your line and draws it on all four screens, in every font and color.</p>
+  <Typewriter id="demo-tw" keys="#~gtk ~guvfd 4<15#" font={3} color={14} mode="plain" title="YOUR LINE  ARABART, 640×480" />
+  <p class="ad-run"><button type="button" class="button button--primary k-btn" data-run-demo="demo-screens"><span class="hk" aria-hidden="true">F9</span> Run his demo on this line</button></p>
+  <p class="af-tip">On an English keyboard, press the key where each letter sits on an Arabic keyboard: <kbd>g</kbd> is <span lang="ar">ل</span>, <kbd>h</kbd> is <span lang="ar">ا</span>. <kbd>Shift</kbd>+<kbd>3</kbd> types <code>#</code>, his underline key, as in the line he chose. For screens 2 and 4 the demo stretches each word at its middle join, just as he stretched his.</p>
+</section>
+
+<section id="binding">
+  <h2>Five tiny functions</h2>
+  <p class="lead">His demo is written in C. ARABART is a separate program, already waiting in memory. Between them sit five small functions he wrote, each a few lines long.</p>
+  <p>Each function fills in a few numbers, the way you fill in a request, and rings ARABART through the PC’s built-in video service, <Term id="int-10h">INT 10h</Term>. The rest of the demo never deals with any of that. It just calls <code>ar_font(1)</code> or <code>ar_text(x, y, s)</code>. Today we call this an <b>SDK</b>: friendly functions over an API. Step through one line of screen 1 below, from the C down to the call and back.</p>
+  <DemoCall id="demo-call" />
+  <ThenNow
+    title="His binding, and an SDK today"
+    rows={[
+      { then: '<code>ar_font(1)</code>, <code>ar_text(x, y, s)</code>', now: '<code>sdk.setFont(1)</code>, <code>sdk.drawText(…)</code>', why: 'A friendly name in your own language, over a numbered request.' },
+      { then: '<code>int 10h</code>, request 36h', now: 'One HTTP call to a service', why: 'One door into code that someone else runs.' },
+      { then: 'A second number picks the job: 1 colors, 3 font, 7 draw', now: 'The route: <code>/colors</code>, <code>/font</code>, <code>/draw</code>', why: 'A number, or a path, says what you want.' },
+      { then: 'The values ride in the processor’s own scratch slots', now: 'The JSON body of the request', why: 'The arguments travel in a fixed, agreed shape.' },
+      { then: '<code>ar_text</code> adds the line height to y', now: 'An SDK that converts units for you', why: 'The caller thinks in its own terms. The binding speaks the service’s.' },
+    ]}
+  />
+  <Deep title="For engineers: main() and the binding, as compiled">
+    <Listing
+      title="DEMO.EXE · main (image offset 2163h)"
+      lines={[
+        { off: '2187', code: 'call SCOPY (28 bytes, DS:0092)', note: 'string 1 onto the stack' },
+        { off: '2198', code: 'call SCOPY (34 bytes, DS:00AE)', note: 'string 2, with the stretch' },
+        { off: '21BC', code: 'call initgraph', note: 'Borland graphics, driver 0: detect the card' },
+        { off: '2209', code: 'mov  word [bp-0Ah],276h', note: 'x = 630' },
+        { off: '221C', code: 'push [bp-0Ch] / call ar_font', hi: true },
+        { off: '2224', code: 'mov  ax,si / add ax,3 / push ax / call ar_color', note: 'colors 4 to 15' },
+        { off: '2239', code: 'call ar_text', note: 'x, y, s1' },
+        { off: '2245', code: 'call ar_height / add di,ax', note: 'y += height' },
+        { off: '2258', code: 'call ar_width / sub [bp-0Ah],ax', note: 'x -= width', hi: true },
+        { off: '226E', code: 'call getch / call cleardevice', note: 'a key, then the next screen' },
+        { off: '22D3', code: 'mov  byte [bp-28h],21h', note: 'pass 2: ! at byte 0 of s1', hi: true },
+        { off: '22DB', code: 'mov  byte [bp-16h],20h / mov byte [bp-14h],23h', note: 'the closing # moves two keys on' },
+        { off: '2300', code: 'cmp  word [bp-8],1 / jg 2309h', note: 'two passes, four screens' },
+      ]}
+      foot="Image offsets in the unpacked DEMO.EXE; the file adds a 300h-byte header. SCOPY is Borland’s helper that copies a block of bytes."
+    />
+    <p>The binding sits at 206Bh to 2162h: <code>ar_color</code> 206Bh, <code>ar_font</code> 208Bh, <code>ar_width</code> 20ABh, <code>ar_height</code> 20D6h and <code>ar_text</code> 212Ch. Each one is a far C function with Borland’s stack check, and each saves every register it touches, so ARABART can use them freely. The demo is built with Borland C++ and its graphics library, the same tools as The Brave Sun, which talks to ARABART through this same binding. <a href={`${base}/bytes/?f=ARABART_DEMO.EXE&layer=memory&at=236b`}>See the binding in Every Byte</a>.</p>
+  </Deep>
+</section>
+
+<section id="string">
+  <h2>The whole line is one C string</h2>
+  <p class="lead">No font file, no markup language. The line, its underline and its version number are 27 keys in an ordinary C string, typed on an English keyboard.</p>
+  <p>ARABART reads the string from the right, the way Arabic reads. Pick any key to see what it becomes. Then switch to screen 3: for the italic screens his demo changes just three bytes of the same string and runs the same loop again.</p>
+  <KeyLine
+    id="demo-string"
+    fonts={[1, 2, 3, 4]}
+    lines={[
+      { label: 'Screen 1', keys: S1, note: 'His first string: a space, <code>#</code> underline on, the line, <code>#</code> underline off, then eight spaces.' },
+      { label: 'Screen 3', keys: patch(S1), note: 'After his patch: byte 0 is now <code>!</code>, italic on, and the closing <code>#</code> sits two keys further on.' },
+      { label: 'Screen 2', keys: S2, note: 'His second string, with <code>JJJ</code> inside two words: three kashida strokes that stretch each join.' },
+      { label: 'Screen 4', keys: patch(S2), note: 'The same three-byte patch, on the stretched string.' },
+    ]}
+  />
+  <div class="af-cols">
+    <p>Look at the number. Arabic runs right to left, and numbers run left to right. ARABART lays every key down from right to left. So he typed the version backwards, <code>51&lt;4</code>, and it comes out reading <span lang="ar">٤,١٥</span>, in the <Term id="arabic-indic-digits">Arabic-Indic digits</Term> used in Egypt.</p>
+    <p>Every key here is the <Term id="key-encoding">Arabic-keyboard encoding</Term> at work: <kbd>~gtk</kbd> are the keys under <span lang="ar">ا</span>, <span lang="ar">ل</span>, <span lang="ar">ف</span> and <span lang="ar">ن</span>. The final yeh is drawn without dots, <span lang="ar">ى</span>, the way Egyptian writers write it. And the <code>J</code> key gives the <Term id="kashida">kashida</Term>, the stroke a calligrapher uses to stretch a word.</p>
+  </div>
+</section>
+
+<style>
+  .ad-run { margin-top: 24px !important; }
+  section > :global(.ds), section > :global(.kl), section > :global(.k-cs), section > :global(.k-tw) { margin-top: 32px; }
+</style>
+

@@ -1,0 +1,72 @@
+---
+// All 44 word pictures in HijriPlugin.dll, as he drew them: 16 pixels tall, one bit a pixel. Tap one to see its pixels.
+import glyphs from './glyphs.json';
+import { svgPath, label, DAY, HMONTH, GMONTH, DIGIT, SP, COMMA, DASH } from './ar.ts';
+interface Props { id: string }
+const { id } = Astro.props;
+const groups: [string, number[]][] = [
+  ['Days', DAY], ['Hijri months', HMONTH], ['Gregorian months', GMONTH], ['Digits and marks', [...DIGIT, COMMA, DASH, SP]],
+];
+const G = glyphs as Record<string, { w: number }>;
+const total = Object.keys(G).length;
+const first = 155;
+const big = svgPath([first]);
+---
+
+<div class="hdt-gw" id={id} data-gw>
+  <div class="hdt-gw-sets">
+    {groups.map(([name, list]) => (
+      <div class="hdt-gw-set">
+        <h4>{name}</h4>
+        <div class="hdt-gw-row">
+          {list.map(g => {
+            const p = svgPath([g]);
+            return (
+              <button type="button" aria-pressed={g === first ? 'true' : 'false'} data-g={g} aria-label={`${label(g)}, ${p.width} pixels wide`}>
+                <svg viewBox={`0 0 ${Math.max(p.width, 3)} 16`} width={Math.max(p.width, 3) * 2} height="32" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d={p.d} /></svg>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    ))}
+  </div>
+  <figure class="hdt-gw-big">
+    <svg viewBox={`0 0 ${big.width} 16`} data-big shape-rendering="crispEdges" role="img" aria-label={label(first)}>
+      <defs><pattern id={`${id}-px`} width="1" height="1" patternUnits="userSpaceOnUse"><rect width="1" height="1" fill="none" stroke="currentColor" stroke-opacity="0.15" stroke-width="0.06" /></pattern></defs>
+      <rect width="100%" height="16" fill={`url(#${id}-px)`} />
+      <path d={big.d} fill="currentColor" data-path />
+    </svg>
+    <figcaption data-cap>{label(first)}: {big.width} × 16 pixels. One of {total} pictures.</figcaption>
+  </figure>
+</div>
+
+<style>
+  .hdt-gw { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .hdt-gw-sets { display: grid; gap: 14px; }
+  .hdt-gw-set h4 { margin: 0 0 6px; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-2); }
+  .hdt-gw-row { display: flex; flex-wrap: wrap; gap: 6px; direction: rtl; }
+  .hdt-gw-row button { min-width: 44px; min-height: 44px; padding: 4px 6px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .hdt-gw-row button[aria-pressed='true'] { background: var(--ink); color: var(--surface); }
+  .hdt-gw-row svg { display: block; image-rendering: pixelated; }
+  .hdt-gw-big { margin: 0; position: sticky; top: 80px; }
+  .hdt-gw-big svg { display: block; width: 100%; height: auto; max-height: 260px; color: var(--ink); background: var(--surface); box-shadow: 0 0 0 1px var(--rule); }
+  .hdt-gw-big figcaption { margin-top: 8px; font-size: 0.9375rem; font-weight: 600; }
+  @media (max-width: 760px) { .hdt-gw { grid-template-columns: minmax(0, 1fr); } .hdt-gw-big { position: static; order: -1; } }
+</style>
+
+<script>
+  import { svgPath, label } from './ar.ts';
+  for (const root of document.querySelectorAll<HTMLElement>('[data-gw]')) {
+    const big = root.querySelector<SVGSVGElement>('[data-big]')!, path = root.querySelector('[data-path]')!, cap = root.querySelector('[data-cap]')!;
+    const total = root.querySelectorAll('[data-g]').length;
+    root.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLElement>('[data-g]'); if (!b) return;
+      const g = +b.dataset.g!, p = svgPath([g]);
+      root.querySelectorAll('[data-g]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      big.setAttribute('viewBox', `0 0 ${Math.max(p.width, 3)} 16`); big.setAttribute('aria-label', label(g));
+      path.setAttribute('d', p.d);
+      cap.textContent = `${label(g)}: ${p.width} × 16 pixels. One of ${total} pictures.`;
+    });
+  }
+</script>

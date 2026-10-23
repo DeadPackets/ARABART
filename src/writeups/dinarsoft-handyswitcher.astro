@@ -1,0 +1,112 @@
+---
+// HandySwitcher, DinarSoft's task manager for Windows Mobile (2003 to 2008), reverse engineered from the archived
+// installers: 2.7 (2006-07-15), 3.1 first build (2008-04-15) and 3.1 Build 78 (2008-07-20).
+// Facts: research/dinarsoft/re/handyswitcher/ (HOW.md, PROOF.md), research/career.md, research/dinarsoft/site/handyswitcher/.
+import LiveSwitcher from '../components/toys/ds-handyswitcher/LiveSwitcher.astro';
+import Parts from '../components/toys/ds-handyswitcher/Parts.astro';
+import TopBar from '../components/toys/ds-handyswitcher/TopBar.astro';
+import Closer from '../components/toys/ds-handyswitcher/Closer.astro';
+import Settings from '../components/toys/ds-handyswitcher/Settings.astro';
+import KeyEngine from '../components/toys/ds-handyswitcher/KeyEngine.astro';
+import TrialClock from '../components/toys/ds-handyswitcher/TrialClock.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Listing from '../components/explain/Listing.astro';
+import Term from '../components/explain/Term.astro';
+import { unlock, groups } from '../lib/dinarsoft/handyswitcher.ts';
+
+const KEY = groups(unlock.generate({}));
+---
+
+<section id="hs-x" class="hs">
+  <h2>The X that really closes</h2>
+  <p class="lead">On a 2003 Pocket PC, the X in the corner did not close anything. It only hid the program, which kept running and kept eating memory. Yasser’s HandySwitcher put a small icon in the top bar, and one tap showed every running program, each with an X that really closed it.</p>
+  <p>Try it. This is the menu as he drew it, with his own action icons and his five menu colors. Tap a name to switch to that program. Tap its X to close it. One of these programs has stopped responding, so watch what HandySwitcher does with it.</p>
+  <LiveSwitcher />
+  <p>This is the menu that won Task Managers at <cite>Smartphone &amp; Pocket PC</cite> magazine two years in a row. The rest of this page opens it up, from the files in its installer down to single ARM instructions. All of it is read back from the copies DinarSoft published for <Term id="hs-windows-mobile">Windows Mobile</Term>.</p>
+</section>
+
+<section id="hs-built" class="hs">
+  <h2>Two programs in 2006, a service in 2008</h2>
+  <p class="lead">Inside the <Term id="hs-cab">CAB installers</Term> sit <Term id="hs-arm">ARM</Term> programs, made for the same chip family your phone runs today.</p>
+  <p>Version 2.7 is two programs that talk by message. Version 3.1 moves the work into a <Term id="hs-service">background service</Term> that starts with the phone, so the menu is there the instant you tap. Step through both.</p>
+  <Parts />
+  <ThenNow
+    era="2002 to 2008"
+    rows={[
+      { then: 'Toolhelp snapshots: a list of every running process and thread', now: 'Activity Monitor, or <code>ps</code> on Linux', why: 'You can only manage what you can list.' },
+      { then: 'HandySwitcher.dll inside <code>services.exe</code>, prefix HSW', now: 'A launchd daemon or a systemd service', why: 'Always running, started by the system, no window of its own.' },
+      { then: '<code>PostMessage</code> between HHTask and HandySwitcher', now: '<code>postMessage</code> between browser tabs', why: 'Drop a message and move on; never block the sender.' },
+      { then: 'Settings under <code>Software\\DinarSoft\\HandySwitcher</code> in the registry', now: 'UserDefaults on iOS, SharedPreferences on Android', why: 'A small key-value store per app.' },
+      { then: 'Shortcuts like <b>HandySwitcher [Close All]</b> for hardware buttons', now: 'iOS Shortcuts or Android quick-settings tiles', why: 'One press runs one action.' },
+    ]}
+  />
+</section>
+
+<section id="hs-topbar" class="hs">
+  <h2>A seat on the system’s top bar</h2>
+  <p class="lead">The top bar belonged to Windows Mobile. No program was supposed to put buttons in it. HandySwitcher, HandyMenu and HandyLauncher all have icons there anyway, and the trick behind it takes three calls.</p>
+  <p>Every window on Windows has one <Term id="hs-window-proc">window procedure</Term>, a function that receives every tap and key press meant for it. A tiny helper, HHTask.exe, finds the top bar by its class name and swaps in its own function. It keeps the old one. Taps on his icons, and on the (X), go to his apps as a <Term id="hs-post-message">posted message</Term>. On the HandyMenu, HandyLauncher and (X) buttons it also checks for <Term id="hs-tap-and-hold">tap and hold</Term>, so a long press can do a second job. Every other tap goes, untouched, to the old function. This is <Term id="hs-subclassing">subclassing</Term>, the same idea as wrapping a function in JavaScript and calling the original for everything you do not handle.</p>
+  <p>Tap a part of the bar, then step his code and watch where the tap goes.</p>
+  <TopBar />
+  <p>One helper serves all three apps. It reads the HandyMenu and HandyLauncher settings too, draws their icons, and if HandyMenu is not running yet, it starts it from the folder its installer recorded.</p>
+</section>
+
+<section id="hs-close" class="hs">
+  <h2>Polite, patient, then firm</h2>
+  <p class="lead">Closing a program sounds simple. Yasser’s close routine treats every program the way a good host treats a guest: ask nicely, give it time, and only then insist.</p>
+  <p>It sends <Term id="hs-wm-close">WM_CLOSE</Term>, the same polite request a desktop window gets when you click its X, so the program can save your work. Windows Media Player keeps playing music when asked, so for that one he presses its own Quit keys, Ctrl+Q, on your behalf. A busy program gets up to six seconds while the wait cursor spins. A program that never answers gets one question to you in plain words, and then <Term id="hs-terminate">TerminateProcess</Term> ends it. Pick a program and step through his code.</p>
+  <Closer />
+  <Deep title="For engineers: which windows count as programs">
+    <p>HandySwitcher walks the windows with <code>EnumWindows</code> and keeps only real, visible, top-level programs. Version 3.1 carries its own list of system window classes to skip, among them <code>desktopexplorerwindow</code> (the Today screen), <code>hhtaskbar</code>, <code>ms_sipbutton</code> (the keyboard button), <code>menu_worker</code>, <code>cursorwindow</code> and <code>tooltips_class32</code>. It also knows that a window whose process is <code>device.exe</code> or <code>rnaapp.exe</code> belongs to the system. Your own ignore list sits on top of that.</p>
+  </Deep>
+</section>
+
+<section id="hs-settings" class="hs">
+  <h2>His settings, rebuilt from his own dialogs</h2>
+  <p class="lead">A Windows program keeps the layout of each screen as data inside itself: every label, box and button with its exact place. These are HandySwitcher 3.1’s own <Term id="hs-dialog-template">dialog templates</Term>, read out of HandySwitcher.dll and drawn again here, unit for unit.</p>
+  <p>The Colors page is live. Pick Theme Colors and the menu takes the colors of the phone’s theme, read from the <Term id="hs-registry">registry</Term>, the way an app follows dark mode today. Pick your own five colors and both menus on this page follow.</p>
+  <Settings />
+</section>
+
+<section id="hs-key" class="hs">
+  <h2>A key made from his name</h2>
+  <p class="lead">HandySwitcher was <Term id="shareware">shareware</Term>: 15 days to try it, then a 16-letter key. In 2026, Yasser Awad released it as freeware, and the key that opens every copy of version 3.1 is made from his own name.</p>
+  <p>Here is how a key was born. Each Pocket PC has a <Term id="hs-device-id">device ID</Term>. HandySwitcher turns it into a 16-letter <b>Pocket PC Code</b> and shows it on the License Key screen. The buyer sent that code to DinarSoft, and DinarSoft sent back the key. The key engine is Yasser’s own take on <Term id="hs-rc4">RC4</Term>, a classic cipher. A deck of 120 numbers is shuffled with the product name, then dealt, card by card, over the letters of the code. Each product name gives a different shuffle, so a HandyMenu key never opens HandySwitcher. The letter O never appears, so nobody reads it as a zero.</p>
+  <p>Version 3.1 also accepts a few built-in codes, so one key fits every device. The first of them is YASSERMOHAMEDALI: his name. Step the engine on it below and you get the freeware key. Or type any Pocket PC code.</p>
+  <p>The engine is one of 24 functions, 4,508 bytes of machine code, shared instruction for instruction by HandySwitcher 2.7, HandyMenu 3.6 and HandyLauncher 3.4. The Pocket PC Code, the key engine and the trial record are among them: Yasser wrote them once and built all three apps on them.</p>
+  <KeyEngine />
+  <div class="hs-free" role="note">
+    <p><b>The freeware key for HandySwitcher 3.1:</b> <code>{KEY}</code></p>
+    <p>HandySwitcher’s own check routine, taken from the archived file and run in an ARM emulator, accepts this key on both 3.1 builds. It accepts every device key the engine makes, and it turns away every near miss and every key made for another product.</p>
+  </div>
+  <p>The 15 days are counted just as carefully. The installer writes the install date into the registry once, as 14 bytes. The date is there twice, each copy in a different disguise, with a checksum. Even the record’s name is built from pieces, so it never appears whole in the file. If the record is missing, the check treats the trial as over. Move the phone’s date and watch.</p>
+  <TrialClock />
+  <Deep title="For engineers: from device ID to Pocket PC Code">
+    <Listing
+      title="HANDYSWITCHER.EXE 2.7, 0x12314: the Pocket PC Code"
+      lines={[
+        { off: '12344', code: 'ldr  r0,=01010054h', note: 'IOCTL_HAL_GET_DEVICEID', hi: true },
+        { off: '12348', code: 'bl   KernelIoControl', note: 'ask the hardware for its ID' },
+        { off: '1237C', code: 'ldr  r5,="%02X"', note: 'every byte as two hex digits' },
+        { off: '12420', code: 'ldr  r1,="730007B6BFA3..."', note: 'no ID? a fixed fallback' },
+        { off: '12434', code: 'ldrh r1,[r0,#32]', note: 'digit k + 16...' },
+        { off: '12448', code: 'add  r2,r1,r2', note: '...is added to digit k', hi: true },
+        { off: '12478', code: 'cmp  r1,#79', note: 'no O here either' },
+        { off: '12490', code: 'strh r7,[r6,#32]', note: 'cut to 16 characters' },
+      ]}
+      foot="The same function, instruction for instruction, sits in HandyLauncher 3.4 and HandyMenu 3.6. Version 3.1 keeps the key as LicKey under Software\DinarSoft\HandySwitcher and the trial date under HKEY_CLASSES_ROOT\RppHelp, value Tedy. When the 15 days are over, the check erases that value and writes the five letters fsjri in its place."
+    />
+  </Deep>
+</section>
+
+<style>
+  .hs :global(.k-fig), .hs :global(.k-cs), .hs :global([data-hslive-wrap]), .hs :global(.hs-set), .hs :global(.hs-key), .hs :global(.hs-tc), .hs :global(.hs-tb), .hs :global(.hs-cl) { margin-block: 32px; }
+  .hs :global(ol.k-code) { display: block; margin-top: 0; padding-left: 0; }
+  .hs :global(.k-code li) { font-size: inherit; line-height: inherit; max-width: none; }
+  .hs cite { font-style: italic; }
+  .hs-free { margin: 28px 0; max-width: 72ch; padding: 16px 20px; background: oklch(0.96 0.04 150); border: 1px solid oklch(0.5 0.13 150); }
+  .hs-free p { margin: 0 !important; font-size: 1rem !important; line-height: 1.55 !important; }
+  .hs-free p + p { margin-top: 8px !important; }
+  .hs-free code { font: 700 clamp(0.8125rem, 4vw, 1.125rem)/1 var(--font-code); color: oklch(0.35 0.12 150); white-space: nowrap; }
+</style>

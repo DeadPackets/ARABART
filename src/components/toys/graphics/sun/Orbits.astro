@@ -1,0 +1,193 @@
+---
+// The solar system page of The Brave Sun, running: his sun, his four planet pictures and his loop, frame by frame,
+// on the four years read from his own program file (DS:19C1). Without JS: one still frame.
+import Window from '../../../shell/Window.astro';
+import { png } from '../ssr.ts';
+import { years } from './ssr.ts';
+import { sprites, orbitClock, orbitScreen, crop, PLANETS, PAL, rgb } from './sun.ts';
+
+const Y = years(), F0 = 140;
+const pics = sprites(), clk = orbitClock(Y), now = clk.at(F0);
+const scr = orbitScreen(pics, now.angles);
+const [X, T, CW, CH] = [22, 74, 286, 209];
+const still = png(crop(scr, X, T, CW, CH), CW, CH, scr.rgb());
+// From the sun outwards. Mercury's 88 days and Earth's 365¼ are from his own pages; Venus and Mars from his loop.
+const ROWS = [
+  { id: 'mercury', days: '88', say: 'Mercury, the fastest: a dark red dot on a circle 20 pixels across each way. It turns π/80 every frame, so one lap takes 160 frames.' },
+  { id: 'venus', days: '225', say: 'Venus, brown, on a circle of 35 pixels. Its year is 225 days, so each frame it turns 88/225 as far as Mercury does.' },
+  { id: 'earth', days: '365¼', say: 'Earth, blue with green land, on an oval 60 pixels wide and 50 tall. His page about Earth gives its year: 365¼ days.' },
+  { id: 'mars', days: '687', say: 'Mars, on the widest oval, 80 by 70 pixels. Its year is 687 days: one lap while Mercury makes almost eight.' },
+].map(r => {
+  const i = PLANETS.findIndex(p => p.id === r.id), p = PLANETS[i];
+  return { ...r, p, i, img: png(pics[p.id], p.w, 13, rgb(PAL)), laps: now.laps[i] };
+});
+const center = (p: (typeof PLANETS)[0]) => [p.x0 + (p.w >> 1) - X, 181 - T];
+---
+
+<div class="or" data-orbits data-years={JSON.stringify(Y)} data-f0={F0}>
+  <Window title="SUN.EXE  the solar system" kind="screen" class="or-win">
+    <div class="or-scr">
+      <img class="or-still" src={still} width={CW} height={CH} alt="His solar system: a yellow sun in a black window, with Mercury, Venus, Earth and Mars around it." />
+      <canvas class="or-cv" width={CW} height={CH} hidden role="img" aria-label="His solar system, running: the sun with Mercury, Venus, Earth and Mars moving around it."></canvas>
+      <svg class="or-ov" viewBox={`0 0 ${CW} ${CH}`} aria-hidden="true">
+        {PLANETS.map(p => { const [cx, cy] = center(p); return <ellipse class="or-path" data-p={p.id} cx={cx + 0.5} cy={cy + 0.5} rx={p.R} ry={p.r} />; })}
+        <rect class="or-ring" x="0" y="0" width="0" height="0" rx="2" />
+      </svg>
+    </div>
+  </Window>
+  <div class="or-side">
+    <div class="or-ctl" hidden>
+      <button type="button" class="button button--primary k-btn" data-act="run" aria-pressed="false"><span data-label>Run</span></button>
+      <button type="button" class="button k-btn" data-act="step">One frame</button>
+      <button type="button" class="button k-btn" data-act="reset">From the start</button>
+      <div class="or-speed" role="radiogroup" aria-label="Speed">
+        {['½×', '1×', '4×', '16×'].map((s, i) => <button type="button" role="radio" class="button k-btn" data-speed={[0.5, 1, 4, 16][i]} aria-checked={String(i === 1)} tabindex={i === 1 ? 0 : -1}>{s}</button>)}
+      </div>
+      <button type="button" class="button k-btn" data-act="paths" aria-pressed="false">Show the paths</button>
+    </div>
+    <ul class="or-pl-list" aria-label="The four planets: tap one to follow it">
+      {ROWS.map(r => (
+        <li>
+          <button type="button" class="or-pl" data-p={r.id} aria-pressed="false">
+            <img src={r.img} width={r.p.w * 3} height="39" alt="" />
+            <span class="or-pl-name">{r.p.name}</span>
+            <span class="or-pl-days"><b>{r.days}</b> days</span>
+            <span class="or-pl-size">{r.p.R} × {r.p.r} px</span>
+            <span class="or-pl-laps"><b data-laps={r.i}>{r.laps}</b> laps</span>
+            <span class="sr-only" data-say>{r.say}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+    <p class="or-say" aria-live="polite" data-out>Frame <b data-frame>{F0}</b> of his loop. Tap a planet to follow it.</p>
+  </div>
+</div>
+
+<style is:global>
+  .or { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 22px clamp(20px, 3vw, 32px); align-items: start; }
+  .or-scr { position: relative; aspect-ratio: 286 / 209; background: var(--vga-0); }
+  .or-scr :is(img, canvas, svg) { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .or-ov { overflow: visible; pointer-events: none; }
+  .or-path { fill: none; stroke: var(--vga-11); stroke-width: 0.6; stroke-dasharray: 2 2; opacity: 0; transition: opacity 0.3s var(--quart); }
+  .or.show-paths .or-path { opacity: 0.45; }
+  .or-path.is-on { opacity: 0.9 !important; stroke: var(--vga-14); }
+  .or-ring { fill: none; stroke: var(--vga-14); stroke-width: 1; opacity: 0; }
+  .or-ring.is-on { opacity: 1; }
+  .or-side { display: grid; gap: 16px; min-width: 0; }
+  .or-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+  .or-ctl:not([hidden]) { display: flex; }
+  .or-speed { display: flex; gap: 4px; }
+  .or-speed .k-btn { min-width: 48px; padding: 0 8px; }
+  .or-pl-list { display: grid; gap: 6px; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+  .or-pl-list li { max-width: none !important; margin: 0; }
+  .or-pl {
+    display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; grid-template-areas: 'pic name laps' 'pic days size';
+    align-items: center; gap: 0 12px; width: 100%; min-height: 56px; padding: 6px 12px 6px 6px; text-align: left;
+    font: 500 0.9375rem/1.35 var(--sans); color: var(--ink); background: var(--surface-2); border: 0;
+    box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer;
+  }
+  .or-pl img { grid-area: pic; justify-self: center; image-rendering: pixelated; }
+  .or-pl-name { grid-area: name; font-weight: 700; }
+  .or-pl-days { grid-area: days; color: var(--ink-2); }
+  .or-pl-days b { color: var(--accent); }
+  .or-pl-size { grid-area: size; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); text-align: right; }
+  .or-pl-laps { grid-area: laps; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+  .or-pl-laps b { color: var(--accent-2); }
+  .or-pl:hover { box-shadow: inset 0 0 0 2px var(--accent-2); }
+  .or-pl[aria-pressed='true'] { box-shadow: inset 0 0 0 2px var(--accent); background: color-mix(in oklch, var(--accent) 14%, var(--surface-2)); }
+  .or-pl:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .or-say { min-height: 5.1em; margin: 0 !important; font-size: 1rem !important; line-height: 1.55 !important; color: var(--ink) !important; }
+  .or-say b { color: var(--accent); font-variant-numeric: tabular-nums; }
+  @media (max-width: 860px) { .or { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 480px) { .or-ctl .k-btn { flex: 1 1 auto; } .or-speed { flex: 1 1 100%; } .or-speed .k-btn { flex: 1; } }
+  @media (prefers-reduced-motion: reduce) { .or-path { transition: none; } }
+</style>
+
+<script>
+  import { sprites, orbitClock, orbitBase, stamp, crop, spots, PLANETS } from './sun.ts';
+  import { blit } from '../ega.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-orbits]').forEach(root => {
+    const clk = orbitClock(JSON.parse(root.dataset.years!)), pics = sprites();
+    const cv = root.querySelector<HTMLCanvasElement>('.or-cv')!, ring = root.querySelector<SVGRectElement>('.or-ring')!;
+    const out = root.querySelector<HTMLElement>('[data-out]')!, runBtn = root.querySelector<HTMLButtonElement>('[data-act="run"]')!;
+    const rows = [...root.querySelectorAll<HTMLButtonElement>('.or-pl')];
+    const laps = [...root.querySelectorAll<HTMLElement>('[data-laps]')];
+    let frame = +root.dataset.f0!, speed = 1, follow = -1, playing = false, seen = false, raf = 0, last = 0, acc = 0;
+    let scr = orbitBase();
+    // His screen keeps what the last frame left; start a few frames back so the picture is exactly his
+    const jump = (n: number) => { frame = n; scr = orbitBase(); for (let f = Math.max(0, n - 3); f <= n; f++) for (let k = 0; k < 4; k++) stamp(scr, pics, clk.at(f).angles, k); };
+    const advance = () => { frame++; const { angles } = clk.at(frame); for (let k = 0; k < 4; k++) stamp(scr, pics, angles, k); };
+
+    function paint() {
+      blit(cv, crop(scr, 22, 74, 286, 209), 286, 209, scr.rgb());
+      const { laps: l, angles } = clk.at(frame);
+      laps.forEach(b => { const v = String(l[+b.dataset.laps!]); if (b.textContent !== v) b.textContent = v; });
+      out.querySelector('[data-frame]')!.textContent = String(frame);
+      if (follow >= 0) {
+        const [x, y] = spots(angles)[follow], p = PLANETS[follow];
+        ring.setAttribute('x', String(x - 22 - 2)); ring.setAttribute('y', String(y - 74 - 2));
+        ring.setAttribute('width', String(p.w + 4)); ring.setAttribute('height', '17');
+      }
+    }
+    const tick = (t: number) => {
+      raf = 0;
+      if (!playing || !seen || document.hidden) return;
+      acc += Math.min(100, t - (last || t)) * 0.03 * speed; last = t;
+      let n = 0;
+      while (acc >= 1 && n < 64) { advance(); acc--; n++; }
+      if (n) paint();
+      raf = requestAnimationFrame(tick);
+    };
+    const loop = () => { if (!raf && playing && seen && !document.hidden) { last = 0; raf = requestAnimationFrame(tick); } };
+    const setPlay = (on: boolean) => {
+      playing = on;
+      runBtn.setAttribute('aria-pressed', String(on));
+      runBtn.querySelector('[data-label]')!.textContent = on ? 'Pause' : 'Run';
+      if (on) loop(); else { cancelAnimationFrame(raf); raf = 0; }
+    };
+
+    root.querySelector('.or-ctl')!.addEventListener('click', e => {
+      const b = (e.target as Element).closest<HTMLButtonElement>('button');
+      if (!b) return;
+      const act = b.dataset.act;
+      if (act === 'run') setPlay(!playing);
+      else if (act === 'step') { setPlay(false); advance(); paint(); }
+      else if (act === 'reset') { jump(0); paint(); }
+      else if (act === 'paths') { const on = b.getAttribute('aria-pressed') !== 'true'; b.setAttribute('aria-pressed', String(on)); root.classList.toggle('show-paths', on); }
+      else if (b.dataset.speed) {
+        speed = +b.dataset.speed;
+        root.querySelectorAll<HTMLButtonElement>('[data-speed]').forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+      }
+    });
+    // Arrow keys move through the speeds, as in any radio group
+    const speeds = [...root.querySelectorAll<HTMLButtonElement>('[data-speed]')];
+    root.querySelector('.or-speed')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key;
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(k)) return;
+      e.preventDefault();
+      const i = speeds.indexOf(document.activeElement as HTMLButtonElement), to = speeds[(i + (k === 'ArrowRight' || k === 'ArrowDown' ? 1 : speeds.length - 1)) % speeds.length];
+      to.click(); to.focus();
+    });
+    rows.forEach(b => b.addEventListener('click', () => {
+      const i = PLANETS.findIndex(p => p.id === b.dataset.p), on = follow !== i;
+      follow = on ? i : -1;
+      rows.forEach(x => x.setAttribute('aria-pressed', String(x === b && on)));
+      root.querySelectorAll('.or-path').forEach(p => p.classList.toggle('is-on', on && p.getAttribute('data-p') === b.dataset.p));
+      ring.classList.toggle('is-on', on);
+      out.innerHTML = on ? `${b.querySelector('[data-say]')!.textContent} <span class="or-f">Frame <b data-frame>${frame}</b>.</span>` : `Frame <b data-frame>${frame}</b> of his loop. Tap a planet to follow it.`;
+      paint();
+    }));
+
+    jump(frame);
+    cv.hidden = false;
+    root.querySelector<HTMLElement>('.or-still')!.hidden = true;
+    root.querySelector<HTMLElement>('.or-ctl')!.hidden = false;
+    paint();
+    new IntersectionObserver(([e]) => { seen = e.isIntersecting; if (seen) loop(); }, { threshold: 0.2 }).observe(cv);
+    document.addEventListener('visibilitychange', loop);
+    if (!reduce()) setPlay(true);
+  });
+</script>

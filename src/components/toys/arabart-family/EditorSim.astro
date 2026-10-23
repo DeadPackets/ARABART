@@ -1,0 +1,228 @@
+---
+// EDITOR.EXE, driven by you: his key loop (editor.ts) on his own engine. Physical keys type like a 1993 US keyboard,
+// phones and Arabic layouts type through the text box, and every key of his has a button. After each key it sends
+// 'editorkey' { before, after, key } on document; 'editor-press' { key } on document presses a key from elsewhere.
+// Without JS: the real capture of his editor.
+import Window from '../../shell/Window.astro';
+import { fromUnicode, toUnicode } from '../arabart/core.ts';
+import { START } from './editor.ts';
+
+interface Props { id?: string }
+const { id = 'editorsim' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const CMDS = [['Q', 'Font 1'], ['W', 'Font 2'], ['E', 'Font 3'], ['R', 'Font 4'], ['C', 'Text color'], ['V', 'Shadow color']];
+const STYLES = [['!', 'Italic'], ['@', 'Bold'], ['#', 'Underline'], ['$', 'Double'], ['*', 'All off']];
+const LETTERS = [...'ابتثجحخدذرزسشصضطظعغفقكلمنهوي', 'ة', 'ى', 'ء', 'أ', 'آ', 'ؤ', 'ئ', 'لا', 'ـ'].map(ar => ({ ar, k: fromUnicode(ar) }));
+const DIGITS = [...'0123456789'].map(d => ({ d, ar: toUnicode(d) }));
+---
+
+<div class="es" id={id} data-editorsim data-start={JSON.stringify(START)}>
+  <div class="es-top">
+    <Window title={'C:\\ARABART\\EDITOR.EXE'} kind="screen" class="es-win" active>
+      <div class="es-screen" data-screen>
+        <img class="es-shot" src={`${base}/images/arabart-editor.png`} width="962" height="600" loading="lazy"
+          alt="His editor: الفن العربي ٤,١٥ in yellow 3-D letters with a red shadow, at the top right of a black screen." />
+        <canvas class="es-canvas" aria-hidden="true"></canvas>
+        <label class="sr-only" for={`${id}-in`}>Type into his editor. On an English keyboard, press the key where each Arabic letter sits on an Arabic keyboard.</label>
+        <textarea id={`${id}-in`} class="es-input" rows="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea>
+        <span class="es-tap" aria-hidden="true">Tap and type</span>
+        <div class="es-end" data-end hidden>
+          <span>EDITOR.EXE has ended.</span>
+          <button type="button" class="button k-btn" data-again>Run it again</button>
+        </div>
+      </div>
+      <p class="sr-only" aria-live="polite" data-said></p>
+    </Window>
+    <Window title="MEMORY" kind="panel" num="2" class="es-mem">
+      <div class="es-buf" data-buf aria-label="His buffer, one key per byte" role="group"></div>
+      <dl class="es-state">
+        <div><dt>Font</dt><dd data-s="font">3</dd></div>
+        <div><dt>Text</dt><dd><i data-sw="color"></i><span data-s="color">14</span></dd></div>
+        <div><dt>Shadow</dt><dd><i data-sw="shadow"></i><span data-s="shadow">4</span></dd></div>
+        <div><dt>Draw</dt><dd data-s="fn">3-D, function 8</dd></div>
+        <div><dt>Keys</dt><dd data-s="i">16 of 80</dd></div>
+      </dl>
+    </Window>
+  </div>
+  <div class="es-keys" data-keys>
+    <div class="es-g">
+      <span class="es-lab">Command keys: they change ARABART, and are never stored</span>
+      <div class="es-row">
+        {CMDS.map(([k, l]) => <button type="button" class="button k-btn es-k" data-k={k}><span class="hk" aria-hidden="true">⇧{k}</span> {l}</button>)}
+        <button type="button" class="button k-btn es-k" data-k="|"><span class="hk" aria-hidden="true">|</span> 3-D on, off</button>
+      </div>
+    </div>
+    <div class="es-g">
+      <span class="es-lab">Style keys: stored in the text, like tags</span>
+      <div class="es-row">
+        {STYLES.map(([k, l]) => <button type="button" class="button k-btn es-k" data-k={k}><span class="hk" aria-hidden="true">{k}</span> {l}</button>)}
+      </div>
+    </div>
+    <div class="es-g">
+      <span class="es-lab">Letters and digits</span>
+      <div class="es-letters" dir="rtl">
+        {LETTERS.map(l => <button type="button" class="es-l" data-k={l.k} aria-label={l.ar}><span lang="ar">{l.ar}</span><small aria-hidden="true">{l.k}</small></button>)}
+        {DIGITS.map(l => <button type="button" class="es-l" data-k={l.d} aria-label={`digit ${l.d}`}><span lang="ar">{l.ar}</span><small aria-hidden="true">{l.d}</small></button>)}
+      </div>
+    </div>
+    <div class="es-row">
+      <button type="button" class="button k-btn" data-k=" ">Space</button>
+      <button type="button" class="button k-btn" data-k="bs">Backspace</button>
+      <button type="button" class="button k-btn" data-k="esc"><span class="hk" aria-hidden="true">Esc</span> Quit</button>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .es { display: grid; gap: 22px; min-width: 0; }
+  .es-top { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(250px, 1fr); gap: 22px; align-items: start; }
+  .es-screen { position: relative; background: var(--vga-0); }
+  .es.is-live .es-screen { aspect-ratio: 4 / 3; cursor: text; }
+  .es-shot { display: block; width: 100%; height: auto; }
+  .es.is-live .es-shot { display: none; }
+  .es-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  .es:not(.is-live) :is(.es-canvas, .es-input, .es-tap), .es:not(.is-live) .es-keys, .es:not(.is-live) .es-mem { display: none; }
+  .es:not(.is-live) .es-top { grid-template-columns: minmax(0, 1fr); }
+  .es-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; resize: none; border: 0; padding: 0; font-size: 16px; color: transparent; background: none; caret-color: transparent; cursor: text; z-index: 2; }
+  .es-tap { position: absolute; left: 12px; bottom: 10px; z-index: 1; padding: 4px 8px; font: 600 12px/1.3 var(--font-code); color: var(--vga-0); background: var(--vga-7); pointer-events: none; transition: opacity 0.3s var(--quart); }
+  .es.is-typing .es-tap { opacity: 0; }
+  .es.is-typing .es-screen { box-shadow: inset 0 0 0 2px var(--vga-14); }
+  .es-end { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 16px; text-align: center; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); background: var(--vga-0); }
+  .es-end[hidden] { display: none; }
+
+  .es-buf { display: flex; flex-wrap: wrap; gap: 3px; min-height: 56px; }
+  .es-c { display: grid; justify-items: center; align-content: start; width: 34px; height: 54px; padding-top: 3px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .es-c b { font: 700 14px/1.3 var(--font-code); color: var(--ink); white-space: pre; }
+  .es-c span { font: 700 18px/1.2 var(--font-ar); color: var(--accent); }
+  .es-c small { font: 600 10px/1.3 var(--font-code); color: var(--surface); background: var(--accent-2); padding: 0 3px; }
+  .es-c.is-i { box-shadow: inset 0 0 0 2px var(--accent); background: none; }
+  .es-c.is-i b { color: var(--accent); }
+  .es-state { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px 16px; margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--rule); }
+  .es-state dt { font: 600 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .es-state dd { display: flex; align-items: center; gap: 8px; margin: 2px 0 0; font: 700 15px/1.3 var(--font-code); color: var(--accent); }
+  .es-state i { width: 22px; height: 22px; background: var(--c, #000); box-shadow: 0 0 0 2px var(--vga-15); }
+
+  .es-keys { display: grid; gap: 16px; }
+  .es-g { display: grid; gap: 8px; }
+  .es-lab { font: 700 0.875rem/1.3 var(--sans); color: var(--ink-2); }
+  .es-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .es-k { padding: 0 12px; }
+  .es-k .hk { margin-right: 2px; }
+  .es-letters { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+  .es-l { flex: none; display: grid; place-items: center; width: 48px; height: 58px; padding: 4px 0 2px; color: var(--btn-ink); background: var(--btn-bg); border: 0; box-shadow: 3px 3px 0 var(--black); cursor: pointer; touch-action: manipulation; }
+  .es-l span { font: 700 1.375rem/1 var(--font-ar); }
+  .es-l small { font: 600 11px/1 var(--font-code); color: var(--hot); direction: ltr; }
+  .es-l:hover { background: var(--accent); }
+  .es-l:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--black); }
+  .es-l:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  @media (max-width: 1023px) { .es-top { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) { .es-k { flex: 1 1 40%; } .es-l { width: 44px; height: 54px; } }
+  @media (prefers-reduced-motion: reduce) { .es-tap { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, fromKey, keysFromText, toUnicode, PALETTE } from '../arabart/core.ts';
+  import { press, again, line, kindOf, STYLE_NAME, colorName, type Ed } from './editor.ts';
+  import { frame, stamp, show, blit, camera, NAMES, reduce } from './vga.ts';
+
+  const esc = (t: string) => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+  const hexc = (i: number) => `#${PALETTE[i & 15].toString(16).padStart(6, '0')}`;
+
+  document.querySelectorAll<HTMLElement>('[data-editorsim]').forEach(async root => {
+    const bin = await fonts();
+    const $ = <T extends Element = HTMLElement>(q: string) => root.querySelector<T>(q)!;
+    const canvas = $<HTMLCanvasElement>('.es-canvas'), input = $<HTMLTextAreaElement>('textarea'), buf = $('[data-buf]');
+    const said = $('[data-said]'), end = $('[data-end]');
+    let s: Ed = JSON.parse(root.dataset.start!);
+    const f = frame(), off = document.createElement('canvas');
+    const cam = { x: 0, y: 0, w: 640, h: 480 };
+
+    const paint = () => blit(canvas, off, cam);
+    const render = (how: 'type' | 'jump') => {
+      const img = line(bin, s);
+      f.data.fill(0);
+      if (s.keys) stamp(f, img, 639, 100);
+      show(off, f);
+      // Frame the line, and the pen's spot when it is short or empty
+      const has = s.keys && img.width, left = has ? 639 - img.x : 600, top = has ? 100 - img.y : 60;
+      const v = camera(Math.min(left, 580), Math.min(top, 60), 639, Math.max(has ? top + img.height : 104, 104));
+      gsap.to(cam, { ...v, duration: how === 'jump' || reduce() ? 0 : 0.6, ease: 'expo.out', overwrite: true, onUpdate: paint });
+      paint();
+      // Memory: his buffer, one cell per byte, then the next free slot
+      buf.innerHTML = [...s.keys].map((k, i) => {
+        const kind = kindOf(k), ar = kind === 'letter' || /\d/.test(k) ? toUnicode(k) : '';
+        return `<span class="es-c" title="buf[${i}]"><b>${k === ' ' ? '·' : esc(k)}</b>${ar ? `<span lang="ar">${esc(ar)}</span>` : kind === 'style' ? `<small>${STYLE_NAME[k].split(' ')[0]}</small>` : ''}</span>`;
+      }).join('') + (s.ended ? '' : `<span class="es-c is-i" title="buf[${s.keys.length}]: the next key goes here"><b>i</b></span>`);
+      const set = (k: string, v: string) => (root.querySelector(`[data-s="${k}"]`)!.textContent = v);
+      set('font', String(s.font));
+      set('color', colorName(s.color));
+      set('shadow', colorName(s.shadow));
+      set('fn', s.fn === 8 ? '3-D, function 8' : 'plain, function 7');
+      set('i', `${s.keys.length} of 80`);
+      root.querySelector<HTMLElement>('[data-sw="color"]')!.style.setProperty('--c', hexc(s.color));
+      root.querySelector<HTMLElement>('[data-sw="shadow"]')!.style.setProperty('--c', hexc(s.shadow));
+      end.hidden = !s.ended;
+    };
+
+    const hit = (key: string) => {
+      key = key === 'bs' ? '\b' : key === 'esc' ? '\x1b' : key;
+      if (!key || s.ended) return;
+      const before = s;
+      s = press(s, key);
+      if (s === before) return;
+      render('type');
+      const k = kindOf(key);
+      said.textContent = k === 'quit' ? 'EDITOR.EXE has ended.' : k === 'font' ? `Font ${s.font}.` : k === 'color' ? `Text color ${colorName(s.color)}.`
+        : k === 'shadow' ? `Shadow color ${colorName(s.shadow)}.` : k === '3d' ? (s.fn === 8 ? '3-D on.' : '3-D off.') : toUnicode(s.keys) || 'Empty line.';
+      if (!reduce() && k !== 'quit') {
+        const last = buf.querySelector<HTMLElement>('.es-c:nth-last-child(2)');
+        if (last && (k === 'letter' || k === 'style' || k === 'space' || k === 'other')) gsap.from(last, { y: -10, opacity: 0, duration: 0.35, ease: 'expo.out' });
+      }
+      document.dispatchEvent(new CustomEvent('editorkey', { detail: { before, after: s, key } }));
+    };
+
+    // Physical keys go through fromKey, so any layout types like a 1993 US keyboard; phones and Arabic layouts arrive as text
+    input.addEventListener('keydown', e => {
+      if (e.isComposing || e.keyCode === 229 || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.key === 'Backspace') { e.preventDefault(); hit('\b'); return; }
+      if (e.key === 'Escape') { e.preventDefault(); hit('\x1b'); return; }
+      if (e.key === 'Tab' || e.key === 'Enter') return;
+      if (e.key.length !== 1 || /[^\x20-\x7e]/.test(e.key)) return;
+      const k = fromKey(e);
+      if (k) { e.preventDefault(); hit(k); }
+    });
+    input.addEventListener('beforeinput', e => {
+      if (e.inputType === 'insertCompositionText') return;
+      e.preventDefault();
+      if (e.inputType.startsWith('delete')) hit('\b');
+      else for (const k of keysFromText(e.data ?? e.dataTransfer?.getData('text/plain') ?? '').replace(/\n/g, '')) hit(k);
+    });
+    input.addEventListener('compositionend', () => { for (const k of keysFromText(input.value)) hit(k); input.value = ''; });
+    input.addEventListener('focus', () => root.classList.add('is-typing'));
+    input.addEventListener('blur', () => root.classList.remove('is-typing'));
+
+    $('[data-keys]').addEventListener('click', e => {
+      const b = (e.target as Element).closest<HTMLButtonElement>('[data-k]');
+      if (b) hit(b.dataset.k!);
+    });
+    $('[data-again]').addEventListener('click', () => {
+      const before = s;
+      s = again(s);
+      render('jump');
+      said.textContent = 'EDITOR.EXE is running again. ARABART kept its font and colors.';
+      document.dispatchEvent(new CustomEvent('editorkey', { detail: { before, after: s, key: '' } }));
+      input.focus({ preventScroll: true });
+    });
+    document.addEventListener('editor-press', e => {
+      const k = (e as CustomEvent).detail.key as string;
+      if (s.ended) { s = again(s); render('jump'); }
+      hit(k);
+    });
+
+    new ResizeObserver(paint).observe(canvas);
+    root.classList.add('is-live');
+    render('jump');
+    said.textContent = '';
+  });
+</script>

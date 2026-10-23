@@ -1,0 +1,581 @@
+ 00000: b81035         mov ax, 0x3510
+ 00003: cd21           int 0x21
+ 00005: 8bfb           mov di, bx
+ 00007: be3c00         mov si, 0x3c
+ 0000a: 0e             push cs
+ 0000b: 1f             pop ds
+ 0000c: b90c00         mov cx, 0xc
+ 0000f: fc             cld 
+ 00010: f3a6           repe cmpsb byte ptr [si], byte ptr es:[di]
+ 00012: 7513           jne 0x27
+ 00014: b40f           mov ah, 0xf
+ 00016: cd10           int 0x10
+ 00018: b400           mov ah, 0
+ 0001a: cd10           int 0x10
+ 0001c: b409           mov ah, 9
+ 0001e: ba6474         mov dx, 0x7464
+ 00021: cd21           int 0x21
+ 00023: b44c           mov ah, 0x4c
+ 00025: cd21           int 0x21
+L00027: 8c065100       mov word ptr [0x51], es
+ 0002b: 891e4f00       mov word ptr [0x4f], bx
+ 0002f: b81025         mov ax, 0x2510
+ 00032: 0e             push cs
+ 00033: 1f             pop ds
+ 00034: ba3c00         mov dx, 0x3c
+ 00037: cd21           int 0x21
+ 00039: e99874         jmp 0x74d4
+ 0003c: eb0a           jmp 0x48
+        ; ---- data 0003e-00047 (10 bytes)
+L00048: fb             sti 
+ 00049: 80fc36         cmp ah, 0x36
+ 0004c: 7405           je 0x53
+ 0004e: ea00000000     ljmp 0:0
+L00053: 3c00           cmp al, 0
+ 00055: 750b           jne 0x62
+ 00057: b84459         mov ax, 0x5944
+ 0005a: bb0f04         mov bx, 0x40f
+ 0005d: b90400         mov cx, 4
+ 00060: fa             cli 
+ 00061: cf             iret 
+L00062: 3c01           cmp al, 1
+ 00064: 750c           jne 0x72
+ 00066: 2e880e0606     mov byte ptr cs:[0x606], cl
+ 0006b: 2e882e0706     mov byte ptr cs:[0x607], ch
+ 00070: fa             cli 
+ 00071: cf             iret 
+L00072: 3c02           cmp al, 2
+ 00074: 750c           jne 0x82
+ 00076: 2e8a0e0606     mov cl, byte ptr cs:[0x606]
+ 0007b: 2e8a2e0706     mov ch, byte ptr cs:[0x607]
+ 00080: fa             cli 
+ 00081: cf             iret 
+L00082: 3c03           cmp al, 3
+ 00084: 752d           jne 0xb3
+ 00086: 2e3b0ee606     cmp cx, word ptr cs:[0x6e6]
+ 0008b: 7610           jbe 0x9d
+L0008d: 58             pop ax
+ 0008e: 5b             pop bx
+ 0008f: 5a             pop dx
+ 00090: 83ca01         or dx, 1
+ 00093: 52             push dx
+ 00094: 53             push bx
+ 00095: 50             push ax
+ 00096: 2e8b0ee606     mov cx, word ptr cs:[0x6e6]
+ 0009b: fa             cli 
+ 0009c: cf             iret 
+L0009d: 83f900         cmp cx, 0
+ 000a0: 74eb           je 0x8d
+ 000a2: 49             dec cx
+ 000a3: 2e890eeb05     mov word ptr cs:[0x5eb], cx
+ 000a8: 58             pop ax
+ 000a9: 5b             pop bx
+ 000aa: 5a             pop dx
+ 000ab: 83e2fe         and dx, 0xfffe
+ 000ae: 52             push dx
+ 000af: 53             push bx
+ 000b0: 50             push ax
+ 000b1: fa             cli 
+ 000b2: cf             iret 
+L000b3: 3c04           cmp al, 4
+ 000b5: 7518           jne 0xcf
+ 000b7: 2e8b0eeb05     mov cx, word ptr cs:[0x5eb]
+ 000bc: 8bd9           mov bx, cx
+ 000be: 41             inc cx
+ 000bf: d1e3           shl bx, 1
+ 000c1: 2e8b97e806     mov dx, word ptr cs:[bx + 0x6e8]
+ 000c6: 8bda           mov bx, dx
+ 000c8: 43             inc bx
+ 000c9: 43             inc bx
+ 000ca: 2e8b17         mov dx, word ptr cs:[bx]
+ 000cd: fa             cli 
+ 000ce: cf             iret 
+L000cf: 3c09           cmp al, 9
+ 000d1: 750c           jne 0xdf
+ 000d3: 2e890ef105     mov word ptr cs:[0x5f1], cx
+ 000d8: 2e891ef305     mov word ptr cs:[0x5f3], bx
+ 000dd: fa             cli 
+ 000de: cf             iret 
+L000df: 3c0a           cmp al, 0xa
+ 000e1: 750c           jne 0xef
+ 000e3: 2e8b0ef105     mov cx, word ptr cs:[0x5f1]
+ 000e8: 2e8b1ef305     mov bx, word ptr cs:[0x5f3]
+ 000ed: fa             cli 
+ 000ee: cf             iret 
+L000ef: 3c07           cmp al, 7
+ 000f1: 740e           je 0x101
+ 000f3: 3c08           cmp al, 8
+ 000f5: 740a           je 0x101
+ 000f7: 3c05           cmp al, 5
+ 000f9: 7406           je 0x101
+ 000fb: 3c06           cmp al, 6
+ 000fd: 7402           je 0x101
+ 000ff: fa             cli 
+ 00100: cf             iret 
+L00101: 56             push si
+ 00102: 57             push di
+ 00103: 55             push bp
+ 00104: 06             push es
+ 00105: 1e             push ds
+ 00106: 2ec706fe050000 mov word ptr cs:[0x5fe], 0
+ 0010d: 2ec606000601   mov byte ptr cs:[0x600], 1
+ 00113: 3c07           cmp al, 7
+ 00115: 7434           je 0x14b
+ 00117: 3c08           cmp al, 8
+ 00119: 7430           je 0x14b
+ 0011b: fec0           inc al
+ 0011d: fec0           inc al
+ 0011f: 2ec606000600   mov byte ptr cs:[0x600], 0
+ 00125: 50             push ax
+ 00126: 2ea1f105       mov ax, word ptr cs:[0x5f1]
+ 0012a: 2ea3f505       mov word ptr cs:[0x5f5], ax
+ 0012e: 2ec706f1052c01 mov word ptr cs:[0x5f1], 0x12c
+ 00135: 2ea1f305       mov ax, word ptr cs:[0x5f3]
+ 00139: 2ea3f705       mov word ptr cs:[0x5f7], ax
+ 0013d: 2ec706f3050000 mov word ptr cs:[0x5f3], 0
+ 00144: 58             pop ax
+ 00145: bb6400         mov bx, 0x64
+ 00148: b96400         mov cx, 0x64
+L0014b: 2ea20806       mov byte ptr cs:[0x608], al
+ 0014f: 2ec606e70500   mov byte ptr cs:[0x5e7], 0
+ 00155: 90             nop 
+ 00156: 2ec606e80500   mov byte ptr cs:[0x5e8], 0
+ 0015c: 90             nop 
+ 0015d: 2ec606ea0550   mov byte ptr cs:[0x5ea], 0x50
+ 00163: 90             nop 
+ 00164: 2ec606e90500   mov byte ptr cs:[0x5e9], 0
+ 0016a: 90             nop 
+ 0016b: 83f9ff         cmp cx, -1
+ 0016e: 740f           je 0x17f
+ 00170: 83fbff         cmp bx, -1
+ 00173: 740a           je 0x17f
+ 00175: 2e891ef305     mov word ptr cs:[0x5f3], bx
+ 0017a: 2e890ef105     mov word ptr cs:[0x5f1], cx
+L0017f: 2ec606e60502   mov byte ptr cs:[0x5e6], 2
+ 00185: 90             nop 
+ 00186: 2e813ef1058002 cmp word ptr cs:[0x5f1], 0x280
+ 0018d: 720c           jb 0x19b
+ 0018f: 2e813ef305e001 cmp word ptr cs:[0x5f3], 0x1e0
+ 00196: 7203           jb 0x19b
+ 00198: e90604         jmp 0x5a1
+L0019b: b40f           mov ah, 0xf
+ 0019d: cd10           int 0x10
+ 0019f: 2ec706e405e001 mov word ptr cs:[0x5e4], 0x1e0
+ 001a6: 2ec70609065000 mov word ptr cs:[0x609], 0x50
+ 001ad: 3c12           cmp al, 0x12
+ 001af: 7421           je 0x1d2
+ 001b1: 2ec706e4055e01 mov word ptr cs:[0x5e4], 0x15e
+ 001b8: 3c10           cmp al, 0x10
+ 001ba: 7416           je 0x1d2
+ 001bc: 2ec706e405c800 mov word ptr cs:[0x5e4], 0xc8
+ 001c3: 3c0e           cmp al, 0xe
+ 001c5: 740b           je 0x1d2
+ 001c7: f9             stc 
+ 001c8: 2ec606e60501   mov byte ptr cs:[0x5e6], 1
+ 001ce: 90             nop 
+ 001cf: e9cf03         jmp 0x5a1
+L001d2: 0e             push cs
+ 001d3: 07             pop es
+ 001d4: 8bf2           mov si, dx
+ 001d6: bf0c06         mov di, 0x60c
+ 001d9: 2e893eef05     mov word ptr cs:[0x5ef], di
+ 001de: fc             cld 
+ 001df: b95a00         mov cx, 0x5a
+ 001e2: f3a4           rep movsb byte ptr es:[di], byte ptr [si]
+ 001e4: 2ea1e405       mov ax, word ptr cs:[0x5e4]
+ 001e8: 2e3906f305     cmp word ptr cs:[0x5f3], ax
+ 001ed: 720a           jb 0x1f9
+ 001ef: 2ec606e60502   mov byte ptr cs:[0x5e6], 2
+ 001f5: 90             nop 
+ 001f6: e9a803         jmp 0x5a1
+L001f9: 2ec606e60500   mov byte ptr cs:[0x5e6], 0
+ 001ff: 90             nop 
+ 00200: 32f6           xor dh, dh
+ 00202: 2e8e1eed05     mov ds, word ptr cs:[0x5ed]
+ 00207: 2e8b3eef05     mov di, word ptr cs:[0x5ef]
+L0020c: 8a15           mov dl, byte ptr [di]
+ 0020e: 80fa00         cmp dl, 0
+ 00211: 741c           je 0x22f
+ 00213: 80fa80         cmp dl, 0x80
+ 00216: 7202           jb 0x21a
+ 00218: 33d2           xor dx, dx
+L0021a: 8bf2           mov si, dx
+ 0021c: 83ee20         sub si, 0x20
+ 0021f: 2e8a848206     mov al, byte ptr cs:[si + 0x682]
+ 00224: 3c00           cmp al, 0
+ 00226: 7502           jne 0x22a
+ 00228: b003           mov al, 3
+L0022a: 8805           mov byte ptr [di], al
+ 0022c: 47             inc di
+ 0022d: ebdd           jmp 0x20c
+L0022f: 2e8e1eed05     mov ds, word ptr cs:[0x5ed]
+ 00234: 2e8b3eef05     mov di, word ptr cs:[0x5ef]
+ 00239: 4f             dec di
+L0023a: 47             inc di
+ 0023b: 8a15           mov dl, byte ptr [di]
+ 0023d: 80fac8         cmp dl, 0xc8
+ 00240: 74f8           je 0x23a
+ 00242: 80fac9         cmp dl, 0xc9
+ 00245: 74f3           je 0x23a
+ 00247: 80faca         cmp dl, 0xca
+ 0024a: 74ee           je 0x23a
+ 0024c: 80facb         cmp dl, 0xcb
+ 0024f: 74e9           je 0x23a
+ 00251: 80fad0         cmp dl, 0xd0
+ 00254: 74e4           je 0x23a
+ 00256: 80e2bf         and dl, 0xbf
+ 00259: 8815           mov byte ptr [di], dl
+L0025b: 8a15           mov dl, byte ptr [di]
+ 0025d: 80fa00         cmp dl, 0
+ 00260: 745b           je 0x2bd
+ 00262: 80fac8         cmp dl, 0xc8
+ 00265: 7453           je 0x2ba
+ 00267: 80fac9         cmp dl, 0xc9
+ 0026a: 744e           je 0x2ba
+ 0026c: 80faca         cmp dl, 0xca
+ 0026f: 7449           je 0x2ba
+ 00271: 80facb         cmp dl, 0xcb
+ 00274: 7444           je 0x2ba
+ 00276: 80fad0         cmp dl, 0xd0
+ 00279: 743f           je 0x2ba
+ 0027b: 8bf7           mov si, di
+L0027d: 46             inc si
+ 0027e: 8a0c           mov cl, byte ptr [si]
+ 00280: 80f9c8         cmp cl, 0xc8
+ 00283: 74f8           je 0x27d
+ 00285: 80f9c9         cmp cl, 0xc9
+ 00288: 74f3           je 0x27d
+ 0028a: 80f9ca         cmp cl, 0xca
+ 0028d: 74ee           je 0x27d
+ 0028f: 80f9cb         cmp cl, 0xcb
+ 00292: 74e9           je 0x27d
+ 00294: 80f9d0         cmp cl, 0xd0
+ 00297: 74e4           je 0x27d
+ 00299: 8ae9           mov ch, cl
+ 0029b: 8af2           mov dh, dl
+ 0029d: 80e680         and dh, 0x80
+ 002a0: 80e540         and ch, 0x40
+ 002a3: 80fe00         cmp dh, 0
+ 002a6: 7408           je 0x2b0
+ 002a8: 80fd00         cmp ch, 0
+ 002ab: 7403           je 0x2b0
+ 002ad: eb0b           jmp 0x2ba
+        ; ---- data 002af-002af (1 bytes)
+L002b0: 80e27f         and dl, 0x7f
+ 002b3: 80e1bf         and cl, 0xbf
+ 002b6: 8815           mov byte ptr [di], dl
+ 002b8: 880c           mov byte ptr [si], cl
+L002ba: 47             inc di
+ 002bb: eb9e           jmp 0x25b
+L002bd: 2e8a1e0606     mov bl, byte ptr cs:[0x606]
+ 002c2: 2ea1f105       mov ax, word ptr cs:[0x5f1]
+ 002c6: 2ea3f905       mov word ptr cs:[0x5f9], ax
+ 002ca: 2ea1f305       mov ax, word ptr cs:[0x5f3]
+ 002ce: 2ea3fb05       mov word ptr cs:[0x5fb], ax
+ 002d2: 2e803e080608   cmp byte ptr cs:[0x608], 8
+ 002d8: 751f           jne 0x2f9
+ 002da: 2e8b36eb05     mov si, word ptr cs:[0x5eb]
+ 002df: d1e6           shl si, 1
+ 002e1: 2e8b9ce806     mov bx, word ptr cs:[si + 0x6e8]
+ 002e6: 2e8b7704       mov si, word ptr cs:[bx + 4]
+ 002ea: 2e2936f105     sub word ptr cs:[0x5f1], si
+ 002ef: 2e2936f305     sub word ptr cs:[0x5f3], si
+ 002f4: 2e8a1e0706     mov bl, byte ptr cs:[0x607]
+L002f9: bace03         mov dx, 0x3ce
+ 002fc: b001           mov al, 1
+ 002fe: ee             out dx, al
+ 002ff: 42             inc dx
+ 00300: b00f           mov al, 0xf
+ 00302: ee             out dx, al
+ 00303: 4a             dec dx
+ 00304: 32c0           xor al, al
+ 00306: ee             out dx, al
+ 00307: 42             inc dx
+ 00308: 8ac3           mov al, bl
+ 0030a: ee             out dx, al
+L0030b: 2e8e1eed05     mov ds, word ptr cs:[0x5ed]
+ 00310: 2e8b36ef05     mov si, word ptr cs:[0x5ef]
+ 00315: 2eff06ef05     inc word ptr cs:[0x5ef]
+ 0031a: 32ff           xor bh, bh
+ 0031c: 8a1c           mov bl, byte ptr [si]
+ 0031e: 0e             push cs
+ 0031f: 1f             pop ds
+ 00320: 80fb00         cmp bl, 0
+ 00323: 7503           jne 0x328
+ 00325: e93502         jmp 0x55d
+L00328: 80fbc8         cmp bl, 0xc8
+ 0032b: 7507           jne 0x334
+ 0032d: 8036e70501     xor byte ptr [0x5e7], 1
+ 00332: ebd7           jmp 0x30b
+L00334: 80fbc9         cmp bl, 0xc9
+ 00337: 7507           jne 0x340
+ 00339: 8036e80501     xor byte ptr [0x5e8], 1
+ 0033e: ebcb           jmp 0x30b
+L00340: 80fbca         cmp bl, 0xca
+ 00343: 7507           jne 0x34c
+ 00345: 8036e90501     xor byte ptr [0x5e9], 1
+ 0034a: ebbf           jmp 0x30b
+L0034c: 80fbcb         cmp bl, 0xcb
+ 0034f: 7517           jne 0x368
+ 00351: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 00356: 7408           je 0x360
+ 00358: c606ea0550     mov byte ptr [0x5ea], 0x50
+ 0035d: 90             nop 
+ 0035e: ebab           jmp 0x30b
+L00360: c606ea05a0     mov byte ptr [0x5ea], 0xa0
+ 00365: 90             nop 
+ 00366: eba3           jmp 0x30b
+L00368: 80fbd0         cmp bl, 0xd0
+ 0036b: 751a           jne 0x387
+ 0036d: c606ea0550     mov byte ptr [0x5ea], 0x50
+ 00372: 90             nop 
+ 00373: c606e80500     mov byte ptr [0x5e8], 0
+ 00378: 90             nop 
+ 00379: c606e70500     mov byte ptr [0x5e7], 0
+ 0037e: 90             nop 
+ 0037f: c606e90500     mov byte ptr [0x5e9], 0
+ 00384: 90             nop 
+ 00385: eb84           jmp 0x30b
+L00387: 881e0506       mov byte ptr [0x605], bl
+ 0038b: 8b16eb05       mov dx, word ptr [0x5eb]
+ 0038f: d1e3           shl bx, 1
+ 00391: d1e2           shl dx, 1
+ 00393: 8bf2           mov si, dx
+ 00395: 039ce806       add bx, word ptr [si + 0x6e8]
+ 00399: 8b37           mov si, word ptr [bx]
+ 0039b: ac             lodsb al, byte ptr [si]
+ 0039c: a2fd05         mov byte ptr [0x5fd], al
+ 0039f: 803ee70501     cmp byte ptr [0x5e7], 1
+ 003a4: 7504           jne 0x3aa
+ 003a6: fe06fd05       inc byte ptr [0x5fd]
+L003aa: 803eea05a0     cmp byte ptr [0x5ea], 0xa0
+ 003af: 90             nop 
+ 003b0: 7504           jne 0x3b6
+ 003b2: d026fd05       shl byte ptr [0x5fd], 1
+L003b6: 8b1ef105       mov bx, word ptr [0x5f1]
+ 003ba: a0fd05         mov al, byte ptr [0x5fd]
+ 003bd: 32e4           xor ah, ah
+ 003bf: 0106fe05       add word ptr [0x5fe], ax
+ 003c3: 803e000600     cmp byte ptr [0x600], 0
+ 003c8: 7503           jne 0x3cd
+ 003ca: e93eff         jmp 0x30b
+L003cd: 2bd8           sub bx, ax
+ 003cf: 81fb8002       cmp bx, 0x280
+ 003d3: 7203           jb 0x3d8
+ 003d5: e98501         jmp 0x55d
+L003d8: 8e067006       mov es, word ptr [0x670]
+ 003dc: a1f305         mov ax, word ptr [0x5f3]
+ 003df: 8b1e0906       mov bx, word ptr [0x609]
+ 003e3: f7e3           mul bx
+ 003e5: 8bf8           mov di, ax
+ 003e7: 893e0306       mov word ptr [0x603], di
+ 003eb: 803ee90501     cmp byte ptr [0x5e9], 1
+ 003f0: 7403           je 0x3f5
+ 003f2: eb6c           jmp 0x460
+        ; ---- data 003f4-003f4 (1 bytes)
+L003f5: b90300         mov cx, 3
+ 003f8: 33db           xor bx, bx
+ 003fa: 8b16f105       mov dx, word ptr [0x5f1]
+L003fe: d1ea           shr dx, 1
+ 00400: d1d3           rcl bx, 1
+ 00402: e2fa           loop 0x3fe
+ 00404: 03fa           add di, dx
+ 00406: 8a8f7206       mov cl, byte ptr [bx + 0x672]
+ 0040a: 32ed           xor ch, ch
+ 0040c: 8bd9           mov bx, cx
+ 0040e: 8a0efd05       mov cl, byte ptr [0x5fd]
+ 00412: b000           mov al, 0
+L00414: 0a877a06       or al, byte ptr [bx + 0x67a]
+ 00418: 83fb00         cmp bx, 0
+ 0041b: 7523           jne 0x440
+ 0041d: bace03         mov dx, 0x3ce
+ 00420: b408           mov ah, 8
+ 00422: 86c4           xchg ah, al
+ 00424: ef             out dx, ax
+ 00425: 268a05         mov al, byte ptr es:[di]
+ 00428: 268805         mov byte ptr es:[di], al
+ 0042b: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 00430: 7408           je 0x43a
+ 00432: 268a45b0       mov al, byte ptr es:[di - 0x50]
+ 00436: 268845b0       mov byte ptr es:[di - 0x50], al
+L0043a: 4f             dec di
+ 0043b: bb0800         mov bx, 8
+ 0043e: b000           mov al, 0
+L00440: 4b             dec bx
+ 00441: e2d1           loop 0x414
+ 00443: bace03         mov dx, 0x3ce
+ 00446: b408           mov ah, 8
+ 00448: 86c4           xchg ah, al
+ 0044a: ef             out dx, ax
+ 0044b: 268a05         mov al, byte ptr es:[di]
+ 0044e: 268805         mov byte ptr es:[di], al
+ 00451: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 00456: 7408           je 0x460
+ 00458: 268a45b0       mov al, byte ptr es:[di - 0x50]
+ 0045c: 268845b0       mov byte ptr es:[di - 0x50], al
+L00460: 803e050603     cmp byte ptr [0x605], 3
+ 00465: 750c           jne 0x473
+ 00467: a0fd05         mov al, byte ptr [0x5fd]
+ 0046a: 32e4           xor ah, ah
+ 0046c: 2906f105       sub word ptr [0x5f1], ax
+ 00470: e998fe         jmp 0x30b
+L00473: a1f105         mov ax, word ptr [0x5f1]
+ 00476: a30106         mov word ptr [0x601], ax
+ 00479: ac             lodsb al, byte ptr [si]
+ 0047a: 8ac8           mov cl, al
+ 0047c: 32e4           xor ah, ah
+ 0047e: a0e805         mov al, byte ptr [0x5e8]
+ 00481: 8b3e0306       mov di, word ptr [0x603]
+ 00485: 8a16ea05       mov dl, byte ptr [0x5ea]
+ 00489: 32f6           xor dh, dh
+L0048b: 2bfa           sub di, dx
+ 0048d: 2906f105       sub word ptr [0x5f1], ax
+ 00491: e2f8           loop 0x48b
+ 00493: 2906f105       sub word ptr [0x5f1], ax
+ 00497: 893e0306       mov word ptr [0x603], di
+ 0049b: a0ea05         mov al, byte ptr [0x5ea]
+ 0049e: 01060306       add word ptr [0x603], ax
+L004a2: 32e4           xor ah, ah
+ 004a4: a0ea05         mov al, byte ptr [0x5ea]
+ 004a7: 29060306       sub word ptr [0x603], ax
+ 004ab: a0e805         mov al, byte ptr [0x5e8]
+ 004ae: 2906f105       sub word ptr [0x5f1], ax
+L004b2: 8b3e0306       mov di, word ptr [0x603]
+ 004b6: ac             lodsb al, byte ptr [si]
+ 004b7: 3cef           cmp al, 0xef
+ 004b9: 74e7           je 0x4a2
+ 004bb: 7603           jbe 0x4c0
+ 004bd: e98c00         jmp 0x54c
+L004c0: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 004c5: 7402           je 0x4c9
+ 004c7: d0e0           shl al, 1
+L004c9: 32e4           xor ah, ah
+ 004cb: 33db           xor bx, bx
+ 004cd: b90300         mov cx, 3
+ 004d0: 8b16f105       mov dx, word ptr [0x5f1]
+ 004d4: 2bd0           sub dx, ax
+L004d6: d1ea           shr dx, 1
+ 004d8: d1d3           rcl bx, 1
+ 004da: e2fa           loop 0x4d6
+ 004dc: 03fa           add di, dx
+ 004de: 8a8f7206       mov cl, byte ptr [bx + 0x672]
+ 004e2: 32ed           xor ch, ch
+ 004e4: 8bd9           mov bx, cx
+ 004e6: ac             lodsb al, byte ptr [si]
+ 004e7: 0206e705       add al, byte ptr [0x5e7]
+ 004eb: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 004f0: 7402           je 0x4f4
+ 004f2: d0e0           shl al, 1
+L004f4: bacf03         mov dx, 0x3cf
+ 004f7: 32ed           xor ch, ch
+ 004f9: 8ac8           mov cl, al
+ 004fb: 32c0           xor al, al
+L004fd: 0a877a06       or al, byte ptr [bx + 0x67a]
+ 00501: 83fb00         cmp bx, 0
+ 00504: 7523           jne 0x529
+ 00506: b408           mov ah, 8
+ 00508: bace03         mov dx, 0x3ce
+ 0050b: 86c4           xchg ah, al
+ 0050d: ef             out dx, ax
+ 0050e: 268a25         mov ah, byte ptr es:[di]
+ 00511: 268805         mov byte ptr es:[di], al
+ 00514: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 00519: 7408           je 0x523
+ 0051b: 268a65b0       mov ah, byte ptr es:[di - 0x50]
+ 0051f: 268845b0       mov byte ptr es:[di - 0x50], al
+L00523: 4f             dec di
+ 00524: bb0800         mov bx, 8
+ 00527: 33c0           xor ax, ax
+L00529: 4b             dec bx
+ 0052a: e2d1           loop 0x4fd
+ 0052c: b408           mov ah, 8
+ 0052e: bace03         mov dx, 0x3ce
+ 00531: 86c4           xchg ah, al
+ 00533: ef             out dx, ax
+ 00534: 268a25         mov ah, byte ptr es:[di]
+ 00537: 268805         mov byte ptr es:[di], al
+ 0053a: 803eea0550     cmp byte ptr [0x5ea], 0x50
+ 0053f: 7408           je 0x549
+ 00541: 268a65b0       mov ah, byte ptr es:[di - 0x50]
+ 00545: 268845b0       mov byte ptr es:[di - 0x50], al
+L00549: e966ff         jmp 0x4b2
+L0054c: a10106         mov ax, word ptr [0x601]
+ 0054f: 32ff           xor bh, bh
+ 00551: 8a1efd05       mov bl, byte ptr [0x5fd]
+ 00555: 2bc3           sub ax, bx
+ 00557: a3f105         mov word ptr [0x5f1], ax
+ 0055a: e9aefd         jmp 0x30b
+L0055d: bace03         mov dx, 0x3ce
+ 00560: b80100         mov ax, 1
+ 00563: ef             out dx, ax
+ 00564: b808ff         mov ax, 0xff08
+ 00567: ef             out dx, ax
+ 00568: 803e080608     cmp byte ptr [0x608], 8
+ 0056d: 7531           jne 0x5a0
+ 0056f: fe0e0806       dec byte ptr [0x608]
+ 00573: a1f905         mov ax, word ptr [0x5f9]
+ 00576: a3f105         mov word ptr [0x5f1], ax
+ 00579: a1fb05         mov ax, word ptr [0x5fb]
+ 0057c: a3f305         mov word ptr [0x5f3], ax
+ 0057f: c606e70500     mov byte ptr [0x5e7], 0
+ 00584: 90             nop 
+ 00585: c606e80500     mov byte ptr [0x5e8], 0
+ 0058a: 90             nop 
+ 0058b: c606e90500     mov byte ptr [0x5e9], 0
+ 00590: 90             nop 
+ 00591: c606ea0550     mov byte ptr [0x5ea], 0x50
+ 00596: 90             nop 
+ 00597: c706ef050c06   mov word ptr [0x5ef], 0x60c
+ 0059d: e91dfd         jmp 0x2bd
+L005a0: f8             clc 
+L005a1: 1f             pop ds
+ 005a2: 07             pop es
+ 005a3: 5d             pop bp
+ 005a4: 5f             pop di
+ 005a5: 5e             pop si
+ 005a6: 58             pop ax
+ 005a7: 5b             pop bx
+ 005a8: 5a             pop dx
+ 005a9: 7206           jb 0x5b1
+ 005ab: 83e2fe         and dx, 0xfffe
+ 005ae: eb04           jmp 0x5b4
+        ; ---- data 005b0-005b0 (1 bytes)
+L005b1: 83ca01         or dx, 1
+L005b4: 52             push dx
+ 005b5: 53             push bx
+ 005b6: 50             push ax
+ 005b7: 2e8b0ef105     mov cx, word ptr cs:[0x5f1]
+ 005bc: 2e8b16f305     mov dx, word ptr cs:[0x5f3]
+ 005c1: 2e803e000600   cmp byte ptr cs:[0x600], 0
+ 005c7: 7515           jne 0x5de
+ 005c9: 2e8b0efe05     mov cx, word ptr cs:[0x5fe]
+ 005ce: 2ea1f505       mov ax, word ptr cs:[0x5f5]
+ 005d2: 2ea3f105       mov word ptr cs:[0x5f1], ax
+ 005d6: 2ea1f705       mov ax, word ptr cs:[0x5f7]
+ 005da: 2ea3f305       mov word ptr cs:[0x5f3], ax
+L005de: 2ea0e605       mov al, byte ptr cs:[0x5e6]
+ 005e2: fa             cli 
+ 005e3: cf             iret 
+        ; ---- data 005e4-074d3 (28400 bytes)
+L074d4: b40f           mov ah, 0xf
+ 074d6: cd10           int 0x10
+ 074d8: b400           mov ah, 0
+ 074da: cd10           int 0x10
+ 074dc: b409           mov ah, 9
+ 074de: ba2274         mov dx, 0x7422
+ 074e1: cd21           int 0x21
+ 074e3: b97000         mov cx, 0x70
+L074e6: 50             push ax
+ 074e7: 52             push dx
+ 074e8: bada03         mov dx, 0x3da
+L074eb: ec             in al, dx
+ 074ec: 2408           and al, 8
+ 074ee: 75fb           jne 0x74eb
+L074f0: ec             in al, dx
+ 074f1: 2408           and al, 8
+ 074f3: 74fb           je 0x74f0
+ 074f5: 5a             pop dx
+ 074f6: 58             pop ax
+ 074f7: e2ed           loop 0x74e6
+ 074f9: ba9e75         mov dx, 0x759e
+ 074fc: cd27           int 0x27

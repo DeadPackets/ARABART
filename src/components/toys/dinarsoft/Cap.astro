@@ -1,0 +1,15 @@
+---
+// One archived capture at its real size, with its credit and a link to the archived page.
+import type { Shot } from '../../../data/dinarsoft';
+import './ds.css';
+
+interface Props { shot: Shot; eager?: boolean }
+const { shot: s, eager = false } = Astro.props;
+---
+
+<figure class="dsx-cap">
+  <div class="dsx-cap-img" tabindex="0">
+    <img src={s.src} width={s.w} height={s.h} alt={s.alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+  </div>
+  <figcaption class="dsx-credit"><a href={s.link} rel="noopener">{s.credit}</a></figcaption>
+</figure>

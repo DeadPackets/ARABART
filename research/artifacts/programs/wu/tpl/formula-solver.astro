@@ -1,0 +1,166 @@
+---
+import Term from '../components/explain/Term.astro';
+import Figure from '../components/explain/Figure.astro';
+import Steps from '../components/explain/Steps.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+// Offsets in the unpacked FORM_X.EXE: 48-byte header, data segment at 0, code segment 016A
+const map = (at: number) => `/DOSArchive/bytes/?f=FORM_X_FORM_X.EXE&layer=memory&at=${(0x30 + 0x16a0 + at).toString(16)}`;
+---
+
+<section id="fx-tldr">
+  <ul class="tldr">
+    <li>FORM_X (1992) takes a formula in x, such as <code>(x-3)*(x+2)/7</code>, and prints a table of results. It is 3.9 KB of hand-written Assembly.</li>
+    <li>Every number is 20 decimal digits, one digit per byte, with the point fixed after digit 14. There is no floating point, so 0.1 stays exactly 0.1.</li>
+    <li>It ignores keys that make no sense at that point, and it hides his name in code that also guards the exit.</li>
+  </ul>
+</section>
+
+<section id="fx-numbers">
+  <h2>How does it store a number?</h2>
+  <p class="lead">As 20 bytes with one decimal digit in each: 14 digits before the point and 6 after.</p>
+  <Figure title="Two numbers in FORM_X's memory" caption="Captured in an emulator while FORM_X evaluated (x-3)*(x+2)/7 with x = -1.5.">
+    @@fx-number@@
+  </Figure>
+  <p>This is unpacked <Term id="bcd">BCD</Term>: a whole <Term id="byte">byte</Term> for one digit, values 0 to 9. It wastes half of each byte, but every digit is ready to print and easy to add. A negative number is stored as its <Term id="tens-complement">ten's complement</Term>: each digit becomes 9 minus itself, then 1 is added. No sign is stored. A first digit above 4 means negative.</p>
+  <p>The point never moves, so this is <Term id="fixed-point">fixed point</Term>, not floating point. Results keep 6 decimals and are cut, not rounded: <code>1/6</code> prints 0.166666.</p>
+  <Deep title="For engineers: the negate routine">
+    <Listing
+      title="FORM_X.EXE 016A:049D, negate"
+      lines={[
+        { off: '04A2', code: 'mov  si, 057Bh / add si, 13h', note: 'last digit' },
+        { off: '04AA', code: 'mov  cx, 14h / ... loop 04B1', note: 'all 20 digits zero? then stop: -0 is 0' },
+        { off: '04C4', code: 'mov  al, [si]', note: 'for each digit, right to left:' },
+        { off: '04C6', code: 'mov  ah, 9 / sub ah, al', note: '9 - digit', hi: true },
+        { off: '04CA', code: 'mov  [si], ah / dec si / loop 04C4' },
+        { off: '04D0', code: 'add  byte [si], 1', note: 'then +1 on the last digit', hi: true },
+        { off: '04D3', code: 'cmp  byte [si], 9 / jbe 04E1', note: 'no carry: done' },
+        { off: '04DE', code: 'call 04E2', note: 'carry pass (below)' },
+        { off: '04E7', code: 'add  [si], al', note: 'carry pass: add the carry from the right' },
+        { off: '04ED', code: 'mov  al, [si] / mov bx, 0Ah / div bx', note: 'one DIV 10 per digit' },
+        { off: '04F4', code: 'mov  [si], dl / loop 04E6', note: 'keep the remainder, carry the rest', hi: true },
+      ]}
+    />
+    <p>He did not use the x86's own decimal instructions (<code>AAA</code>, <code>DAA</code>, <code>AAM</code>): the file has none. <a href={map(0x49d)}>See these bytes in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="fx-math">
+  <h2>How does it subtract with only addition?</h2>
+  <p class="lead">It adds the ten's complement, then lets the extra carry fall off the left end.</p>
+  <Steps
+    title="8 - 7.5 inside FORM_X"
+    steps={[
+      '-7.5 in ten\'s complement: thirteen 9s, then 2 and 5. These are the real bytes from FORM_X\'s memory, with 7.5 and 8 typed as the first and last x.',
+      '8, stored the same way.',
+      'Add digit by digit, with no carries yet. Digit 13 becomes 2 + 8 = 10.',
+      'One carry pass, right to left: each digit keeps its last figure and passes the rest left. The 1 runs through all thirteen 9s and drops off the end. Result: 0.5.',
+    ]}
+  >
+    @@fx-sub@@
+  </Steps>
+  <p>Multiply works like long multiplication on paper: 20 by 20 digits into a 40-digit total. Divide is repeated subtraction, and a quotient digit may count up to 250 before a carry pass tidies it, which saves passes. Overflow shows up as a sign that flipped by mistake, so <code>x/0</code> prints <code>* OVERFLOW *</code> instead of crashing.</p>
+</section>
+
+<section id="fx-keys">
+  <h2>How does it stop you typing a wrong formula?</h2>
+  <p class="lead">One byte, <code>DS:0282</code>, holds one bit for each kind of key that may come next. A key whose bit is off is ignored.</p>
+  <Steps
+    title="Typing 2 * * ( x"
+    steps={[
+      'Start: state 2Eh. Allowed: an opening bracket, a digit, x or a minus sign.',
+      'Type 2: state 75h. Now a closing bracket, another digit, an operator, minus or a point.',
+      'Type *: state 0Eh. Only an opening bracket, a digit or x may follow.',
+      'Type * again: its bit is off, so FORM_X ignores the key. Nothing appears.',
+      'Type (: back to 2Eh.',
+      'Type x: state 31h. Now a closing bracket, an operator or minus.',
+    ]}
+  >
+    @@fx-keys@@
+  </Steps>
+  <p>This is a <Term id="state-machine">state machine</Term>, the same idea as the <Term id="tokenizer">tokenizer</Term> at the front of a compiler, but it runs while you type, so a wrong formula cannot even be entered. Bit 80h remembers that the current number already has a point, which blocks a second one. Each character also saves the state that came before it, so Backspace goes back exactly one step.</p>
+  <p>The formula may be 70 characters long, and brackets are counted when you press Enter. The evaluator then works from the innermost brackets out, doing <code>* /</code> before <code>+ -</code> (<Term id="operator-precedence">operator precedence</Term>) and writing each result back into the formula text.</p>
+  <Deep title="For engineers: the key filter">
+    <Listing
+      title="FORM_X.EXE 016A:0075, condensed"
+      lines={[
+        { off: '0075', code: 'mov  ah, 7 / int 21h', note: 'read a key, no echo' },
+        { off: '0079', code: 'mov  bl, [0282h] / mov bh, bl', note: 'the state byte' },
+        { off: '007F', code: "cmp  al, '(' / je 00C4" },
+        { off: '00C4', code: 'and  bh, 2 / cmp bh, 0 / je 0075', note: 'bit off: ignore the key', hi: true },
+        { off: '00CC', code: 'mov  byte [0282h], 2Eh', note: 'after (' },
+        { off: '011A', code: 'and  bh, 0C0h / cmp bh, 40h', note: 'a point needs 40h and not 80h' },
+        { off: '0125', code: 'mov  byte [0282h], 84h', note: 'after a point: digits only' },
+        { off: '0138', code: 'and  byte [0282h], 80h', note: 'after a digit: keep "point seen"...' },
+        { off: '013D', code: 'or   byte [0282h], 75h', note: '...and allow ) digit op - .', hi: true },
+        { off: '0145', code: 'cmp  si, 46h', note: '70 characters at most' },
+        { off: '014D', code: 'mov  [si+0232h], bl', note: 'save the old state for Backspace' },
+      ]}
+    />
+    <p><a href={map(0x75)}>See the parser in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="fx-protect">
+  <h2>What happens when you leave?</h2>
+  <p class="lead">Three blocks of code each run once and then switch themselves off. Together they unscramble his name and repair the exit jump, but only if the code is untouched.</p>
+  <Steps
+    title="FORM_X protects its credit"
+    steps={[
+      'His credit is stored scrambled, as 54 bytes inside the code at 0B20. In the file it reads as nonsense.',
+      'Block 1 (036E) is the tail of the routine that reads a typed number, so it runs the first time you enter a value. It writes 5 bytes into the scrambled text, then writes RET over its own first byte, so it never runs again.',
+      'Block 2 (0A6F) runs inside the evaluator. It unscrambles the text: each byte minus the stored byte before it. Result: "Yasser Dot Design.. &lt;c&gt;1992 YASSER MOHAMED ALI."',
+      'Block 3 (0B73) adds up the code from 035E, which holds block 1, as 52 overlapping words: 582Eh. It adds A517h and puts the result, FD45h, into the jump at 0F13, which the file stores as <code>E9 00 00</code>.',
+      'On exit the jump goes to 0C5B, which writes the credit straight into video memory and quits. Change one byte of block 1 and the jump lands at 0D5C instead, and the program no longer exits properly.',
+    ]}
+  >
+    @@fx-protect@@
+  </Steps>
+  <p>This is <Term id="obfuscation">obfuscation</Term> plus a <Term id="checksum">checksum</Term>, written by hand with <Term id="self-modifying-code">self-modifying code</Term>. Someone who patches the protection out also changes the sum, and the exit breaks. FORM_X was paid work. His gift programs, such as the SCREEN screensaver, keep their credit in plain text.</p>
+  <Deep title="For engineers: the unscramble loop and the checksum">
+    <Listing
+      title="FORM_X.EXE 016A:0A6F and 0B73"
+      lines={[
+        { off: '0A75', code: 'mov  cs:[si], 0C3h', note: 'SI = 0A6F: RET over my own first byte', hi: true },
+        { off: '0A79', code: 'mov  si, 0B20h / mov cx, 35h', note: '53 bytes after the seed byte' },
+        { off: '0A83', code: 'mov  bl, cs:[si]', note: 'the first "previous" byte' },
+        { off: '0A87', code: 'mov  al, cs:[si] / mov dl, al', note: 'next byte, keep it' },
+        { off: '0A8C', code: 'sub  ax, bx', note: 'this byte - previous byte' },
+        { off: '0A93', code: 'dec  al', note: 'borrowed? take 1 more' },
+        { off: '0A95', code: 'mov  cs:[si], al / mov bl, dl', note: 'write the letter back' },
+        { off: '0B7B', code: 'mov  cs:[si], 0C3h', note: 'block 3 switches itself off too' },
+        { off: '0B7F', code: 'mov  si, 035Eh / mov cx, 34h' },
+        { off: '0B88', code: 'add  ax, cs:[si] / inc si / loop', note: '52 words, one byte apart' },
+        { off: '0B91', code: 'add  ax, 0A517h' },
+        { off: '0B94', code: 'add  cs:[si+1], ax', note: 'SI = 0F13: patch the jump', hi: true },
+      ]}
+    />
+    <p>The data segment also holds a plain copy of the same credit (at DS:035E) that no code we found uses, likely left from an earlier version. <a href={map(0xb20)}>See the scrambled bytes in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="fx-now">
+  <h2>What would you use in 2026?</h2>
+  <p class="lead">The same ideas now ship as library types and form features.</p>
+  <ThenNow
+    rows={[
+      { then: '20 unpacked BCD digits, point fixed after digit 14', now: 'Python decimal.Decimal, Java BigDecimal, SQL DECIMAL(20,6)', why: 'Exact decimal math: 0.1 + 0.2 is exactly 0.3. Money code still needs this.' },
+      { then: "Ten's complement for negative numbers", now: "Two's complement in every CPU", why: 'The same trick in base 2: subtraction becomes addition.' },
+      { then: 'A state byte that ignores wrong keys', now: 'Input masks and live validation in forms', why: 'Stop bad input at the keyboard instead of reporting it later.' },
+      { then: 'A checksum of its own code that steers the exit jump', now: 'Code signing and integrity checks', why: 'Both notice a changed program. Signing uses cryptography; FORM_X used a 16-bit sum.' },
+    ]}
+  />
+  <p>SQL's <code>DECIMAL(20,6)</code> is exactly FORM_X's format: 20 digits, 6 after the point.</p>
+</section>
+
+<section id="fx-him">
+  <h2>What this tells us about him</h2>
+  <p class="lead">He built a complete calculator from nothing, in 3.9 KB, and protected it with his own tricks.</p>
+  <ul>
+    <li><strong>Complete:</strong> key filter, evaluator with brackets and precedence, four operations on 20-digit numbers and a results table, with no runtime library at all.</li>
+    <li><strong>Learned from books (likely):</strong> the textbook EXE start (<code>push ds / mov ax,0 / push ax</code>), a dead <code>RETF</code> left from a <code>PROC FAR</code> template, and <code>JMP SHORT</code> plus <code>NOP</code> pairs from a one-pass assembler.</li>
+    <li><strong>Inventive:</strong> code blocks that switch themselves off, and a checksum that steers a jump instead of printing a warning.</li>
+    <li><strong>Weak spots:</strong> the opening animation waits with a CPU-speed loop (<code>mov cx,3000h / loop $</code>); results are cut, not rounded; the messages have spelling slips ("intial", "praces", "accurecy").</li>
+  </ul>
+</section>

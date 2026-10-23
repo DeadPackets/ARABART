@@ -1,0 +1,85 @@
+---
+// The DLL Optimizer's registry edit in the CodeStepper, with a linked view of the loader's search path: one block of
+// text where each folder ends in a zero and a second zero ends the list. Then the loader finds a DLL on the card.
+import Window from '../../shell/Window.astro';
+import CodeStepper from '../CodeStepper.astro';
+import { LOADER_ASM, LOADER_C, LOADER_STEPS } from './steps';
+---
+
+<CodeStepper id="mmcs-loader" title="MemMaid.exe  add a folder to the search path" asm={LOADER_ASM} c={LOADER_C} steps={LOADER_STEPS} speed={1} cTitle="In C. Query and Set: RegQueryValueEx, RegSetValueEx">
+  <div slot="visual" class="mld" data-mm-loader>
+    <Window title={String.raw`Registry  HKLM\Loader`} kind="panel" active class="mld-reg">
+      <p class="mld-name"><span>SystemPath</span> <b data-type>REG_MULTI_SZ</b></p>
+      <ol class="mld-list" data-list>
+        <li class="mld-e" data-e="0"><span>\Windows\</span></li>
+        <li class="mld-z" data-z="0">0</li>
+        <li class="mld-e mld-new" data-e="1"><span>\Storage Card\DLL Store\</span></li>
+        <li class="mld-z mld-new" data-z="1">0</li>
+        <li class="mld-z mld-end" data-z="end">0</li>
+      </ol>
+      <p class="mld-say" data-say>Each folder ends with a zero. A second zero in a row ends the list.</p>
+    </Window>
+    <Window title="Loader  an app asks for plugin.dll" kind="panel" class="mld-find">
+      <ol class="mld-try">
+        <li data-t="0"><span>\Windows\plugin.dll</span><b>not here</b></li>
+        <li data-t="1"><span>\Storage Card\DLL Store\plugin.dll</span><b>found</b></li>
+      </ol>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .mld { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .mld-name { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 600 0.9375rem/1.3 var(--font-code) !important; color: var(--ink) !important; }
+  .mld-name b { padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; color: var(--surface); background: var(--accent-2); }
+  .mld-list { display: flex; flex-wrap: wrap; gap: 4px; margin: 14px 0 0; padding: 0; list-style: none; }
+  .mld-list li { display: grid; place-items: center; min-height: 34px; padding: 0 8px; border-radius: 3px; font: 600 0.8125rem/1.2 var(--font-code); }
+  .mld-e { color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .mld-z { min-width: 30px; color: var(--surface); background: var(--ink-2); }
+  .mld-e.is-cmp { box-shadow: inset 0 0 0 2px var(--accent); }
+  .mld-new { color: var(--surface); background: var(--good); box-shadow: none; }
+  .mld-z.mld-new { background: var(--good); }
+  .mld-list li.is-off { display: none; }
+  .mld-list { padding-bottom: 22px; }
+  .mld-list li { position: relative; }
+  .mld-list li.is-p::after { content: '▲ p'; position: absolute; left: 4px; top: calc(100% + 4px); font: 700 0.75rem/1 var(--font-code); color: var(--accent); white-space: nowrap; }
+  .mld-say { margin-top: 14px !important; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  .mld-try { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .mld-try li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 8px 10px; border-radius: 3px; font: 500 0.8125rem/1.35 var(--font-code); color: var(--ink); background: var(--surface-2); overflow-wrap: anywhere; }
+  .mld-try b { color: var(--hot); }
+  .mld-try li[data-t='1'] b { color: var(--good); }
+  .mld-try li.is-off { opacity: 0.2; }
+  @media (max-width: 1023px) { .mld { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SAY: Record<string, string> = {
+    open: 'The loader’s own settings key.', size: 'First only the size of the value.', read: 'The list, as one block of text.',
+    cmp: '\\Windows\\ is not our folder.', next: 'A zero right after a zero: the end of the list.', add: 'Our folder goes where the end was…',
+    zero: '…and a new zero ends the list again.', save: 'Written back as a list of strings, REG_MULTI_SZ.', load: 'The loader tries each folder in order.',
+  };
+  document.querySelectorAll<HTMLElement>('[data-mm-loader]').forEach(root => {
+    const host = root.closest<HTMLElement>('[data-stepper]')!;
+    const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const say = $('[data-say]'), list = $('[data-list]');
+    const PH = ['open', 'size', 'read', 'cmp', 'next', 'add', 'zero', 'save', 'load'];
+    host.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail;
+      const ph = PH.indexOf(step.ph as string), d = how === 'jump' || reduce() ? 0 : 0.45;
+      list.style.opacity = ph < 2 ? '0.25' : '1';
+      $('[data-e="1"]').classList.toggle('is-off', ph < 5);
+      $('[data-z="1"]').classList.toggle('is-off', ph < 6);
+      $('[data-e="0"]').classList.toggle('is-cmp', ph === 3);
+      const at = ph < 2 || ph > 6 ? null : $(ph >= 4 ? (ph >= 5 ? '[data-e="1"]' : '[data-z="end"]') : '[data-e="0"]');
+      list.querySelectorAll('li').forEach(li => li.classList.toggle('is-p', li === at));
+      $('[data-type]').style.opacity = ph >= 7 || ph < 2 ? '1' : '0.35';
+      say.textContent = SAY[step.ph as string];
+      root.querySelectorAll<HTMLElement>('[data-t]').forEach(li => li.classList.toggle('is-off', ph < 8));
+      if (d && ph === 8) gsap.fromTo(root.querySelectorAll('[data-t]'), { opacity: 0.2 }, { opacity: 1, duration: 0.4, stagger: 0.5 });
+      if (d && (ph === 5 || ph === 6)) gsap.from($(ph === 5 ? '[data-e="1"]' : '[data-z="1"]'), { scale: 0.6, opacity: 0, duration: d, ease: 'back.out(2)' });
+    });
+  });
+</script>

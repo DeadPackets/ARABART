@@ -1,0 +1,114 @@
+---
+// The end of the picture: no key yet, so he adds 1 to the color byte inside his own code and draws line 3 again.
+// 14 frames, colors 03h up to 0Fh, then 02h. Scrub, step or run them.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { Player, SCRIPT, Y } from './player.ts';
+import { EGA, css } from '../ega.ts';
+import { memSync, png } from '../ssr.ts';
+import { NAMES, hx } from './screen.ts';
+import './player.css';
+
+const X0 = 150, Y0 = 236, CW = 330, CH = 40;
+const mem = memSync('SCREEN_SCREEN.COM');
+// Line 3: from its header (after the second y) to the '{'
+let s = mem.indexOf(Y, SCRIPT.screen + 9);
+s = mem.indexOf(Y, s + 10) + 1;
+const line = mem.slice(s, mem.indexOf(0x7b, s));
+const p = new Player(line, 0);
+p.run();
+const crop = new Uint8Array(CW * CH);
+for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) crop[y * CW + x] = p.pix[(y + Y0) * 640 + x + X0];
+const colors = Array.from({ length: 14 }, (_, i) => ((3 + i - 2) % 14) + 2);
+const data = JSON.stringify({ X0, Y0, CW, CH, line: [...line] });
+---
+
+<div class="gp gpcc" data-gp-cycle>
+  <script type="application/json" data-line set:html={data} />
+  <div class="gpcc-grid">
+    <Window title="SCREEN  line 3" kind="screen" class="gpcc-scr">
+      <div class="gp-crt" style={`--gp-ar:${CW} / ${CH}`}>
+        <img src={png(crop, CW, CH)} width={CW} height={CH} alt="إدارة الحاسب الآلى, Computer Department, in cyan." data-still />
+        <canvas hidden aria-hidden="true"></canvas>
+      </div>
+      <ol class="gpcc-sw" aria-label="The 14 colors, in order">
+        {colors.map((c, i) => <li><button type="button" style={`--c:${css(EGA[c])}`} aria-label={`Frame ${i + 1}: ${NAMES[c]}`} aria-pressed={String(i === 0)} data-i={i}><span>{hx(c)}</span></button></li>)}
+      </ol>
+    </Window>
+    <Window title="SCREEN.COM  014B" kind="editor" class="gpcc-code">
+      <ol class="gpcc-lines">
+        <li><span>014B</span><code>cmp  dl,'&#123;'</code><em>end of the picture</em></li>
+        <li><span>0150</span><code>mov  si,0A9Bh</code><em>line 3's start</em></li>
+        <li><span>0153</span><code>mov  ax,0B00h</code><em>DOS: a key waiting?</em></li>
+        <li><span>0156</span><code>int  21h</code></li>
+        <li><span>0158</span><code>cmp  al,0FFh</code><em>yes: stop</em></li>
+        <li class="hi"><span>015C</span><code>inc  byte [0179h]</code><em>no: next ink</em></li>
+        <li><span>0160</span><code>cmp  byte [0179h],10h</code><em>past 15?</em></li>
+        <li><span>0167</span><code>mov  byte [0179h],2</code><em>back to 2</em></li>
+        <li><span>016D</span><code>jmp  0126h</code><em>draw again</em></li>
+      </ol>
+      <p class="gpcc-byte">0179h, inside <code>mov ax,0C<b data-byte>03</b>h</code>, now holds <b data-byte2>03h</b>: <span data-name>cyan</span></p>
+    </Window>
+  </div>
+  <div class="gpcc-ctl"><Scrubber n={14} label="Frames of line 3" /></div>
+</div>
+
+<style is:global>
+  .gpcc-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .gpcc-sw { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 12px !important; }
+  .gpcc-sw button { width: 100%; min-height: 44px; padding: 0; border: 0; background: var(--c); cursor: pointer; font: 700 11px/1 var(--font-code); color: var(--vga-0); position: relative; }
+  .gpcc-sw button span { background: oklch(1 0 0 / 0.75); padding: 2px 3px; }
+  .gpcc-sw button[aria-pressed='true'] { outline: 3px solid var(--vga-15); outline-offset: -3px; }
+  .gpcc-sw button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; z-index: 1; }
+  .gpcc-lines { display: grid; gap: 0; font: 500 13px/1.75 var(--font-code); }
+  .gpcc-lines li { display: grid; grid-template-columns: 4.5ch 20ch minmax(0, 1fr); gap: 1.2ch; padding: 0 6px; }
+  .gpcc-lines span { color: var(--accent-2); }
+  .gpcc-lines code { font: inherit; color: var(--ink); white-space: pre; }
+  .gpcc-lines em { font-style: normal; color: var(--ink-2); }
+  .gpcc-lines li.hi { background: var(--accent-2); }
+  .gpcc-lines li.hi :is(span, code, em) { color: var(--surface); }
+  .gpcc .gpcc-byte { margin-top: 14px; font: 500 13px/1.6 var(--font-code); color: var(--ink); }
+  .gpcc-byte b { color: var(--accent); }
+  .gpcc-byte code { font: inherit; color: var(--ink-2); }
+  .gpcc-ctl { margin-top: 18px; }
+  @media (max-width: 1023px) { .gpcc-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) {
+    .gpcc-lines li { grid-template-columns: 4.5ch minmax(0, 1fr); }
+    .gpcc-lines em { grid-column: 2; font-size: 12px; line-height: 1.3; padding-bottom: 4px; }
+    .gpcc-lines code { white-space: normal; }
+  }
+</style>
+
+<script>
+  import { Player } from './player.ts';
+  import { Screen, loop, reduce, NAMES, hx } from './screen.ts';
+  import { scrubber } from '../../scrubber';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-cycle]').forEach(root => {
+    const d = JSON.parse(root.querySelector('[data-line]')!.textContent!) as { X0: number; Y0: number; CW: number; CH: number; line: number[] };
+    const base = Uint8Array.from(d.line);
+    const canvas = root.querySelector('canvas')!, scr = new Screen(canvas, d.CW, d.CH, d.X0, d.Y0);
+    const sws = [...root.querySelectorAll<HTMLButtonElement>('.gpcc-sw button')];
+    let p: Player | null = null;
+    const anim = loop(root, () => {
+      for (let n = 0; n < 22; n++) if (!p!.step()) { scr.flush(); return false; }
+      scr.flush();
+    });
+    const show = (i: number, how: string) => {
+      const c = ((3 + i - 2) % 14) + 2;
+      const b = base.slice(); b[3] = c;
+      p = new Player(b, 0);
+      p.onPlot = (x, y, k) => scr.set(x, y, k);
+      if (how === 'scrub' || how === 'jump' || reduce()) { p.run(); scr.flush(); anim.stop(); } else { anim.stop(); anim.start(); }
+      sws.forEach((s, j) => s.setAttribute('aria-pressed', String(j === i)));
+      root.querySelector('[data-byte]')!.textContent = hx(c);
+      root.querySelector('[data-byte2]')!.textContent = `${hx(c)}h`;
+      root.querySelector('[data-name]')!.textContent = NAMES[c];
+    };
+    canvas.hidden = false;
+    root.querySelector<HTMLElement>('[data-still]')!.hidden = true;
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 0.7 });
+    sws.forEach((b, i) => b.addEventListener('click', () => { s.pause(); s.go(i, 'step'); }));
+    show(0, 'jump');
+  });
+</script>

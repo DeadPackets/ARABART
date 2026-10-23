@@ -1,109 +1,49 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DosPlayer from '../components/DosPlayer.astro';
+import Commander from '../components/Commander.astro';
+import { bundleSize } from '../data/files';
 
 const base = import.meta.env.BASE_URL;
 const bundleUrl = `${base}/bundles/terminal.jsdos?v=${Date.now()}`;
 ---
 
 <BaseLayout
-  title="Terminal - DOSArchive"
-  description="An interactive DOS terminal to browse and run all of Yasser Awad's DOS programs."
+  title="DOS shell · Yasser Awad"
+  description="Boot the whole archive as one DOS machine and browse Yasser Awad's programs from a real command line."
   hasEmulator={true}
 >
   <div class="container">
-    <section class="terminal-header">
-      <h1 class="glow">DOS Terminal</h1>
-      <p class="terminal-desc">
-        Browse the entire archive from an interactive DOS command line.
-        Use <code>DIR</code> to list directories and <code>CD</code> to navigate.
-        Each program folder contains a <code>README.TXT</code> with instructions.
-      </p>
-    </section>
+    <header class="head">
+      <h1>DOS shell</h1>
+      <p class="lead">His whole archive as one DOS machine. Click the screen and type, or let the buttons type for you.</p>
+    </header>
 
-    <section class="terminal-emulator" aria-label="Interactive DOS Terminal">
-      <DosPlayer bundleUrl={bundleUrl} programId="terminal" />
-    </section>
-
-    <section class="terminal-help">
-      <h2>Quick Reference</h2>
-      <div class="help-grid">
-        <div class="help-item">
-          <code>DIR</code>
-          <span>List files in current directory</span>
-        </div>
-        <div class="help-item">
-          <code>CD dirname</code>
-          <span>Change to a directory</span>
-        </div>
-        <div class="help-item">
-          <code>CD \</code>
-          <span>Return to root</span>
-        </div>
-        <div class="help-item">
-          <code>TYPE README.TXT</code>
-          <span>Read program instructions</span>
-        </div>
-        <div class="help-item">
-          <code>CLS</code>
-          <span>Clear the screen</span>
-        </div>
-        <div class="help-item">
-          <code>program.EXE</code>
-          <span>Run a program</span>
-        </div>
-      </div>
-    </section>
+    <div class="grid">
+      <section aria-label="DOS shell emulator">
+        <DosPlayer
+          bundleUrl={bundleUrl}
+          name="the archive"
+          title={"C:\\"}
+          image={`${base}/images/terminal.svg`}
+          alt="A DOS prompt with a welcome message"
+          bundleBytes={bundleSize('terminal')}
+        />
+      </section>
+      <Commander />
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  .terminal-header {
-    margin-bottom: 2rem;
-  }
-
-  .terminal-header h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .terminal-desc {
-    font-size: 0.9rem;
-    color: var(--color-text);
-    max-width: 600px;
-    line-height: 1.7;
-  }
-
-  .terminal-emulator {
-    margin-bottom: 3rem;
-  }
-
-  .terminal-help {
-    border-top: 1px solid var(--color-border);
-    padding-top: 2rem;
-  }
-
-  .terminal-help h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .help-grid {
+  .head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 24px; padding-block: 16px 20px; }
+  .head h1 { font: 400 32px/1.2 var(--font-dos); color: var(--accent); }
+  .head .lead { font-size: 1.0625rem; color: var(--ink-2); }
+  .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 26vw, 380px);
+    gap: clamp(32px, 4vw, 64px);
+    align-items: start;
   }
-
-  .help-item {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    font-size: 0.85rem;
-    color: var(--color-text);
-    padding: 0.5rem 0;
-  }
-
-  .help-item code {
-    flex-shrink: 0;
-    min-width: 160px;
-  }
+  @media (max-width: 1000px) { .grid { grid-template-columns: 1fr; } }
 </style>

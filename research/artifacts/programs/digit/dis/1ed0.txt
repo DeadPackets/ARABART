@@ -1,0 +1,36 @@
+1ed0:0000 68080c         push 0xc08
+1ed0:0003 0e             push cs
+1ed0:0004 e8e7fe         call 0xfffffeee
+1ed0:0007 83c406         add sp, 6
+1ed0:000a 5d             pop bp
+1ed0:000b cb             retf 
+1ed0:000c 55             push bp
+1ed0:000d 8bec           mov bp, sp
+1ed0:000f 39265c16       cmp word ptr [0x165c], sp
+1ed0:0013 7705           ja 0x1a
+1ed0:0015 9aac290000     lcall 0, 0x29ac
+1ed0:001a 8b4606         mov ax, word ptr [bp + 6]
+1ed0:001d 0b4608         or ax, word ptr [bp + 8]
+1ed0:0020 742e           je 0x50
+1ed0:0022 c45e06         les bx, ptr [bp + 6]
+1ed0:0025 26c707440c     mov word ptr es:[bx], 0xc44
+1ed0:002a 6a00           push 0
+1ed0:002c ff7608         push word ptr [bp + 8]
+1ed0:002f ff7606         push word ptr [bp + 6]
+1ed0:0032 9a0100ac1e     lcall 0x1eac, 1
+1ed0:0037 83c406         add sp, 6
+1ed0:003a f7460a0100     test word ptr [bp + 0xa], 1
+1ed0:003f 740f           je 0x50
+1ed0:0041 ff7608         push word ptr [bp + 8]
+1ed0:0044 ff7606         push word ptr [bp + 6]
+1ed0:0047 9a71220000     lcall 0, 0x2271
+1ed0:004c 59             pop cx
+1ed0:004d 59             pop cx
+1ed0:004e eb00           jmp 0x50
+1ed0:0050 5d             pop bp
+1ed0:0051 cb             retf 
+1ed0:0052 55             push bp
+1ed0:0053 8bec           mov bp, sp
+1ed0:0055 39265c16       cmp word ptr [0x165c], sp
+1ed0:0059 7705           ja 0x60
+1ed0:005b 9aac290000     lcall 0, 0x29ac

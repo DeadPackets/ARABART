@@ -1,0 +1,91 @@
+---
+// The 29 cleaners of MemMaid 2.3, by where they work: memory, files, the registry and the notification queue.
+// Pick one to follow it: where it asks first (often the registry), then what it removes.
+import Window from '../../shell/Window.astro';
+import { CLEANERS, STR } from './data';
+
+const NAMES = (STR.cats as string[][]).map(c => c[0]);
+const AREAS = [
+  { id: 'ram', label: 'Memory' },
+  { id: 'files', label: 'Files' },
+  { id: 'reg', label: 'Registry' },
+  { id: 'queue', label: 'Notification queue' },
+] as const;
+const START = 5;
+const c0 = CLEANERS[START];
+---
+
+<div class="mcl" data-mm-cleaner>
+  <Window title="Quick Cleaner: 29 cleaners" kind="panel" active class="mcl-pick">
+    {AREAS.map(a => (
+      <div class="mcl-grp">
+        <p class="mcl-h" data-area={a.id}><i aria-hidden="true"></i>{a.label} <span>{CLEANERS.filter(c => c.area === a.id).length}</span></p>
+        <ul>
+          {CLEANERS.map((c, i) => c.area === a.id && (
+            <li><button type="button" data-c={i} data-area={c.area} aria-pressed={String(i === START)}>{NAMES[i]}</button></li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </Window>
+  <Window title="Where it looks" kind="dialog" class="mcl-path">
+    <ol class="mcl-trail" aria-live="polite">
+      <li class="mcl-step mcl-ask" data-ask hidden={!c0.reg}><small>1. Ask the registry where it is</small><code data-reg>{c0.reg}</code></li>
+      <li class="mcl-step mcl-go" data-area={c0.area}><small data-golab>{c0.reg ? '2. Then go there' : 'Where it works'}</small>{c0.where.map(w => <code>{w}</code>)}</li>
+      <li class="mcl-step mcl-how"><small>What it removes</small><p data-how>{c0.how}</p></li>
+    </ol>
+  </Window>
+  <script type="application/json" data-cl set:html={JSON.stringify(CLEANERS.map((c, i) => ({ ...c, name: NAMES[i] })))} />
+</div>
+
+<style is:global>
+  .mcl { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .mcl-grp + .mcl-grp { margin-top: 12px; }
+  .mcl-h { display: flex; align-items: center; gap: 8px; margin: 0 0 6px !important; font: 700 0.875rem/1.2 var(--font-ui) !important; color: var(--ink) !important; }
+  .mcl-h span { font: 600 0.75rem var(--font-code); color: var(--ink-2); }
+  .mcl-h i { width: 12px; height: 12px; border-radius: 2px; background: var(--k); }
+  .mcl ul { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .mcl ul button { min-height: 44px; padding: 4px 10px; font: 500 0.875rem/1.2 var(--font-ui); color: var(--ink); text-align: left; background: var(--surface-2); border: 0; border-radius: 3px; box-shadow: inset 3px 0 0 var(--k); cursor: pointer; }
+  .mcl ul button:hover { background: color-mix(in oklch, var(--k) 14%, var(--surface-2)); }
+  .mcl ul button[aria-pressed='true'] { color: #fff; background: var(--k); }
+  .mcl ul button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .mcl [data-area='ram'] { --k: var(--accent); }
+  .mcl [data-area='files'] { --k: oklch(0.5 0.12 150); }
+  .mcl [data-area='reg'] { --k: var(--accent-2); }
+  .mcl [data-area='queue'] { --k: oklch(0.55 0.15 40); }
+  .mcl-trail { display: grid; gap: 22px; margin: 0; padding: 0; list-style: none; }
+  .mcl-step { position: relative; display: grid; gap: 6px; }
+  .mcl-step + .mcl-step::before { content: ''; position: absolute; left: 12px; top: -20px; height: 18px; border-left: 2px dashed var(--accent); }
+  .mcl-step small { font-size: 0.8125rem; color: var(--ink-2); }
+  .mcl-step code { display: block; padding: 8px 10px; border-radius: 3px; font: 600 0.8125rem/1.4 var(--font-code); color: var(--ink); background: var(--surface-2); overflow-wrap: anywhere; }
+  .mcl-ask code { box-shadow: inset 3px 0 0 var(--accent-2); }
+  .mcl-go code { box-shadow: inset 3px 0 0 var(--k); }
+  .mcl-how p { margin: 0 !important; font-size: 1rem !important; line-height: 1.5 !important; color: var(--ink) !important; }
+  @media (max-width: 1023px) { .mcl { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  type C = { name: string; where: string[]; reg?: string; how: string; area: string };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-mm-cleaner]').forEach(root => {
+    const all = JSON.parse(root.querySelector('[data-cl]')!.textContent!) as C[];
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-c]')];
+    const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const ask = $('[data-ask]'), go = $('.mcl-go'), steps = root.querySelectorAll('.mcl-step');
+    const pick = (i: number) => {
+      const c = all[i];
+      btns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.c! === i)));
+      ask.hidden = !c.reg;
+      $('[data-reg]').textContent = c.reg ?? '';
+      go.dataset.area = c.area;
+      go.querySelectorAll('code').forEach(n => n.remove());
+      for (const w of c.where) { const code = document.createElement('code'); code.textContent = w; go.appendChild(code); }
+      $('[data-golab]').textContent = c.reg ? '2. Then go there' : 'Where it works';
+      $('[data-how]').textContent = c.how;
+      if (!reduce()) gsap.fromTo([...steps].filter(s => !(s as HTMLElement).hidden), { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.18, ease: 'power2.out' });
+    };
+    btns.forEach(b => b.addEventListener('click', () => pick(+b.dataset.c!)));
+  });
+</script>

@@ -1,0 +1,138 @@
+---
+// The 1991 commercial, replayed from his own script bytes the way his player draws them: stroke by stroke, every pixel
+// twice for the 3-D shadow. The side window shows the five bytes of his code each line rewrites.
+// Without JS: the real screenshot.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { SLIDES } from './com.ts';
+
+interface Props { id?: string }
+const { id = 'complayer' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const PATCH = [
+  ['0149', ['4B'], 'dec  bx', 'x: one column to the left'],
+  ['0151', ['43'], 'inc  bx', 'w: one column to the right'],
+  ['016C', ['B8', '07', '0C'], 'mov  ax,0C07h', 'the letters’ color'],
+  ['0173', ['EB', '00'], 'jmp  +0', 'draw the shadow'],
+  ['0175', ['B8', '04', '0C'], 'mov  ax,0C04h', 'the shadow’s color'],
+];
+const SLOT = [0, 0, 1, 1, 1];
+---
+
+<div class="comp" id={id} data-complayer data-src={`${base}/bytes/files/ARABIC_DEMO.COM.mem`}>
+  <div class="comp-main">
+    <Window title={'C:\\ARABIC\\DEMO.COM'} kind="screen" class="comp-win">
+      <div class="comp-screen">
+        <img class="comp-shot" src={`${base}/images/arabic-commercial.png`} width="962" height="600" loading="lazy"
+          alt="A slide of his commercial: مركز بورسعيد لخدمات الكمبيوتر, Port Said Center for Computer Services, in white letters with a red 3-D shadow." />
+        <canvas class="comp-canvas" width="640" height="350" aria-hidden="true"></canvas>
+      </div>
+      <div class="comp-cap"><span lang="ar" dir="rtl" data-ar>{SLIDES[0][0]}</span><span data-en>{SLIDES[0][1]}</span></div>
+    </Window>
+    <Window title="HIS CODE, live" kind="panel" num="2" class="comp-side">
+      <div class="comp-patch" role="table" aria-label="The five bytes each line writes into his code">
+        {PATCH.map(([off, bytes, asm, what], i) => (
+          <div class="comp-p" role="row" data-p={i}>
+            <span role="cell" class="comp-off">{off}</span>
+            <span role="cell" class="comp-bytes">{(bytes as string[]).map((b, j) => <i class:list={{ hi: j === SLOT[i] }}>{b}</i>)}</span>
+            <code role="cell">{asm}</code>
+            <span role="cell" class="comp-what">{i === 2 || i === 4 ? <b class="comp-sw" /> : null}{what}</span>
+          </div>
+        ))}
+      </div>
+      <div class="comp-count" aria-live="off" data-count>Line 1 of 1 · 368 strokes · 3,712 pixel calls</div>
+    </Window>
+  </div>
+  <div class="comp-ctl"><Scrubber n={15} at={0} label="Slide" /></div>
+</div>
+
+<style is:global>
+  .comp { display: grid; gap: 18px; min-width: 0; }
+  .comp-main { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(250px, 1fr); gap: 22px; align-items: start; }
+  .comp-screen { position: relative; background: var(--vga-0); }
+  .comp.is-live .comp-screen { aspect-ratio: 4 / 3; }
+  .comp-shot { display: block; width: 100%; height: auto; }
+  .comp.is-live .comp-shot { display: none; }
+  .comp-canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .comp:not(.is-live) .comp-canvas, .comp:not(.is-live) .comp-side, .comp:not(.is-live) .comp-ctl, .comp:not(.is-live) .comp-cap { display: none; }
+  .comp:not(.is-live) .comp-main { grid-template-columns: minmax(0, 1fr); }
+  .comp-cap { display: grid; gap: 4px; padding: 12px 4px 2px; text-align: center; }
+  .comp-cap [lang='ar'] { font: 700 1.25rem/1.4 var(--font-ar); color: var(--vga-15); }
+  .comp-cap [data-en] { font: 500 0.875rem/1.4 var(--sans); color: var(--vga-7); }
+  .comp-patch { display: grid; gap: 4px; }
+  .comp-p { display: grid; grid-template-columns: 4.5ch minmax(0, 1fr); grid-template-areas: 'off bytes' 'off asm' 'off what'; gap: 2px 10px; padding: 6px 4px; border-bottom: 1px solid var(--rule); }
+  .comp-off { grid-area: off; font: 600 12px/1.5 var(--font-code); color: var(--ink-2); }
+  .comp-bytes { grid-area: bytes; display: flex; gap: 3px; }
+  .comp-bytes i { font: 700 13px/1 var(--font-code); font-style: normal; padding: 3px 4px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .comp-bytes i.hi { color: var(--surface); background: var(--accent); box-shadow: none; }
+  .comp-p code { grid-area: asm; font: 600 13px/1.4 var(--font-code); color: var(--accent); }
+  .comp-what { grid-area: what; display: flex; align-items: center; gap: 6px; font: 500 0.8125rem/1.35 var(--sans); color: var(--ink); }
+  .comp-sw { width: 14px; height: 14px; flex: none; background: var(--c, #aaa); box-shadow: 0 0 0 1px var(--vga-15); }
+  .comp-count { margin-top: 12px; font: 600 12px/1.5 var(--font-code); color: var(--accent-2); font-variant-numeric: tabular-nums; }
+  .comp-ctl { position: sticky; bottom: calc(var(--sl, 0px) + 8px); z-index: 2; padding: 10px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--rule), 8px 8px 0 oklch(0 0 0 / 0.55); margin-right: 14px; }
+  @media (max-width: 1023px) { .comp-main { grid-template-columns: minmax(0, 1fr); } .comp-patch { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+  @media (max-width: 640px) { .comp-ctl { margin-right: 0; padding: 8px; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber } from '../scrubber.ts';
+  import { parse, paintRun, SLIDES, type TextLine } from './com.ts';
+  import { frame, show, NAMES, reduce } from './vga.ts';
+  import { PALETTE, hex } from '../arabart/core.ts';
+
+  const hexc = (i: number) => `#${PALETTE[i & 15].toString(16).padStart(6, '0')}`;
+
+  document.querySelectorAll<HTMLElement>('[data-complayer]').forEach(async root => {
+    const com = new Uint8Array(await (await fetch(root.dataset.src!)).arrayBuffer());
+    const { slides } = parse(com);
+    const canvas = root.querySelector<HTMLCanvasElement>('canvas')!, count = root.querySelector<HTMLElement>('[data-count]')!;
+    const ar = root.querySelector<HTMLElement>('[data-ar]')!, en = root.querySelector<HTMLElement>('[data-en]')!;
+    const title = root.querySelector<HTMLElement>('.comp-win .win-title')!;
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-p]')];
+    const f = frame(640, 350);
+    let anim: gsap.core.Tween | null = null, lastLine: TextLine | null = null;
+
+    const patch = (l: TextLine, flash: boolean) => {
+      const set = (i: number, j: number, v: number) => (rows[i].querySelectorAll('i')[j].textContent = hex(v));
+      set(0, 0, l.head[0]); set(1, 0, l.head[1]); set(2, 1, l.face); set(3, 1, l.head[2]); set(4, 1, l.shade);
+      rows[2].querySelector('code')!.textContent = `mov  ax,0C${hex(l.face)}h`;
+      rows[3].querySelector('code')!.textContent = `jmp  +${l.head[2] ? '0Dh' : '0'}`;
+      rows[4].querySelector('code')!.textContent = `mov  ax,0C${hex(l.shade)}h`;
+      rows[3].querySelector('.comp-what')!.lastChild!.textContent = l.shadow ? 'draw the shadow' : 'skip the shadow';
+      rows[2].querySelector('.comp-what')!.lastChild!.textContent = `the letters: ${NAMES[l.face]}`;
+      rows[4].querySelector('.comp-what')!.lastChild!.textContent = l.shadow ? `the shadow: ${NAMES[l.shade]}` : 'the shadow: not drawn';
+      rows[2].querySelector<HTMLElement>('.comp-sw')!.style.setProperty('--c', hexc(l.face));
+      rows[4].querySelector<HTMLElement>('.comp-sw')!.style.setProperty('--c', hexc(l.shade));
+      if (flash && !reduce()) gsap.fromTo(root.querySelectorAll('.comp-bytes i.hi'), { scale: 1.5 }, { scale: 1, duration: 0.45, ease: 'back.out(3)' });
+    };
+    const counter = (k: number, n: number, line: number, lines: number, calls: number) =>
+      (count.textContent = `Line ${line} of ${lines} · stroke ${k.toLocaleString('en-US')} of ${n.toLocaleString('en-US')} · ${calls.toLocaleString('en-US')} pixel calls`);
+
+    // Draw slide i up to stroke k (all strokes when k is undefined)
+    const strokes = (i: number) => slides[i].flatMap(l => l.runs.map(r => ({ l, r })));
+    const drawTo = (i: number, k: number) => {
+      const all = strokes(i);
+      f.data.fill(0);
+      let calls = 0;
+      for (const { l, r } of all.slice(0, k)) { paintRun(f.data, 640, 350, l, r); calls += r.n * (l.shadow ? 2 : 1); }
+      show(canvas, f);
+      const cur = all[Math.max(0, k - 1)]?.l ?? slides[i][0];
+      if (cur !== lastLine) { patch(cur, true); lastLine = cur; }
+      counter(k, all.length, slides[i].indexOf(cur) + 1, slides[i].length, calls);
+    };
+
+    const go = (i: number, how: string) => {
+      anim?.kill(); anim = null;
+      ar.textContent = SLIDES[i][0]; en.textContent = SLIDES[i][1];
+      title.textContent = `C:\\ARABIC\\DEMO.COM  slide ${i + 1} of 15`;
+      const n = strokes(i).length;
+      if (how === 'jump' || how === 'scrub' || reduce()) { drawTo(i, n); return; }
+      const o = { k: 0 };
+      anim = gsap.to(o, { k: n, duration: 1.6, ease: 'none', onUpdate: () => drawTo(i, Math.round(o.k)) });
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, go, { speed: 2.6 });
+    root.classList.add('is-live');
+    s.go(0, 'jump');
+  });
+</script>

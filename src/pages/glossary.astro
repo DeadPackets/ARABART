@@ -1,0 +1,219 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Window from '../components/shell/Window.astro';
+import { glossary } from '../data/glossary';
+import { programs } from '../data/programs';
+
+const base = import.meta.env.BASE_URL;
+// Topics, in reading order. A term not listed here lands in "More words", so new terms always show.
+const TOPICS: [string, string, string][] = [
+  ['memory', 'Memory and addresses', 'byte kilobyte hex paragraph segment real-mode protected-mode a20-line conventional-memory upper-memory rom cpu-register stack heap memory-model far-pointer memmove mmio io-port bit-field'],
+  ['calls', 'Interrupts and services', 'interrupt ivt int-21h int-10h int-16h int-27h bios dos hook tsr install-check register-convention carry-flag psp bioskey api'],
+  ['files', 'Program files and packing', 'com-file exe-file mz-header relocation load-segment entry-point linker assembler static-linking runtime-library packer diet lz77 back-reference entropy text-mode-file ctrl-z file-attribute'],
+  ['screen', 'Screen and graphics', 'vga ega video-memory text-mode bit-planes graphics-controller set-reset bit-mask map-mask latches vertical-retrace vga-palette xor-drawing save-under sprite bgi run-length-encoding chain-code'],
+  ['arabic', 'Arabic text', 'auto-shaping ligature key-encoding glyph joining-type opentype-shaping kashida harakat bidi arabic-indic-digits baseline'],
+  ['code', 'Code and tools', 'assembly turbo-c borland-cpp turbo-debugger dos-debug disassembly emulator dosbox-cycles project-file stack-check inline-asm self-modifying-code dead-store opcode-match cpp-class vtable inheritance virtual-method class-library stack-frame fpu float-emulator gap-buffer piece-table heap-overflow busy-wait event-loop game-loop state-machine tokenizer operator-precedence interpreter obfuscation pc-speaker thread'],
+  ['numbers', 'Numbers', 'bcd fixed-point tens-complement checksum'],
+  ['circuits', 'Digital circuits', 'logic-gate ttl open-collector truth-table netlist logic-simulator stuck-at-fault test-pattern five-valued-logic controlling-value d-algorithm atpg fault-dictionary guided-probe isa-bus gpio'],
+  ['viruses', 'Viruses and defense', 'virus-signature file-infector edr behavior-detection'],
+  ['phones', 'Phones and apps', 'pocket-pc today-screen shareware hijri-calendar'],
+  ['networks', 'Networks', 'corba idl orb event-channel tmn cmip gdmo managed-object nms oss ossi jidm cli tl1 netconf yang jinja ansible webhook cidr'],
+  ['data', 'Databases and patents', 'patent-claim prior-art relational-database primary-key foreign-key sql-join db-index range-scan recursive-cte materialized-path nested-sets closure-table ltree hierarchyid ordpath dynamodb sort-key'],
+];
+const topicOf = new Map(TOPICS.flatMap(([t, , ids]) => ids.split(' ').map(id => [id, t] as const)));
+const groups = [...TOPICS, ['more', 'More words', ''] as [string, string, string]].map(([id, name]) => ({
+  id, name,
+  terms: Object.entries(glossary).filter(([tid]) => (topicOf.get(tid) ?? 'more') === id).sort(([, a], [, b]) => a.term.localeCompare(b.term, 'en', { sensitivity: 'base' })),
+})).filter(g => g.terms.length);
+
+// Where each term is used: every <Term id="..."> in the writeups and pages
+const sources = import.meta.glob<string>(['../writeups/*.astro', './*.astro'], { query: '?raw', import: 'default', eager: true });
+const PAGES: Record<string, [string, string]> = {
+  arabart: ['/arabart/', 'ARABART'], primer: ['/primer/', 'DOS for developers'], career: ['/career/', 'Career'], patents: ['/patents/', 'Patents'],
+  bytes: ['/bytes/', 'Every Byte'], index: ['/', 'Home'], about: ['/about/', 'About'], timeline: ['/timeline/', 'Timeline'],
+};
+const seen = new Map<string, [string, string][]>();
+for (const [path, src] of Object.entries(sources)) {
+  const name = path.split('/').pop()!.replace('.astro', '');
+  const p = programs.find(q => q.id === name);
+  const page: [string, string] | undefined = p ? [`/program/${name}/`, p.title.replace(' - ', ': ')] : PAGES[name];
+  if (!page) continue;
+  for (const m of src.matchAll(/<Term\s+id=["']([a-z0-9-]+)["']/g)) {
+    const list = seen.get(m[1]) ?? [];
+    if (!list.some(x => x[0] === page[0])) list.push(page);
+    seen.set(m[1], list);
+  }
+}
+const total = Object.keys(glossary).length;
+---
+
+<BaseLayout
+  title="Glossary · Yasser Awad"
+  description={`${total} words from Yasser Awad's archive in plain English, each with the 2026 idea that does the same job.`}
+  era="dos"
+  keys={[{ k: '/', label: 'Search' }, { k: 'Esc', label: 'Clear' }]}
+>
+  <div class="gl">
+    <header class="gl-head">
+      <h1>Glossary</h1>
+      <p class="gl-lead">{total} words from this site in plain English. Each one comes with the thing you already know in 2026 that does the same job.</p>
+    </header>
+
+    <div class="gl-body">
+      <Window title="SEARCH" kind="dialog" class="gl-search" data-search hidden>
+          <div class="gl-row">
+            <label class="gl-find">
+              <span class="sr-only">Find a word</span>
+              <input type="search" autocomplete="off" spellcheck="false" placeholder="Find a word: TSR, segment, pixel, Arabic" aria-describedby="gl-count" />
+            </label>
+            <p class="gl-count" id="gl-count" aria-live="polite" data-count>{total} words</p>
+          </div>
+        </Window>
+      <aside class="gl-side">
+        <Window title="TOPICS" kind="panel" active class="gl-topics">
+          <nav aria-label="Topics">
+            <ol>
+              {groups.map(g => <li><a href={`#t-${g.id}`} data-topic={g.id}><span>{g.name}</span><b>{g.terms.length}</b></a></li>)}
+            </ol>
+          </nav>
+        </Window>
+      </aside>
+
+      <div class="gl-main">
+        <p class="gl-none" data-none hidden>No word matches that. Try a shorter word, or a 2026 idea like “cache” or “API”.</p>
+
+        {groups.map(g => (
+          <section class="gl-group" id={`t-${g.id}`} aria-labelledby={`th-${g.id}`} data-group={g.id}>
+            <h2 id={`th-${g.id}`}>{g.name}</h2>
+            <dl class="gl-list">
+              {g.terms.map(([id, t]) => (
+                <div class="gl-term" id={id} data-text={`${t.term} ${id} ${t.short} ${t.now ?? ''}`.toLowerCase()}>
+                  <dt><a href={`#${id}`} class="gl-name">{t.term}</a></dt>
+                  <dd class="gl-def" data-hl>{t.short}</dd>
+                  {t.now && <dd class="gl-now"><b>In 2026</b> <span data-hl>{t.now}</span></dd>}
+                  {seen.get(id) && <dd class="gl-seen"><span>Seen on</span> {seen.get(id)!.map(([u, n]) => <a href={`${base}${u}`}>{n}</a>)}</dd>}
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .gl { width: 100%; max-width: 1360px; margin-inline: auto; padding: clamp(28px, 5vw, 64px) var(--gut) 24px; }
+  .gl-head h1 { font-size: clamp(3rem, 5vw + 1rem, 6rem); font-stretch: 72%; line-height: 0.9; color: var(--accent); }
+  .gl-lead { margin-top: 18px; max-width: 52ch; font-size: clamp(1.1875rem, 0.6vw + 1rem, 1.5rem); line-height: 1.5; font-weight: 500; color: var(--ink); }
+  .gl-body { display: grid; grid-template-columns: 300px minmax(0, 1fr); grid-template-areas: 'side search' 'side main'; gap: 28px 32px; align-items: start; margin-top: clamp(36px, 5vw, 64px); }
+  .gl-side { grid-area: side; position: sticky; top: calc(var(--mb) + 20px); }
+  .gl-body > .gl-search { grid-area: search; }
+  .gl-main { grid-area: main; }
+  .gl-topics ol { margin: 0; padding: 0; list-style: none; }
+  .gl-topics a { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; min-height: 44px; padding: 4px 10px; font: 400 16px/1.2 var(--font-dos); color: var(--vga-11); text-decoration: none; }
+  .gl-topics a b { font-weight: 400; color: var(--vga-7); }
+  .gl-topics a:is(:hover, :focus-visible), .gl-topics a.on { background: var(--vga-3); color: var(--vga-0); outline: 0; }
+  .gl-topics a:is(:hover, :focus-visible, .on) b { color: var(--vga-0); }
+  .gl-topics a.empty { opacity: 0.4; }
+
+  .gl-main { min-width: 0; display: grid; gap: 28px; }
+  .gl-search { position: sticky; top: calc(var(--mb) + 12px); z-index: 3; }
+  .gl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .gl-find { flex: 1 1 260px; display: grid; }
+  .gl-find input { width: 100%; min-height: 48px; padding: 0 14px; font: 500 1.125rem var(--sans); color: var(--vga-14); background: var(--vga-1); border: 0; box-shadow: inset 2px 2px 0 var(--vga-0); }
+  .gl-find input::placeholder { color: var(--dos-ink-2); opacity: 0.75; }
+  .gl-find input:focus-visible { outline: 2px solid var(--vga-1); outline-offset: 3px; }
+  .gl-count { margin: 0; font: 500 0.8125rem/1.3 var(--font-code); color: var(--ink-2); white-space: nowrap; }
+  .gl-none { font-size: 1.0625rem; font-weight: 600; color: var(--ink); }
+
+  .gl-group { scroll-margin-top: calc(var(--mb) + 110px); }
+  .gl-group h2 { font-size: clamp(1.75rem, 1.6vw + 1rem, 2.5rem); font-stretch: 80%; color: var(--ink); padding-bottom: 10px; border-bottom: 2px solid var(--accent-2); }
+  .gl-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 0 32px; margin: 0; }
+  .gl-term { padding: 16px 0 18px; border-bottom: 1px solid var(--rule); scroll-margin-top: calc(var(--mb) + 120px); }
+  .gl-term dt { margin: 0; }
+  .gl-name { font: 800 1.25rem/1.25 var(--sans); font-stretch: 90%; color: var(--accent); text-decoration: none; }
+  .gl-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .gl-term dd { margin: 6px 0 0; font-size: 1rem; line-height: 1.55; color: var(--ink); text-wrap: pretty; }
+  .gl-now b { margin-right: 6px; padding: 1px 6px; font: 600 0.75rem/1.4 var(--font-code); color: var(--vga-0); background: var(--vga-11); }
+  .gl-now span { color: var(--dos-ink-2); }
+  .gl-seen { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-size: 0.875rem !important; }
+  .gl-seen span { font: 500 0.75rem var(--font-code); color: var(--ink-2); }
+  .gl-seen a { color: var(--accent-2); text-underline-offset: 3px; }
+  .gl-term:target, .gl-term.is-target { background: var(--vga-1); box-shadow: -14px 0 0 var(--vga-1), 14px 0 0 var(--vga-1), inset 4px 0 0 var(--vga-14); padding-left: 14px; }
+  .gl-term :global(mark) { background: var(--vga-14); color: var(--vga-0); }
+
+  @media (max-width: 960px) {
+    .gl-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'search' 'side' 'main'; }
+    .gl-side { position: static; }
+    .gl-topics ol { display: flex; flex-wrap: wrap; gap: 4px; }
+    .gl-topics li { flex: 1 1 200px; }
+  }
+  @media (max-width: 560px) { .gl-topics li { flex-basis: calc(50% - 2px); } .gl-topics a { font-size: 14px; } .gl-search { top: calc(var(--mb) + 6px); } }
+</style>
+
+<script>
+  const box = document.querySelector<HTMLElement>('[data-search]')!;
+  const input = box.querySelector('input')!, count = document.querySelector<HTMLElement>('[data-count]')!;
+  const terms = [...document.querySelectorAll<HTMLElement>('.gl-term')];
+  const groups = [...document.querySelectorAll<HTMLElement>('.gl-group')];
+  const topics = [...document.querySelectorAll<HTMLAnchorElement>('[data-topic]')];
+  const none = document.querySelector<HTMLElement>('[data-none]')!;
+  const total = terms.length;
+  const orig = new Map(terms.map(t => [t, [...t.querySelectorAll<HTMLElement>('[data-hl]')].map(e => e.textContent!)]));
+  const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  box.hidden = false;
+
+  function filter(q: string) {
+    const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+    let n = 0;
+    for (const t of terms) {
+      const hit = words.every(w => t.dataset.text!.includes(w));
+      t.hidden = !hit; if (hit) n++;
+      const re = words.length ? new RegExp(`(${words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi') : null;
+      t.querySelectorAll<HTMLElement>('[data-hl]').forEach((e, i) => {
+        const txt = orig.get(t)![i];
+        e.innerHTML = re && hit ? esc(txt).replace(re, '<mark>$1</mark>') : esc(txt);
+      });
+      const name = t.querySelector('.gl-name')!;
+      name.innerHTML = re && hit ? esc(name.textContent!).replace(re, '<mark>$1</mark>') : esc(name.textContent!);
+    }
+    for (const g of groups) {
+      const k = g.querySelectorAll('.gl-term:not([hidden])').length;
+      g.hidden = !k;
+      const a = topics.find(x => x.dataset.topic === g.dataset.group)!;
+      a.querySelector('b')!.textContent = String(words.length ? k : g.querySelectorAll('.gl-term').length);
+      a.classList.toggle('empty', !k);
+    }
+    count.textContent = words.length ? `${n} of ${total} words` : `${total} words`;
+    none.hidden = n > 0;
+  }
+
+  // Deep links: /glossary/#tsr opens that term, even if a search was hiding it
+  function openHash(smooth: boolean) {
+    const el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    if (!el || !el.classList.contains('gl-term')) return;
+    if (el.hidden) { input.value = ''; filter(''); }
+    terms.forEach(t => t.classList.toggle('is-target', t === el));
+    el.scrollIntoView({ block: 'start', behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+    el.querySelector<HTMLElement>('.gl-name')!.focus({ preventScroll: true });
+  }
+
+  input.addEventListener('input', () => filter(input.value.trim()));
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Escape') { input.value = ''; filter(''); }
+    if (e.key === 'Enter') { const first = terms.find(t => !t.hidden); first?.querySelector<HTMLElement>('.gl-name')!.focus(); }
+  });
+  addEventListener('keydown', e => {
+    const inField = (e.target as Element).closest('input, textarea, select');
+    if (e.key === '/' && !inField) { e.preventDefault(); input.focus(); input.select(); return; }
+    if (e.key.length === 1 && /\S/.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey && !inField && !(e.target as Element).closest('a, button')) input.focus();
+  });
+  addEventListener('hashchange', () => openHash(true));
+  // The topic list follows the reader
+  const spy = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting) topics.forEach(a => a.classList.toggle('on', a.dataset.topic === (e.target as HTMLElement).dataset.group));
+  }), { rootMargin: '-30% 0px -60% 0px' });
+  groups.forEach(g => spy.observe(g));
+  openHash(false);
+</script>

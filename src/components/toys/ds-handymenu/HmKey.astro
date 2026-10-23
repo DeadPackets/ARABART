@@ -1,0 +1,81 @@
+---
+// HandyMenu 3.7's License Key dialog (dialog 105), rebuilt from its resources, with the freeware key from
+// src/lib/dinarsoft/handymenu.ts. Type the four groups yourself, or let the page type them.
+import Window from '../../shell/Window.astro';
+import { renderDialog } from '../ds-handyswitcher/pocket.ts';
+import '../ds-handyswitcher/pocket.css';
+import ui from './ui.json';
+import logo from './logo-2008.png';
+import { unlock } from '../../../lib/dinarsoft/handymenu.ts';
+import { groups, pocketPcCode } from '../../../lib/dinarsoft/handyswitcher.ts';
+
+const KEY = unlock.generate({});
+const html = renderDialog((ui as any)['37'].dialogs['105'], {
+  1017: { img: logo.src },
+  1002: { value: groups(pocketPcCode('730007B6BFA373D1380000050BFE45CE5')) },
+  1004: { value: '', attrs: 'aria-label="Key, letters 1 to 4" data-k="0" maxlength="4"' }, 1005: { value: '', attrs: 'aria-label="Key, letters 5 to 8" data-k="1" maxlength="4"' },
+  1006: { value: '', attrs: 'aria-label="Key, letters 9 to 12" data-k="2" maxlength="4"' }, 1007: { value: '', attrs: 'aria-label="Key, letters 13 to 16" data-k="3" maxlength="4"' },
+}, 'hmkey');
+---
+
+<div class="hm-key" data-hm-key data-key={KEY}>
+  <Window title="License Key" kind="device" num="9:41" class="hm-dev2" aria-label="HandyMenu's License Key dialog">
+    <div class="ppc hm-key-scr">
+      <div set:html={html} />
+      <p class="hm-key-ok" aria-live="polite" data-ok></p>
+    </div>
+    <p slot="status" class="hm-soft"><span>ok</span><span></span></p>
+  </Window>
+  <div class="hm-key-side">
+    <p class="hm-key-big"><span>The key for HandyMenu 3.7</span><b>{groups(KEY)}</b></p>
+    <button type="button" class="button button--primary k-btn" hidden data-type>Type it in for me</button>
+    <p class="hm-key-note">The same 16 letters unlock every Pocket PC, whatever its code says.</p>
+  </div>
+</div>
+
+<style is:global>
+  .hm-key { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 24px 36px; align-items: center; margin-block: 32px; }
+  .hm-key-scr { position: relative; height: 100%; }
+  .hm-key-ok { position: absolute; left: 6%; right: 6%; bottom: 8%; margin: 0 !important; padding: 6px 8px; font: 700 12px/1.3 Tahoma, sans-serif !important; color: #fff !important; background: #2e7d32; text-align: center; max-width: none !important; }
+  .hm-key-ok:empty { display: none; }
+  .hm-key-side { display: grid; gap: 14px; justify-items: start; }
+  .hm-key-big { display: grid; gap: 6px; margin: 0 !important; padding: 16px 18px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-key-big span { font-size: 0.9375rem; color: var(--ink-2); }
+  .hm-key-big b { font: 700 clamp(1rem, 4.4vw, 1.75rem)/1.2 var(--font-code); letter-spacing: 0.04em; color: var(--accent); overflow-wrap: anywhere; }
+  .hm-key-note { margin: 0 !important; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  @media (max-width: 760px) { .hm-key { grid-template-columns: minmax(0, 1fr); justify-items: center; } .hm-key-side { justify-items: center; text-align: center; } }
+</style>
+
+<script>
+  import { reduce } from './hm.ts';
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-key]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const key = root.dataset.key!, boxes = [...root.querySelectorAll<HTMLInputElement>('[data-k]')], ok = root.querySelector<HTMLElement>('[data-ok]')!;
+    const btn = root.querySelector<HTMLButtonElement>('[data-type]')!;
+    const test = () => {
+      const typed = boxes.map(b => b.value.toUpperCase()).join('');
+      ok.textContent = typed === key ? 'This version of HandyMenu is Registered' : '';
+    };
+    boxes.forEach((b, i) => b.addEventListener('input', () => {
+      b.value = b.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
+      if (b.value.length === 4 && boxes[i + 1]) boxes[i + 1].focus();
+      test();
+    }));
+    btn.addEventListener('click', () => {
+      boxes.forEach(b => (b.value = ''));
+      ok.textContent = '';
+      if (reduce()) { boxes.forEach((b, i) => (b.value = key.slice(i * 4, i * 4 + 4))); test(); return; }
+      let k = 0;
+      const tick = () => {
+        const b = boxes[k >> 2];
+        b.value += key[k];
+        k++;
+        if (k < 16) setTimeout(tick, 90); else test();
+      };
+      tick();
+    });
+    btn.hidden = false;
+  });
+</script>

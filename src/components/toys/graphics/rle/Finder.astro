@@ -1,0 +1,151 @@
+---
+// PORTSAID.EXE's six pictures live between its functions. The scan walks his code looking for the four instructions
+// he used to point at a picture (mov ax,offset / xor dx,dx / mov bx,10h / div bx), and each find decodes that picture.
+// Without JS: the memory map and all six pictures.
+import Window from '../../../shell/Window.astro';
+import anatomy from '../../../../data/anatomy/PORTSAID_PORTSAID.EXE.json';
+import { memSync, png } from '../ssr.ts';
+import { portsaid, picPixels, PS_PICS, PORTSAID } from './rle.ts';
+import './rle.css';
+
+const bin = memSync(PORTSAID);
+const ps = portsaid(bin);
+const SIZE = bin.length - 0x50;
+const hx = (n: number, w = 4) => n.toString(16).toUpperCase().padStart(w, '0');
+// Where he points at each picture, found the same way the browser scan does
+const finds: { at: number; target: number }[] = [];
+for (let i = 0; i + 10 <= SIZE; i++) {
+  const o = i + 0x50;
+  if (bin[o] === 0xb8 && bin[o + 3] === 0x33 && bin[o + 4] === 0xd2 && bin[o + 5] === 0xbb && bin[o + 6] === 0x10 && bin[o + 7] === 0x00 && bin[o + 8] === 0xf7 && bin[o + 9] === 0xf3)
+    finds.push({ at: i, target: bin[o + 1] | (bin[o + 2] << 8) });
+}
+const PICS = finds.map(f => {
+  const m = PS_PICS.find(p => p.at === f.target)!, p = ps.pics[m.id];
+  return {
+    ...f, id: m.id, name: m.name, en: m.en, w: p.w, h: p.h, packed: p.packed, out: p.stride * 4,
+    seg: hx(f.target >> 4, 3), off: hx(f.target & 15, 4), img: png(picPixels(p), p.w * 8, p.h),
+  };
+});
+const REGIONS = anatomy.regions.filter(r => r.end > 0x50).map(r => ({ s: Math.max(0, r.start - 0x50), e: r.end - 0x50, kind: r.kind, by: r.by, label: r.label }));
+const pc = (n: number) => `${((n / SIZE) * 100).toFixed(3)}%`;
+---
+
+<div class="ps-fd" data-psfd data-finds={JSON.stringify(PICS.map(p => ({ at: p.at, target: p.target, id: p.id })))} data-size={SIZE}>
+  <Window title={`PORTSAID.EXE in memory   ${SIZE.toLocaleString('en-US')} bytes`} kind="panel" active class="ps-fd-map">
+    <div class="ps-fd-bar" aria-hidden="true">
+      {REGIONS.map(r => <span class:list={['ps-fd-r', `is-${r.kind}`, `by-${r.by}`]} data-kind={r.kind} style={`left:${pc(r.s)};width:${pc(r.e - r.s)}`} title={r.label} />)}
+      {PICS.map(p => <span class="ps-fd-ptr" data-ptr={p.at} style={`left:${pc(p.at)}`} />)}
+      <span class="ps-fd-cur" data-cur style="left:0%" />
+    </div>
+    <div class="ps-fd-key"><span class="k-y">his code</span><span class="k-w">his pictures</span><span class="k-b">Borland's start-up and math library</span></div>
+    <div class="ps-fd-go g-js">
+      <button type="button" class="button button--primary k-btn" data-scan>Find the pictures</button>
+      <p class="g-say" aria-live="polite" data-say>His code points at six pictures. Scan it to find them.</p>
+    </div>
+  </Window>
+  <div class="ps-fd-cards" role="group" aria-label="The six pictures">
+    {PICS.map((p, i) => (
+      <button type="button" class="ps-fd-card" data-card={p.id} aria-pressed={String(i === 2)}>
+        <span class="ps-fd-img" style={`aspect-ratio:${p.w * 8} / ${p.h}`}><img src={p.img} width={p.w * 8} height={p.h} alt="" /></span>
+        <span class="ps-fd-name">{p.id === 'arabic' ? <span lang="ar" dir="rtl">{p.name}</span> : p.en}</span>
+        <span class="ps-fd-num">{p.w * 8} × {p.h} px · {p.packed.toLocaleString('en-US')} bytes</span>
+      </button>
+    ))}
+  </div>
+  <Window title="FOUND" kind="help" class="ps-fd-detail">
+    {PICS.map((p, i) => (
+      <div class="ps-fd-d" data-detail={p.id} hidden={i !== 2}>
+        <p>His code says <code>mov ax,{hx(p.target)}h / xor dx,dx / mov bx,10h / div bx</code>: divide the picture’s place by 16.</p>
+        <p>{hx(p.target)}h ÷ 16 = <b>{p.seg}h</b>, remainder <b>{parseInt(p.off, 16)}</b>. He moves his starting point in memory forward by {p.seg}h and keeps {parseInt(p.off, 16)} as the step inside it. That leaves the decoder a whole 64 KB window to read the picture from.</p>
+        <p>Its first two words say <b>{p.w} bytes</b> ({p.w * 8} pixels) by <b>{p.h} rows</b>. {p.packed.toLocaleString('en-US')} packed bytes become {p.out.toLocaleString('en-US')}: four color layers of {(p.out / 4).toLocaleString('en-US')}.</p>
+      </div>
+    ))}
+  </Window>
+</div>
+
+<style>
+  .ps-fd { display: grid; gap: 22px; }
+  .ps-fd-bar { position: relative; height: 56px; margin-top: 30px; background: var(--vga-0); box-shadow: inset 0 0 0 1px var(--rule); }
+  .ps-fd-r { position: absolute; top: 0; bottom: 0; }
+  .ps-fd-r.by-borland, .ps-fd-r.by-dos { background: color-mix(in oklch, var(--vga-7) 30%, transparent); }
+  .ps-fd-r.is-code { background: var(--vga-14); }
+  .ps-fd-r.is-image { background: var(--vga-15); box-shadow: inset -1px 0 0 var(--vga-0); transition: background-color 0.3s, transform 0.3s; transform-origin: bottom; }
+  .ps-fd.is-scanning .ps-fd-r.is-image { background: color-mix(in oklch, var(--vga-15) 25%, transparent); }
+  .ps-fd .ps-fd-r.is-image.found { background: var(--vga-15); }
+  .ps-fd-ptr { position: absolute; top: -26px; width: 2px; height: 26px; margin-left: -1px; background: var(--vga-12); }
+  .ps-fd-ptr::after { content: ''; position: absolute; top: -5px; left: -4px; border: 5px solid transparent; border-top-color: var(--vga-12); transform: translateY(-1px) rotate(180deg); }
+  .ps-fd.is-scanning .ps-fd-ptr:not(.found) { opacity: 0; }
+  .ps-fd-cur { position: absolute; top: -6px; bottom: -6px; width: 3px; margin-left: -1px; background: var(--vga-10); opacity: 0; }
+  .ps-fd-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .ps-fd-key span::before { content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 6px; vertical-align: -1px; }
+  .ps-fd-key .k-y::before { background: var(--vga-14); }
+  .ps-fd-key .k-w::before { background: var(--vga-15); }
+  .ps-fd-key .k-b::before { background: color-mix(in oklch, var(--vga-7) 30%, transparent); box-shadow: inset 0 0 0 1px var(--vga-7); }
+  .ps-fd-go { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 16px; }
+  .ps-fd-go .g-say { flex: 1 1 260px; min-height: 0; }
+  .ps-fd-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .ps-fd-card:nth-child(-n + 2) { grid-column: span 2; }
+  .ps-fd-card { display: grid; align-content: start; gap: 6px; min-height: 44px; padding: 8px; text-align: left; color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule), 4px 4px 0 var(--black); cursor: pointer; font: inherit; transition: opacity 0.3s, transform 0.3s; }
+  .ps-fd-card[aria-pressed='true'] { box-shadow: inset 0 0 0 3px var(--accent), 4px 4px 0 var(--black); }
+  .ps-fd-card:hover { box-shadow: inset 0 0 0 2px var(--accent-2), 4px 4px 0 var(--black); }
+  .ps-fd-card:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .ps-fd.is-scanning .ps-fd-card:not(.found) { opacity: 0.25; }
+  .ps-fd-img { display: grid; place-items: center; background: #000; }
+  .ps-fd-img img { width: 100%; height: auto; image-rendering: pixelated; }
+  .ps-fd-name { font: 700 0.875rem/1.25 var(--sans); }
+  .ps-fd-name [lang='ar'] { font: 700 1rem/1.2 var(--font-ar); }
+  .ps-fd-num { font: 500 11px/1.3 var(--font-code); color: var(--ink-2); }
+  .ps-fd-d p { margin: 0 0 8px !important; max-width: none !important; font-size: 1rem !important; line-height: 1.55 !important; color: var(--ink) !important; }
+  .ps-fd-d p:last-child { margin-bottom: 0 !important; }
+  .ps-fd-d code { font: 600 0.9em var(--font-code); color: var(--accent) !important; overflow-wrap: anywhere; }
+  .ps-fd-d b { color: var(--accent); }
+  @media (max-width: 640px) { .ps-fd-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (prefers-reduced-motion: reduce) { .ps-fd-card, .ps-fd-r.is-image { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduce } from './view.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-psfd]').forEach(root => {
+    const finds: { at: number; target: number; id: string }[] = JSON.parse(root.dataset.finds!);
+    const size = +root.dataset.size!, hx = (n: number) => n.toString(16).toUpperCase().padStart(4, '0');
+    const cards = [...root.querySelectorAll<HTMLButtonElement>('[data-card]')], say = root.querySelector<HTMLElement>('[data-say]')!;
+    const cur = root.querySelector<HTMLElement>('[data-cur]')!, btn = root.querySelector<HTMLButtonElement>('[data-scan]')!;
+    const ptrs = [...root.querySelectorAll<HTMLElement>('[data-ptr]')];
+    const imgs = [...root.querySelectorAll<HTMLElement>('.ps-fd-r.is-image')];
+    // Which map region holds each picture: the image region that starts nearest its address
+    const regionOf = (t: number) => imgs.reduce((b, r) => (Math.abs(parseFloat(r.style.left) / 100 * size - t) < Math.abs(parseFloat(b.style.left) / 100 * size - t) ? r : b));
+    const pick = (id: string) => {
+      cards.forEach(c => c.setAttribute('aria-pressed', String(c.dataset.card === id)));
+      root.querySelectorAll<HTMLElement>('[data-detail]').forEach(d => (d.hidden = d.dataset.detail !== id));
+    };
+    cards.forEach(c => c.addEventListener('click', () => pick(c.dataset.card!)));
+    let tl: gsap.core.Timeline | null = null;
+    const found = (k: number) => {
+      const f = finds[k];
+      ptrs[k].classList.add('found');
+      regionOf(f.target).classList.add('found');
+      cards.find(c => c.dataset.card === f.id)!.classList.add('found');
+      say.textContent = `Found ${k + 1} of ${finds.length}: at ${hx(f.at)}, mov ax,${hx(f.target)}h points at a picture.`;
+      pick(f.id);
+    };
+    btn.addEventListener('click', () => {
+      tl?.kill();
+      root.querySelectorAll('.found').forEach(e => e.classList.remove('found'));
+      if (reduce()) { finds.forEach((_, k) => found(k)); say.textContent = `Found all ${finds.length}: two names and four logo tiles, each inside the code.`; return; }
+      root.classList.add('is-scanning');
+      tl = gsap.timeline({ onComplete: () => { root.classList.remove('is-scanning'); gsap.to(cur, { opacity: 0, duration: 0.3 }); say.textContent = `Found all ${finds.length}: two names and four logo tiles, each inside the code.`; } });
+      tl.set(cur, { left: '0%', opacity: 1 });
+      let t = 0;
+      finds.forEach((f, k) => {
+        const to = (f.at / size) * 100, dur = Math.max(0.25, (to - (k ? finds[k - 1].at / size * 100 : 0)) / 40);
+        tl!.to(cur, { left: `${to}%`, duration: dur, ease: 'none' });
+        tl!.call(() => found(k));
+        tl!.to({}, { duration: 0.45 });
+        t += dur;
+      });
+      tl.to(cur, { left: `${(28182 - 0x50) / size * 100}%`, duration: 0.4, ease: 'none' });
+    });
+  });
+</script>

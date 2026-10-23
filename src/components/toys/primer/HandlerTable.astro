@@ -1,0 +1,228 @@
+---
+// Interrupts as event handlers and system calls. Fire an event (a key, a clock tick) or make a request (int 21h, int 10h)
+// and watch the interrupt table route it to its handler and back. The JavaScript beside it lights the same idea.
+import Window from '../../shell/Window.astro';
+
+interface Props { id?: string }
+const { id = 'pr-handlers' } = Astro.props;
+const ROWS = [
+  { n: '08', at: '0000:0020', what: 'clock tick', h: 'clock' },
+  { n: '09', at: '0000:0024', what: 'key press', h: 'kbd' },
+  { n: '10', at: '0000:0040', what: 'video service', h: 'video' },
+  { n: '16', at: '0000:0058', what: 'keyboard service', h: 'kbd' },
+  { n: '21', at: '0000:0084', what: 'DOS', h: 'dos' },
+];
+const HANDLERS = [
+  { h: 'clock', name: 'BIOS clock code', where: 'on the BIOS chip' },
+  { h: 'kbd', name: 'BIOS keyboard code', where: 'on the BIOS chip' },
+  { h: 'video', name: 'Video BIOS', where: 'on the graphics card' },
+  { h: 'dos', name: 'DOS', where: 'in memory, loaded at boot' },
+];
+// The story of one key press, shown before any button is pressed (and without JavaScript)
+const KEY = ['You press <b>Y</b>. The keyboard chip raises its hand: interrupt 9.',
+  'The processor pauses your program and notes where it was, like pushing a frame on the call stack.',
+  'It reads entry 09h of the table, at 0000:0024, and jumps to the address it finds there.',
+  'The BIOS keyboard code reads the key and keeps <b>Y</b> in the keyboard buffer.',
+  'It returns, and your program carries on exactly where it stopped. It never noticed.'];
+const JS = [
+  { l: 'const table = new Array(256);   // at address 0', k: '' },
+  { l: 'table[0x08] = biosClock;         // filled in at power-on', k: '' },
+  { l: 'table[0x09] = biosKeyboard;', k: '' },
+  { l: 'table[0x10] = videoBios;', k: '' },
+  { l: 'table[0x21] = dos;               // filled in when DOS starts', k: '' },
+  { l: '', k: '' },
+  { l: '// Events: the hardware calls the table for you', k: '' },
+  { l: "clock.on('tick', () => table[0x08]());", k: 'tick' },
+  { l: "keyboard.on('key', k => table[0x09](k));", k: 'key' },
+  { l: '', k: '' },
+  { l: '// Requests: your program calls it, a system call', k: '' },
+  { l: "table[0x21]({ ah: 0x09, text: 'Hello$' });", k: 'dos' },
+  { l: 'table[0x10]({ ah: 0x0C, x, y, color: 14 });', k: 'video' },
+];
+---
+
+<div class="pri" id={id} data-handlers>
+  <span class="pri-chip" aria-hidden="true"></span>
+  <div class="pri-grid">
+    <Window title="EVENTS" kind="dialog" class="pri-ev">
+      <p class="pri-lab">Something happens</p>
+      <div class="pri-btns">
+        <button type="button" class="button k-btn pri-key" data-ev="key"><kbd data-cap>Y</kbd> Press a key</button>
+        <button type="button" class="button k-btn" data-ev="tick">Clock tick</button>
+      </div>
+      <p class="pri-lab">Your program asks</p>
+      <div class="pri-btns">
+        <button type="button" class="button k-btn" data-ev="dos"><code>int 21h</code> Print text</button>
+        <button type="button" class="button k-btn" data-ev="video"><code>int 10h</code> Draw a pixel</button>
+      </div>
+      <p class="pri-tip">Or type on your keyboard while a button here has focus.</p>
+    </Window>
+
+    <Window title="INTERRUPT TABLE  at address 0" kind="panel" num="1" active class="pri-tab">
+      <table class="pri-rows">
+        <thead><tr><th scope="col">Entry</th><th scope="col">Where</th><th scope="col">For</th></tr></thead>
+        <tbody>{ROWS.map(r => <tr data-n={r.n} data-h={r.h}><td>{r.n}h</td><td>{r.at}</td><td>{r.what}</td></tr>)}</tbody>
+      </table>
+      <p class="pri-sub">Entry n sits at n × 4. Five of the 256 entries.</p>
+    </Window>
+
+    <Window title="HANDLERS" kind="editor" num="2" class="pri-hd">
+      <ul class="pri-hl">{HANDLERS.map(h => <li data-h={h.h}><b>{h.name}</b><span>{h.where}</span></li>)}</ul>
+      <dl class="pri-out">
+        <div><dt>Keyboard buffer</dt><dd data-out="key"><span data-buf>empty</span></dd></div>
+        <div><dt>Clock ticks</dt><dd data-out="tick"><span data-ticks>0</span></dd></div>
+        <div><dt>Screen</dt><dd data-out="dos"><span data-said>&nbsp;</span></dd></div>
+        <div><dt>Pixels drawn</dt><dd data-out="video"><span data-px>0</span></dd></div>
+      </dl>
+    </Window>
+  </div>
+
+  <div class="pri-under">
+    <Window title="HOW IT WENT" kind="help" class="pri-log">
+      <ol class="pri-steps" data-log aria-live="polite">
+        {KEY.map(l => <li set:html={l} />)}
+      </ol>
+    </Window>
+    <Window title="THE SAME IDEA IN JAVASCRIPT" kind="editor" class="pri-js">
+      <ol class="pri-code">{JS.map(j => <li data-k={j.k || undefined}><code>{j.l || ' '}</code></li>)}</ol>
+    </Window>
+  </div>
+</div>
+
+<style is:global>
+  .pri { position: relative; display: grid; gap: 26px; }
+  .pri-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr) minmax(0, 1fr); gap: 26px; align-items: stretch; }
+  .pri-lab { margin: 0 0 10px; font: 700 0.8125rem/1.2 var(--sans); color: var(--ink); }
+  .pri-lab + .pri-btns + .pri-lab { margin-top: 18px; }
+  .pri-btns { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+  .pri-btns .k-btn { justify-content: flex-start; gap: 10px; font-size: 0.9375rem; }
+  .pri-btns code { font: 600 0.75rem var(--font-code); padding: 2px 5px; background: var(--vga-0); color: var(--vga-14); }
+  .pri-key kbd { display: inline-grid; place-items: center; min-width: 26px; height: 26px; font: 700 0.875rem var(--font-code); color: var(--vga-0); background: var(--vga-15); box-shadow: inset -2px -3px 0 var(--vga-7); }
+  .pri-tip { margin: 14px 0 0; font: 500 0.8125rem/1.45 var(--sans); color: var(--ink-2); }
+  .pri-rows { width: 100%; border-collapse: collapse; font: 500 0.875rem/1.3 var(--font-code); }
+  .pri-rows th { text-align: left; padding: 4px 8px; font-weight: 600; color: var(--accent-2); border-bottom: 1px solid var(--rule); }
+  .pri-rows td { padding: 9px 8px; color: var(--ink); transition: background-color 0.2s, color 0.2s; }
+  .pri-rows td:first-child { color: var(--accent); font-weight: 700; }
+  .pri-rows tr.on td { background: var(--vga-3); color: var(--vga-0); }
+  .pri-sub { margin: 10px 0 0; font: 500 0.75rem/1.4 var(--font-code); color: var(--ink-2); }
+  .pri-hl { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .pri-hl li { display: grid; padding: 8px 10px; background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 40%, transparent); transition: background-color 0.2s; }
+  .pri-hl b { font: 700 0.9375rem/1.3 var(--sans); color: var(--ink); }
+  .pri-hl span { font: 500 0.75rem/1.3 var(--font-code); color: var(--ink-2); }
+  .pri-hl li.on { background: var(--vga-14); }
+  .pri-hl li.on :is(b, span) { color: var(--vga-0); }
+  .pri-out { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin: 16px 0 0; }
+  .pri-out dt { font: 500 0.6875rem/1.3 var(--font-code); color: var(--accent-2); }
+  .pri-out dd { margin: 2px 0 0; min-height: 1.5em; font: 700 0.9375rem/1.4 var(--font-code); color: var(--accent); overflow-wrap: anywhere; }
+  .pri-under { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 26px; align-items: stretch; }
+  .pri-steps { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink); }
+  .pri-steps li { text-wrap: pretty; }
+  .pri-steps li.now { font-weight: 700; }
+  .pri-steps li.next { opacity: 0.35; }
+  .pri-code { margin: 0; padding: 0; list-style: none; font: 500 clamp(11.5px, 0.25vw + 9.5px, 13px)/1.8 var(--font-code); }
+  .pri-code li { padding: 0 8px; white-space: pre; color: var(--ink); transition: background-color 0.15s, color 0.15s; }
+  .pri-code li.on { background: var(--accent-2); color: var(--surface); }
+  .pri-chip { position: absolute; left: 0; top: 0; z-index: 4; display: none; min-width: 28px; height: 28px; padding: 0 8px; place-items: center; font: 700 0.8125rem/1 var(--font-code); color: var(--vga-0); background: var(--vga-14); box-shadow: 0 0 0 2px var(--vga-0), 0 0 18px var(--vga-14); pointer-events: none; }
+  @media (max-width: 1100px) { .pri-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .pri-ev { grid-column: 1 / -1; } .pri-btns { flex-flow: row wrap; } }
+  @media (max-width: 1023px) { .pri-under { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 760px) {
+    .pri-grid { grid-template-columns: minmax(0, 1fr); }
+    .pri-btns .k-btn { flex: 1 1 100%; }
+    .pri-code li { white-space: pre-wrap; padding-left: 2ch; text-indent: -2ch; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pri-rows td, .pri-hl li, .pri-code li { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type Ev = 'key' | 'tick' | 'dos' | 'video';
+  const ROUTE: Record<Ev, { n: string; h: string }> = { key: { n: '09', h: 'kbd' }, tick: { n: '08', h: 'clock' }, dos: { n: '21', h: 'dos' }, video: { n: '10', h: 'video' } };
+  const STEPS: Record<Ev, (k: string) => string[]> = {
+    key: k => [`You press <b>${k}</b>. The keyboard chip raises its hand: interrupt 9.`,
+      'The processor pauses your program and notes where it was, like pushing a frame on the call stack.',
+      'It reads entry 09h of the table, at 0000:0024, and jumps to the address it finds there.',
+      `The BIOS keyboard code reads the key and keeps <b>${k}</b> in the keyboard buffer.`,
+      'It returns, and your program carries on exactly where it stopped. It never noticed.'],
+    tick: () => ['The clock chip fires interrupt 8. It does this 18.2 times a second, all day.',
+      'The processor pauses your program and notes where it was.',
+      'It reads entry 08h of the table, at 0000:0020, and jumps there.',
+      'The BIOS clock code adds one to its tick counter. This is how DOS knows the time.',
+      'It returns, and your program carries on.'],
+    dos: () => ['Your program puts <b>09h</b>, “print text”, in a register and runs <code>int 21h</code>.',
+      'The processor notes where it was, the same as for a key press.',
+      'It reads entry 21h of the table, at 0000:0084, and jumps there: into DOS.',
+      'DOS prints the text. ARABART prints its “already active” message exactly this way.',
+      'It returns, and the next line of your program runs.'],
+    video: () => ['Your program puts <b>0Ch</b>, “one pixel”, in a register and runs <code>int 10h</code>.',
+      'The processor notes where it was.',
+      'It reads entry 10h of the table, at 0000:0040, and jumps there: into the video BIOS.',
+      'The video BIOS colors one pixel. His Port Said screensaver draws every pixel this way.',
+      'It returns, and your program asks for the next one.'],
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-handlers]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const chip = $('.pri-chip'), log = $('[data-log]'), cap = $('[data-cap]');
+    const rows = [...root.querySelectorAll<HTMLElement>('.pri-rows tr[data-n]')];
+    const hs = [...root.querySelectorAll<HTMLElement>('.pri-hl li')];
+    const code = [...root.querySelectorAll<HTMLElement>('.pri-code li')];
+    const NAME = 'YASSER';
+    let n = 0, buf = '', ticks = 0, px = 0, tl: gsap.core.Timeline | null = null;
+
+    const center = (el: Element) => {
+      const r = el.getBoundingClientRect(), o = root.getBoundingClientRect();
+      return { x: r.left - o.left + r.width / 2, y: r.top - o.top + r.height / 2 };
+    };
+    const light = (ev: Ev | null, stage: number) => {
+      const rt = ev ? ROUTE[ev] : null;
+      rows.forEach(r => r.classList.toggle('on', !!rt && stage >= 1 && r.dataset.n === rt.n));
+      hs.forEach(h => h.classList.toggle('on', !!rt && stage >= 2 && h.dataset.h === rt.h));
+      code.forEach(c => c.classList.toggle('on', !!ev && c.dataset.k === ev));
+    };
+    const steps = (lines: string[], at: number) => {
+      log.innerHTML = lines.map((l, i) => `<li class="${i === at ? 'now' : i > at ? 'next' : ''}">${l}</li>`).join('');
+    };
+    const result = (ev: Ev, k: string) => {
+      if (ev === 'key') { buf = (buf + k).slice(-16); $('[data-buf]').textContent = buf; }
+      if (ev === 'tick') $('[data-ticks]').textContent = String(++ticks);
+      if (ev === 'dos') $('[data-said]').textContent = 'Hello';
+      if (ev === 'video') $('[data-px]').textContent = String(++px);
+      const out = $(`[data-out="${ev}"]`);
+      if (!reduce()) gsap.fromTo(out, { scale: 1.25, transformOrigin: 'left center' }, { scale: 1, duration: 0.4, ease: 'back.out(3)' });
+    };
+
+    function fire(ev: Ev, src: HTMLElement, key?: string) {
+      const k = key ?? NAME[n++ % NAME.length];
+      if (ev === 'key' && !key) cap.textContent = NAME[n % NAME.length];
+      tl?.progress(1).kill();
+      const lines = STEPS[ev](k), rt = ROUTE[ev];
+      const row = rows.find(r => r.dataset.n === rt.n)!, h = hs.find(x => x.dataset.h === rt.h)!, out = $(`[data-out="${ev}"]`);
+      if (reduce()) { light(ev, 2); steps(lines, lines.length); result(ev, k); return; }
+      chip.textContent = ev === 'key' ? k : ev === 'tick' ? '08h' : ev === 'dos' ? '21h' : '10h';
+      const p = [center(src), center(row), center(h), center(out)];
+      const at = (i: number) => ({ x: p[i].x - chip.offsetWidth / 2, y: p[i].y - 14 });
+      steps(lines, 0); light(ev, 0);
+      gsap.set(chip, { display: 'grid', opacity: 1, scale: 1 });
+      gsap.set(chip, at(0));
+      tl = gsap.timeline({ onComplete: () => { tl = null; } })
+        .to(chip, { ...at(1), duration: 0.5, ease: 'power2.inOut', onStart: () => steps(lines, 1) })
+        .add(() => { light(ev, 1); steps(lines, 2); })
+        .to(chip, { ...at(2), duration: 0.5, ease: 'power2.inOut', delay: 0.35 })
+        .add(() => { light(ev, 2); steps(lines, 3); })
+        .to(chip, { ...at(3), duration: 0.45, ease: 'power2.inOut', delay: 0.35 })
+        .add(() => { result(ev, k); steps(lines, 4); })
+        .to(chip, { opacity: 0, scale: 0.6, duration: 0.25, delay: 0.2 })
+        .set(chip, { display: 'none' })
+        .add(() => steps(lines, lines.length));
+    }
+
+    root.querySelectorAll<HTMLElement>('[data-ev]').forEach(b => b.addEventListener('click', () => fire(b.dataset.ev as Ev, b)));
+    $('.pri-ev').addEventListener('keydown', e => {
+      if (e.ctrlKey || e.metaKey || e.altKey || !/^[a-z0-9]$/i.test(e.key)) return;
+      e.preventDefault();
+      fire('key', $('.pri-key'), e.key.toUpperCase());
+    });
+  });
+</script>

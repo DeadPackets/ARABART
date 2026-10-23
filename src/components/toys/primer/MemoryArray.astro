@@ -1,0 +1,229 @@
+---
+// Memory is one big array: drag an address along the first megabyte, read what lives there, and write a byte to see
+// that nothing stops you. The lens shows what the write does: pixels, a letter, a hooked interrupt, or plain bytes.
+import Window from '../../shell/Window.astro';
+import { REGIONS, MB, hex, regionOf, posOf, detail, pct } from './mem';
+
+interface Props { id?: string; at?: number }
+const { id = 'pr-memarray', at = 0xa1f4c } = Astro.props;
+const r0 = regionOf(at), d0 = detail(at);
+const STEPS = 2000;
+const p640 = posOf(0xa0000) * 100;
+---
+
+<div class="prm" id={id} data-memarray data-at={at}>
+  <Window title="MEMORY  one array, 1,048,576 bytes" kind="editor" active class="prm-arr">
+    <div class="prm-track">
+      <div class="prm-strip" aria-hidden="true">
+        {REGIONS.map(r => <span class="prm-r" data-r={r.id} style={`flex:${pct(r)} 1 0`}><b>{r.short}</b></span>)}
+      </div>
+      <span class="prm-pin" aria-hidden="true" style={`left:${posOf(at) * 100}%`}></span>
+      <input class="prm-range" type="range" min="0" max={STEPS} step="1" value={Math.round(posOf(at) * STEPS)}
+        aria-label="Address in memory" aria-valuetext={`${hex(at)}h, ${r0.name}`} data-steps={STEPS} />
+      <div class="prm-ticks" aria-hidden="true">
+        <span style="left:0">0</span><span style={`left:${p640}%`}>640 KB</span><span style="left:100%">1 MB</span>
+      </div>
+    </div>
+    <div class="prm-jump" role="group" aria-label="Jump to a part of memory">
+      {REGIONS.filter(r => !['mono', 'rom'].includes(r.id)).map(r => (
+        <button type="button" class="button k-btn" data-go={r.id === 'vga' ? 0xa1f4c : r.id === 'text' ? 0xb8000 : r.id === 'ivt' ? 0x84 : r.id === 'bda' ? 0x41e : r.id === 'bios' ? 0xffff0 : r.id === 'app' ? 0x10000 : r.a} aria-pressed={String(r === r0)}>{r.name}</button>
+      ))}
+    </div>
+  </Window>
+
+  <div class="prm-out">
+    <Window title="WATCH" kind="panel" num="2" class="prm-read">
+      <p class="prm-addr"><code>memory[<b data-hex>0x{hex(at)}</b>]</code><span data-dec>byte {at.toLocaleString('en-US')} of {MB.toLocaleString('en-US')}</span></p>
+      <h3 class="prm-name" data-name>{r0.name}</h3>
+      <p class="prm-say" data-say>{r0.say}</p>
+      <p class="prm-detail" data-detail>{d0.line}</p>
+      <p class="prm-who" data-who hidden={!r0.who}>{r0.who}</p>
+    </Window>
+    <Window title="WRITE ONE BYTE" kind="screen" class="prm-lens" data-lens-win hidden>
+      <div class="prm-lens-box">
+        <canvas class="prm-canvas" data-canvas width="640" height="480" aria-hidden="true"></canvas>
+        <div class="prm-html" data-html></div>
+      </div>
+      <p class="prm-con" aria-live="polite"><code data-cmd></code><span data-res></span></p>
+      <p class="prm-btns">
+        <button type="button" class="button button--primary k-btn" data-write>Write a byte here</button>
+        <button type="button" class="button k-btn" data-clear>Clear</button>
+      </p>
+    </Window>
+  </div>
+</div>
+
+<style is:global>
+  .prm { display: grid; gap: 26px; }
+  .prm-track { position: relative; padding: 18px 0 30px; }
+  .prm-strip { display: flex; height: 64px; gap: 2px; }
+  .prm-r { position: relative; min-width: 0; display: flex; align-items: flex-end; padding: 6px; overflow: hidden; color: var(--vga-0); background: var(--c); transition: filter 0.2s; }
+  .prm-r b { font: 600 12px/1.15 var(--font-code); white-space: nowrap; }
+  .prm-r[data-r='ivt'] { --c: var(--vga-14); } .prm-r[data-r='bda'] { --c: var(--vga-11); } .prm-r[data-r='dos'] { --c: var(--vga-7); }
+  .prm-r[data-r='app'] { --c: var(--vga-10); } .prm-r[data-r='vga'] { --c: var(--vga-13); } .prm-r[data-r='mono'] { --c: var(--vga-8); color: var(--vga-15); }
+  .prm-r[data-r='text'] { --c: var(--vga-12); } .prm-r[data-r='vbios'] { --c: var(--vga-3); } .prm-r[data-r='rom'] { --c: var(--vga-6); color: var(--vga-15); }
+  .prm-r[data-r='bios'] { --c: var(--vga-15); }
+  .prm-r.on { outline: 3px solid var(--vga-15); outline-offset: 2px; z-index: 1; }
+  .prm-pin { position: absolute; top: 8px; width: 4px; height: 76px; margin-left: -2px; background: var(--vga-15); box-shadow: 0 0 0 2px var(--vga-0); pointer-events: none; z-index: 2; }
+  .prm-pin::before { content: ''; position: absolute; top: -10px; left: -7px; border: 9px solid transparent; border-top-color: var(--vga-15); border-bottom: 0; }
+  .prm-range { position: absolute; inset: 6px 0 auto; width: 100%; height: 84px; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; z-index: 3; }
+  .prm-range:focus-visible + .prm-ticks { outline: 2px solid var(--focus); outline-offset: 4px; }
+  .prm-track:has(.prm-range:focus-visible) .prm-pin { background: var(--vga-14); }
+  .prm-ticks { position: absolute; left: 0; right: 0; bottom: 4px; height: 18px; font: 500 11px/18px var(--font-code); color: var(--ink-2); }
+  .prm-ticks span { position: absolute; translate: -50% 0; white-space: nowrap; }
+  .prm-ticks span:first-child { translate: 0 0; }
+  .prm-ticks span:last-child { translate: -100% 0; }
+  .prm-jump { display: flex; flex-wrap: wrap; gap: 12px 12px; margin-top: 10px; }
+  .prm-jump .k-btn { font-size: 0.875rem; padding: 0 12px; }
+
+  .prm-out { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: stretch; }
+  .prm-addr { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin: 0; }
+  .prm-addr code { font: 600 clamp(1.25rem, 1vw + 1rem, 1.75rem)/1.2 var(--font-code); color: var(--ink); }
+  .prm-addr b { color: var(--accent); font-weight: 700; }
+  .prm-addr span { font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .prm-name { margin: 14px 0 0; font: 800 1.5rem/1.15 var(--font-display); font-stretch: 85%; color: var(--accent); }
+  .prm-say, .prm-detail, .prm-who { margin: 8px 0 0; font: 500 1rem/1.55 var(--sans); color: var(--ink); text-wrap: pretty; }
+  .prm-detail { color: var(--accent-2); font-family: var(--font-code); font-size: 0.875rem; }
+  .prm-detail:empty { display: none; }
+  .prm-who { color: var(--ink-2); }
+  .prm-lens-box { position: relative; height: clamp(220px, 26vw, 330px); background: var(--vga-0); }
+  .prm-canvas { display: block; width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  .prm-html { position: absolute; inset: 0; display: none; padding: 14px; overflow: hidden; font: 500 13px/1.6 var(--font-code); color: var(--vga-7); }
+  .prm-lens-box.is-html .prm-html { display: block; }
+  .prm-lens-box.is-html .prm-canvas { visibility: hidden; }
+  .prm-html table { width: 100%; border-collapse: collapse; }
+  .prm-html td { padding: 1px 6px; white-space: nowrap; }
+  .prm-html tr.on td { background: var(--vga-3); color: var(--vga-0); }
+  .prm-html tr.hk td:last-child { color: var(--vga-14); }
+  .prm-html .prm-bx { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; margin-top: 10px; }
+  .prm-html .prm-bx span { display: grid; place-items: center; height: 34px; background: var(--vga-8); color: var(--vga-7); }
+  .prm-html .prm-bx span.w { background: var(--vga-14); color: var(--vga-0); font-weight: 700; }
+  .prm-html .prm-bx span.on { outline: 2px solid var(--vga-11); outline-offset: 1px; }
+  .prm-html p { margin: 0 0 6px; }
+  .prm-con { display: grid; gap: 2px; margin: 12px 0 0; min-height: 3.2em; font: 500 13px/1.5 var(--font-code); }
+  .prm-con code { color: var(--vga-15); }
+  .prm-con span { color: var(--vga-10); }
+  .prm-btns { display: flex; flex-wrap: wrap; gap: 12px 14px; margin: 12px 0 4px; }
+  @media (max-width: 1023px) { .prm-out { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 760px) {
+    .prm-r b { display: none; }
+    .prm-r.on b { display: none; }
+    .prm-jump .k-btn { flex: 1 1 calc(50% - 12px); }
+  }
+  @media (prefers-reduced-motion: reduce) { .prm-r { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { REGIONS, MB, hex, regionOf, posOf, addrOf, detail, VECTORS } from './mem';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PAL = ['#000', '#0000aa', '#00aa00', '#00aaaa', '#aa0000', '#aa00aa', '#aa5500', '#aaaaaa', '#555555', '#5555ff', '#55ff55', '#55ffff', '#ff5555', '#ff55ff', '#ffff55', '#fff'];
+
+  document.querySelectorAll<HTMLElement>('[data-memarray]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const range = $<HTMLInputElement>('.prm-range'), pin = $('.prm-pin'), N = +range.dataset.steps!;
+    const strips = [...root.querySelectorAll<HTMLElement>('.prm-r')], jumps = [...root.querySelectorAll<HTMLButtonElement>('[data-go]')];
+    const box = $('.prm-lens-box'), cv = $<HTMLCanvasElement>('[data-canvas]'), ctx = cv.getContext('2d')!, html = $('[data-html]');
+    const cmd = $('[data-cmd]'), res = $('[data-res]');
+    const written = new Map<number, number>();
+    let at = +root.dataset.at!, last = '';
+    $('[data-lens-win]').hidden = false;
+
+    const valueFor = (a: number) => {
+      const r = regionOf(a);
+      if (r.id === 'text' || r.id === 'mono') return a & 1 ? 0x4e : 0x41;
+      return 0xff;
+    };
+    const say = (a: number, v: number) => {
+      const r = regionOf(a), d = detail(a);
+      if (r.id === 'vga') return d.y != null ? `8 pixels light up on row ${d.y}. No driver, no API: one byte.` : 'Stored off-screen, out of sight.';
+      if (r.id === 'text' || r.id === 'mono') return a & 1 ? 'Yellow on red: the cell changes color.' : 'The letter A appears on the screen.';
+      if (r.id === 'ivt') return `Entry ${hex(d.n!, 2)}h now points somewhere new. This is how a program hooks a service.`;
+      if (r.id === 'vbios' || r.id === 'rom' || r.id === 'bios') return 'Nothing changes: this is a chip you can only read.';
+      if (r.id === 'dos') return 'Done. No error, no warning: DOS itself just changed.';
+      if (r.id === 'bda') return 'Done. The BIOS will read it as if it wrote it.';
+      return `Done. No error, no warning. Byte ${hex(v, 2)}h is there now.`;
+    };
+
+    function lens(a: number) {
+      const r = regionOf(a), d = detail(a);
+      box.classList.toggle('is-html', r.lens !== 'screen' && r.lens !== 'text');
+      if (r.lens === 'screen') {
+        cv.width = 640; cv.height = 480;
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 640, 480);
+        if (d.y != null) { ctx.fillStyle = 'rgb(85 255 255 / 0.45)'; ctx.fillRect(0, d.y, 640, 1); ctx.fillRect(d.x! + 3, 0, 2, 480); }
+        // Written bytes on top of the crosshair: 8 pixels each, drawn 2 rows tall so a single row stays visible
+        ctx.fillStyle = PAL[14];
+        for (const [w] of written) if (regionOf(w).id === 'vga') { const o = w - 0xa0000, y = Math.floor(o / 80); if (y < 480) ctx.fillRect((o % 80) * 8, y, 8, 2); }
+        if (d.y != null) { ctx.strokeStyle = PAL[15]; ctx.lineWidth = 3; ctx.strokeRect(d.x! - 6, d.y - 6, 20, 14); }
+        ctx.fillStyle = PAL[7]; ctx.font = '16px "Web437 IBM VGA 9x16", monospace'; ctx.fillText('640 × 480, 16 colors', 12, 470);
+      } else if (r.lens === 'text') {
+        cv.width = 640; cv.height = 400;
+        ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 640, 400);
+        ctx.font = '16px "Web437 IBM VGA 9x16", monospace'; ctx.textBaseline = 'top';
+        const page = d.page ?? 0;
+        for (const [w, v] of written) {
+          const wr = regionOf(w); if (wr.id !== r.id) continue;
+          const o = w - wr.a; if (o >> 12 !== page || (o % 4096) >= 4000) continue;
+          const c = (o % 4096) >> 1, x = (c % 80) * 8, y = Math.floor(c / 80) * 16;
+          const col = written.get(wr.a + (o | 1)), ch = written.get(wr.a + (o & ~1));
+          if (col != null) { ctx.fillStyle = PAL[col >> 4]; ctx.fillRect(x, y, 8, 16); }
+          if (ch != null) { ctx.fillStyle = PAL[col != null ? col & 15 : 7]; ctx.fillText(String.fromCharCode(ch), x, y); }
+          void v;
+        }
+        if (d.row != null) { ctx.strokeStyle = PAL[11]; ctx.lineWidth = 2; ctx.strokeRect(d.col! * 8 - 1, d.row * 16 - 1, 10, 18); }
+      } else if (r.lens === 'table') {
+        const n = d.n!, lo = Math.max(0, Math.min(256 - 8, n - 3));
+        html.innerHTML = `<table><tbody>${Array.from({ length: 8 }, (_, i) => lo + i).map(k => {
+          const hooked = [0, 1, 2, 3].some(j => written.has(k * 4 + j));
+          return `<tr class="${k === n ? 'on' : ''} ${hooked ? 'hk' : ''}"><td>${hex(k, 2)}h</td><td>0000:${hex(k * 4, 4)}</td><td>${hooked ? 'hooked' : VECTORS[k] ?? ''}</td></tr>`;
+        }).join('')}</tbody></table>`;
+      } else {
+        const row = a & ~7, ro = r.id === 'vbios' || r.id === 'rom' || r.id === 'bios';
+        html.innerHTML = `<p>${hex(row)}h</p><div class="prm-bx">${Array.from({ length: 8 }, (_, i) => row + i).map(k =>
+          `<span class="${k === a ? 'on' : ''} ${written.has(k) && !ro ? 'w' : ''}">${written.has(k) && !ro ? hex(written.get(k)!, 2) : '··'}</span>`).join('')}</div>
+          <p style="margin-top:12px">${ro ? 'A chip: reading works, writing does nothing.' : 'Each square is one byte. ·· is whatever is there now.'}</p>`;
+      }
+    }
+
+    function show(a: number, how: 'drag' | 'jump' = 'drag') {
+      at = Math.max(0, Math.min(MB - 1, a));
+      const r = regionOf(at), d = detail(at), p = posOf(at);
+      range.value = String(Math.round(p * N));
+      range.setAttribute('aria-valuetext', `${hex(at)}h, ${r.name}`);
+      if (how === 'jump' && !reduce()) gsap.to(pin, { left: `${p * 100}%`, duration: 0.45, ease: 'power3.out', overwrite: true });
+      else { gsap.killTweensOf(pin); pin.style.left = `${p * 100}%`; }
+      $('[data-hex]').textContent = `0x${hex(at)}`;
+      $('[data-dec]').textContent = `byte ${at.toLocaleString('en-US')} of ${MB.toLocaleString('en-US')}`;
+      $('[data-detail]').textContent = d.line;
+      if (r.id !== last) {
+        last = r.id;
+        $('[data-name]').textContent = r.name;
+        $('[data-say]').textContent = r.say;
+        const who = $('[data-who]'); who.textContent = r.who ?? ''; who.hidden = !r.who;
+        strips.forEach(s => s.classList.toggle('on', s.dataset.r === r.id));
+        jumps.forEach(b => b.setAttribute('aria-pressed', String(regionOf(+b.dataset.go!) === r)));
+        if (!reduce()) gsap.fromTo($('[data-name]'), { opacity: 0.2, x: -8 }, { opacity: 1, x: 0, duration: 0.35, ease: 'power2.out' });
+      }
+      const v = valueFor(at);
+      cmd.textContent = `> memory[0x${hex(at)}] = 0x${hex(v, 2)}${v === 0x41 ? "  // 'A'" : ''}`;
+      res.textContent = written.has(at) ? say(at, v) : '';
+      lens(at);
+    }
+
+    range.addEventListener('input', () => show(addrOf(+range.value / N)));
+    jumps.forEach(b => b.addEventListener('click', () => show(+b.dataset.go!, 'jump')));
+    $('[data-write]').addEventListener('click', () => {
+      const v = valueFor(at), r = regionOf(at);
+      if (!['vbios', 'rom', 'bios'].includes(r.id)) written.set(at, v);
+      show(at);
+      res.textContent = say(at, v);
+      if (!reduce()) gsap.fromTo(box, { outlineColor: 'rgb(255 255 85)', outlineWidth: 4, outlineStyle: 'solid' }, { outlineWidth: 0, duration: 0.6 });
+    });
+    $('[data-clear]').addEventListener('click', () => { written.clear(); show(at); });
+    document.fonts?.load('16px "Web437 IBM VGA 9x16"').then(() => lens(at));
+    void REGIONS;
+    show(at);
+  });
+</script>

@@ -1,0 +1,208 @@
+/* Explainer kit: glossary terms, diagrams, steps, then-and-now tables, listings, disclosures, writeup type and the
+   toys' shared controls. Colors are the Shell's semantic tokens (src/components/shell/README.md), so everything
+   follows the era and the window it sits in: --ink is the text of that surface, --accent its emphasis. */
+
+/* Class names. Kit classes start with k- (k-cs, k-btn, k-bits, k-scrub); the diagram vocabulary lives under .dg.
+   Rule for everyone: scoped <style> is the default. A <style is:global> block (needed for JS-built markup) must
+   start every selector with one class prefix that no other component uses (grep src first: kxf-, gpcc-, dtv-),
+   never a bare word like .pt, .num or .on. Never give a toy root an id that a page section may also use. */
+
+/* Kit buttons sit on the Shell's .button (the era's look) and add compact sizing and a pressed state */
+.k-btn { min-width: 44px; padding: 0 14px; font-size: 1rem; white-space: nowrap; touch-action: manipulation; box-shadow: 4px 4px 0 var(--black); }
+.k-btn:is([aria-pressed='true'], [aria-checked='true'], [aria-selected='true']) { background: var(--ink); color: var(--surface); }
+.k-btn:is(:disabled, [aria-disabled='true']) { opacity: 0.45; cursor: default; translate: none; }
+.k-btn:is(:disabled, [aria-disabled='true']):hover { background: var(--btn-bg); color: var(--btn-ink); }
+.k-btn .hk { color: var(--hot); font: 700 0.75rem/1 var(--font-code); }
+/* On pressed and primary buttons the hotkey takes the label's color: red or cyan there falls under 4.5:1 */
+.k-btn:is([aria-pressed='true'], [aria-checked='true'], .button--primary) .hk { color: inherit; }
+
+/* Glossary terms and their popover */
+.term {
+  color: var(--accent-2);
+  font-weight: 600;
+  text-decoration: underline dotted 2px;
+  text-underline-offset: 4px;
+  cursor: help;
+  transition: color 0.2s;
+}
+.term:hover, .term[aria-expanded='true'] { color: var(--accent); }
+
+#gpop {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: min(340px, calc(100vw - 24px));
+  padding: 16px 18px 14px;
+  background: var(--cyan);
+  color: var(--black);
+  border: 0;
+  box-shadow: 8px 8px 0 var(--black);
+  font: 400 0.9375rem/1.5 var(--sans);
+  transition: opacity 0.18s var(--quart), translate 0.18s var(--quart), display 0.18s allow-discrete, overlay 0.18s allow-discrete;
+}
+@starting-style { #gpop:popover-open { opacity: 0; translate: 0 6px; } }
+#gpop p + p { margin-top: 6px; }
+#gpop .gp-t { font-weight: 800; font-size: 1.125rem; }
+#gpop .gp-now b { font-weight: 700; }
+#gpop a { display: inline-block; margin-top: 10px; color: var(--black); font-weight: 700; text-underline-offset: 3px; }
+#gpop :focus-visible { outline-color: var(--black); }
+
+.dg-defs { position: absolute; overflow: hidden; }
+.d-arrow { fill: var(--accent-2); }
+.d-arrow-hi { fill: var(--accent); }
+
+/* Figure, Steps and Listing are Shell windows; the caption sits under the window, like a museum label */
+.k-fig { margin: 40px 0 36px; min-width: 0; }
+.k-fig > figcaption { margin-top: 14px; font-size: 0.9375rem; line-height: 1.55; color: var(--ink-2); max-width: 72ch; }
+.fig-body { overflow-x: auto; }
+.fig-narrow { display: none; }
+@media (max-width: 640px) {
+  .fig-body.has-narrow .fig-wide { display: none; }
+  .fig-body.has-narrow .fig-narrow { display: block; }
+}
+
+/* The older window markup (.win with a .win-t title) that pages outside the kit still use */
+.win:not([data-win]) {
+  position: relative;
+  margin: 40px 12px 36px 0;
+  padding: 30px clamp(14px, 2.4vw, 28px) 18px;
+  background: var(--surface);
+  border: 4px double var(--ink);
+  box-shadow: 12px 12px 0 var(--black);
+}
+.win-t { position: absolute; top: -0.85em; left: 0; right: 0; text-align: center; pointer-events: none; }
+.win-t span { background: var(--surface); padding: 0 12px; font: 600 0.8125rem/1.6 var(--font-code); color: var(--ink); }
+.win:not([data-win]) figcaption { margin-top: 14px; font-size: 0.875rem; line-height: 1.5; color: var(--ink-2); max-width: 72ch; }
+@media (max-width: 640px) { .win:not([data-win]) { margin-right: 8px; box-shadow: 8px 8px 0 var(--black); } }
+
+/* Diagram vocabulary for inline SVG: add class="dg" to the <svg> */
+.dg { display: block; width: 100%; height: auto; overflow: visible; }
+.dg text { fill: var(--ink); font: 500 14px var(--font-code); }
+.dg .t-sm { font-size: 12px; fill: var(--ink-2); }
+.dg .t-lg { font: 800 20px var(--font-display); font-stretch: 85%; }
+.dg .t-ar { font-family: var(--font-ar); font-weight: 700; }
+.dg .t-cy { fill: var(--accent-2); }
+.dg .t-yl { fill: var(--accent); }
+.dg .t-bk { fill: var(--black); }
+.dg .box { fill: var(--surface-2); stroke: var(--accent-2); stroke-width: 1.5; }
+.dg .box-hi { fill: var(--accent); stroke: var(--accent); }
+.dg .box-ink { fill: var(--ink); stroke: var(--ink); }
+.dg .box-bk { fill: var(--black); stroke: var(--ink-2); stroke-width: 1; }
+.dg .box-dash { fill: none; stroke: var(--accent-2); stroke-width: 1.5; stroke-dasharray: 5 5; }
+.dg .wire { fill: none; stroke: var(--accent-2); stroke-width: 1.5; }
+.dg .wire-hi { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.dg .arrow { marker-end: url(#d-arrow); }
+.dg .wire-hi.arrow { marker-end: url(#d-arrow-hi); }
+.dg .dash { stroke-dasharray: 4 5; }
+.dg .dim { opacity: 0.35; }
+
+/* Steps: without JS everything shows; with JS the current step's parts light up (GSAP drives the change) */
+.steps.is-live [data-s] { transition: opacity 0.45s var(--expo); }
+.steps.is-live [data-s]:not(.on) { opacity: 0.2; }
+.steps .k-scrub { margin-top: 18px; }
+.steps-cap { margin: 16px 0 0; padding: 0; list-style: none; counter-reset: st; display: grid; gap: 2px; }
+.steps-cap li {
+  counter-increment: st;
+  position: relative;
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  min-height: 44px;
+  padding: 8px 10px 8px 0;
+  font: 400 0.9375rem/1.5 var(--sans);
+  color: var(--ink-2);
+  transition: background-color 0.2s var(--quart), color 0.2s var(--quart);
+}
+.steps-cap li::before { content: counter(st); font: 600 0.8125rem/1.8 var(--font-code); color: var(--accent-2); text-align: center; }
+.steps-cap button { position: absolute; inset: 0; width: 100%; background: none; border: 0; cursor: pointer; }
+.steps-cap button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.steps-cap li > span { position: relative; pointer-events: none; }
+.steps-cap li > span a { pointer-events: auto; }
+.steps-cap li:hover { color: var(--ink); }
+.steps.is-live .steps-cap li.now { color: var(--surface); background: var(--ink); }
+.steps.is-live .steps-cap li.now::before { color: var(--surface); }
+.steps-cap code { font: 500 0.875em var(--font-code); color: var(--accent); }
+.steps.is-live .steps-cap li.now :is(code, a) { color: var(--surface); }
+
+/* Then and now */
+.tn { margin-top: 32px; overflow-x: auto; }
+.tn table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; line-height: 1.5; }
+.tn caption { text-align: left; font: 800 1.25rem/1.2 var(--font-display); font-stretch: 85%; color: var(--accent); padding-bottom: 10px; }
+.tn th { text-align: left; font: 600 0.75rem/1.4 var(--font-code); color: var(--accent-2); padding: 8px 16px 8px 0; border-bottom: 2px solid var(--accent-2); }
+.tn td { vertical-align: top; padding: 12px 16px 12px 0; border-bottom: 1px solid var(--rule); color: var(--ink-2); transition: background-color 0.2s var(--quart); }
+.tn td:first-child, .tn td:nth-child(2) { color: var(--ink); font-weight: 600; }
+.tn td:nth-child(2) { color: var(--accent); }
+.tn tbody tr:hover td { background: color-mix(in oklch, var(--ink) 5%, transparent); }
+@media (max-width: 640px) {
+  .tn thead { display: none; }
+  .tn tr, .tn td { display: block; }
+  .tn tr { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .tn td { border: 0; padding: 2px 0; }
+  .tn td::before { content: attr(data-h); display: block; font: 600 0.6875rem/1.6 var(--font-code); color: var(--accent-2); }
+  .tn td:empty { display: none; }
+}
+
+/* Listings: the editor's colors. Text in the window's ink, mnemonics in its accent, numbers in accent-2 */
+.listing .code { font: 400 0.8125rem/1.95 var(--font-code); font-stretch: 87.5%; overflow-x: auto; }
+.listing .ln { display: grid; grid-template-columns: 6ch minmax(24ch, auto) 1fr; gap: 20px; }
+.listing .ln.hi { background: color-mix(in oklch, var(--accent-2) 22%, transparent); }
+.listing .off { color: var(--accent-2); }
+.listing code { font: inherit; color: var(--ink); white-space: pre; }
+.listing code .op { color: var(--accent); }
+.listing code .num { color: var(--accent-2); }
+.listing .cm { color: var(--ink-2); }
+@media (max-width: 640px) {
+  .listing .ln { grid-template-columns: 6ch 1fr; gap: 0 12px; padding-block: 3px; }
+  .listing .cm { grid-column: 2; }
+  .listing code { white-space: pre-wrap; }
+  .listing .code { font-size: 0.75rem; line-height: 1.55; }
+}
+
+/* For-engineers disclosure: opens smoothly where the browser can animate to auto height */
+.deep { margin-top: 28px; border-top: 2px solid var(--accent-2); interpolate-size: allow-keywords; }
+.deep summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  cursor: pointer;
+  list-style: none;
+  font: 700 1.0625rem/1.3 var(--sans);
+  color: var(--accent-2);
+}
+.deep summary::-webkit-details-marker { display: none; }
+.deep summary::before { content: '+'; font: 600 1.25rem/1 var(--font-code); width: 1ch; }
+.deep[open] summary::before { content: '−'; }
+.deep summary:hover { color: var(--accent); }
+.deep::details-content { block-size: 0; overflow: clip; transition: block-size 0.4s var(--expo), content-visibility 0.4s allow-discrete; }
+.deep[open]::details-content { block-size: auto; }
+.deep-in { padding: 4px 0 24px; }
+
+/* Writeup typography */
+.writeup { max-width: 980px; }
+.writeup > section, .writeup .wu { margin-top: clamp(72px, 9vw, 120px); }
+.writeup > section:first-child { margin-top: 0; }
+.writeup h2 { font: 800 clamp(2rem, 2.4vw + 1rem, 3.25rem)/1.05 var(--font-display); font-stretch: 80%; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+.writeup h3 { margin-top: 36px; font: 800 1.5rem/1.15 var(--font-display); font-stretch: 88%; color: var(--ink); }
+/* Prose rules skip anything inside a window, a figure or a then-and-now table: toys style themselves.
+   :where() keeps the specificity of the plain .writeup p rules, so writeup overrides still win */
+.writeup p:where(:not(.win *, figure *, .tn *)), .writeup li:where(:not(.win *, figure *, .tn *)) { max-width: 68ch; font-size: 1.0625rem; line-height: 1.7; color: var(--ink); }
+.writeup p:where(:not(.win *, figure *, .tn *)) + p { margin-top: 1em; }
+.writeup h2 + p:where(:not(.win *, figure *, .tn *)), .writeup h3 + p:where(:not(.win *, figure *, .tn *)) { margin-top: 14px; }
+.writeup .lead { margin-top: 16px; font-size: clamp(1.25rem, 0.6vw + 1rem, 1.5rem); line-height: 1.45; font-weight: 500; max-width: 46ch; }
+.writeup ul:where(:not(.win *, figure *, .tn *)), .writeup ol:where(:not(.win *, figure *, .tn *)) { margin-top: 14px; padding-left: 1.2em; display: grid; gap: 6px; }
+/* js-dos ships Tailwind preflight (list-style: none) on emulator pages */
+.writeup ul:not(.tldr):where(:not(.win *, figure *, .tn *)) { list-style: square; }
+.writeup ol:where(:not(.win *, figure *, .tn *)) { list-style: decimal; }
+.writeup li:where(:not(.win *, figure *, .tn *))::marker { color: var(--accent-2); }
+.writeup .tldr { list-style: none; padding: 0; gap: 10px; }
+.writeup .tldr li { position: relative; padding-left: 26px; font-size: 1.125rem; }
+.writeup .tldr li::before { content: ''; position: absolute; left: 0; top: 0.7em; width: 12px; height: 3px; background: var(--accent); }
+.writeup :not(pre) > code { font: 500 0.9em var(--font-code); color: var(--accent); }
+.writeup strong { font-weight: 700; color: var(--accent); }
+.writeup .k-fig, .writeup .tn { max-width: 100%; }
+.writeup a:not(.term):not([class*='btn']):not(.button) { color: var(--accent-2); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.writeup a:not(.term):not([class*='btn']):not(.button):hover { color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .steps-cap li, .tn td, #gpop, .deep::details-content { transition: none; }
+}

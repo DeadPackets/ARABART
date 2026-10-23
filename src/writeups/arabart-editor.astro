@@ -1,0 +1,77 @@
+---
+// EDITOR.EXE. Facts: research/arabart.md, research/programs.md, EDITOR_EXE.img (main 1CFD-1F37), the capture made with
+// research/artifacts/arabart/run_editor.py. Every Arabic letter drawn here comes from his engine (src/lib/arabart).
+import EditorSim from '../components/toys/arabart-family/EditorSim.astro';
+import KeyFlow from '../components/toys/arabart-family/KeyFlow.astro';
+import EditorLoop from '../components/toys/arabart-family/EditorLoop.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import '../components/toys/arabart-family/writeup.css';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="drive">
+  <h2>Drive his editor</h2>
+  <p class="lead">EDITOR.EXE is a typewriter for Arabic. Every key you press becomes joined Arabic at once, in the font, color and style you pick.</p>
+  <p>This is his editor’s own logic, running on his own engine, with his own keys. Tap the black screen and type, or use the buttons. It starts where his own session ended: font 3, yellow, 3-D with a red shadow.</p>
+  <div class="af-toy"><EditorSim id="editor-sim" /></div>
+  <div class="af-cols">
+    <p>His keys know the Arabic keyboard. The four keys that type rare vowel marks there, <kbd>Shift</kbd>+<kbd>Q</kbd>, <kbd>W</kbd>, <kbd>E</kbd> and <kbd>R</kbd>, became his font keys, 1 to 4. <kbd>Shift</kbd>+<kbd>C</kbd> and <kbd>Shift</kbd>+<kbd>V</kbd> step through the 16 screen colors for the text and its shadow. <kbd>|</kbd> turns 3-D on and off.</p>
+    <p>Style keys are different. <kbd>!</kbd> <kbd>@</kbd> <kbd>#</kbd> <kbd>$</kbd> and <kbd>*</kbd> go into the text itself, like tags in HTML: everything after an <code>@</code> is bold, until the next <code>@</code>. Command keys change ARABART’s settings and are never stored. Watch the memory window: a style key gets a cell, a command key does not.</p>
+  </div>
+</section>
+
+<section id="keys">
+  <h2>From a key to a joined letter</h2>
+  <p class="lead">His editor never stores a letter. It stores the key you pressed, and ARABART turns keys into letters every time it draws. That is why the letters reshape as you type.</p>
+  <p>Press a key, here or in the editor above, and follow its five stops.</p>
+  <div class="af-toy"><KeyFlow id="editor-flow" /></div>
+  <div class="af-cols">
+    <p>This is the <Term id="key-encoding">Arabic-keyboard encoding</Term> at work. A whole line of Arabic is a plain string of English keys, so his C program keeps it in an ordinary 85-byte array. No Unicode, no font file, no layout engine on the C side.</p>
+    <p>Today your browser does these same steps for you: it stores the text as UTF-8, then a shaping engine picks each letter’s <Term id="glyph">glyph</Term> from its neighbors. His ARABART did all of it, in 1,448 bytes of code.</p>
+  </div>
+</section>
+
+<section id="loop">
+  <h2>The whole program is one loop</h2>
+  <p class="lead">571 bytes of his C. Wait for a key, act on it, clear the screen, draw the whole line again. That is all of EDITOR.EXE.</p>
+  <p>Pick a key and follow it through his code, line by line. The picture lights the boxes that key passes through. Press keys in the editor above and the loop here traces them too.</p>
+  <div class="af-toy"><EditorLoop id="editor-loop" /></div>
+  <p class="af-after">Drawing everything again after every key keeps the program tiny and always right. The screen is always made from the text, so it can never drift out of step with it. Modern interfaces are built on the same idea: React renders the view from the data on every change.</p>
+  <ThenNow
+    title="His editor, and the same ideas today"
+    rows={[
+      { then: 'Clear the screen and draw the whole line after every key', now: 'React rendering the view from state', why: 'The picture always comes from the data, so it cannot drift.' },
+      { then: 'One <code>getch()</code> loop reads letters and commands', now: 'One keydown handler that checks for shortcuts before it inserts text', why: 'One stream of keys; the code decides which ones are commands.' },
+      { then: 'Style keys stored in the text, commands sent to ARABART', now: 'Markdown’s <code>**bold**</code> in the text, a font menu in the app', why: 'Some styling travels with the text. Some belongs to the program showing it.' },
+      { then: 'ARABART keeps its font and colors between programs', now: 'A background service that keeps its own state', why: 'Run the editor again and it starts in the colors you left it in.' },
+    ]}
+  />
+  <Deep title="For engineers: the start of main() and the draw call">
+    <Listing
+      title="EDITOR.EXE · main (image offset 1CFDh)"
+      lines={[
+        { off: '1D13', code: 'mov  word [bp-8],3607h', note: 'fn: plain text to start' },
+        { off: '1D18', code: 'mov  byte [bp-9],1 / mov byte [bp-0Ah],1', note: 'color and shadow counters' },
+        { off: '1D2E', code: 'call initgraph', note: 'Borland graphics: detect the card' },
+        { off: '1D49', code: 'mov  ax,3600h / int 10h', note: 'is ARABART in memory?', hi: true },
+        { off: '1D4E', code: 'cmp  ax,5944h / je 1D5Dh', note: 'it answers 5944h' },
+        { off: '1D7A', code: 'mov  byte es:[bx],0 / inc word [bp-16h]', note: 'clear 85 bytes of buffer' },
+        { off: '1EFF', code: 'push si / push di / push bp / push es / push ds', note: 'save nine registers' },
+        { off: '1F04', code: 'push dx / push cx / push bx / push ax' },
+        { off: '1F08', code: 'lds  dx,[bp-12h] / mov cx,27Fh / mov bx,64h', note: 'text, x = 639, y = 100' },
+        { off: '1F11', code: 'mov  ax,[bp-8] / int 10h', note: 'draw: 3607h or 3608h', hi: true },
+      ]}
+      foot="Image offsets in the unpacked EDITOR.EXE; the file adds a 2A0h-byte header. The names in the stepper above are ours: his variables live on the stack, the key at [bp-13h], i at [bp-18h], the colors at [bp-9] and [bp-0Ah], the draw function at [bp-8]."
+    />
+    <p>Every call to ARABART is a small block of <Term id="inline-asm">inline assembly</Term> inside his C: save the registers, load AX and CX, <code>int 10h</code>, restore. Before the draw call he saves nine registers, so ARABART is free to use any of them. The buffer starts at DS:0093 and the copy ARABART reads at DS:00EF. The editor is built with Borland C++ and its graphics library. <a href={`${base}/bytes/?f=ARABART_EDITOR.EXE&layer=memory&at=1f9d`}>See main() in Every Byte</a>.</p>
+  </Deep>
+</section>
+
+<style>
+  .af-after { margin-top: 28px; }
+</style>
+

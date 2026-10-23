@@ -1,0 +1,414 @@
+1e65:0000 59             pop cx
+1e65:0001 59             pop cx
+1e65:0002 eb00           jmp 4
+1e65:0004 5d             pop bp
+1e65:0005 cb             retf 
+1e65:0006 55             push bp
+1e65:0007 8bec           mov bp, sp
+1e65:0009 39265c16       cmp word ptr [0x165c], sp
+1e65:000d 7705           ja 0x14
+1e65:000f 9aac290000     lcall 0, 0x29ac
+1e65:0014 6a00           push 0
+1e65:0016 6a00           push 0
+1e65:0018 68f12a         push 0x2af1
+1e65:001b 68eb0c         push 0xceb
+1e65:001e 6a04           push 4
+1e65:0020 6a00           push 0
+1e65:0022 6a00           push 0
+1e65:0024 9a770b6a22     lcall 0x226a, 0xb77
+1e65:0029 83c40e         add sp, 0xe
+1e65:002c 89167825       mov word ptr [0x2578], dx
+1e65:0030 a37625         mov word ptr [0x2576], ax
+1e65:0033 6a04           push 4
+1e65:0035 68f12a         push 0x2af1
+1e65:0038 68eb0c         push 0xceb
+1e65:003b 6a05           push 5
+1e65:003d 68003d         push 0x3d00
+1e65:0040 6a03           push 3
+1e65:0042 6a00           push 0
+1e65:0044 6a00           push 0
+1e65:0046 6a00           push 0
+1e65:0048 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:004d 83c412         add sp, 0x12
+1e65:0050 52             push dx
+1e65:0051 50             push ax
+1e65:0052 ff367825       push word ptr [0x2578]
+1e65:0056 ff367625       push word ptr [0x2576]
+1e65:005a 9a470d6a22     lcall 0x226a, 0xd47
+1e65:005f 83c408         add sp, 8
+1e65:0062 6a04           push 4
+1e65:0064 68f12a         push 0x2af1
+1e65:0067 68eb0c         push 0xceb
+1e65:006a 6a06           push 6
+1e65:006c 6a00           push 0
+1e65:006e 6a04           push 4
+1e65:0070 6a00           push 0
+1e65:0072 6a00           push 0
+1e65:0074 6a00           push 0
+1e65:0076 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:007b 83c412         add sp, 0x12
+1e65:007e 52             push dx
+1e65:007f 50             push ax
+1e65:0080 ff367825       push word ptr [0x2578]
+1e65:0084 ff367625       push word ptr [0x2576]
+1e65:0088 9a470d6a22     lcall 0x226a, 0xd47
+1e65:008d 83c408         add sp, 8
+1e65:0090 6a04           push 4
+1e65:0092 68f12a         push 0x2af1
+1e65:0095 68eb0c         push 0xceb
+1e65:0098 6a07           push 7
+1e65:009a 68003c         push 0x3c00
+1e65:009d 6a14           push 0x14
+1e65:009f 6a00           push 0
+1e65:00a1 6a00           push 0
+1e65:00a3 6a00           push 0
+1e65:00a5 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:00aa 83c412         add sp, 0x12
+1e65:00ad 52             push dx
+1e65:00ae 50             push ax
+1e65:00af ff367825       push word ptr [0x2578]
+1e65:00b3 ff367625       push word ptr [0x2576]
+1e65:00b7 9a470d6a22     lcall 0x226a, 0xd47
+1e65:00bc 83c408         add sp, 8
+1e65:00bf 6a04           push 4
+1e65:00c1 68f12a         push 0x2af1
+1e65:00c4 68eb0c         push 0xceb
+1e65:00c7 6a08           push 8
+1e65:00c9 68002d         push 0x2d00
+1e65:00cc 6a15           push 0x15
+1e65:00ce 6a00           push 0
+1e65:00d0 6a00           push 0
+1e65:00d2 6a00           push 0
+1e65:00d4 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:00d9 83c412         add sp, 0x12
+1e65:00dc 52             push dx
+1e65:00dd 50             push ax
+1e65:00de ff367825       push word ptr [0x2578]
+1e65:00e2 ff367625       push word ptr [0x2576]
+1e65:00e6 9a470d6a22     lcall 0x226a, 0xd47
+1e65:00eb 83c408         add sp, 8
+1e65:00ee 6a00           push 0
+1e65:00f0 6a00           push 0
+1e65:00f2 68f12a         push 0x2af1
+1e65:00f5 68eb0c         push 0xceb
+1e65:00f8 6a06           push 6
+1e65:00fa 6a00           push 0
+1e65:00fc 6a00           push 0
+1e65:00fe 9a770b6a22     lcall 0x226a, 0xb77
+1e65:0103 83c40e         add sp, 0xe
+1e65:0106 89167c25       mov word ptr [0x257c], dx
+1e65:010a a37a25         mov word ptr [0x257a], ax
+1e65:010d 6a04           push 4
+1e65:010f 68f12a         push 0x2af1
+1e65:0112 68eb0c         push 0xceb
+1e65:0115 6a09           push 9
+1e65:0117 6a00           push 0
+1e65:0119 6a09           push 9
+1e65:011b 6a00           push 0
+1e65:011d 6a00           push 0
+1e65:011f 6a00           push 0
+1e65:0121 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0126 83c412         add sp, 0x12
+1e65:0129 52             push dx
+1e65:012a 50             push ax
+1e65:012b ff367c25       push word ptr [0x257c]
+1e65:012f ff367a25       push word ptr [0x257a]
+1e65:0133 9a470d6a22     lcall 0x226a, 0xd47
+1e65:0138 83c408         add sp, 8
+1e65:013b 6a04           push 4
+1e65:013d 68f12a         push 0x2af1
+1e65:0140 68eb0c         push 0xceb
+1e65:0143 6a0a           push 0xa
+1e65:0145 680e31         push 0x310e
+1e65:0148 6a0a           push 0xa
+1e65:014a 6a00           push 0
+1e65:014c 6a00           push 0
+1e65:014e 6a00           push 0
+1e65:0150 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0155 83c412         add sp, 0x12
+1e65:0158 52             push dx
+1e65:0159 50             push ax
+1e65:015a ff367c25       push word ptr [0x257c]
+1e65:015e ff367a25       push word ptr [0x257a]
+1e65:0162 9a470d6a22     lcall 0x226a, 0xd47
+1e65:0167 83c408         add sp, 8
+1e65:016a 6a04           push 4
+1e65:016c 68f12a         push 0x2af1
+1e65:016f 68eb0c         push 0xceb
+1e65:0172 6a0b           push 0xb
+1e65:0174 680917         push 0x1709
+1e65:0177 6a06           push 6
+1e65:0179 6a00           push 0
+1e65:017b 6a00           push 0
+1e65:017d 6a00           push 0
+1e65:017f 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0184 83c412         add sp, 0x12
+1e65:0187 52             push dx
+1e65:0188 50             push ax
+1e65:0189 ff367c25       push word ptr [0x257c]
+1e65:018d ff367a25       push word ptr [0x257a]
+1e65:0191 9a470d6a22     lcall 0x226a, 0xd47
+1e65:0196 83c408         add sp, 8
+1e65:0199 6a04           push 4
+1e65:019b 68f12a         push 0x2af1
+1e65:019e 68eb0c         push 0xceb
+1e65:01a1 6a0c           push 0xc
+1e65:01a3 680f18         push 0x180f
+1e65:01a6 6a05           push 5
+1e65:01a8 6a00           push 0
+1e65:01aa 6a00           push 0
+1e65:01ac 6a00           push 0
+1e65:01ae 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:01b3 83c412         add sp, 0x12
+1e65:01b6 52             push dx
+1e65:01b7 50             push ax
+1e65:01b8 ff367c25       push word ptr [0x257c]
+1e65:01bc ff367a25       push word ptr [0x257a]
+1e65:01c0 9a470d6a22     lcall 0x226a, 0xd47
+1e65:01c5 83c408         add sp, 8
+1e65:01c8 6a04           push 4
+1e65:01ca 68f12a         push 0x2af1
+1e65:01cd 68eb0c         push 0xceb
+1e65:01d0 6a0d           push 0xd
+1e65:01d2 68162f         push 0x2f16
+1e65:01d5 6a07           push 7
+1e65:01d7 6a00           push 0
+1e65:01d9 6a00           push 0
+1e65:01db 6a00           push 0
+1e65:01dd 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:01e2 83c412         add sp, 0x12
+1e65:01e5 52             push dx
+1e65:01e6 50             push ax
+1e65:01e7 ff367c25       push word ptr [0x257c]
+1e65:01eb ff367a25       push word ptr [0x257a]
+1e65:01ef 9a470d6a22     lcall 0x226a, 0xd47
+1e65:01f4 83c408         add sp, 8
+1e65:01f7 6a04           push 4
+1e65:01f9 68f12a         push 0x2af1
+1e65:01fc 68eb0c         push 0xceb
+1e65:01ff 6a0e           push 0xe
+1e65:0201 680722         push 0x2207
+1e65:0204 6a08           push 8
+1e65:0206 6a00           push 0
+1e65:0208 6a00           push 0
+1e65:020a 6a00           push 0
+1e65:020c 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0211 83c412         add sp, 0x12
+1e65:0214 52             push dx
+1e65:0215 50             push ax
+1e65:0216 ff367c25       push word ptr [0x257c]
+1e65:021a ff367a25       push word ptr [0x257a]
+1e65:021e 9a470d6a22     lcall 0x226a, 0xd47
+1e65:0223 83c408         add sp, 8
+1e65:0226 6a00           push 0
+1e65:0228 6a00           push 0
+1e65:022a 68f12a         push 0x2af1
+1e65:022d 68eb0c         push 0xceb
+1e65:0230 6a04           push 4
+1e65:0232 6a00           push 0
+1e65:0234 6a00           push 0
+1e65:0236 9a770b6a22     lcall 0x226a, 0xb77
+1e65:023b 83c40e         add sp, 0xe
+1e65:023e 89168025       mov word ptr [0x2580], dx
+1e65:0242 a37e25         mov word ptr [0x257e], ax
+1e65:0245 6a04           push 4
+1e65:0247 68f12a         push 0x2af1
+1e65:024a 68eb0c         push 0xceb
+1e65:024d 6a0f           push 0xf
+1e65:024f 6a00           push 0
+1e65:0251 6a0b           push 0xb
+1e65:0253 6a00           push 0
+1e65:0255 6a00           push 0
+1e65:0257 6a00           push 0
+1e65:0259 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:025e 83c412         add sp, 0x12
+1e65:0261 52             push dx
+1e65:0262 50             push ax
+1e65:0263 ff368025       push word ptr [0x2580]
+1e65:0267 ff367e25       push word ptr [0x257e]
+1e65:026b 9a470d6a22     lcall 0x226a, 0xd47
+1e65:0270 83c408         add sp, 8
+1e65:0273 6a04           push 4
+1e65:0275 68f12a         push 0x2af1
+1e65:0278 68eb0c         push 0xceb
+1e65:027b 6a10           push 0x10
+1e65:027d 6a00           push 0
+1e65:027f 6a0c           push 0xc
+1e65:0281 6a00           push 0
+1e65:0283 6a00           push 0
+1e65:0285 6a00           push 0
+1e65:0287 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:028c 83c412         add sp, 0x12
+1e65:028f 52             push dx
+1e65:0290 50             push ax
+1e65:0291 ff368025       push word ptr [0x2580]
+1e65:0295 ff367e25       push word ptr [0x257e]
+1e65:0299 9a470d6a22     lcall 0x226a, 0xd47
+1e65:029e 83c408         add sp, 8
+1e65:02a1 6a04           push 4
+1e65:02a3 68f12a         push 0x2af1
+1e65:02a6 68eb0c         push 0xceb
+1e65:02a9 6a11           push 0x11
+1e65:02ab 6a00           push 0
+1e65:02ad 6a0d           push 0xd
+1e65:02af 6a00           push 0
+1e65:02b1 6a00           push 0
+1e65:02b3 6a00           push 0
+1e65:02b5 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:02ba 83c412         add sp, 0x12
+1e65:02bd 52             push dx
+1e65:02be 50             push ax
+1e65:02bf ff368025       push word ptr [0x2580]
+1e65:02c3 ff367e25       push word ptr [0x257e]
+1e65:02c7 9a470d6a22     lcall 0x226a, 0xd47
+1e65:02cc 83c408         add sp, 8
+1e65:02cf 6a04           push 4
+1e65:02d1 68f12a         push 0x2af1
+1e65:02d4 68eb0c         push 0xceb
+1e65:02d7 6a12           push 0x12
+1e65:02d9 6a00           push 0
+1e65:02db 6a0e           push 0xe
+1e65:02dd 6a00           push 0
+1e65:02df 6a00           push 0
+1e65:02e1 6a00           push 0
+1e65:02e3 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:02e8 83c412         add sp, 0x12
+1e65:02eb 52             push dx
+1e65:02ec 50             push ax
+1e65:02ed ff368025       push word ptr [0x2580]
+1e65:02f1 ff367e25       push word ptr [0x257e]
+1e65:02f5 9a470d6a22     lcall 0x226a, 0xd47
+1e65:02fa 83c408         add sp, 8
+1e65:02fd 6a00           push 0
+1e65:02ff 6a00           push 0
+1e65:0301 68f12a         push 0x2af1
+1e65:0304 68eb0c         push 0xceb
+1e65:0307 6a01           push 1
+1e65:0309 6a00           push 0
+1e65:030b 6a00           push 0
+1e65:030d 9a770b6a22     lcall 0x226a, 0xb77
+1e65:0312 83c40e         add sp, 0xe
+1e65:0315 89168425       mov word ptr [0x2584], dx
+1e65:0319 a38225         mov word ptr [0x2582], ax
+1e65:031c 6a04           push 4
+1e65:031e 68f12a         push 0x2af1
+1e65:0321 68eb0c         push 0xceb
+1e65:0324 6a14           push 0x14
+1e65:0326 6a00           push 0
+1e65:0328 6a11           push 0x11
+1e65:032a 6a00           push 0
+1e65:032c 6a00           push 0
+1e65:032e 6a00           push 0
+1e65:0330 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0335 83c412         add sp, 0x12
+1e65:0338 52             push dx
+1e65:0339 50             push ax
+1e65:033a ff368425       push word ptr [0x2584]
+1e65:033e ff368225       push word ptr [0x2582]
+1e65:0342 9a470d6a22     lcall 0x226a, 0xd47
+1e65:0347 83c408         add sp, 8
+1e65:034a 68f12a         push 0x2af1
+1e65:034d 68eb0c         push 0xceb
+1e65:0350 6a05           push 5
+1e65:0352 6a00           push 0
+1e65:0354 6a00           push 0
+1e65:0356 9ad8146a22     lcall 0x226a, 0x14d8
+1e65:035b 83c40a         add sp, 0xa
+1e65:035e 89168825       mov word ptr [0x2588], dx
+1e65:0362 a38625         mov word ptr [0x2586], ax
+1e65:0365 6a00           push 0
+1e65:0367 6a00           push 0
+1e65:0369 6a04           push 4
+1e65:036b 68f12a         push 0x2af1
+1e65:036e 68eb0c         push 0xceb
+1e65:0371 6a00           push 0
+1e65:0373 6a00           push 0
+1e65:0375 6a1b           push 0x1b
+1e65:0377 6a00           push 0
+1e65:0379 6a00           push 0
+1e65:037b 6a00           push 0
+1e65:037d 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0382 83c412         add sp, 0x12
+1e65:0385 52             push dx
+1e65:0386 50             push ax
+1e65:0387 ff368825       push word ptr [0x2588]
+1e65:038b ff368625       push word ptr [0x2586]
+1e65:038f 9a95166a22     lcall 0x226a, 0x1695
+1e65:0394 83c40c         add sp, 0xc
+1e65:0397 ff367825       push word ptr [0x2578]
+1e65:039b ff367625       push word ptr [0x2576]
+1e65:039f 6a04           push 4
+1e65:03a1 68f12a         push 0x2af1
+1e65:03a4 68eb0c         push 0xceb
+1e65:03a7 6a01           push 1
+1e65:03a9 6a00           push 0
+1e65:03ab 6a17           push 0x17
+1e65:03ad 6a00           push 0
+1e65:03af 6a00           push 0
+1e65:03b1 6a00           push 0
+1e65:03b3 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:03b8 83c412         add sp, 0x12
+1e65:03bb 52             push dx
+1e65:03bc 50             push ax
+1e65:03bd ff368825       push word ptr [0x2588]
+1e65:03c1 ff368625       push word ptr [0x2586]
+1e65:03c5 9a95166a22     lcall 0x226a, 0x1695
+1e65:03ca 83c40c         add sp, 0xc
+1e65:03cd ff367c25       push word ptr [0x257c]
+1e65:03d1 ff367a25       push word ptr [0x257a]
+1e65:03d5 6a04           push 4
+1e65:03d7 68f12a         push 0x2af1
+1e65:03da 68eb0c         push 0xceb
+1e65:03dd 6a02           push 2
+1e65:03df 6a00           push 0
+1e65:03e1 6a18           push 0x18
+1e65:03e3 6a00           push 0
+1e65:03e5 6a00           push 0
+1e65:03e7 6a00           push 0
+1e65:03e9 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:03ee 83c412         add sp, 0x12
+1e65:03f1 52             push dx
+1e65:03f2 50             push ax
+1e65:03f3 ff368825       push word ptr [0x2588]
+1e65:03f7 ff368625       push word ptr [0x2586]
+1e65:03fb 9a95166a22     lcall 0x226a, 0x1695
+1e65:0400 83c40c         add sp, 0xc
+1e65:0403 ff368025       push word ptr [0x2580]
+1e65:0407 ff367e25       push word ptr [0x257e]
+1e65:040b 6a04           push 4
+1e65:040d 68f12a         push 0x2af1
+1e65:0410 68eb0c         push 0xceb
+1e65:0413 6a03           push 3
+1e65:0415 6a00           push 0
+1e65:0417 6a19           push 0x19
+1e65:0419 6a00           push 0
+1e65:041b 6a00           push 0
+1e65:041d 6a00           push 0
+1e65:041f 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:0424 83c412         add sp, 0x12
+1e65:0427 52             push dx
+1e65:0428 50             push ax
+1e65:0429 ff368825       push word ptr [0x2588]
+1e65:042d ff368625       push word ptr [0x2586]
+1e65:0431 9a95166a22     lcall 0x226a, 0x1695
+1e65:0436 83c40c         add sp, 0xc
+1e65:0439 ff368425       push word ptr [0x2584]
+1e65:043d ff368225       push word ptr [0x2582]
+1e65:0441 6a04           push 4
+1e65:0443 68f12a         push 0x2af1
+1e65:0446 68eb0c         push 0xceb
+1e65:0449 6a04           push 4
+1e65:044b 6a00           push 0
+1e65:044d 6a1a           push 0x1a
+1e65:044f 6a00           push 0
+1e65:0451 6a00           push 0
+1e65:0453 6a00           push 0
+1e65:0455 9aa4086a22     lcall 0x226a, 0x8a4
+1e65:045a 83c412         add sp, 0x12
+1e65:045d 52             push dx
+1e65:045e 50             push ax
+1e65:045f ff368825       push word ptr [0x2588]
+1e65:0463 ff368625       push word ptr [0x2586]
+1e65:0467 9a95166a22     lcall 0x226a, 0x1695
+1e65:046c 83c40c         add sp, 0xc
+1e65:046f 5d             pop bp

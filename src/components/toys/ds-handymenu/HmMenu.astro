@@ -1,0 +1,215 @@
+---
+// HandyMenu as it ran: the Today screen with his icon in the tray, his 27-item menu, and his own settings sheet beside it.
+// Everything comes from HandyMenu 3.7: labels from its string table, icons from HandyMenu.vga, dialogs 502 to 505,
+// and the five translations from HandyMenu.bin. Settings drive the menu live: tick items, pick the Quick Action, the colors
+// and the language. Picking an item fires 'hm-pick' on the document so the switch below can follow it.
+import Window from '../../shell/Window.astro';
+import Sheet from '../ds-handyswitcher/Sheet.astro';
+import { renderDialog } from '../ds-handyswitcher/pocket.ts';
+import ui from './ui.json';
+import items32 from './items-32.png';
+import tray from './icon-101-16.png';
+import logo from './logo-2008.png';
+import { ITEMS, LANGS, DOES } from './hm.ts';
+
+const D = (ui as any)['37'].dialogs;
+const ix = (n: number) => `data-ix="${n}"`;
+const COLORS = ['No Colors', 'Custom Colors', 'Theme Colors', 'Reverse Theme Colors'];
+const pages = [
+  { tab: 'Main', html: renderDialog(D['502'], {
+    9: { attrs: ix(52) }, 1031: { attrs: ix(32) }, 1032: { attrs: ix(34) }, 1016: { attrs: ix(37) }, 1024: { attrs: `${ix(33)} data-exec` },
+    1011: { rows: ITEMS.map(([, t]) => ({ text: t, checked: true })), attrs: 'data-items' },
+    1015: { options: ITEMS.map(([, t]) => t), value: 'Quick Action', attrs: 'data-qa' },
+    1021: { checked: true, attrs: `${ix(35)} data-mode="0"` }, 1022: { attrs: `${ix(36)} data-mode="1"` },
+  }, 'hm1') },
+  { tab: 'Display', html: renderDialog(D['503'], {
+    1050: { attrs: ix(31) }, 1046: { options: LANGS, value: 'Language', attrs: 'data-lang' },
+    1016: { checked: true, attrs: `${ix(40)} data-icons` }, 1017: { attrs: ix(41) }, 1027: { attrs: ix(42) },
+    1060: { hidden: true }, 1061: { hidden: true }, 1058: { hidden: true },
+  }, 'hm2') },
+  { tab: 'Colors', html: renderDialog(D['505'], {
+    9: { attrs: ix(57) }, 1049: { options: COLORS, value: 'Menu colors', attrs: 'data-scheme' },
+    1031: { attrs: ix(59) }, 1032: { attrs: ix(60) }, 1033: { attrs: ix(61) }, 1034: { attrs: ix(62) }, 1035: { attrs: ix(63) }, 1051: { attrs: ix(71) },
+    1041: { value: 'Menu text color', attrs: 'data-sw="tc"' }, 1042: { value: 'Menu background color', attrs: 'data-sw="bk"' },
+    1043: { value: 'Icons background color', attrs: 'data-sw="ibk"' }, 1044: { value: 'Highlighted text color', attrs: 'data-sw="stc"' },
+    1045: { value: 'Highlighted background color', attrs: 'data-sw="sbk"' },
+  }, 'hm3') },
+  { tab: 'About', html: renderDialog(D['504'], { 1047: { img: logo.src }, 1025: { value: 'This version of HandyMenu is Registered', attrs: ix(44) } }, 'hm4') },
+];
+const TABIX = [53, 54, 56, 55];
+---
+
+<div class="hm-m" data-hm-menu style={`--sprite:url(${items32.src})`}>
+  <div class="hm-m-devs">
+    <div class="hm-m-col">
+      <Window title="Start" kind="device" num="9:41" class="hm-dev" aria-label="A Pocket PC Today screen with HandyMenu in the tray">
+        <div class="ppc hm-today" data-today>
+          <div class="hm-today-in" aria-hidden="true">
+            <p class="hm-t-date">Thursday, October 22, 2026</p>
+            <p class="hm-t-row"><b>No upcoming appointments</b></p>
+            <p class="hm-t-row">0 unread messages</p>
+            <p class="hm-t-row">No active tasks</p>
+          </div>
+          <div class="hm-pop is-open" role="menu" aria-label="HandyMenu" data-pop>
+            {ITEMS.map(([id, t]) => (
+              <button type="button" role="menuitem" class="hm-it" data-item={id} title={DOES[id]}>
+                <i class="hm-ico" style={`--i:${id - 1}`} aria-hidden="true"></i><span data-ix={id}>{t}</span>
+              </button>
+            ))}
+          </div>
+          <p class="hm-toast" aria-live="polite" data-toast></p>
+          <div class="hm-tray">
+            <span class="hm-tray-sp" aria-hidden="true"></span>
+            <button type="button" class="hm-trayicon" aria-label="HandyMenu icon" aria-haspopup="menu" aria-expanded="true" data-icon>
+              <img src={tray.src} alt="" width="16" height="16" /><span class="hm-ring" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <p slot="status" class="hm-soft"><span>Calendar</span><span>Contacts</span></p>
+      </Window>
+      <div class="hm-m-keys" hidden data-keys>
+        <button type="button" class="button k-btn" data-act="tap">Tap the icon</button>
+        <button type="button" class="button k-btn" data-act="hold">Tap and hold</button>
+      </div>
+    </div>
+    <div class="hm-m-col">
+      <Sheet id="hm-set" title="Settings" pages={pages} label="HandyMenu settings" soft={['ok', '']} />
+      <p class="hm-m-note">His settings sheet, rebuilt from dialogs 502 to 505 inside HandyMenu.exe. Change anything and the menu beside it follows.</p>
+    </div>
+  </div>
+  <div hidden data-tabix={JSON.stringify(TABIX)}></div>
+</div>
+
+<style is:global>
+  .hm-m { display: grid; gap: 16px; margin-block: 32px; }
+  .hm-m-devs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 28px 40px; align-items: start; justify-items: center; }
+  .hm-m-col { display: grid; gap: 14px; justify-items: center; width: 100%; }
+  .hm-m-note { max-width: 36ch; font-size: 0.9375rem !important; line-height: 1.5 !important; color: var(--ink-2) !important; text-align: center; }
+  .hm-m-keys { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .hm-dev > .win-body, .hm-dev2 > .win-body { padding: 0 !important; overflow: hidden !important; }
+  .hm-soft { display: contents; }
+
+  /* The Today screen, in 240-pixel units */
+  .hm-today { --p: calc(100cqw / 240); position: relative; height: 100%; overflow: hidden; background: linear-gradient(#fff, #e9f0fb); }
+  .hm-today-in { padding: calc(var(--p) * 8) calc(var(--p) * 8) 0; font-size: calc(var(--p) * 11); }
+  .hm-today-in p { margin: 0 0 calc(var(--p) * 9) !important; font-size: inherit !important; line-height: 1.25 !important; color: #000 !important; max-width: none !important; }
+  .hm-t-date { font-weight: 700; color: #00309c !important; border-bottom: 1px solid #a9b8d8; padding-bottom: calc(var(--p) * 4); }
+  .hm-tray { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: flex-end; height: calc(var(--p) * 22); padding: 0 calc(var(--p) * 4); background: linear-gradient(#f4f6fb, #d8dfee); border-top: 1px solid #9aa9c8; }
+  .hm-trayicon { position: relative; display: grid; place-items: center; width: calc(var(--p) * 22); height: calc(var(--p) * 22); padding: 0; background: none; border: 0; cursor: pointer; touch-action: none; -webkit-touch-callout: none; user-select: none; }
+  .hm-trayicon img { width: calc(var(--p) * 16); height: calc(var(--p) * 16); image-rendering: pixelated; pointer-events: none; }
+  .hm-trayicon:focus-visible { outline: 2px solid #316ac5; outline-offset: 1px; }
+  /* Windows Mobile's tap-and-hold ring: red dots that fill in a circle */
+  .hm-ring { position: absolute; inset: calc(var(--p) * -9); border-radius: 50%; background: repeating-conic-gradient(#d00 0 6deg, transparent 6deg 30deg); -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 74% 100%, transparent 101%); mask: radial-gradient(closest-side, transparent 72%, #000 74% 100%, transparent 101%); opacity: 0; pointer-events: none; }
+  .hm-trayicon.is-holding .hm-ring { animation: hm-ring 0.6s linear forwards; }
+  @keyframes hm-ring { from { opacity: 1; clip-path: polygon(50% 50%, 50% 0, 50% 0); } 25% { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%); } 50% { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 50% 100%); } 75% { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 50%); } to { opacity: 1; clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0); } }
+
+  /* His owner-drawn menu: an icon column, then the label; colors come from the Colors page */
+  .hm-pop { --tc: #000; --bk: #fff; --ibk: #dbe5f5; --stc: #fff; --sbk: #316ac5;
+    position: absolute; right: calc(var(--p) * 2); bottom: calc(var(--p) * 23); z-index: 2; display: none; flex-direction: column; width: calc(var(--p) * 150);
+    max-height: calc(100% - var(--p) * 30); overflow: auto; overscroll-behavior: contain; background: var(--bk); border: 1px solid #000; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.45); }
+  .hm-pop.is-open { display: flex; }
+  .hm-it { display: flex; align-items: center; gap: calc(var(--p) * 5); min-height: calc(var(--p) * 20); padding: 0 calc(var(--p) * 6) 0 0; font: inherit; font-size: calc(var(--p) * 10.5); text-align: left; color: var(--tc); background: linear-gradient(90deg, var(--ibk) calc(var(--p) * 22), var(--bk) 0); border: 0; cursor: pointer; }
+  .hm-it[hidden] { display: none; }
+  .hm-it:is(:hover, :focus-visible) { color: var(--stc); background: var(--sbk); outline: 0; }
+  .hm-ico { flex: none; width: calc(var(--p) * 16); height: calc(var(--p) * 16); margin-left: calc(var(--p) * 3); background: var(--sprite) calc(var(--i) * var(--p) * -16) 0 / calc(var(--p) * 432) 100% no-repeat; }
+  .hm-pop.no-icons .hm-ico { visibility: hidden; }
+  .hm-toast { position: absolute; left: calc(var(--p) * 8); right: calc(var(--p) * 8); top: 42%; z-index: 3; margin: 0 !important; padding: calc(var(--p) * 6) calc(var(--p) * 8); font-size: calc(var(--p) * 10.5) !important; line-height: 1.3 !important; color: #000 !important; background: #ffffe1; border: 1px solid #000; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.4); max-width: none !important; }
+  .hm-toast:empty { display: none; }
+  .hm-toast b { color: #00309c; }
+  .ppc-lv li.is-sel { background: #316ac5; color: #fff; }
+  .ppc-lv li span { cursor: pointer; }
+</style>
+
+<script>
+  import { label, word, DOES, ITEMS, reduce, type Lang } from './hm.ts';
+
+  const PALETTE = ['#000000', '#ffffff', '#dbe5f5', '#316ac5', '#ffffff', '#003399', '#ffd200', '#cf2f2f', '#2e7d32', '#ece9d8'];
+  const SCHEMES: Record<string, Record<string, string>> = {
+    'No Colors': { tc: '#000000', bk: '#ffffff', ibk: '#ffffff', stc: '#ffffff', sbk: '#000000' },
+    'Theme Colors': { tc: '#000000', bk: '#ffffff', ibk: '#dbe5f5', stc: '#ffffff', sbk: '#316ac5' },
+    'Reverse Theme Colors': { tc: '#ffffff', bk: '#316ac5', ibk: '#0a3d91', stc: '#000000', sbk: '#dbe5f5' },
+  };
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-menu]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const pop = root.querySelector<HTMLElement>('[data-pop]')!, toast = root.querySelector<HTMLElement>('[data-toast]')!;
+    const icon = root.querySelector<HTMLButtonElement>('[data-icon]')!;
+    const items = [...pop.querySelectorAll<HTMLButtonElement>('[data-item]')];
+    const qa = root.querySelector<HTMLSelectElement>('[data-qa]')!, langSel = root.querySelector<HTMLSelectElement>('[data-lang]')!;
+    const tabIx: number[] = JSON.parse(root.querySelector<HTMLElement>('[data-tabix]')!.dataset.tabix!);
+    let lang: Lang = 'English', holdMode = 0, timer = 0, held = false;
+    const name = (id: number) => label(id, lang);
+
+    const say = (html: string) => { toast.innerHTML = html; clearTimeout(+toast.dataset.t! || 0); toast.dataset.t = String(setTimeout(() => (toast.innerHTML = ''), 4200)); };
+    const open = (on: boolean) => { pop.classList.toggle('is-open', on); icon.setAttribute('aria-expanded', String(on)); if (on) toast.innerHTML = ''; };
+    const run = (id: number, quick = false) => {
+      open(false);
+      say(`${quick ? 'Quick Action: ' : ''}<b>${name(id)}</b><br>HandyMenu ${DOES[id]}.`);
+      document.dispatchEvent(new CustomEvent('hm-pick', { detail: { id } }));
+    };
+    // Tap opens the menu and hold runs the Quick Action; his second radio button swaps the two
+    const act = (hold: boolean) => (hold !== (holdMode === 1) ? run(qa.selectedIndex + 1, true) : open(!pop.classList.contains('is-open')));
+
+    items.forEach(b => b.addEventListener('click', () => run(+b.dataset.item!)));
+    pop.addEventListener('keydown', e => {
+      const k = items.filter(b => !b.hidden), i = k.indexOf(document.activeElement as HTMLButtonElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); k[(i + (e.key === 'ArrowDown' ? 1 : -1) + k.length) % k.length]?.focus(); }
+      if (e.key === 'Escape') { open(false); icon.focus(); }
+    });
+    icon.addEventListener('pointerdown', e => {
+      e.preventDefault();
+      held = false;
+      if (!reduce()) icon.classList.add('is-holding');
+      timer = window.setTimeout(() => { held = true; icon.classList.remove('is-holding'); act(true); }, 600);
+    });
+    const end = () => { clearTimeout(timer); icon.classList.remove('is-holding'); };
+    icon.addEventListener('pointerup', () => { const was = held; end(); if (!was) act(false); });
+    icon.addEventListener('pointerleave', end);
+    icon.addEventListener('pointercancel', end);
+    icon.addEventListener('contextmenu', e => e.preventDefault());
+    icon.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(e.shiftKey); } });
+    root.querySelectorAll<HTMLButtonElement>('[data-act]').forEach(b => b.addEventListener('click', () => act(b.dataset.act === 'hold')));
+
+    // Settings: menu items on or off, and Execute runs the row you picked
+    const rows = [...root.querySelectorAll<HTMLLIElement>('[data-items] li')];
+    let sel = 0;
+    rows.forEach((li, i) => {
+      li.querySelector('input')!.addEventListener('change', e => (items[i].hidden = !(e.target as HTMLInputElement).checked));
+      li.querySelector('span')!.addEventListener('click', () => { sel = i; rows.forEach((r, k) => r.classList.toggle('is-sel', k === i)); });
+    });
+    root.querySelector('[data-exec]')?.addEventListener('click', () => run(sel + 1));
+    root.querySelectorAll<HTMLInputElement>('[data-mode] input').forEach(r => r.addEventListener('change', () => (holdMode = +(r.closest<HTMLElement>('[data-mode]')!.dataset.mode!))));
+    root.querySelector<HTMLInputElement>('[data-icons] input')?.addEventListener('change', e => pop.classList.toggle('no-icons', !(e.target as HTMLInputElement).checked));
+
+    // Colors: his four schemes, and the five swatches step through a palette
+    const setVar = (k: string, v: string) => { pop.style.setProperty(`--${k}`, v); const sw = root.querySelector<HTMLElement>(`[data-sw="${k}"]`); sw?.style.setProperty('--sw', v); };
+    const scheme = (n: string) => { const s = SCHEMES[n]; if (s) for (const [k, v] of Object.entries(s)) setVar(k, v); };
+    const schemeSel = root.querySelector<HTMLSelectElement>('[data-scheme]')!;
+    schemeSel.selectedIndex = 2;
+    scheme('Theme Colors');
+    schemeSel.addEventListener('change', () => scheme(schemeSel.value));
+    root.querySelectorAll<HTMLButtonElement>('[data-sw]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.sw!, cur = getComputedStyle(pop).getPropertyValue(`--${k}`).trim().toLowerCase();
+      setVar(k, PALETTE[(PALETTE.indexOf(cur) + 1) % PALETTE.length]);
+      schemeSel.selectedIndex = 1;
+    }));
+
+    // Language: every label carries its IX number from HandyMenu.bin; English fills any gap
+    const tagged = [...root.querySelectorAll<HTMLElement>('[data-ix]')].map(el => {
+      const t = el.matches('label') ? el.querySelector('span')! : el;
+      return { t, ix: +el.dataset.ix!, en: t.textContent ?? '' };
+    });
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('.ppc-tabs [role=tab]')].map((t, i) => ({ t, ix: tabIx[i], en: t.textContent ?? '' }));
+    const rowSpans = rows.map(r => r.querySelector('span')!);
+    langSel.addEventListener('change', () => {
+      lang = langSel.value as Lang;
+      for (const { t, ix, en } of [...tagged, ...tabs]) t.textContent = word(ix, lang, en);
+      rowSpans.forEach((s, i) => (s.textContent = name(i + 1)));
+      [...qa.options].forEach((o, i) => (o.textContent = name(i + 1)));
+      say(`<b>${lang}</b>: ${ITEMS.filter(([id]) => label(id, lang) !== ITEMS[id - 1][1]).length} of 27 menu labels come from HandyMenu.bin.`);
+    });
+
+    root.querySelector<HTMLElement>('[data-keys]')!.hidden = false;
+  });
+</script>

@@ -1,0 +1,65 @@
+<svg class="dg" viewBox="0 0 640 304" role="img" aria-labelledby="kvc-exe-t">
+<title id="kvc-exe-t">EXE header fields of the infected test file and after KVC cleaned it, with where each value comes from: SP C0C1h becomes 0200h and the file shrinks from 3,360 to 1,056 bytes.</title>
+<text class="t-cy" x="10" y="24">Header field</text>
+<text class="t-cy" x="262" y="24" text-anchor="end">infected</text>
+<text class="t-cy" x="392" y="24" text-anchor="end">cleaned</text>
+<text class="t-cy" x="424" y="24">source</text>
+<text x="10" y="58">02h last page</text>
+<text x="262" y="58" text-anchor="end">0120h</text>
+<text x="392" y="58" text-anchor="end">0020h</text>
+<text x="424" y="58">size mod 512</text>
+<text x="10" y="90">04h pages</text>
+<text x="262" y="90" text-anchor="end">0007h</text>
+<text x="392" y="90" text-anchor="end">0003h</text>
+<text x="424" y="90">size / 512 + 1</text>
+<text x="10" y="122">0Eh SS</text>
+<text x="262" y="122" text-anchor="end">0099h</text>
+<text x="392" y="122" text-anchor="end">0030h</text>
+<text x="424" y="122">from entry+4Fh</text>
+<text x="10" y="154">10h SP</text>
+<text class="t-yl" x="262" y="154" text-anchor="end">C0C1h</text>
+<text x="392" y="154" text-anchor="end">0200h</text>
+<text x="424" y="154">from entry+53h</text>
+<rect class="wire-hi" x="178" y="133" width="92" height="30" />
+<text x="10" y="186">14h IP</text>
+<text x="262" y="186" text-anchor="end">0000h</text>
+<text x="392" y="186" text-anchor="end">0010h</text>
+<text x="424" y="186">from entry+51h</text>
+<text x="10" y="218">16h CS</text>
+<text x="262" y="218" text-anchor="end">0050h</text>
+<text x="392" y="218" text-anchor="end">0000h</text>
+<text x="424" y="218">from entry+4Dh</text>
+<text x="10" y="250">file size</text>
+<text x="262" y="250" text-anchor="end">3,360</text>
+<text x="392" y="250" text-anchor="end">1,056</text>
+<text x="424" y="250">entry - 100h</text>
+<text class="t-cy" x="10" y="292">SP = C0C1h is Koko's mark.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 282" role="img" aria-labelledby="kvc-exe-tn">
+<title id="kvc-exe-tn">EXE header fields before and after KVC: SP C0C1h becomes 0200h.</title>
+<text class="t-cy" x="10" y="18">field</text>
+<text class="t-cy" x="186" y="18" text-anchor="end">infected</text>
+<text class="t-cy" x="290" y="18" text-anchor="end">cleaned</text>
+<text x="10" y="48">last page</text>
+<text x="186" y="48" text-anchor="end">0120h</text>
+<text x="290" y="48" text-anchor="end">0020h</text>
+<text x="10" y="78">pages</text>
+<text x="186" y="78" text-anchor="end">0007h</text>
+<text x="290" y="78" text-anchor="end">0003h</text>
+<text x="10" y="108">SS</text>
+<text x="186" y="108" text-anchor="end">0099h</text>
+<text x="290" y="108" text-anchor="end">0030h</text>
+<text x="10" y="138">SP</text>
+<text class="t-yl" x="186" y="138" text-anchor="end">C0C1h</text>
+<text x="290" y="138" text-anchor="end">0200h</text>
+<text x="10" y="168">IP</text>
+<text x="186" y="168" text-anchor="end">0000h</text>
+<text x="290" y="168" text-anchor="end">0010h</text>
+<text x="10" y="198">CS</text>
+<text x="186" y="198" text-anchor="end">0050h</text>
+<text x="290" y="198" text-anchor="end">0000h</text>
+<text x="10" y="228">size</text>
+<text x="186" y="228" text-anchor="end">3,360</text>
+<text x="290" y="228" text-anchor="end">1,056</text>
+<text class="t-cy" x="10" y="270">SP = C0C1h: Koko's mark.</text>
+</svg>

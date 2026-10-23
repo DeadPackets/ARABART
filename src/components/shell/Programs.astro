@@ -1,0 +1,174 @@
+---
+// The fifteen programs as Norton Commander's two panels: the file list on the left, the info panel on the right.
+// Point at a file (or arrow through the list) to see it; select it to run it. Without JS every row is a plain link.
+// On a program page (current = its id) that program is the highlighted file, with Previous and Next under the panels.
+import Window from './Window.astro';
+import { programs } from '../../data/programs';
+import { exeSize, bytes } from '../../data/files';
+import { glance, shelf } from '../../layouts/glance';
+
+interface Props { current?: string }
+const { current } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const rows = shelf
+  .map(p => ({ ...p, size: exeSize(p) }))
+  .map(p => ({
+    id: p.id,
+    name: p.title.replace(' - ', ' '),
+    year: p.year,
+    size: bytes(p.size),
+    path: `C:\\${p.folder}\\${p.executable}`,
+    lang: p.language,
+    text: glance[p.id] ?? p.subtitle,
+    img: `${base}/images/${p.image}`,
+    href: `${base}/program/${p.id}/`,
+  }));
+const total = bytes(programs.reduce((s, p) => s + exeSize(p), 0));
+const at = Math.max(0, rows.findIndex(r => r.id === current));
+const prev = rows[(at + rows.length - 1) % rows.length], next = rows[(at + 1) % rows.length];
+// On a program page the cursor waits on the next program, the way NC's cursor moves on after you leave a file
+const sel = current ? (at + 1) % rows.length : 0;
+const first = rows[sel];
+---
+
+<section class="progs era-sec" data-era="dos" id="programs" aria-labelledby="pg-h">
+  <div class="container">
+    <div class="pg-head">
+      <h2 id="pg-h">Fifteen programs from Port Said</h2>
+      {current
+        ? <p>The arrow marks this page. The bar waits on the next program. Point at any file to see it.</p>
+        : <p>1991 to 1993: {total} bytes of his code in all. Pick one and press Run.</p>}
+    </div>
+
+    <div class="nc" id="collection" data-nc>
+      <Window kind="panel" title={'C:\\PORTSAID'} active class="nc-list" as="div">
+        <div class="nc-cols" aria-hidden="true"><span>Name</span><span>Year</span><span>Bytes</span></div>
+        <ol class="nc-rows">
+          {rows.map((r, i) => (
+            <li>
+              <a href={r.href} data-row={i} aria-current={i === sel ? 'true' : undefined} data-here={r.id === current ? '' : undefined}>
+                <span class="nc-n">{r.name}{r.id === current && <span class="sr-only"> (this page)</span>}</span><span class="nc-y">{r.year}</span><span class="nc-s">{r.size}</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+        <p slot="status" class="nc-path" data-path>{first.path}</p>
+      </Window>
+
+      <Window kind="panel" title="Info" class="nc-info" as="div">
+        <div class="nc-shot"><img src={first.img} alt="" width="640" height="400" data-img loading="lazy" decoding="async" /></div>
+        <h3 data-name>{first.name}</h3>
+        <p class="nc-meta"><span data-year>{first.year}</span> · <span data-lang>{first.lang}</span></p>
+        <p class="nc-text" data-text>{first.text}</p>
+        <div class="nc-acts">
+          <a class="button button--primary" href={first.href} data-run>Run <span data-short>{first.name}</span></a>
+          <a class="nc-link" href={`${base}/bytes/`}>See every byte of all fifteen</a>
+          <a class="nc-link" href={`${base}/terminal/`}>Open a DOS command line</a>
+        </div>
+      </Window>
+    </div>
+    {current && (
+      <nav class="nc-keys" aria-label="Previous and next program">
+        <a href={prev.href} rel="prev"><b aria-hidden="true">◄</b><span>Previous: {prev.name}</span></a>
+        <a href={next.href} rel="next"><span>Next: {next.name}</span><b aria-hidden="true">►</b></a>
+      </nav>
+    )}
+    <script type="application/json" data-nc-rows set:html={JSON.stringify(rows)} />
+  </div>
+</section>
+
+<style>
+  .progs { padding-block: clamp(72px, 10vw, 140px) clamp(64px, 8vw, 120px); }
+  .pg-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 40ch); gap: 16px 56px; align-items: end; margin-bottom: clamp(32px, 4vw, 56px); }
+  .pg-head h2 { font-size: clamp(2.25rem, 3.4vw + 1rem, 4.5rem); max-width: 14ch; }
+  .pg-head p { color: var(--ink-2); }
+
+  .nc { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 28px; align-items: stretch; }
+  .nc-cols, .nc-rows a { display: grid; grid-template-columns: minmax(0, 1fr) 6ch 9ch; gap: 12px; }
+  .nc-cols { padding: 0 10px 6px; font: 400 16px/1.2 var(--font-dos); color: var(--accent); }
+  .nc-cols span:not(:first-child), .nc-y, .nc-s { text-align: right; font-variant-numeric: tabular-nums; }
+  .nc-rows { list-style: none; }
+  .nc-rows a {
+    align-items: center; min-height: 36px; padding: 0 10px; text-decoration: none; color: var(--ink);
+    font: 400 16px/1.25 var(--font-dos);
+  }
+  .nc-rows a[aria-current='true'] { background: var(--vga-3); color: var(--vga-0); }
+  .nc-rows a:focus-visible { outline: 2px solid var(--vga-14); outline-offset: -2px; }
+  @media (pointer: coarse) { .nc-rows a { min-height: 44px; } }
+  .nc-n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .nc-rows a[data-here] .nc-n::after { content: ' \25C4'; color: var(--vga-14); }
+  .nc-rows a[data-here][aria-current='true'] .nc-n::after { color: var(--vga-0); }
+
+  /* Norton Commander's bottom line: the key in white on black, its job in black on cyan */
+  .nc-keys { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: 36px; }
+  .nc-keys a { display: flex; min-height: 44px; min-width: 0; font: 400 16px/1 var(--font-dos); text-decoration: none; }
+  .nc-keys b { display: grid; place-items: center; padding: 0 10px; font-weight: 400; color: var(--vga-15); background: var(--vga-0); }
+  .nc-keys span { display: flex; align-items: center; min-width: 0; padding: 0 14px; color: var(--vga-0); background: var(--vga-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .nc-keys a:hover span { background: var(--vga-14); }
+  .nc-keys a:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 3px; }
+  .nc-path { font: 400 16px/1.3 var(--font-dos); color: var(--vga-15); overflow-wrap: anywhere; }
+
+  .nc-shot { position: relative; aspect-ratio: 16 / 10; background: var(--vga-0); overflow: hidden; }
+  .nc-shot img { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; }
+  .nc-info h3 { margin-top: 18px; font-size: clamp(1.5rem, 1vw + 1rem, 2rem); color: var(--vga-15); }
+  .nc-meta { margin-top: 6px; font: 400 16px/1.4 var(--font-dos); color: var(--accent); }
+  .nc-text { margin-top: 10px; max-width: 52ch; color: var(--vga-15); font-size: 1rem; line-height: 1.55; min-height: 4.65em; }
+  .nc-acts { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 24px; margin-top: 18px; }
+  .nc-link { display: inline-flex; align-items: center; min-height: 44px; color: var(--vga-11); font-weight: 600; }
+  .nc-link:hover { color: var(--vga-14); }
+  .nc.swap :is([data-name], [data-text], .nc-shot img) { animation: nc-in 0.35s var(--expo); }
+  @keyframes nc-in { from { opacity: 0.2; translate: 0 4px; } }
+
+  @media (max-width: 900px) {
+    .pg-head { grid-template-columns: 1fr; }
+    .nc { grid-template-columns: 1fr; gap: 28px; }
+    .nc-info { order: -1; }
+  }
+  @media (max-width: 420px) {
+    .nc-cols, .nc-rows a { grid-template-columns: minmax(0, 1fr) 5ch; }
+    .nc-cols span:last-child, .nc-s { display: none; }
+  }
+</style>
+
+<script>
+  type Row = { name: string; year: number; path: string; lang: string; text: string; img: string; href: string };
+  const nc = document.querySelector<HTMLElement>('[data-nc]')!;
+  const rows: Row[] = JSON.parse(document.querySelector('[data-nc-rows]')!.textContent!);
+  const links = [...nc.querySelectorAll<HTMLAnchorElement>('[data-row]')];
+  const $ = (s: string) => nc.querySelector<HTMLElement>(s)!;
+  const img = $('[data-img]') as HTMLImageElement;
+  // the other screenshots load as the panels come near, not with the page
+  new IntersectionObserver(([e], o) => {
+    if (!e.isIntersecting) return;
+    o.disconnect();
+    rows.forEach(r => { const i = new Image(); i.decoding = 'async'; i.src = r.img; });
+  }, { rootMargin: '600px' }).observe(nc);
+  let cur = links.findIndex(a => a.hasAttribute('aria-current'));
+  function pick(i: number) {
+    if (i === cur) return;
+    cur = i;
+    const r = rows[i];
+    links.forEach((a, k) => (k === i ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    $('[data-name]').textContent = r.name;
+    $('[data-year]').textContent = String(r.year);
+    $('[data-lang]').textContent = r.lang;
+    $('[data-text]').textContent = r.text;
+    $('[data-short]').textContent = r.name;
+    $('[data-path]').textContent = r.path;
+    ($('[data-run]') as HTMLAnchorElement).href = r.href;
+    img.src = r.img;
+    nc.classList.remove('swap');
+    void nc.offsetWidth;
+    nc.classList.add('swap');
+  }
+  links.forEach((a, i) => {
+    a.addEventListener('pointerenter', e => e.pointerType === 'mouse' && pick(i));
+    a.addEventListener('focus', () => pick(i));
+    a.addEventListener('keydown', e => {
+      const k = { ArrowDown: 1, ArrowUp: -1, Home: -99, End: 99 }[e.key];
+      if (!k) return;
+      e.preventDefault();
+      links[Math.max(0, Math.min(links.length - 1, i + k))].focus();
+    });
+  });
+</script>

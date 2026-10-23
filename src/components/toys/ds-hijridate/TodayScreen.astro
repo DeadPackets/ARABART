@@ -1,0 +1,305 @@
+---
+// HijriDate 1.5 on a Windows Mobile 5 Today screen, rebuilt from its own resources: the 44 word pictures, the clock
+// icon, the four settings pages and the License Key dialog (dialogs.json, from HijriPlugin.dll). The dates come from
+// his engine (hijri.ts), the lines from his eight formats (ar.ts). Without JS it shows DinarSoft's 2006 screenshot date.
+import Window from '../../shell/Window.astro';
+import { toHijri } from './hijri.ts';
+import { ids, svgPath } from './ar.ts';
+import clock from './hd-icon-111-16.png';
+import shot from './hijriscreen-2006.png';
+import logo from './logo-dinar.png';
+import logoAr from './logo-dinar-ar.png';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const h = toHijri(2006, 9, 24, 1);
+const hl = svgPath(ids(0, { y: h.hy, m: h.hm, d: h.hd, dow: 0 }, true));
+const gl = svgPath(ids(0, { y: 2006, m: 9, d: 24, dow: 0 }, false));
+const svg = (p: { width: number; d: string }) =>
+  `<svg viewBox="0 0 ${p.width} 16" width="${p.width}" height="16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="${p.d}"/></svg>`;
+---
+
+<div class="hdt-today" id={id} data-hdt-today data-pics={JSON.stringify({ 162: logo.src, 157: logoAr.src })}>
+  <figure class="hdt-dev">
+    <Window title="Start" kind="device" num="8:03" class="hdt-win">
+      <div class="hdt-fit" data-fit>
+        <div class="hdt-q" data-theme="blue" data-q>
+          <div class="hdt-row"><span class="hdt-ico hdt-ico--owner" aria-hidden="true"></span>Tap here to set owner information</div>
+          <div class="hdt-row"><span class="hdt-ico hdt-ico--mail" aria-hidden="true"></span>No unread messages</div>
+          <div class="hdt-item" data-item>
+            <button type="button" class="hdt-clock" data-open aria-label="Open HijriDate’s settings"><img src={clock.src} width="16" height="16" alt="" /></button>
+            <div class="hdt-lines" data-lines>
+              <div class="hdt-line" style="text-align:right" lang="ar" dir="rtl" role="img" aria-label="الأحد ٢، رمضان ١٤٢٧" set:html={svg(hl)} />
+              <div class="hdt-line" style="text-align:right" lang="ar" dir="rtl" role="img" aria-label="الأحد ٢٤، سبتمبر ٢٠٠٦" set:html={svg(gl)} />
+            </div>
+          </div>
+          <div class="hdt-row"><span class="hdt-ico hdt-ico--task" aria-hidden="true"></span>No tasks</div>
+          <div class="hdt-row"><span class="hdt-ico hdt-ico--cal" aria-hidden="true"></span>No upcoming appointments</div>
+          <div class="hdt-sheet" data-sheet hidden>
+            <div class="hdt-sheet-bar"><b data-sheet-title>Hijri Date Settings</b><button type="button" class="hdt-ok" data-close>ok</button></div>
+            <div class="hdt-pages" data-pages></div>
+            <div class="hdt-tabs" role="tablist" aria-label="HijriDate settings pages" data-tabs></div>
+          </div>
+        </div>
+      </div>
+      <Fragment slot="status"><span>Calendar</span><span>Contacts</span></Fragment>
+    </Window>
+    <figcaption>His plug-in, rebuilt from its own files. Tap the clock to open its settings.</figcaption>
+  </figure>
+
+  <div class="hdt-side">
+    <fieldset class="hdt-set">
+      <legend>The date on the device</legend>
+      <div class="hdt-daterow">
+        <input type="date" data-date value="2006-09-24" min="1700-01-01" max="2300-12-31" aria-label="Date on the device" />
+        <button type="button" class="button k-btn" data-today>Today</button>
+      </div>
+      <button type="button" class="button k-btn hdt-wide" data-2006>Sunday, 24 September 2006</button>
+    </fieldset>
+    <fieldset class="hdt-set">
+      <legend>Today screen theme</legend>
+      <div class="hdt-themes" role="radiogroup" aria-label="Theme">
+        <button type="button" class="hdt-theme" role="radio" aria-checked="true" data-th="blue"><i></i>Windows Default</button>
+        <button type="button" class="hdt-theme" role="radio" aria-checked="false" data-th="white"><i></i>Paper</button>
+        <button type="button" class="hdt-theme" role="radio" aria-checked="false" data-th="night"><i></i>Night</button>
+      </div>
+    </fieldset>
+    <p class="hdt-read" aria-live="polite" data-read>Sunday 2 Ramadan 1427, with the adjustment at +1.</p>
+    <figure class="hdt-then">
+      <img src={shot.src} width="240" height="320" alt="DinarSoft’s 2006 screenshot of a Windows Mobile 5 Today screen: two Arabic lines under the clock icon, الأحد ٢، رمضان ١٤٢٧ and الأحد ٢٤، سبتمبر ٢٠٠٦." loading="lazy" />
+      <figcaption>DinarSoft’s own screenshot, September 2006. Pick 24 September 2006 above and the rebuilt plug-in draws the same two lines, pixel for pixel.</figcaption>
+    </figure>
+  </div>
+</div>
+
+<style>
+  .hdt-today { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; margin: 32px 0; }
+  .hdt-dev { margin: 0; min-width: 0; }
+  .hdt-dev > figcaption, .hdt-then figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--ink-2); }
+  .hdt-dev :global(.hdt-win > .win-body) { padding: 0; overflow: hidden; }
+  .hdt-fit { width: 100%; height: 100%; overflow: hidden; }
+  .hdt-q {
+    --k: 1.2;
+    position: relative; width: 240px; height: 268px; transform: scale(var(--k)); transform-origin: 0 0;
+    font: 11px/1.2 Tahoma, Verdana, 'DejaVu Sans', sans-serif; color: var(--hq-ink); background: var(--hq-bg);
+  }
+  .hdt-q[data-theme='blue'] { --hq-ink: #fff; --hq-bg: linear-gradient(170deg, #4d9be8 0%, #2c74cf 38%, #1f5fb8 70%, #3d8ae0 100%); --hq-sel: #8cc3ff; }
+  .hdt-q[data-theme='white'] { --hq-ink: #000; --hq-bg: #fff; --hq-sel: #c8daf0; }
+  .hdt-q[data-theme='night'] { --hq-ink: #ffd75e; --hq-bg: linear-gradient(#1b1b2b, #0b0b14); --hq-sel: #444466; }
+  .hdt-row { display: flex; align-items: center; gap: 6px; height: 21px; padding: 0 4px; white-space: nowrap; }
+  .hdt-ico { width: 16px; height: 16px; flex: none; border-radius: 2px; background: color-mix(in oklch, var(--hq-ink) 30%, transparent); }
+  .hdt-ico--owner { background: radial-gradient(circle at 50% 35%, #f0c08a 0 3px, transparent 3.5px), radial-gradient(ellipse at 50% 100%, #3a6fd0 0 7px, transparent 7.5px); }
+  .hdt-ico--mail { background: linear-gradient(135deg, #fff 45%, #d6d6d6 0); border: 1px solid #8a8a8a; }
+  .hdt-ico--task { background: linear-gradient(#e33 0 0) 3px 4px / 10px 8px no-repeat, #fff; border: 1px solid #b33; }
+  .hdt-ico--cal { background: linear-gradient(#36c 0 4px, #fff 0); border: 1px solid #36c; }
+  .hdt-item { position: relative; display: grid; grid-template-columns: 22px 1fr; align-items: start; padding: 2px 4px 2px 4px; }
+  .hdt-clock { width: 20px; height: 20px; padding: 2px; margin: 0; border: 0; background: none; cursor: pointer; }
+  .hdt-clock img { display: block; image-rendering: pixelated; }
+  .hdt-clock:focus-visible { outline: 2px solid var(--hq-ink); }
+  .hdt-lines { min-width: 0; }
+  .hdt-line { height: 16px; overflow: hidden; white-space: nowrap; line-height: 16px; }
+  .hdt-line :global(svg) { display: inline-block; vertical-align: top; }
+  .hdt-line:empty { display: none; }
+
+  .hdt-sheet { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; background: #fff; color: #000; }
+  .hdt-sheet[hidden] { display: none; }
+  .hdt-sheet-bar { display: flex; align-items: center; justify-content: space-between; height: 20px; padding: 0 6px; color: #fff; background: linear-gradient(#3e78d6, #1f4fa8); font-size: 11px; }
+  .hdt-ok { padding: 0 6px; height: 18px; border: 0; color: #fff; background: none; font: 700 11px Tahoma, sans-serif; cursor: pointer; }
+  .hdt-pages { position: relative; flex: 1; overflow: hidden; }
+  .hdt-tabs { display: flex; height: 20px; border-top: 1px solid #000; background: #d4d0c8; }
+  .hdt-tabs :global(button) { padding: 0 7px; border: 0; border-right: 1px solid #808080; background: none; font: 11px Tahoma, sans-serif; color: #000; cursor: pointer; }
+  .hdt-tabs :global(button[aria-selected='true']) { background: #fff; font-weight: 700; margin-top: -1px; }
+
+  .hdt-side { display: grid; gap: 18px; align-content: start; min-width: 0; }
+  .hdt-set { margin: 0; padding: 12px 14px 14px; border: 1px solid var(--rule); background: var(--surface-2, transparent); }
+  .hdt-set legend { padding: 0 6px; font-weight: 700; font-size: 0.9375rem; }
+  .hdt-daterow { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+  .hdt-daterow input { min-height: 44px; padding: 0 10px; font: inherit; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+  .hdt-wide { width: 100%; }
+  .hdt-themes { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hdt-theme { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+  .hdt-theme i { width: 18px; height: 18px; border: 1px solid #0005; }
+  .hdt-theme[data-th='blue'] i { background: linear-gradient(#4d9be8, #1f5fb8); }
+  .hdt-theme[data-th='white'] i { background: #fff; }
+  .hdt-theme[data-th='night'] i { background: #0b0b14; box-shadow: inset 0 0 0 5px #ffd75e; }
+  .hdt-theme[aria-checked='true'] { outline: 3px solid var(--accent); outline-offset: -1px; font-weight: 700; }
+  .hdt-read { margin: 0; font-weight: 600; }
+  .hdt-then { margin: 0; }
+  .hdt-then img { display: block; width: 240px; max-width: 100%; height: auto; image-rendering: pixelated; box-shadow: 0 0 0 1px var(--rule); }
+  @media (max-width: 760px) { .hdt-today { grid-template-columns: minmax(0, 1fr); justify-items: center; } .hdt-side { width: 100%; } }
+</style>
+
+<style is:global>
+  .hdt-dlg { position: relative; }
+  .hdt-c { position: absolute; box-sizing: border-box; margin: 0; font: 11px/1.15 Tahoma, Verdana, sans-serif; color: #000; }
+  .hdt-c[hidden] { display: none; }
+  .hdt-st { overflow: hidden; }
+  .hdt-c[data-id='444'], .hdt-c[data-id='9'] { color: #0a3fa5; font-weight: 700; border-bottom: 1px solid #0a3fa5; height: 15px !important; }
+  .hdt-opt { display: flex; align-items: center; gap: 3px; white-space: nowrap; cursor: pointer; }
+  .hdt-opt input { margin: 0; width: 11px; height: 11px; }
+  .hdt-grp { border: 1px solid #8a8a8a; padding: 0; }
+  .hdt-grp legend { padding: 0 2px; font: 11px Tahoma, sans-serif; }
+  .hdt-btn { border: 1px solid #000; background: #fff; font: 11px Tahoma, sans-serif; cursor: pointer; }
+  .hdt-btn:active { background: #000; color: #fff; }
+  .hdt-edit { border: 1px solid #000; padding: 0 2px; font: 700 11px Tahoma, monospace; text-transform: uppercase; text-align: center; }
+  .hdt-sel { font: 11px Tahoma, sans-serif; }
+  .hdt-pick { display: block; width: 100%; height: 100%; padding: 0 14px 0 2px; overflow: hidden; border: 1px solid #000; background: #fff linear-gradient(#000 0 0) right 3px center / 7px 1px no-repeat; text-align: right; color: #000; cursor: pointer; font: 11px Tahoma, sans-serif; white-space: nowrap; }
+  .hdt-pick svg, .hdt-menu svg { display: inline-block; vertical-align: middle; }
+  .hdt-menu { position: absolute; z-index: 5; margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid #000; box-shadow: 2px 2px 0 #0006; }
+  .hdt-menu li { display: block; }
+  .hdt-menu button { display: block; width: 100%; min-height: 18px; padding: 1px 4px; border: 0; background: none; text-align: right; color: #000; font: 11px Tahoma, sans-serif; cursor: pointer; white-space: nowrap; }
+  .hdt-menu button[aria-selected='true'], .hdt-menu button:focus-visible { background: #0a246a; color: #fff; outline: 0; }
+</style>
+
+<script>
+  import { toHijri, DAYS_EN, HIJRI_EN } from './hijri.ts';
+  import { ids, svgPath, english, arText, FORMATS } from './ar.ts';
+  import { dialogHtml, type Dlg } from './dlg.ts';
+  import dialogs from './dialogs.json';
+  import { pocketPcCode, groups } from '../../../lib/dinarsoft/handyswitcher.ts';
+  import { unlock } from '../../../lib/dinarsoft/hijridate.ts';
+
+  const D = dialogs as unknown as Record<string, Dlg>;
+  const svg = (p: { width: number; d: string }) =>
+    `<svg viewBox="0 0 ${p.width} 16" width="${p.width}" height="16" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="${p.d}"/></svg>`;
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-hdt-today]')) {
+    const pics = JSON.parse(root.dataset.pics!);
+    const q = root.querySelector<HTMLElement>('[data-q]')!, fit = root.querySelector<HTMLElement>('[data-fit]')!;
+    const lines = root.querySelector<HTMLElement>('[data-lines]')!, read = root.querySelector<HTMLElement>('[data-read]')!;
+    const sheet = root.querySelector<HTMLElement>('[data-sheet]')!, pages = root.querySelector<HTMLElement>('[data-pages]')!;
+    const tabs = root.querySelector<HTMLElement>('[data-tabs]')!, dateIn = root.querySelector<HTMLInputElement>('[data-date]')!;
+    const title = root.querySelector<HTMLElement>('.win-title')!;
+    const S = { show: 2, first: 0, hLang: 0, hFmt: 0, adj: 1, hAlign: 2, gLang: 0, gFmt: 0, gAlign: 2, baby: false, registered: false };
+    let date = { y: 2006, m: 9, d: 24 };
+
+    new ResizeObserver(() => q.style.setProperty('--k', String(fit.clientWidth / 240))).observe(fit);
+
+    const dowOf = (y: number, m: number, d: number) => new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+    const hijriOf = () => { const r = toHijri(date.y, date.m, date.d, S.adj); return { y: r.hy, m: r.hm, d: r.hd, dow: dowOf(date.y, date.m, date.d) }; };
+    const gregOf = () => ({ ...date, dow: dowOf(date.y, date.m, date.d) });
+    const ALIGN = ['left', 'center', 'right'];
+    const line = (hijri: boolean, fmt = hijri ? S.hFmt : S.gFmt) => {
+      const t = hijri ? hijriOf() : gregOf(), lang = hijri ? S.hLang : S.gLang;
+      if (lang === 0) { const l = ids(fmt, t, hijri); return { html: svg(svgPath(l)), ar: true, text: arText(l) }; }
+      const s = english(fmt, t, hijri, !hijri && S.baby);
+      return { html: s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!), ar: false, text: s };
+    };
+
+    const draw = () => {
+      const order = S.show === 0 ? [true] : S.show === 1 ? [false] : S.first === 0 ? [true, false] : [false, true];
+      lines.innerHTML = order.map(hj => {
+        const l = line(hj), al = ALIGN[hj ? S.hAlign : S.gAlign];
+        return `<div class="hdt-line" style="text-align:${al}"${l.ar ? ' lang="ar" dir="ltr"' : ''} role="img" aria-label="${l.text}">${l.html}</div>`;
+      }).join('');
+      const t = hijriOf();
+      read.textContent = `${DAYS_EN[t.dow]} ${t.d} ${HIJRI_EN[t.m - 1].replace('MuHarram', 'Muharram')} ${t.y}, with the adjustment at ${S.adj > 0 ? '+' : ''}${S.adj}.`;
+      if (!sheet.hidden) refreshPicks();
+    };
+
+    // ---- the settings sheet: four pages rebuilt from the DLL's dialogs, with his owner-drawn pickers
+    const PAGES: [string, string, string][] = [['Main', '502', 'm'], ['Hijri', '501', 'h'], ['Gregorian', '102', 'g'], ['About', '503', 'a']];
+    const pick = (kind: string) => `<button type="button" class="hdt-pick" data-pick="${kind}" aria-haspopup="listbox"></button>`;
+    pages.innerHTML = PAGES.map(([name, dlg, p], i) =>
+      `<section class="hdt-page" data-page="${i}" aria-label="${name}"${i ? ' hidden' : ''}>` +
+      dialogHtml(D[dlg], `${root.id}-${p}`, pics, it => (it.id === 1013 ? pick(`${p}fmt`) : it.id === 1014 ? pick('adj') : null)) + '</section>').join('');
+    tabs.innerHTML = PAGES.map(([name], i) => `<button type="button" role="tab" aria-selected="${i === 0}" data-tab="${i}">${name}</button>`).join('');
+    const $ = <T extends HTMLElement>(p: string, id: number) => root.querySelector<T>(`#${root.id}-${p}-${id}`)!;
+    const showPage = (i: number) => {
+      pages.querySelectorAll<HTMLElement>('[data-page]').forEach(pg => (pg.hidden = pg.dataset.page !== String(i)));
+      tabs.querySelectorAll('button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === String(i))));
+    };
+    tabs.addEventListener('click', e => { const b = (e.target as HTMLElement).closest<HTMLElement>('[data-tab]'); if (b) showPage(+b.dataset.tab!); });
+
+    const sel = $<HTMLSelectElement>('m', 1010);
+    sel.innerHTML = '<option>Hijri</option><option>Gregorian</option>';
+    const bind = (p: string, idsList: number[], get: () => number, set: (v: number) => void) => idsList.forEach((id, v) => {
+      const el = $<HTMLInputElement>(p, id); el.checked = get() === v;
+      el.addEventListener('change', () => { if (el.checked) { set(v); syncPage(); draw(); } });
+    });
+    bind('m', [103, 106, 114], () => S.show, v => (S.show = v));
+    bind('h', [1011, 1012], () => S.hLang, v => (S.hLang = v));
+    bind('h', [1019, 1020, 1021], () => S.hAlign, v => (S.hAlign = v));
+    bind('g', [1011, 1012], () => S.gLang, v => (S.gLang = v));
+    bind('g', [1019, 1020, 1021], () => S.gAlign, v => (S.gAlign = v));
+    sel.value = 'Hijri';
+    sel.addEventListener('change', () => { S.first = sel.selectedIndex; draw(); });
+    const baby = $<HTMLInputElement>('g', 403);
+    baby.addEventListener('change', () => { S.baby = baby.checked; draw(); refreshPicks(); });
+    const syncPage = () => { (baby.closest('label') as HTMLElement).hidden = S.gLang !== 1; sel.disabled = S.show !== 2; };
+
+    const pickHtml = (kind: string, v: number) => kind === 'adj' ? `${v > 0 ? '+' : ''}${v}` : line(kind === 'hfmt', v).html;
+    const refreshPicks = () => root.querySelectorAll<HTMLElement>('[data-pick]').forEach(b => {
+      const k = b.dataset.pick!, v = k === 'adj' ? S.adj : k === 'hfmt' ? S.hFmt : S.gFmt;
+      b.innerHTML = pickHtml(k, v);
+      b.setAttribute('aria-label', k === 'adj' ? `Adjust: ${v}` : `Format: ${FORMATS[v]}`);
+    });
+    let menu: HTMLUListElement | null = null;
+    const closeMenu = () => { menu?.remove(); menu = null; };
+    pages.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLElement>('[data-pick]');
+      if (!b) return;
+      closeMenu();
+      const k = b.dataset.pick!, vals = k === 'adj' ? [-2, -1, 0, 1, 2] : [0, 1, 2, 3, 4, 5, 6, 7];
+      const cur = k === 'adj' ? S.adj : k === 'hfmt' ? S.hFmt : S.gFmt;
+      menu = document.createElement('ul');
+      menu.className = 'hdt-menu'; menu.setAttribute('role', 'listbox');
+      const box = b.parentElement!, pr = pages.getBoundingClientRect(), br = box.getBoundingClientRect(), k2 = +getComputedStyle(q).getPropertyValue('--k') || 1;
+      menu.style.left = `${(br.left - pr.left) / k2}px`; menu.style.minWidth = `${br.width / k2}px`;
+      const top = (br.bottom - pr.top) / k2, rows = vals.length * 19;
+      menu.style.top = `${top + rows > pages.clientHeight ? Math.max(0, (br.top - pr.top) / k2 - rows) : top}px`;
+      menu.innerHTML = vals.map(v => `<li><button type="button" role="option" aria-selected="${v === cur}" data-v="${v}">${pickHtml(k, v)}</button></li>`).join('');
+      pages.append(menu);
+      menu.querySelector<HTMLButtonElement>('[aria-selected="true"]')?.focus();
+      menu.addEventListener('click', ev => {
+        const o = (ev.target as HTMLElement).closest<HTMLElement>('[data-v]'); if (!o) return;
+        const v = +o.dataset.v!;
+        if (k === 'adj') S.adj = v; else if (k === 'hfmt') S.hFmt = v; else S.gFmt = v;
+        closeMenu(); draw(); b.focus();
+      });
+      menu.addEventListener('keydown', ev => {
+        const all = [...menu!.querySelectorAll<HTMLButtonElement>('button')], i = all.indexOf(document.activeElement as HTMLButtonElement);
+        if (ev.key === 'ArrowDown' || ev.key === 'ArrowUp') { ev.preventDefault(); all[(i + (ev.key === 'ArrowDown' ? 1 : all.length - 1)) % all.length].focus(); }
+        if (ev.key === 'Escape') { closeMenu(); b.focus(); }
+      });
+    });
+
+    // About and the License Key dialog: a made-up device, its code, and his check
+    const hex = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    const code = groups(pocketPcCode(hex));
+    const status = () => { $('a', 1009).textContent = S.registered ? 'This version of DinarSoft’s Hijri-Plugin is Registered' : 'The trial version will expire after 15 day(s)'; $('a', 1008).hidden = S.registered; };
+    const lic = document.createElement('section');
+    lic.className = 'hdt-page'; lic.hidden = true; lic.dataset.page = 'lic'; lic.setAttribute('aria-label', 'License Key');
+    lic.innerHTML = dialogHtml(D['105'], `${root.id}-k`, pics);
+    pages.append(lic);
+    $('k', 1002).textContent = code;
+    const boxes = [1004, 1005, 1006, 1007].map(i => $<HTMLInputElement>('k', i));
+    boxes.forEach((b, i) => b.addEventListener('input', () => { b.value = b.value.toUpperCase(); if (b.value.length >= 4 && boxes[i + 1]) boxes[i + 1].focus(); }));
+    $('a', 1008).addEventListener('click', () => { pages.querySelectorAll<HTMLElement>('[data-page]').forEach(p => (p.hidden = p !== lic)); tabs.hidden = true; boxes[0].focus(); });
+    status();
+
+    const open = () => { sheet.hidden = false; title.textContent = 'Settings'; showPage(0); syncPage(); refreshPicks(); sheet.querySelector<HTMLElement>('[data-close]')!.focus(); };
+    const close = () => {
+      if (!lic.hidden) {
+        const typed = boxes.map(b => b.value).join('');
+        S.registered = typed === unlock.generate({ code }).replace(/[^A-Z]/g, '');
+        lic.hidden = true; tabs.hidden = false; status(); showPage(3); return;
+      }
+      closeMenu(); sheet.hidden = true; title.textContent = 'Start'; root.querySelector<HTMLElement>('[data-open]')!.focus();
+    };
+    root.querySelector('[data-open]')!.addEventListener('click', open);
+    root.querySelector('[data-close]')!.addEventListener('click', close);
+    sheet.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu) close(); });
+
+    // The side controls
+    const setDate = (y: number, m: number, d: number) => { date = { y, m, d }; dateIn.value = `${String(y).padStart(4, '0')}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`; draw(); };
+    dateIn.addEventListener('change', () => { const [y, m, d] = dateIn.value.split('-').map(Number); if (y >= 1700 && y <= 2300) { date = { y, m, d }; draw(); } });
+    root.querySelector('[data-today]')!.addEventListener('click', () => { const n = new Date(); setDate(n.getFullYear(), n.getMonth() + 1, n.getDate()); });
+    root.querySelector('[data-2006]')!.addEventListener('click', () => { S.adj = 1; S.show = 2; S.first = 0; S.hLang = S.gLang = 0; S.hFmt = S.gFmt = 0; S.hAlign = S.gAlign = 2; sel.selectedIndex = 0; setDate(2006, 9, 24); });
+    root.querySelectorAll<HTMLElement>('[data-th]').forEach(b => b.addEventListener('click', () => {
+      q.dataset.theme = b.dataset.th; root.querySelectorAll('[data-th]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+    }));
+    const n = new Date();
+    S.adj = 0; setDate(n.getFullYear(), n.getMonth() + 1, n.getDate());
+  }
+</script>

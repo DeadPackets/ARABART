@@ -1,0 +1,151 @@
+---
+// The race: the same question asked of a parent-linked tree and of his key. Sliders size the shelf; the shared
+// Scrubber steps jump by jump. Server render shows the finished race, so it reads without JS.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { layout, stripSVG, say } from './twoways';
+
+const S = 3, C = 2, P = 4;
+const L = layout(S, C, P);
+const SL = [['s', 'Slots in the shelf', 1, 6, S], ['c', 'Cards in each slot', 1, 4, C], ['p', 'Ports on each card', 1, 8, P]] as const;
+---
+
+<div class="tw" data-twoways data-s={S} data-c={C} data-p={P}>
+  <div class="tw-top">
+    <Window title="Shelf 2" kind="dialog" class="tw-size">
+      <div class="tw-sl" data-sliders hidden>
+        {SL.map(([k, lab, lo, hi, v]) => (
+          <label class="tw-f"><span>{lab}</span><input type="range" min={lo} max={hi} value={v} data-k={k} /><output data-o={k}>{v}</output></label>
+        ))}
+      </div>
+      <p class="tw-q">Which ports are inside this shelf?</p>
+    </Window>
+    <Window title="Help" kind="help" class="tw-help">
+      <p class="tw-say" aria-live="polite" data-say set:html={say(L.n - 1, S, C, P)} />
+    </Window>
+  </div>
+  <div class="tw-lanes">
+    <Window title="The usual way: each part knows its parent" kind="editor" class="tw-lane" data-lane="a">
+      {L.a.map(st => (
+        <div class="tw-strip" data-strip={st.id}>
+          <p class="tw-lab">{st.label}</p>
+          <div class="tw-box"><svg viewBox={`0 0 ${st.total} 10`} preserveAspectRatio="none" aria-hidden="true" set:html={stripSVG(st)} /><span class="tw-head" aria-hidden="true">▼</span></div>
+        </div>
+      ))}
+      <p class="tw-count"><b data-jumps>{L.jumps}</b> jumps into the index <span>·</span> <b data-rows>{S + S * C + L.ports}</b> rows read</p>
+    </Window>
+    <Window title="His key" kind="editor" active class="tw-lane" data-lane="b">
+      {L.b.map(st => (
+        <div class="tw-strip" data-strip={st.id}>
+          <p class="tw-lab">{st.label}</p>
+          <div class="tw-box"><svg viewBox={`0 0 ${st.total} 10`} preserveAspectRatio="none" aria-hidden="true" set:html={stripSVG(st)} /><span class="tw-head" aria-hidden="true">▼</span></div>
+        </div>
+      ))}
+      <p class="tw-count"><b data-jumps>1</b> jump into the index <span>·</span> <b data-rows>{L.ports}</b> rows read</p>
+      <p class="tw-note">One bar is one row of the index. Light bars are rows that belong to other shelves.</p>
+    </Window>
+  </div>
+  <div class="tw-ctl"><Scrubber n={L.n} at={L.n - 1} label="Step through both ways, jump by jump" /></div>
+</div>
+
+<style>
+  .tw { display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+  .tw-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .tw-sl { display: grid; gap: 2px; margin-bottom: 8px; }
+  .tw-f { display: grid; grid-template-columns: 9.5em minmax(0, 1fr) 2ch; align-items: center; gap: 12px; min-height: 44px; font: 400 0.9375rem/1.2 var(--font-ui); color: var(--ink); }
+  .tw-f input { width: 100%; min-height: 44px; accent-color: var(--accent); }
+  .tw-f output { font: 700 1rem/1 var(--font-code); text-align: right; }
+  .tw-q { font: 700 1.125rem/1.3 var(--sans); color: var(--ink); }
+  .tw-say { font: 500 1rem/1.55 var(--sans); color: var(--ink); min-height: 4.65em; }
+  .tw-say :global(b) { color: var(--accent); }
+  .tw-lanes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .tw-strip + .tw-strip { margin-top: 14px; }
+  .tw-lab { font: 500 0.8125rem/1.3 var(--font-code); color: var(--ink-2); margin-bottom: 4px; }
+  .tw-box { position: relative; padding-top: 18px; }
+  .tw-box svg { display: block; width: 100%; height: 34px; }
+  .tw-box :global(rect) { transition: fill 0.18s; }
+  .tw-box :global(.fill) { fill: #d4d4d4; }
+  .tw-box :global(.tg) { fill: #9c9c9c; }
+  .tw-box :global(.tg.on) { fill: var(--accent-2); }
+  .tw-box :global(.tg.cur) { fill: var(--accent); }
+  [data-lane='b'] .tw-box :global(.tg.on) { fill: var(--accent); }
+  .tw-head { position: absolute; top: 0; left: 0; translate: -50% 0; font: 700 14px/18px var(--font-code); color: var(--hot); opacity: 0; pointer-events: none; }
+  .tw-count { margin-top: 16px; font: 500 0.9375rem/1.4 var(--font-code); color: var(--ink-2); }
+  .tw-count b { display: inline-block; min-width: 3ch; text-align: right; font-size: 1.5rem; color: var(--accent); font-variant-numeric: tabular-nums; } /* the line keeps its wrap while the counts change */
+  .tw-count span { margin: 0 6px; }
+  .tw-note { margin-top: 8px; font-size: 0.875rem; color: var(--ink-2); }
+  .tw-ctl { --accent-2: #005555; --surface: var(--w-silver); position: sticky; bottom: calc(var(--sl, 0px) + 8px); z-index: 2; padding: 10px; background: var(--w-silver); box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), 4px 4px 0 oklch(0 0 0 / 0.3); }
+  @media (max-width: 900px) { .tw-top, .tw-lanes { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+  import { layout, stripSVG, say } from './twoways';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-twoways]').forEach(root => {
+    const v = { s: +root.dataset.s!, c: +root.dataset.c!, p: +root.dataset.p! };
+    const sayEl = root.querySelector<HTMLElement>('[data-say]')!;
+    const lanes = ['a', 'b'].map(k => root.querySelector<HTMLElement>(`[data-lane="${k}"]`)!);
+    let L = layout(v.s, v.c, v.p);
+    let tl: gsap.core.Timeline | null = null;
+
+    const build = () => {
+      L = layout(v.s, v.c, v.p);
+      [...L.a, ...L.b].forEach(st => { root.querySelector(`[data-strip="${st.id}"] svg`)!.innerHTML = stripSVG(st); });
+    };
+
+    const paint = (i: number, how: How) => {
+      tl?.kill();
+      tl = null;
+      const moving = (how === 'play' || how === 'step') && !reduce();
+      lanes.forEach((lane, li) => {
+        const strips = li ? L.b : L.a;
+        const cur = li ? Math.min(i, 1) : i; // the jump shown as current: lane B is done after its one jump
+        let rows = 0, jumps = 0;
+        for (const st of strips) {
+          const box = lane.querySelector<HTMLElement>(`[data-strip="${st.id}"]`)!;
+          const head = box.querySelector<HTMLElement>('.tw-head')!;
+          const rects = [...box.querySelectorAll<SVGRectElement>('rect.tg')];
+          rects.forEach(r => { const j = +r.dataset.j!; r.classList.toggle('on', j <= i); r.classList.toggle('cur', j === cur); });
+          for (const g of st.groups) if (g.j <= i) { rows += g.len; jumps++; }
+          const g = st.groups.find(x => x.j === cur);
+          if (!g) { gsap.set(head, { opacity: 0 }); continue; }
+          const at = (x: number) => `${((x + 0.4) / st.total) * 100}%`;
+          gsap.set(head, { opacity: 1, left: at(g.start + g.len - 1) });
+          // Animate only the jump that just happened: lane A's latest one, lane B's single long read
+          if (!moving || (li === 1 && i !== 1)) continue;
+          const mine = rects.filter(r => +r.dataset.j! === g.j);
+          mine.forEach(r => r.classList.remove('on', 'cur'));
+          const each = Math.min(0.03, 0.45 / mine.length);
+          tl ??= gsap.timeline();
+          tl.fromTo(head, { left: at(g.start), y: -8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.16, ease: 'power2.out' }, 0);
+          mine.forEach((r, k) => tl!.call(() => r.classList.add('on', 'cur'), [], 0.16 + k * each));
+          tl.to(head, { left: at(g.start + g.len - 1), duration: Math.max(0.01, (mine.length - 1) * each), ease: 'none' }, 0.16);
+        }
+        lane.querySelector('[data-jumps]')!.textContent = String(jumps);
+        lane.querySelector('[data-rows]')!.textContent = String(rows);
+      });
+      sayEl.innerHTML = say(i, v.s, v.c, v.p);
+    };
+
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, paint, { speed: 0.5 });
+    const sl = root.querySelector<HTMLElement>('[data-sliders]')!;
+    sl.hidden = false;
+    sl.querySelectorAll<HTMLInputElement>('input').forEach(inp => inp.addEventListener('input', () => {
+      v[inp.dataset.k as 's' | 'c' | 'p'] = +inp.value;
+      sl.querySelector(`[data-o="${inp.dataset.k}"]`)!.textContent = inp.value;
+      build();
+      s.resize(L.n, L.n - 1);
+    }));
+    paint(s.i, 'jump');
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (!reduce()) { s.go(0, 'jump'); s.play(); }
+    }, { threshold: 0.4 });
+    io.observe(root);
+  });
+</script>

@@ -1,0 +1,138 @@
+---
+// The freeware unlock. The form is built from unlock.inputs of src/lib/dinarsoft/<app>.ts and calls its generate()
+// in the browser. One key for every device: the key is made at build time and shows without JS.
+// No module yet: a calm "on its way" note. Then plain install steps for a real Pocket PC or an emulator.
+import Window from '../../shell/Window.astro';
+import Term from '../../explain/Term.astro';
+import type { App } from '../../../data/dinarsoft';
+import './ds.css';
+
+export interface UnlockModule {
+  version: string;
+  inputs: { id: string; label: string; hint?: string }[];
+  generate(values: Record<string, string>): string;
+  note: string;
+}
+interface Props { app: App; unlock: UnlockModule | null }
+const { app, unlock } = Astro.props;
+let fixed = '';
+if (unlock && unlock.inputs.length === 0) {
+  try { fixed = unlock.generate({}); } catch { fixed = ''; }
+}
+---
+
+<div class="dsk" data-dsk data-app={app.id}>
+  <Window kind="dialog" title={`${app.name}: Register`} active class="dsk-win">
+    {unlock ? (
+      <>
+        <p class="dsk-lead">Every DinarSoft trial asked for an unlock key after 15 days. In 2026 Yasser Awad made {app.name} free, so here is the key, made the way DinarSoft made it.</p>
+        {unlock.inputs.length > 0 ? (
+          <form class="dsk-form" data-dsk-form>
+            {unlock.inputs.map(f => (
+              <label class="dsk-f">
+                <span class="dsk-l">{f.label}</span>
+                <input name={f.id} type="text" required autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby={f.hint ? `dsk-h-${app.id}-${f.id}` : undefined} />
+                {f.hint && <span class="dsk-hint" id={`dsk-h-${app.id}-${f.id}`}>{f.hint}</span>}
+              </label>
+            ))}
+            <button type="submit" class="button button--primary">Make my key</button>
+            <noscript><p class="dsk-hint">Making a key needs JavaScript.</p></noscript>
+          </form>
+        ) : null}
+        <div class="dsk-out" data-dsk-out hidden={!fixed}>
+          <span class="dsk-l">Your unlock key</span>
+          <output class="dsk-key" data-dsk-key>{fixed}</output>
+          <button type="button" class="button k-btn dsk-copy" data-dsk-copy>Copy</button>
+        </div>
+        <p class="dsk-msg" data-dsk-msg aria-live="polite"></p>
+        <p class="dsk-note">{unlock.note}</p>
+        <p class="dsk-ver">For {app.name} {unlock.version}.</p>
+      </>
+    ) : (
+      <div class="dsk-soon">
+        <span class="dsk-key-ico" aria-hidden="true"></span>
+        <div>
+          <p class="dsk-lead"><b>{app.name}’s key maker is on its way.</b></p>
+          <p class="dsk-p">It is being rebuilt from {app.name}’s own key check, line by line, so every key it makes is one the app accepts. Until it lands here, every installer on this page runs as the full app for its 15-day trial.</p>
+        </div>
+      </div>
+    )}
+  </Window>
+
+  <div class="dsk-steps">
+    <h3 class="dsk-h3">Install it</h3>
+    <ol class="dsk-ol">
+      <li><b>On a Pocket PC or Windows Mobile phone.</b> Download the <Term id="cab-file">.CAB</Term> file marked latest. Copy it to the device on a memory card, through <Term id="activesync">ActiveSync</Term>, or download it in Pocket Internet Explorer. Then open File Explorer on the device and tap it. It installs itself, like tapping an .apk on Android.</li>
+      <li><b>From a Windows PC.</b> Connect the device through ActiveSync on Windows XP, or Windows Mobile Device Center on later Windows, and run the Setup .exe. It sends the app to the device.</li>
+      <li><b>In an emulator.</b> Microsoft’s <Term id="device-emulator">Device Emulator</Term> runs Windows Mobile 5 and 6 on a Windows PC. In its File menu, choose Configure and set a shared folder. The device sees that folder as its Storage Card. Put the .CAB there and tap it in File Explorer.</li>
+      <li><b>Unlock it.</b> Open {app.name}, find its Register screen, and type the key from this page.</li>
+    </ol>
+  </div>
+</div>
+
+<style>
+  .dsk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+  .dsk-win { max-width: 560px; }
+  .dsk-lead { font-size: 1rem; line-height: 1.55; }
+  .dsk-p { margin-top: 8px; font-size: 0.9375rem; line-height: 1.55; }
+  .dsk-form { display: grid; gap: 14px; margin-top: 16px; }
+  .dsk-f { display: grid; gap: 4px; }
+  .dsk-l { font: 700 0.875rem/1.3 var(--ds-verdana); }
+  .dsk-f input { min-height: 44px; padding: 0 10px; font: 500 1rem/1 var(--mono); color: #000; background: #fff; border: 1px solid var(--xp-line); border-radius: 0; }
+  .dsk-f input:focus-visible { outline: 2px solid var(--xp-sel); outline-offset: 0; }
+  .dsk-hint { font: 400 0.8125rem/1.45 var(--ds-verdana); color: var(--ink-2); }
+  .dsk-form .button { justify-self: start; }
+  .dsk-out { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; margin-top: 18px; padding: 12px; background: #fff; border: 1px solid var(--xp-line); }
+  .dsk-out .dsk-l { grid-column: 1 / -1; }
+  .dsk-key { font: 600 clamp(1.125rem, 1vw + 0.9rem, 1.5rem)/1.3 var(--mono); letter-spacing: 0.08em; color: var(--ds-ink); overflow-wrap: anywhere; }
+  .dsk-out.fresh .dsk-key { animation: dsk-pop 0.45s var(--expo); }
+  @keyframes dsk-pop { from { opacity: 0; letter-spacing: 0.4em; } }
+  .dsk-copy { box-shadow: none; }
+  .dsk-msg { min-height: 1.4em; margin-top: 8px; font: 400 0.875rem/1.4 var(--ds-verdana); color: #1b6b1b; }
+  .dsk-msg.err { color: var(--ds-menu); }
+  .dsk-note { margin-top: 6px; font-size: 0.9375rem; line-height: 1.55; }
+  .dsk-ver { margin-top: 6px; font: 400 0.8125rem/1.4 var(--ds-verdana); color: var(--ink-2); }
+  .dsk-soon { display: flex; gap: 16px; align-items: flex-start; }
+  .dsk-key-ico { flex: none; width: 48px; height: 48px; border-radius: 50%; background: radial-gradient(circle at 34% 50%, transparent 7px, #d4a017 7.5px 13px, transparent 13.5px), linear-gradient(#d4a017, #d4a017) 30px 21px / 16px 6px no-repeat, linear-gradient(#d4a017, #d4a017) 40px 26px / 4px 7px no-repeat; animation: dsk-turn 2.4s var(--quart) infinite; }
+  @keyframes dsk-turn { 50% { rotate: -14deg; } }
+  .dsk-h3 { font: 700 1.25rem/1.2 var(--ds-arial); color: var(--ds-ink); letter-spacing: 0; }
+  .dsk-ol { margin: 12px 0 0 20px; display: grid; gap: 12px; font-size: 1rem; line-height: 1.6; }
+  .dsk-ol b { color: var(--ds-ink); }
+  @media (max-width: 900px) { .dsk { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 480px) { .dsk-out { grid-template-columns: minmax(0, 1fr); } .dsk-key { letter-spacing: 0.04em; } .dsk-copy { justify-self: start; } }
+</style>
+
+<script>
+  type M = { unlock: { generate(v: Record<string, string>): string } };
+  const mods = import.meta.glob<M>('../../../lib/dinarsoft/*.ts');
+
+  document.querySelectorAll<HTMLElement>('[data-dsk]').forEach(root => {
+    const form = root.querySelector<HTMLFormElement>('[data-dsk-form]');
+    const box = root.querySelector<HTMLElement>('[data-dsk-out]');
+    const key = root.querySelector<HTMLElement>('[data-dsk-key]');
+    const msg = root.querySelector<HTMLElement>('[data-dsk-msg]');
+    root.querySelector('[data-dsk-copy]')?.addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(key!.textContent!.trim()); msg!.textContent = 'Copied.'; }
+      catch { msg!.textContent = 'Select the key and copy it.'; }
+    });
+    form?.addEventListener('submit', async e => {
+      e.preventDefault();
+      msg!.textContent = '';
+      msg!.classList.remove('err');
+      const load = mods[`../../../lib/dinarsoft/${root.dataset.app}.ts`];
+      if (!load) return;
+      const values = Object.fromEntries([...new FormData(form)].map(([k, v]) => [k, String(v).trim()]));
+      try {
+        const k = String((await load()).unlock.generate(values) ?? '').trim();
+        if (!k) throw new Error('');
+        key!.textContent = k;
+        box!.hidden = false;
+        box!.classList.remove('fresh'); void box!.offsetWidth; box!.classList.add('fresh');
+      } catch (err) {
+        const m = err instanceof Error && err.message.length < 140 ? err.message : '';
+        msg!.classList.add('err');
+        msg!.textContent = m || 'Check the fields and try again.';
+      }
+    });
+  });
+</script>

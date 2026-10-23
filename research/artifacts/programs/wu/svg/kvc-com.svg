@@ -1,0 +1,46 @@
+<svg class="dg" viewBox="0 0 640 304" role="img" aria-labelledby="kvc-com-t">
+<title id="kvc-com-t">An 800-byte infected COM test file: the 26-byte stub, the program, padding and the Koko body, with the fields KVC reads to repair it.</title>
+<text class="t-cy" x="20" y="26">Test file, 800 bytes (built from KVC's own checks)</text>
+<rect class="box-ink" x="20" y="40" width="19.5" height="40" />
+<rect class="box" x="39.5" y="40" width="189" height="40" />
+<rect class="box-bk" x="228.5" y="40" width="7.5" height="40" />
+<rect class="box-dash" x="236" y="40" width="384" height="40" />
+<text x="134" y="66" text-anchor="middle">program</text>
+<text x="428" y="66" text-anchor="middle">Koko body</text>
+<text x="20" y="100">0</text>
+<text x="226.5" y="100" text-anchor="end">278</text>
+<text x="238" y="100">288</text>
+<text x="620" y="100" text-anchor="end">800</text>
+<g data-s="1"><rect class="wire-hi" x="17" y="37" width="25.5" height="46" /></g>
+<g data-s="1+"><text x="20" y="134">bytes 0-25:  ?? ?? ?? 12 00  50 B8 00 01 50 33 C0 CB</text><text x="20" y="156">             08 00 "KoKo (1)" 0A 0D 24</text></g>
+<g data-s="2"><rect class="wire-hi" x="233" y="37" width="390" height="46" /></g>
+<g data-s="2+"><text x="20" y="188">bytes 3-4 = 0012h paragraphs: body at 0120h (288)</text></g>
+<g data-s="3+"><text x="20" y="214">body+127h = BF 00 01 BE 22 01 (Koko's own code)</text></g>
+<g data-s="4+"><text x="20" y="240">body+18h = 0116h (278 bytes), body+22h = 26 bytes</text></g>
+<g data-s="5"><rect class="wire-hi" x="17" y="37" width="25.5" height="46" /></g>
+<g data-s="5+"><text x="20" y="266">the 26 bytes go back to 0, then the date and time</text></g>
+<g data-s="6"><rect class="wire-hi" x="228.5" y="37" width="394.5" height="46" /></g>
+<g data-s="6"><text class="t-yl" x="20" y="292">chsize 278: 522 bytes cut, byte-exact again</text></g>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 444" role="img" aria-labelledby="kvc-com-tn">
+<title id="kvc-com-tn">The infected COM test file and the six repair steps.</title>
+<text class="t-cy" x="20" y="18">Test file, 800 bytes</text>
+<rect class="box-ink" x="20" y="30" width="8.45" height="36" />
+<rect class="box" x="28.45" y="30" width="81.9" height="36" />
+<rect class="box-bk" x="110.35" y="30" width="3.25" height="36" />
+<rect class="box-dash" x="113.6" y="30" width="166.4" height="36" />
+<text x="69.4" y="54" text-anchor="middle">program</text>
+<text x="196.8" y="54" text-anchor="middle">Koko body</text>
+<text x="20" y="86">0</text>
+<text x="108.35" y="86" text-anchor="end">278</text>
+<text x="280" y="86" text-anchor="end">800</text>
+<g data-s="1"><rect class="wire-hi" x="17" y="27" width="14.45" height="42" /></g>
+<g data-s="1+"><text x="10" y="118">1. bytes 5-25:</text><text x="10" y="140">50 B8 00 01 50 33 C0 CB</text><text x="10" y="162">08 00 "KoKo (1)" 0A 0D 24</text></g>
+<g data-s="2"><rect class="wire-hi" x="110.6" y="27" width="172.4" height="42" /></g>
+<g data-s="2+"><text x="10" y="194">2. bytes 3-4 = 0012h</text><text x="10" y="216">   body at 0120h (288)</text></g>
+<g data-s="3+"><text x="10" y="248">3. body+127h:</text><text x="10" y="270">   BF 00 01 BE 22 01</text></g>
+<g data-s="4+"><text x="10" y="302">4. body+18h = 0116h (278)</text><text x="10" y="324">   body+22h = saved bytes</text></g>
+<g data-s="5+"><text x="10" y="356">5. 26 bytes back to 0,</text><text x="10" y="378">   date and time back</text></g>
+<g data-s="6"><rect class="wire-hi" x="110.35" y="27" width="172.65" height="42" /></g>
+<g data-s="6"><text class="t-yl" x="10" y="410">6. cut to 278 bytes:</text><text class="t-yl" x="10" y="432">   byte-exact again</text></g>
+</svg>

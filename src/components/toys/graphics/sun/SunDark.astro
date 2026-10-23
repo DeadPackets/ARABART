@@ -1,0 +1,196 @@
+---
+// His menu screen's sky and sun, drawn while invisible and then switched on through the palette (04DA:0E06 and
+// draw_sun at 04DA:0038), in the CodeStepper beside the C. Under it: his 16 color slots, live; pick one and change it.
+import CodeStepper from '../../CodeStepper.astro';
+import { png } from '../ssr.ts';
+import { Scr, menuOps, crop, PAL, SUN_SLOTS, SUN_SHADES, sunRadii, STAR_SLOTS, stars, type RGB6 } from './sun.ts';
+
+const ops = menuOps(), radii = sunRadii(100), nStars = stars().length;
+const C = [
+  { code: 'getpalette(&pal);', note: 'the 16 slots' },
+  { code: 'for (i = 0; i < 4; i++)' },
+  { code: '  setrgbpalette(sky[i], 0, 0, 0);' },
+  { code: 'for (row = 0; row < 9; row++)' },
+  { code: '  star(x, y, kind);', note: '14 a row' },
+  { code: 'draw_sun(180, 240, 100);' },
+  { code: '/* inside draw_sun(x, y, r): */' },
+  { code: 'for (i = 0; i < 6; i++)' },
+  { code: '  setrgbpalette(gold[i], 0, 0, 0);' },
+  { code: 'setfillstyle(SOLID_FILL, 10);' },
+  { code: 'fillellipse(x, y, r, r);' },
+  { code: 'r -= r / 40;', note: 'slot 2, and fill' },
+  { code: 'r -= r / 30;', note: 'slot 4' },
+  { code: 'r -= r / 20;', note: 'slot 5' },
+  { code: 'r -= r / 10;', note: 'slot 13' },
+  { code: 'r -= r / 5;', note: 'slot 14' },
+  { code: 'setrgbpalette(14, 63, 50, 0);' },
+  { code: 'setrgbpalette(13, 63, 49, 0);' },
+  { code: 'setrgbpalette(5,  63, 47, 0);' },
+  { code: 'setrgbpalette(4,  63, 45, 0);' },
+  { code: 'setrgbpalette(2,  63, 42, 0);' },
+  { code: 'setrgbpalette(10, 63, 38, 0);' },
+  { code: 'setrgbpalette(1, 0, 0, 42);', note: 'and 3 more' },
+];
+const ASM = [
+  { off: '0E7D', label: 'menu', code: 'call getpalette', note: 'read the 16 slots' },
+  { off: '0E88', code: 'call setrgbpalette', note: '× 4: stars to black' },
+  { off: '0ED7', code: 'call star', note: `× ${nStars}, row by row` },
+  { off: '102A', code: 'call draw_sun', note: '180, 240, radius 100' },
+  { off: '0066', label: 'sun', code: 'call setrgbpalette', note: '× 6: sun to black' },
+  { off: '00CD', code: 'push 10 / call setcolor' },
+  { off: '00E6', code: 'call fillellipse', note: 'the biggest disc' },
+  { off: '0101', code: 'mov  bx,40 / idiv bx', note: 'r -= r / 40' },
+  { off: '012C', code: 'mov  bx,30 / idiv bx', note: 'r -= r / 30' },
+  { off: '0157', code: 'mov  bx,20 / idiv bx', note: 'r -= r / 20' },
+  { off: '0182', code: 'mov  bx,10 / idiv bx', note: 'r -= r / 10' },
+  { off: '01AD', code: 'mov  bx,5 / idiv bx', note: 'r -= r / 5' },
+  { off: '01C5', code: 'call setrgbpalette', note: '14: 63, 50, 0' },
+  { off: '01D8', code: 'call setrgbpalette', note: '13: 63, 49, 0' },
+  { off: '01EB', code: 'call setrgbpalette', note: '5: 63, 47, 0' },
+  { off: '01FE', code: 'call setrgbpalette', note: '4: 63, 45, 0' },
+  { off: '0211', code: 'call setrgbpalette', note: '2: 63, 42, 0' },
+  { off: '0224', code: 'call setrgbpalette', note: '10: 63, 38, 0' },
+  { off: '1030', label: 'menu', code: 'call setrgbpalette', note: '× 4: stars on' },
+];
+const slotRegs = (n: number, c: RGB6, means: string, changed = true) => ({ name: String(n), value: c.join(' '), means, changed });
+const steps: { a: number; c: number; say: string; op: number; regs: object[] }[] = [
+  { a: 0, c: 0, op: 0, say: 'His menu screen starts as a blue-gray panel with an empty black window. <code>getpalette</code> reads which color each of the 16 slots holds right now.', regs: [] },
+  { a: 1, c: 2, op: 1, say: 'Four slots, the four colors of his stars, are set to <b>black</b>. Anything drawn in them will be black on black.', regs: STAR_SLOTS.map(k => slotRegs(k, [0, 0, 0], 'black for now')) },
+  { a: 2, c: 4, op: 2, say: `He draws ${nStars} stars, 14 to a row, each row shifted a little. Not one is visible. Turn on <b>Show the hidden</b> to see them.`, regs: [] },
+  { a: 3, c: 5, op: 2, say: 'Now the sun: a call to his own function, <code>draw_sun</code>, with the middle of the window and a radius of 100 pixels.', regs: [{ name: 'x', value: '180', means: 'center' }, { name: 'y', value: '240', means: 'center' }, { name: 'r', value: '100', means: 'radius in pixels' }] },
+  { a: 4, c: 8, op: 3, say: 'Six more slots go black: the six shades the sun will use.', regs: SUN_SLOTS.map(k => slotRegs(k, [0, 0, 0], 'black for now')) },
+  ...SUN_SLOTS.map((slot, i) => ({
+    a: [6, 7, 8, 9, 10, 11][i], c: [10, 11, 12, 13, 14, 15][i], op: 4 + i,
+    say: i === 0 ? `The biggest disc, radius <b>${radii[0]}</b>, in slot 10. Black on black.` : `Radius ${radii[i - 1]} minus ${radii[i - 1]} ÷ ${[40, 30, 20, 10, 5][i - 1]} = <b>${radii[i]}</b>, in slot ${slot}.${i === 5 ? ' Six discs, one inside the other, and the screen still shows nothing.' : ''}`,
+    regs: [{ name: 'r', value: String(radii[i]), means: 'this disc', changed: true }, { name: 'c', value: String(slot), means: 'its slot' }],
+  })),
+  ...[5, 4, 3, 2, 1, 0].map((i, j) => ({
+    a: 12 + j, c: 16 + j, op: 10 + j,
+    say: j === 0 ? `Lights on. Slot 14 becomes gold: red 63, green 50, blue 0. The smallest disc appears, all at once.` : j === 5 ? 'Slot 10 becomes the deepest orange, and the rim appears. A glowing sun, with not one pixel drawn twice.' : `Slot ${SUN_SLOTS[i]}: green ${SUN_SHADES[i][1]}. The next ring lights up, a little more orange.`,
+    regs: [slotRegs(SUN_SLOTS[i], SUN_SHADES[i], 'red, green, blue: 0 to 63 each')],
+  })),
+  { a: 18, c: 22, op: 16, say: 'Back in the menu, four calls give the stars their colors, and the whole sky appears around the sun.', regs: [slotRegs(1, [0, 0, 42], 'blue ring'), slotRegs(9, [0, 0, 63], 'blue diamond'), slotRegs(7, [42, 42, 42], 'gray cross'), slotRegs(15, [63, 63, 63], 'white dot')] },
+];
+const done = new Scr();
+for (const o of ops) o.run(done);
+const still = png(crop(done, 30, 90, 301, 301), 301, 301, done.rgb());
+const swatch = (c: RGB6) => `rgb(${c.map(v => Math.round((v * 255) / 63)).join(' ')})`;
+---
+
+<CodeStepper id="sundark" title="SUN.EXE  the menu and draw_sun" cTitle="What he wrote, in C" asm={ASM} c={C} steps={steps} speed={0.5}>
+  <div slot="visual" class="sd" data-sundark data-for="sundark">
+    <div class="sd-scr">
+      <img class="sd-still" src={still} width="301" height="301" alt="His sun: six shades of gold, one inside the other, on a black sky full of small blue and white stars." />
+      <canvas class="sd-cv" width="301" height="301" hidden role="img" aria-label="His sky and sun at this step, in the colors of the 16 slots."></canvas>
+    </div>
+    <div class="sd-side">
+      <p class="sd-h" id="sd-pal-h">His 16 color slots</p>
+      <div class="sd-pal" role="radiogroup" aria-labelledby="sd-pal-h">
+        {PAL.map((c, i) => (
+          <button type="button" role="radio" class="sd-slot" data-slot={i} aria-checked={String(i === 14)} tabindex={i === 14 ? 0 : -1} aria-label={`Slot ${i}`} style={`--c:${swatch(c)}`}>
+            <span class="sd-sw"></span><span class="sd-n">{i}</span>
+          </button>
+        ))}
+      </div>
+      <div class="sd-edit" hidden>
+        <p class="sd-cur">Slot <b data-cur>14</b> <span data-rgb>63 50 0</span></p>
+        {['Red', 'Green', 'Blue'].map((n, i) => (
+          <label class="sd-rng"><span>{n}</span><input type="range" min="0" max="63" step="1" value={[63, 50, 0][i]} data-ch={i} /><output>{[63, 50, 0][i]}</output></label>
+        ))}
+        <div class="sd-btns">
+          <button type="button" class="button k-btn" data-xray aria-pressed="true">Show the hidden</button>
+          <button type="button" class="button k-btn" data-his>His colors</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .sd { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .sd-scr { position: relative; aspect-ratio: 1; background: var(--vga-0); max-width: 420px; width: 100%; justify-self: center; }
+  .sd-scr :is(img, canvas) { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .sd-side { display: grid; gap: 12px; min-width: 0; }
+  .sd-h { margin: 0 !important; font: 700 0.8125rem/1.3 var(--font-code) !important; color: var(--accent-2) !important; }
+  .sd-pal { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+  .sd-slot { position: relative; display: grid; place-items: end start; min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .sd-sw { position: absolute; inset: 0; background: var(--c); box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.3); transition: background-color 0.25s var(--quart); }
+  .sd-n { position: relative; padding: 1px 3px; font: 700 10px/1.2 var(--font-code); color: #fff; background: oklch(0 0 0 / 0.6); }
+  .sd-slot.is-hidden .sd-sw { background: repeating-linear-gradient(45deg, #000 0 4px, #222 4px 8px); }
+  .sd-slot[aria-checked='true'] { outline: 3px solid var(--accent); outline-offset: 1px; z-index: 1; }
+  .sd-slot:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; z-index: 2; }
+  .sd-edit { display: grid; gap: 6px; }
+  .sd-cur { margin: 0 !important; font: 600 0.9375rem/1.4 var(--font-code) !important; color: var(--ink) !important; }
+  .sd-cur b { color: var(--accent); }
+  .sd-rng { display: grid; grid-template-columns: 5ch minmax(0, 1fr) 3ch; align-items: center; gap: 10px; font: 600 12px/1 var(--font-code); color: var(--ink-2); }
+  .sd-rng input { width: 100%; height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+  .sd-rng output { color: var(--accent); text-align: right; font-variant-numeric: tabular-nums; }
+  .sd-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  @media (max-width: 760px) { .sd { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .sd-sw { transition: none; } }
+</style>
+
+<script>
+  import { Scr, menuOps, crop, rgb, type RGB6 } from './sun.ts';
+  import { blit } from '../ega.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-sundark]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!) as HTMLElement & { stepper?: { i: number } };
+    const ops = menuOps(), cv = vis.querySelector<HTMLCanvasElement>('.sd-cv')!;
+    const slots = [...vis.querySelectorAll<HTMLButtonElement>('.sd-slot')];
+    const ranges = [...vis.querySelectorAll<HTMLInputElement>('.sd-rng input')];
+    const xray = vis.querySelector<HTMLButtonElement>('[data-xray]')!;
+    const steps: { op: number }[] = JSON.parse(root.querySelector('[data-trace]')!.textContent!);
+    let scr = new Scr(), cur = 14, edits: Record<number, RGB6> = {};
+    const finalPal = (() => { const s = new Scr(); for (const o of ops) o.run(s); return s.pal; })();
+
+    function paint() {
+      const pal = scr.pal.map((c, i) => edits[i] ?? c);
+      const shown = pal.map(c => c[0] + c[1] + c[2] === 0);
+      const colors = rgb(pal);
+      // "Show the hidden": pixels in a slot that is black right now, at a third of the color they will get
+      if (xray.getAttribute('aria-pressed') === 'true') {
+        const g = rgb(finalPal.map(c => c.map(v => Math.round(v * 0.38)) as RGB6));
+        for (let i = 1; i < 16; i++) if (shown[i]) colors[i] = g[i];
+      }
+      blit(cv, crop(scr, 30, 90, 301, 301), 301, 301, colors);
+      slots.forEach((b, i) => {
+        const c = pal[i];
+        b.style.setProperty('--c', `rgb(${c.map(v => Math.round((v * 255) / 63)).join(' ')})`);
+        b.classList.toggle('is-hidden', i > 0 && shown[i]);
+        b.setAttribute('aria-label', `Slot ${i}: ${c.join(', ')}${i > 0 && shown[i] ? ', black for now' : ''}`);
+      });
+      const c = pal[cur];
+      vis.querySelector('[data-cur]')!.textContent = String(cur);
+      vis.querySelector('[data-rgb]')!.textContent = c.join(' ');
+      ranges.forEach((r, i) => { r.value = String(c[i]); r.nextElementSibling!.textContent = String(c[i]); r.setAttribute('aria-label', `Slot ${cur} ${['red', 'green', 'blue'][i]}`); });
+    }
+    const show = (op: number) => { scr = new Scr(); for (let k = 0; k <= op; k++) ops[k].run(scr); edits = {}; paint(); };
+
+    root.addEventListener('stepper', e => show(((e as CustomEvent).detail.step as { op: number }).op));
+    const pick = (b: HTMLButtonElement) => {
+      cur = +b.dataset.slot!;
+      slots.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+      paint();
+    };
+    slots.forEach(b => b.addEventListener('click', () => pick(b)));
+    vis.querySelector('.sd-pal')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key, i = slots.indexOf(document.activeElement as HTMLButtonElement);
+      const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 8, ArrowUp: -8 }[k];
+      if (d === undefined || i < 0) return;
+      e.preventDefault();
+      const to = slots[(i + d + 16) % 16]; pick(to); to.focus();
+    });
+    ranges.forEach((r, ch) => r.addEventListener('input', () => {
+      const c = [...(edits[cur] ?? scr.pal[cur])] as RGB6;
+      c[ch] = +r.value; edits[cur] = c; paint();
+    }));
+    xray.addEventListener('click', () => { xray.setAttribute('aria-pressed', String(xray.getAttribute('aria-pressed') !== 'true')); paint(); });
+    vis.querySelector('[data-his]')!.addEventListener('click', () => { edits = {}; paint(); });
+
+    show(steps[root.stepper?.i ?? steps.length - 1].op);
+    cv.hidden = false;
+    vis.querySelector<HTMLElement>('.sd-still')!.hidden = true;
+    vis.querySelector<HTMLElement>('.sd-edit')!.hidden = false;
+  });
+</script>

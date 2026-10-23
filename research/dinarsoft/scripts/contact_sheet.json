@@ -1,0 +1,358 @@
+{
+ "note": "Every image is DinarSoft's own file from the Internet Archive (site/) or from inside its 2008 installers (brand/installer/). Checkerboard = transparent.",
+ "sections": [
+  [
+   "Logo (Nov 2006 onward). No vector file was archived.",
+   [
+    [
+     "site/templates/dinarsoft/images/logo.gif",
+     "logo.gif 300x50 (site header)"
+    ],
+    [
+     "site/images/press/logo_name_50.png",
+     "press/logo_name_50.png 220x50"
+    ],
+    [
+     "site/images/press/logo_100.png",
+     "press/logo_100.png 100x100 (mark)"
+    ],
+    [
+     "site/images/dinarsoft.ico",
+     "dinarsoft.ico 32x32 (favicon)",
+     "width:64px"
+    ]
+   ]
+  ],
+  [
+   "Product icons, press kit (100x100 PNG, transparent)",
+   [
+    [
+     "site/images/press/MemMaid_100.png",
+     "MemMaid_100.png"
+    ],
+    [
+     "site/images/press/HandySwitcher_100.png",
+     "HandySwitcher_100.png"
+    ],
+    [
+     "site/images/press/HandyMenu_100.png",
+     "HandyMenu_100.png"
+    ],
+    [
+     "site/images/press/HandyLauncher_100.png",
+     "HandyLauncher_100.png"
+    ],
+    [
+     "site/images/press/TapText_100.png",
+     "TapText_100.png"
+    ],
+    [
+     "site/images/press/HijriDate_100.png",
+     "HijriDate_100.png"
+    ]
+   ]
+  ],
+  [
+   "Product box art (130x130 GIF)",
+   [
+    [
+     "site/images/MemMaid.gif",
+     "MemMaid.gif"
+    ],
+    [
+     "site/images/HandySwitcher.gif",
+     "HandySwitcher.gif"
+    ],
+    [
+     "site/images/HandyMenu.gif",
+     "HandyMenu.gif"
+    ],
+    [
+     "site/images/HandyLauncher.gif",
+     "HandyLauncher.gif"
+    ],
+    [
+     "site/images/TapText.gif",
+     "TapText.gif"
+    ],
+    [
+     "site/images/HijriDate.gif",
+     "HijriDate.gif"
+    ]
+   ]
+  ],
+  [
+   "Installer icons (64x64, from DinarSoftHandySwitcher_Setup.exe, 2008)",
+   [
+    [
+     "brand/installer/memmaid_icon.png",
+     "MemMaid"
+    ],
+    [
+     "brand/installer/handyswitcher_icon.png",
+     "HandySwitcher"
+    ],
+    [
+     "brand/installer/handymenu_icon.png",
+     "HandyMenu"
+    ],
+    [
+     "brand/installer/handylauncher_icon.png",
+     "HandyLauncher"
+    ],
+    [
+     "brand/installer/taptext_icon.png",
+     "TapText"
+    ]
+   ]
+  ],
+  [
+   "Product wordmarks and slogans (installer bitmaps, 190x40)",
+   [
+    [
+     "brand/installer/memmaid_slogan.png",
+     "MemMaid"
+    ],
+    [
+     "brand/installer/handyswitcher_slogan.png",
+     "HandySwitcher"
+    ],
+    [
+     "brand/installer/handymenu_slogan.png",
+     "HandyMenu"
+    ],
+    [
+     "brand/installer/handylauncher_slogan.png",
+     "HandyLauncher"
+    ],
+    [
+     "brand/installer/taptext_slogan.png",
+     "TapText"
+    ]
+   ]
+  ],
+  [
+   "Product page titles (225x40 GIF)",
+   [
+    [
+     "site/images/mm_title.gif",
+     "mm_title.gif"
+    ],
+    [
+     "site/images/hs_title.gif",
+     "hs_title.gif"
+    ],
+    [
+     "site/images/hm_title.gif",
+     "hm_title.gif"
+    ],
+    [
+     "site/images/hl_title.gif",
+     "hl_title.gif"
+    ],
+    [
+     "site/images/tt_title.gif",
+     "tt_title.gif"
+    ],
+    [
+     "site/images/hd_title.gif",
+     "hd_title.gif"
+    ]
+   ]
+  ],
+  [
+   "Promotion buttons (278x60, light and dark)",
+   [
+    [
+     "site/promote/memmaid.gif",
+     "memmaid.gif"
+    ],
+    [
+     "site/promote/memmaidb.gif",
+     "memmaidb.gif"
+    ],
+    [
+     "site/promote/handyswitcher.gif",
+     "handyswitcher.gif"
+    ],
+    [
+     "site/promote/handyswitcherb.gif",
+     "handyswitcherb.gif"
+    ],
+    [
+     "site/promote/handymenu.gif",
+     "handymenu.gif"
+    ],
+    [
+     "site/promote/handymenub.gif",
+     "handymenub.gif"
+    ],
+    [
+     "site/promote/handylauncher.gif",
+     "handylauncher.gif"
+    ],
+    [
+     "site/promote/handylauncherb.gif",
+     "handylauncherb.gif"
+    ],
+    [
+     "site/promote/taptext.gif",
+     "taptext.gif"
+    ],
+    [
+     "site/promote/taptextb.gif",
+     "taptextb.gif"
+    ],
+    [
+     "site/promote/hijridate.gif",
+     "hijridate.gif"
+    ],
+    [
+     "site/promote/hijridateb.gif",
+     "hijridateb.gif"
+    ]
+   ]
+  ],
+  [
+   "Home-page banner (755x123) with the tagline",
+   [
+    [
+     "site/images/banners/bannerci1s1i2.jpg",
+     "bannerci1s1i2.jpg"
+    ],
+    [
+     "site/images/banners/banneri84.jpg",
+     "banneri84.jpg"
+    ]
+   ]
+  ],
+  [
+   "Buttons and menu tiles",
+   [
+    [
+     "site/images/stories/button.gif",
+     "menu tile (button.gif)"
+    ],
+    [
+     "site/images/stories/buttonH.gif",
+     "menu tile, hover (buttonH.gif)"
+    ],
+    [
+     "site/templates/dinarsoft/images/rd_n.gif",
+     "Read More (sprite: normal/hover)",
+     "width:164px"
+    ],
+    [
+     "site/templates/dinarsoft/images/bn_n.gif",
+     "Buy Now",
+     "width:164px"
+    ],
+    [
+     "site/templates/dinarsoft/images/dn_n.gif",
+     "Download",
+     "width:164px"
+    ],
+    [
+     "site/templates/dinarsoft/images/cb_n.gif",
+     "CAB File",
+     "width:164px"
+    ],
+    [
+     "site/images/signup.gif",
+     "signup.gif"
+    ],
+    [
+     "site/buttons/0button.gif",
+     "2006 frames menu: Home"
+    ],
+    [
+     "site/buttons/1button.gif",
+     "2006 frames menu: Contact Us"
+    ]
+   ]
+  ]
+ ],
+ "colors": [
+  [
+   "#CF2F2F",
+   "logo red; product headings"
+  ],
+  [
+   "#433C3C",
+   "logo charcoal (wordmark)"
+  ],
+  [
+   "#E0251B",
+   "favicon red"
+  ],
+  [
+   "#3D3D3D",
+   "product wordmark gray"
+  ],
+  [
+   "#B8380E",
+   "product slogan rust"
+  ],
+  [
+   "#A82711",
+   "menu hover, FAQ links"
+  ],
+  [
+   "#AA0000",
+   "heading underline rule"
+  ],
+  [
+   "#D34B0C",
+   "side-menu hover underline"
+  ],
+  [
+   "#C55D3B",
+   "active side-menu item"
+  ],
+  [
+   "#6A6A6A",
+   "drop-down menu background"
+  ],
+  [
+   "#555555",
+   "content headings"
+  ],
+  [
+   "#E9E9ED",
+   "page background gray"
+  ],
+  [
+   "#EEEEEE",
+   "table rows, menu hover"
+  ],
+  [
+   "#F5F5F5",
+   "table rows"
+  ],
+  [
+   "#003366",
+   "2005-06 frames site navy"
+  ],
+  [
+   "#006699",
+   "2005-06 frames site blue"
+  ]
+ ],
+ "fonts": [
+  [
+   "Verdana, Arial, Helvetica, sans-serif",
+   "13px",
+   "Body text: Mobile Software for every need"
+  ],
+  [
+   "Arial, Helvetica, sans-serif",
+   "14px",
+   "Headings and menus: MemMaid - The Best Maid for PocketPCs"
+  ],
+  [
+   "Tahoma",
+   "13px",
+   "Download titles: DinarSoftMemMaid_Setup.exe"
+  ]
+ ]
+}

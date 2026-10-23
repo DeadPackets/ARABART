@@ -1,0 +1,165 @@
+---
+// Long arithmetic on his 20-digit numbers, like school: multiply row by row, add column by column, subtract by adding
+// the opposite, with his carry pass animated. The math is digits.ts, checked digit for digit against the FORM_X port.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { trace, type Trace } from './digits';
+
+const PRESETS: [string, string, string][] = [['*', '2.5', '3.5'], ['*', '12.25', '4.4'], ['-', '8', '7.5'], ['-', '1', '2.25'], ['+', '0.1', '0.2'], ['+', '999.9', '0.1']];
+const t: Trace = trace('*', '2.5', '3.5');
+const last = t.steps[t.steps.length - 1];
+const sym = (o: string) => (o === '*' ? '×' : o === '-' ? '−' : '+');
+---
+
+<div class="kxd" data-digitmath>
+  <div class="kxd-ctl">
+    <label class="kxd-in"><span>First</span><input type="text" inputmode="decimal" value="2.5" maxlength="13" data-x aria-describedby="kxd-hint" /></label>
+    <div class="kxd-ops" role="radiogroup" aria-label="Operation">
+      {['*', '+', '-'].map(o => <button type="button" class="button k-btn" role="radio" aria-checked={String(o === '*')} tabindex={o === '*' ? 0 : -1} data-op={o} aria-label={o === '*' ? 'times' : o === '+' ? 'plus' : 'minus'}>{sym(o)}</button>)}
+    </div>
+    <label class="kxd-in"><span>Second</span><input type="text" inputmode="decimal" value="3.5" maxlength="13" data-y aria-describedby="kxd-hint" /></label>
+  </div>
+  <p class="kxd-hint" id="kxd-hint" data-hint>Up to 6 digits before the point and 6 after.</p>
+  <div class="kxd-presets" role="group" aria-label="Try">
+    {PRESETS.map(([o, a, b]) => <button type="button" class="button k-btn" data-preset={`${o}|${a}|${b}`}>{a} {sym(o)} {b}</button>)}
+  </div>
+
+  <Window title="FORM_X.EXE  one digit per byte" kind="editor" active class="kxd-win">
+    <div class="kxd-board" data-board style={`--cols:${t.cols}`}>
+      <div class="kxd-head" aria-hidden="true"><span class="kxd-lab"></span>{Array.from({ length: t.cols }, (_, i) => <span class:list={['kxd-h', { dot: i === t.point }]}>{i === t.point ? '.' : ''}</span>)}</div>
+      {last.rows.map(r => (
+        <div class:list={['kxd-row', `t-${r.tone}`]}>
+          <span class="kxd-lab">{r.label}</span>
+          {r.cells.map((v, i) => <span class:list={['kxd-c', { dot: i === t.point, big: v !== null && v > 9, z: v === 0 }]}>{v ?? ''}</span>)}
+        </div>
+      ))}
+    </div>
+    <p class="kxd-say" aria-live="polite" data-say set:html={last.say} />
+    <Scrubber n={t.steps.length} at={t.steps.length - 1} label="Step through the sum" />
+  </Window>
+</div>
+
+<style is:global>
+  .kxd { display: grid; gap: 16px; min-width: 0; }
+  .kxd-ctl { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 16px; }
+  .kxd-in { display: grid; gap: 6px; font: 600 0.8125rem/1.2 var(--font-code); color: var(--accent-2); }
+  .kxd-in input { width: 13ch; min-height: 44px; padding: 0 12px; font: 600 1.125rem var(--font-code); color: var(--vga-14); background: var(--vga-1); border: 2px solid var(--vga-11); border-radius: 0; }
+  .kxd-in input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .kxd-in input[aria-invalid='true'] { border-color: var(--vga-12); }
+  .kxd-ops { display: flex; gap: 8px; }
+  .kxd-ops .k-btn { min-width: 52px; font: 700 1.375rem/1 var(--font-code); }
+  .kxd-hint { margin: 0 !important; min-height: 1.5em; font-size: 0.875rem !important; color: var(--ink-2) !important; }
+  .kxd-hint.bad { color: var(--vga-12) !important; }
+  .kxd-presets { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kxd-presets .k-btn { font: 600 0.875rem var(--font-code); }
+  .kxd-board { --lab: 10ch; display: grid; gap: 4px; overflow: hidden; font-variant-numeric: tabular-nums; }
+  .kxd-row, .kxd-head { display: grid; grid-template-columns: var(--lab) repeat(var(--cols), minmax(0, 1fr)); gap: 2px; align-items: center; }
+  .kxd-head { height: 14px; }
+  .kxd-h { font: 700 14px/1 var(--font-code); color: var(--accent); text-align: right; }
+  .kxd-lab { padding-right: 8px; font: 600 12px/1.2 var(--font-code); color: var(--accent-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kxd-c { position: relative; display: grid; place-items: center; height: clamp(26px, 3.2vw, 34px); font: 700 clamp(11px, 1.3vw, 15px)/1 var(--font-code); color: var(--ink); background: var(--surface-2); }
+  .kxd-c:empty { background: none; }
+  .kxd-c.z { color: color-mix(in oklch, var(--ink) 35%, transparent); }
+  .kxd-c.dot { box-shadow: 3px 0 0 -1px var(--accent); }
+  .kxd-c.big { color: var(--vga-0); background: var(--vga-14); font-size: clamp(10px, 1.1vw, 13px); }
+  .kxd-c.hl { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .kxd-c.sweep { background: var(--vga-10); color: var(--vga-0); }
+  .kxd .t-b .kxd-c:not(:empty) { border-bottom: 2px solid var(--ink); }
+  .kxd .t-p .kxd-lab { color: var(--ink-2); }
+  .kxd .t-t .kxd-lab, .t-r .kxd-lab { color: var(--accent); }
+  .kxd .t-t { margin-top: 6px; }
+  .kxd .t-r .kxd-c:not(:empty) { background: var(--vga-11); color: var(--vga-0); }
+  .kxd .t-r .kxd-c.z { color: color-mix(in oklch, var(--vga-0) 40%, transparent); }
+  .kxd-say { margin: 16px 0 14px; min-height: 4.8em; font-size: 1rem; line-height: 1.55; color: var(--ink); }
+  .kxd-say b { color: var(--accent); }
+  @media (max-width: 640px) {
+    .kxd-row, .kxd-head { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 1px; }
+    .kxd-head .kxd-lab { display: none; }
+    .kxd-row .kxd-lab { grid-column: 1 / -1; padding: 6px 0 0; }
+    .kxd-c { height: 26px; font-size: clamp(9px, 2.9vw, 13px); }
+    .kxd-c.big { font-size: clamp(8px, 2.5vw, 11px); }
+    .kxd-in input { width: 11ch; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+  import { trace, VALID, type Trace, type Op } from './digits';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-digitmath]').forEach(root => {
+    const board = root.querySelector<HTMLElement>('[data-board]')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const xin = root.querySelector<HTMLInputElement>('[data-x]')!, yin = root.querySelector<HTMLInputElement>('[data-y]')!;
+    const hint = root.querySelector<HTMLElement>('[data-hint]')!;
+    const ops = [...root.querySelectorAll<HTMLButtonElement>('[data-op]')];
+    let op: Op = '*', t: Trace = trace('*', '2.5', '3.5'), shown = -1, sweep: gsap.core.Timeline | null = null;
+
+    const cell = (v: number | null, i: number) => `<span class="kxd-c${i === t.point ? ' dot' : ''}${v !== null && v > 9 ? ' big' : ''}${v === 0 ? ' z' : ''}">${v ?? ''}</span>`;
+    function paint(i: number, how: How) {
+      sweep?.kill();
+      const s = t.steps[i];
+      board.style.setProperty('--cols', String(t.cols));
+      board.innerHTML = `<div class="kxd-head" aria-hidden="true"><span class="kxd-lab"></span>${Array.from({ length: t.cols }, (_, k) => `<span class="kxd-h${k === t.point ? ' dot' : ''}">${k === t.point ? '.' : ''}</span>`).join('')}</div>`
+        + s.rows.map(r => `<div class="kxd-row t-${r.tone}"><span class="kxd-lab">${r.label}</span>${r.cells.map(cell).join('')}</div>`).join('');
+      say.innerHTML = s.say;
+      const rows = [...board.querySelectorAll<HTMLElement>('.kxd-row')], lastRow = rows[rows.length - (s.result ? 2 : 1)];
+      if (s.hl) s.hl.forEach(k => lastRow.children[k + 1]?.classList.add('hl'));
+      const anim = how !== 'jump' && how !== 'scrub' && !reduce() && i === shown + 1;
+      if (anim && s.kind === 'carry' && s.before) {
+        // The carry pass sweeps right to left; each column settles as the pass reaches it
+        const cells = [...lastRow.querySelectorAll<HTMLElement>('.kxd-c')], final = s.rows[s.rows.length - 1].cells;
+        cells.forEach((c, k) => { const v = s.before![k]; c.textContent = v === null ? '' : String(v); c.classList.toggle('big', v !== null && v > 9); c.classList.toggle('z', v === 0); });
+        sweep = gsap.timeline();
+        for (let k = cells.length - 1; k >= 0; k--) {
+          const c = cells[k], v = final[k];
+          sweep.call(() => {
+            c.textContent = v === null ? '' : String(v);
+            c.classList.remove('big'); c.classList.toggle('z', v === 0); c.classList.add('sweep');
+          }, [], (cells.length - 1 - k) * 0.045).call(() => c.classList.remove('sweep'), [], (cells.length - 1 - k) * 0.045 + 0.18);
+        }
+      } else if (anim && s.rows.length > t.steps[shown]?.rows.length) {
+        gsap.from(rows.slice(t.steps[shown].rows.length), { opacity: 0, y: -10, duration: 0.45, ease: 'expo.out', stagger: 0.06 });
+      }
+      shown = i;
+    }
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, paint, { speed: 1.5 });
+
+    function load(autoplay = true) {
+      const x = xin.value.trim(), y = yin.value.trim();
+      const bad = [xin, yin].filter(el => !VALID.test(el.value.trim()));
+      [xin, yin].forEach(el => el.setAttribute('aria-invalid', String(bad.includes(el))));
+      hint.classList.toggle('bad', bad.length > 0);
+      hint.textContent = bad.length ? 'Use plain numbers: up to 6 digits before the point and 6 after, like 12.25.' : 'Up to 6 digits before the point and 6 after.';
+      if (bad.length) return;
+      t = trace(op, x, y);
+      shown = -1;
+      scrub.resize(t.steps.length, 0);
+      if (autoplay && !reduce()) scrub.play();
+    }
+    const pickOp = (b: HTMLButtonElement) => {
+      ops.forEach(o => { const on = o === b; o.setAttribute('aria-checked', String(on)); o.tabIndex = on ? 0 : -1; });
+      op = b.dataset.op as Op;
+    };
+    ops.forEach(b => b.addEventListener('click', () => { pickOp(b); load(); }));
+    root.querySelector('[role=radiogroup]')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key, d = k === 'ArrowRight' || k === 'ArrowDown' ? 1 : k === 'ArrowLeft' || k === 'ArrowUp' ? -1 : 0;
+      if (!d) return;
+      e.preventDefault();
+      const b = ops[(ops.findIndex(o => o.dataset.op === op) + d + ops.length) % ops.length];
+      pickOp(b); b.focus(); load();
+    });
+    for (const el of [xin, yin]) {
+      el.addEventListener('input', () => load(false));
+      el.addEventListener('keydown', e => { if (e.key === 'Enter') load(); });
+    }
+    root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(b => b.addEventListener('click', () => {
+      const [o, a, c] = b.dataset.preset!.split('|');
+      xin.value = a; yin.value = c;
+      pickOp(ops.find(x => x.dataset.op === o)!);
+      load();
+    }));
+    scrub.go(t.steps.length - 1, 'jump');
+  });
+</script>

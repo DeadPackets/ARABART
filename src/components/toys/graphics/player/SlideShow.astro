@@ -1,0 +1,173 @@
+---
+// The two commands his player learned for TAHER: 88h (wait, clear the screen, next picture) and z (wait, then text
+// mode and his name). It plays TAHER.COM, one picture then z, and ARABIC/DEMO.COM, 15 pictures joined by 88h.
+import Window from '../../../shell/Window.astro';
+import { Player, SCRIPT, W, H } from './player.ts';
+import { memSync, png } from '../ssr.ts';
+import './player.css';
+
+const shows = [
+  { id: 'taher', file: 'TAHER_TAHER.COM', label: 'TAHER.COM' },
+  { id: 'demo', file: 'ARABIC_DEMO.COM', label: 'ARABIC/DEMO.COM' },
+].map(s => {
+  // Count the pictures: every 88h starts one more
+  const p = new Player(memSync(s.file), SCRIPT.taher, 'taher');
+  let n = 1, e;
+  while ((e = p.step())) if (e.t === 'next') n++;
+  return { ...s, n };
+});
+const p = new Player(memSync('TAHER_TAHER.COM'), SCRIPT.taher, 'taher');
+p.run();
+const t = memSync('TAHER_TAHER.COM');
+const credit = String.fromCharCode(...[...t.slice(0xab, 0xab + 64)].map((v, i) => (v - 4 - i) & 255)).replace(/\r/g, '').replace(/\$$/, '');
+---
+
+<div class="gp gpss" data-gp-show>
+  <div class="gpss-pick" role="radiogroup" aria-label="Play" hidden>
+    {shows.map((s, i) => <button type="button" role="radio" class="button k-btn" aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1} data-file={s.file} data-n={s.n}>{s.label}<span class="gpss-n">{s.n} {s.n === 1 ? 'picture' : 'pictures'}</span></button>)}
+  </div>
+  <Window title="SCREEN  640 × 350" kind="screen" active>
+    <div class="gp-crt gp-box">
+      <img src={png(p.pix, W, H)} width={W} height={H} alt="TAHER.COM's one picture: the name طاهر ابراهيم الصرفي." data-still />
+      <canvas hidden aria-hidden="true"></canvas>
+      <pre class="gp-text" hidden data-text>{credit}</pre>
+      <div class="gpss-wait" hidden data-wait><span>Waiting: <b data-count>0</b> of 4,096 key checks</span><i><i data-bar></i></i></div>
+    </div>
+  </Window>
+  <ol class="gpss-line" aria-label="The script, picture by picture" data-line>
+    <li><button type="button" data-k="0" aria-current="true">1</button></li>
+    <li class="gpss-cmd is-z"><span>z</span></li>
+  </ol>
+  <div class="gp-ctl" hidden>
+    <button type="button" class="button button--primary k-btn" data-act="run" aria-pressed="false"><span data-label>Run</span></button>
+    <button type="button" class="button k-btn" data-act="next">Next command</button>
+  </div>
+  <p class="gp-say" aria-live="polite" data-say>TAHER.COM draws one picture, then <b>z</b>: a short wait, text mode, and his name.</p>
+</div>
+
+<style is:global>
+  .gpss-pick { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+  .gpss-pick[hidden] { display: none; }
+  .gpss-pick .gpss-n { font: 500 12px/1 var(--font-code); opacity: 0.8; }
+  .gpss-wait { position: absolute; left: 50%; bottom: 8%; translate: -50% 0; display: grid; gap: 6px; width: min(80%, 360px); padding: 10px 12px; font: 600 13px/1.3 var(--font-code); color: var(--vga-15); background: oklch(0 0 0 / 0.8); box-shadow: inset 0 0 0 1px var(--vga-8); }
+  .gpss-wait[hidden] { display: none; }
+  .gpss-wait b { color: var(--vga-14); font-variant-numeric: tabular-nums; }
+  .gpss-wait > i { display: block; height: 6px; background: var(--vga-8); }
+  .gpss-wait > i > i { display: block; height: 100%; width: 0; background: var(--vga-14); }
+  .gpss-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 16px !important; font: 700 13px/1 var(--font-code); }
+  .gpss-line > li { display: flex; align-items: center; gap: 4px; }
+  .gpss-line button { min-width: 44px; height: 44px; padding: 0 6px; font: inherit; color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; }
+  .gpss-line button:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+  .gpss-line button[aria-current='true'] { color: var(--surface); background: var(--accent); box-shadow: none; }
+  .gpss-line button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  @media (max-width: 560px) { .gpss-wait { bottom: 3%; padding: 5px 8px; font-size: 11px; gap: 4px; width: 88%; } }
+  .gpss-cmd span { display: grid; place-items: center; min-width: 34px; height: 26px; padding: 0 4px; color: var(--accent-2); box-shadow: inset 0 0 0 1px var(--accent-2); font-size: 11px; }
+  .gpss-cmd.is-z span { color: var(--surface); background: var(--accent-2); }
+  .gpss-cmd.on span { color: var(--surface); background: var(--accent); box-shadow: none; }
+</style>
+
+<script>
+  import { Player, SCRIPT, type Ev } from './player.ts';
+  import { Screen, loop, reduce, radios } from './screen.ts';
+  import { mem } from '../ega.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-show]').forEach(root => {
+    const canvas = root.querySelector('canvas')!, text = root.querySelector<HTMLElement>('[data-text]')!;
+    const wait = root.querySelector<HTMLElement>('[data-wait]')!, count = root.querySelector('[data-count]')!, bar = root.querySelector<HTMLElement>('[data-bar]')!;
+    const line = root.querySelector<HTMLElement>('[data-line]')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const runBtn = root.querySelector<HTMLButtonElement>('[data-act="run"]')!, label = runBtn.querySelector('[data-label]')!;
+    const scr = new Screen(canvas);
+    let b: Uint8Array, n = 1, p: Player, slide = 0, phase: 'draw' | 'wait' | 'done' = 'draw', waited = 0, cmd: Ev | null = null, file = '';
+
+    const build = () => {
+      line.innerHTML = Array.from({ length: n }, (_, i) =>
+        `<li><button type="button" data-k="${i}" aria-label="Picture ${i + 1}">${i + 1}</button></li><li class="gpss-cmd${i === n - 1 ? ' is-z' : ''}"><span>${i === n - 1 ? 'z' : '88h'}</span></li>`).join('');
+    };
+    const mark = () => {
+      line.querySelectorAll<HTMLButtonElement>('button[data-k]').forEach((x, i) => x.setAttribute('aria-current', String(i === slide)));
+      line.querySelectorAll<HTMLElement>('.gpss-cmd').forEach((x, i) => x.classList.toggle('on', phase !== 'draw' && i === slide));
+    };
+    const fresh = () => {
+      p = new Player(b, SCRIPT.taher, 'taher');
+      p.onPlot = (x, y, c) => scr.set(x, y, c);
+      scr.clear(); scr.flush();
+      slide = 0; phase = 'draw'; text.hidden = true; wait.hidden = true;
+    };
+    const tell = () => {
+      say.innerHTML = phase === 'draw' ? `Picture <b>${slide + 1}</b> of ${n}: his player draws its strokes.`
+        : phase === 'wait' && cmd?.t === 'next' ? `<b>88h</b>: wait for 4,096 key checks, set the video mode again to wipe the screen, read the next header.`
+        : phase === 'wait' ? `<b>z</b>: the same wait, then back to text mode.`
+        : `The end: DOS prints his name, unfolded at start-up from 65 scrambled bytes.`;
+    };
+    // One command at a time: a whole picture, or the wait after it
+    const after = () => {
+      if (cmd?.t === 'next') { scr.clear(); scr.flush(); slide++; phase = 'draw'; wait.hidden = true; }
+      else { phase = 'done'; wait.hidden = true; text.hidden = false; setRun(false); }
+      mark(); tell();
+    };
+    const drawSome = (k: number) => {
+      let e: Ev | null = null;
+      for (let s = 0; s < k; ) {
+        e = p.step();
+        if (!e) break;
+        if (e.t === 'stroke') s++;
+        if (e.t === 'next' || e.t === 'end') { cmd = e; phase = 'wait'; waited = 0; wait.hidden = false; mark(); tell(); break; }
+      }
+      scr.flush();
+    };
+    const anim = loop(root, () => {
+      if (phase === 'draw') drawSome(n > 1 ? 18 : 10);
+      else if (phase === 'wait') {
+        wait.hidden = false;
+        waited = Math.min(4096, waited + 64);
+        count.textContent = waited.toLocaleString('en-US');
+        bar.style.width = `${(waited / 4096) * 100}%`;
+        if (waited >= 4096) after();
+      } else return false;
+    });
+    const setRun = (on: boolean) => {
+      runBtn.setAttribute('aria-pressed', String(on));
+      label.textContent = on ? 'Pause' : phase === 'done' ? 'Run again' : 'Run';
+      on ? anim.start() : anim.stop();
+    };
+    // Next command: finish this picture at once, or skip the wait
+    const next = () => {
+      if (phase === 'done') { fresh(); mark(); tell(); return; }
+      if (phase === 'draw') { drawSome(Infinity); return; }
+      waited = 4096; count.textContent = '4,096'; bar.style.width = '100%';
+      after();
+    };
+    const jump = (k: number) => {
+      setRun(false); fresh();
+      while (slide < k) { drawSome(Infinity); after(); }
+      if (reduce()) drawSome(Infinity); else setRun(true);
+      mark(); tell();
+    };
+    const load = async (f: string, count: number) => {
+      file = f; b = await mem(f); n = count;
+      build(); fresh(); mark(); tell();
+      if (f === 'TAHER_TAHER.COM') say.innerHTML = 'TAHER.COM draws one picture, then <b>z</b>: a short wait, text mode, and his name. Press Run.';
+      else say.innerHTML = 'His advertisement for a Port Said computer center: 15 pictures joined by <b>88h</b>, then <b>z</b>. Press Run, or tap a picture.';
+    };
+
+    radios(root.querySelector<HTMLElement>('.gpss-pick')!, x => { setRun(false); load(x.dataset.file!, +x.dataset.n!); });
+    line.addEventListener('click', e => { const k = (e.target as Element).closest<HTMLElement>('[data-k]')?.dataset.k; if (k) jump(+k); });
+    root.addEventListener('click', e => {
+      const act = (e.target as Element).closest<HTMLElement>('[data-act]')?.dataset.act;
+      if (act === 'run') {
+        if (phase === 'done') fresh();
+        if (reduce()) { next(); setRun(false); return; }
+        setRun(!anim.on);
+        if (anim.on) tell();
+      } else if (act === 'next') next();
+    });
+    for (const el of [root.querySelector<HTMLElement>('.gpss-pick')!, root.querySelector<HTMLElement>('.gp-ctl')!]) el.hidden = false;
+    canvas.hidden = false;
+    root.querySelector<HTMLElement>('[data-still]')!.hidden = true;
+    // Start with TAHER's picture on screen, the player stopped at its z
+    load('TAHER_TAHER.COM', 1).then(() => {
+      drawSome(Infinity); wait.hidden = true;
+      say.innerHTML = 'TAHER.COM draws one picture, then <b>z</b>: a short wait, text mode, and his name. Press Run.';
+    });
+  });
+</script>

@@ -1,0 +1,135 @@
+---
+// The DOS shell's side panel: buttons that type a command into the running emulator for you
+import Window from './shell/Window.astro';
+import { programs } from '../data/programs';
+
+const folders = [...new Set(programs.map(p => p.folder))].sort().map(folder => ({
+  folder,
+  programs: programs.filter(p => p.folder === folder),
+}));
+
+const basics = [
+  { cmd: 'DIR', label: 'List files' },
+  { cmd: 'TYPE README.TXT', label: 'Read the README' },
+  { cmd: 'CD \\', label: 'Back to C:\\' },
+  { cmd: 'CLS', label: 'Clear the screen' },
+];
+---
+
+<Window kind="dialog" title="Type it for me" active as="aside" class="cmds" data-cmds aria-labelledby="cmds-h">
+  <h2 id="cmds-h" class="sr-only">Type it for me</h2>
+  <p class="state" data-cmd-state role="status">The buttons switch on when DOS is ready.</p>
+
+  <div class="basics">
+    {basics.map(b => (
+      <button type="button" class="cmd" data-type={b.cmd} disabled>
+        <code>{b.cmd}</code><span>{b.label}</span>
+      </button>
+    ))}
+  </div>
+
+  <h3>Folders</h3>
+  <ul class="folders">
+    {folders.map(f => (
+      <li class="folder">
+        <button type="button" class="open" data-type={`CD \\${f.folder}|DIR`} disabled>{f.folder}</button>
+        <div class="runs">
+          {f.programs.map(p => (
+            <button type="button" class="run" data-type={`CD \\${f.folder}|${p.executable.replace(/\.(EXE|COM)$/, '')}`} disabled title={p.title}>
+              Run {p.executable}
+            </button>
+          ))}
+        </div>
+      </li>
+    ))}
+  </ul>
+</Window>
+
+<style>
+  .cmds {
+    position: sticky;
+    top: calc(var(--mb) + 16px);
+  }
+  h3 { margin: 26px 0 8px; font: 400 16px/1.4 var(--font-dos); color: var(--ink); }
+  .state { margin: 0 0 16px; font-size: 0.9375rem; }
+  [data-ready] .state { font-weight: 700; }
+
+  .basics { display: grid; gap: 10px; }
+  .cmd {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 10px 12px;
+    font: 500 0.9375rem/1.3 var(--sans);
+    color: var(--btn-ink);
+    text-align: left;
+    background: var(--btn-bg);
+    border: 0;
+    box-shadow: 4px 4px 0 var(--black);
+    cursor: pointer;
+  }
+  .cmd code { font: 400 16px/1 var(--font-dos); color: inherit; }
+
+  .folders { list-style: none; border-top: 2px solid var(--black); }
+  .folder { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 8px; padding: 2px 0; border-bottom: 1px solid oklch(0 0 0 / 0.35); }
+  .open, .run { min-height: 44px; padding: 0 10px; font: 400 16px/1 var(--font-dos); color: var(--black); background: none; border: 0; cursor: pointer; }
+  .open::before { content: '▸ '; color: var(--hot); }
+  .run { font-weight: 400; }
+  .runs { display: flex; flex-wrap: wrap; justify-content: flex-end; }
+
+  .cmds button:not(:disabled):hover, .cmds button.is-typing { background: var(--vga-14); }
+  .cmds button:active:not(:disabled) { translate: 2px 2px; box-shadow: 2px 2px 0 var(--black); }
+  .cmds button:disabled { opacity: 0.55; cursor: wait; }
+  .cmds button:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+
+  @media (max-width: 1000px) { .cmds { position: static; } }
+</style>
+
+<script>
+  type CI = { simulateKeyPress: (...codes: number[]) => void };
+
+  const panel = document.querySelector<HTMLElement>('[data-cmds]')!;
+  const state = panel.querySelector<HTMLElement>('[data-cmd-state]')!;
+  const buttons = [...panel.querySelectorAll<HTMLButtonElement>('[data-type]')];
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  // js-dos key codes follow GLFW: letters and digits are ASCII, Enter is 257, Shift is 340
+  const SPECIAL: Record<string, number[]> = { ' ': [32], '.': [46], '\\': [92], '-': [45], '_': [340, 45], ':': [340, 59] };
+  const codes = (ch: string) => SPECIAL[ch] ?? [ch.toUpperCase().charCodeAt(0)];
+
+  let ci: CI | null = null;
+  let emu: HTMLElement | null = null;
+  let busy = false;
+
+  async function type(script: string) {
+    if (!ci || busy) return;
+    busy = true;
+    for (const line of script.split('|')) {
+      for (const ch of line) {
+        ci.simulateKeyPress(...codes(ch));
+        await sleep(45);
+      }
+      ci.simulateKeyPress(257);
+      await sleep(260);
+    }
+    busy = false;
+  }
+
+  document.addEventListener('dos:ready', (e => {
+    ({ ci, emu } = (e as CustomEvent<{ ci: CI; emu: HTMLElement }>).detail);
+    panel.dataset.ready = '';
+    state.textContent = 'DOS is ready. Each button types its command and presses Enter.';
+    buttons.forEach(b => (b.disabled = false));
+  }) as EventListener);
+
+  for (const b of buttons) {
+    b.addEventListener('click', async () => {
+      b.classList.add('is-typing');
+      await type(b.dataset.type!);
+      b.classList.remove('is-typing');
+      emu?.querySelector<HTMLCanvasElement>('canvas')?.focus();
+    });
+  }
+</script>

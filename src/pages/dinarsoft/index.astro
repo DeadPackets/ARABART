@@ -1,0 +1,265 @@
+---
+// DinarSoft, the hub: the company in Visual Studio 2005 chrome, with DinarSoft's own logo, colors and Verdana inside it.
+// Start Page (story, projects, his press releases), Solution Explorer (the six apps on a Pocket PC), the years, the awards,
+// the reviews, the company's look, and the 2026 freeware release with every installer.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Window from '../../components/shell/Window.astro';
+import Explorer from '../../components/toys/dinarsoft/Explorer.astro';
+import Years from '../../components/toys/dinarsoft/Years.astro';
+import Awards from '../../components/toys/dinarsoft/Awards.astro';
+import Reviews from '../../components/toys/dinarsoft/Reviews.astro';
+import Downloads from '../../components/toys/dinarsoft/Downloads.astro';
+import Relaunch from '../../components/toys/dinarsoft/Relaunch.astro';
+import Term from '../../components/explain/Term.astro';
+import { apps, icon, img, press, reviews, downloads, totalBytes, awards, company, longDate } from '../../data/dinarsoft';
+import '../../components/toys/dinarsoft/ds.css';
+
+const base = import.meta.env.BASE_URL;
+const logo = img('logo'), mark = img('mark'), banner = img('banner');
+const his = press.filter(p => p.his).length;
+const releases = apps.reduce((n, a) => n + a.releases.length, 0);
+const mb = (totalBytes / 1e6).toFixed(1);
+const wins = awards.filter(a => a.level === 'Winner').length;
+---
+
+<BaseLayout
+  title="DinarSoft · Yasser Awad"
+  description="Yasser Awad's own company: six award-winning apps for Pocket PC and Windows Mobile, made in Kanata from 2002 to 2008, and free since 2026. Run them, download them, unlock them."
+  image="/ARABART/dinarsoft/site/ds-2006-home-relaunch.webp"
+  era="vs2005"
+  keys={[{ k: 'F5', label: 'Free downloads', href: '#free' }, { k: 'F6', label: 'The six apps', href: '#apps' }]}
+>
+  <div class="dsh">
+    <section class="dsh-start" aria-labelledby="dsh-h1">
+      <div class="container">
+        <Window kind="editor" title="Start Page" active class="dsh-sp">
+          <div class="dsh-sp-grid">
+            <div class="dsh-sp-main">
+              <h1 id="dsh-h1" class="dsh-h1"><img src={logo.src} width={logo.w} height={logo.h} alt="DinarSoft" fetchpriority="high" /></h1>
+              <p class="dsh-tag">{company.tagline}</p>
+              <p class="dsh-big">Six apps for the smartphones before the iPhone. {awards.length} nominations, {wins} magazine wins, and all six free today.</p>
+              <p class="dsh-lead">In November 2002, Yasser Awad founded DinarSoft Corporation in Kanata, Ontario, the tech town its own website called “silicon valley north”. Alongside his work at Alcatel, he wrote all six of its apps for <Term id="pocket-pc">Pocket PC and Windows Mobile</Term>: the phones people carried before the iPhone. Reviewers from New Zealand to Dubai to Spain praised them. In October 2026 he released all six as freeware.</p>
+              <div class="dsh-acts">
+                <a class="button button--primary" href="#apps">Open the solution</a>
+                <a class="button" href="#free">Download, free</a>
+              </div>
+            </div>
+            <div class="dsh-sp-side">
+              <h2 class="dsh-sp-h">Recent Projects</h2>
+              <ul class="dsh-recent">
+                {apps.map(a => {
+                  const ic = icon(a.id);
+                  return (
+                    <li><a href={`${base}/dinarsoft/${a.id}/`}>
+                      <img src={ic.src} width="40" height="40" alt="" />
+                      <span><span class="dsx-word">{a.pre}<b>{a.post}</b></span><span class="dsx-slogan">{a.slogan}</span></span>
+                    </a></li>
+                  );
+                })}
+              </ul>
+              <h2 class="dsh-sp-h">DinarSoft News</h2>
+              <p class="dsh-news-p">He wrote the company’s news himself: {his} of its {press.length} press releases carry his name.</p>
+              <ol class="dsh-news" tabindex="0" aria-label={`DinarSoft's ${press.length} press releases, newest first`}>
+                {press.map(p => (
+                  <li>
+                    <time datetime={p.date}>{longDate(p.date)}</time>
+                    <a href={p.link} rel="noopener">{p.title}</a>
+                    {p.his && <span class="dsh-by">Yasser Awad</span>}
+                  </li>
+                ))}
+              </ol>
+              <p class="dsx-credit">Every release links to its copy in the Internet Archive’s Wayback Machine.</p>
+            </div>
+          </div>
+        </Window>
+      </div>
+    </section>
+
+    <section class="dsh-sec" id="apps" aria-labelledby="apps-h">
+      <div class="container">
+        <div class="dsh-intro">
+          <h2 id="apps-h" class="dsx-h2">Open the solution.</h2>
+          <p class="dsx-lede">Six projects, one engineer. Pick one in Solution Explorer to see it on a Pocket PC, in its real screens from DinarSoft’s own product pages. Tap the screen to move through them, then open the app for its story, its installers, a free unlock key and a tour of how it works.</p>
+        </div>
+        <Explorer />
+      </div>
+    </section>
+
+    <section class="dsh-sec dsh-sec--doc" id="years" aria-labelledby="years-h">
+      <div class="container">
+        <div class="dsh-intro">
+          <h2 id="years-h" class="dsx-h2">Five apps in one summer.</h2>
+          <p class="dsx-lede">Between June and September 2003 he shipped MemMaid, HijriDate, HandyMenu, HandyLauncher and HandySwitcher. TapText followed in 2005. He kept making them better: {releases} releases in six years, each one in his own revision histories. Press Run to watch DinarSoft grow year by year, or tap any dot to read what that version added.</p>
+        </div>
+        <Years />
+      </div>
+    </section>
+
+    <section class="dsh-sec" id="awards" aria-labelledby="awards-h">
+      <div class="container">
+        <div class="dsh-intro">
+          <h2 id="awards-h" class="dsx-h2">{awards.length} nominations. {wins === 3 ? 'Three' : wins} wins.</h2>
+          <p class="dsx-lede">For eight years, <cite>Pocket PC Magazine</cite>, later renamed <cite>Smartphone &amp; Pocket PC</cite>, held the Best Software Awards for Windows Mobile. A DinarSoft app was nominated every year from 2003 to 2008. HandySwitcher won Task Managers in 2007 and again in 2008, TapText won Misc. Utilities in 2007, and MemMaid was a finalist four years running.</p>
+          <p class="dsx-lede">Tap a year to open the magazine’s own page, as the Internet Archive kept it. Stores and review sites honored his apps too.</p>
+        </div>
+        <Awards />
+      </div>
+    </section>
+
+    <section class="dsh-sec dsh-sec--doc" id="reviews" aria-labelledby="reviews-h">
+      <div class="container">
+        <div class="dsh-intro">
+          <h2 id="reviews-h" class="dsx-h2">What the reviewers said.</h2>
+          <p class="dsx-lede">Reviewers in the US, the UK, New Zealand, the UAE, Germany and Spain wrote about his apps, and Russia’s <cite>CHIP</cite> magazine put them on its cover discs. Here are {reviews.length} reviews, each with the reviewer’s own page as the Internet Archive kept it.</p>
+        </div>
+        <Reviews />
+      </div>
+    </section>
+
+    <section class="dsh-sec dsh-look" id="look" aria-labelledby="look-h">
+      <div class="container">
+        <div class="dsh-intro">
+          <h2 id="look-h" class="dsx-h2">Red, charcoal and Verdana.</h2>
+          <p class="dsx-lede">His first logo was DiNAR in blue, with a little green globe as the dot of the i, and an Arabic twin that spells <span lang="ar" dir="rtl">دينار</span>. It shipped inside his apps, which is where it was found again. On November 1, 2006, DinarSoft got a new logo: two red crescents around a red dot, forming a D, beside a charcoal italic wordmark. Two weeks later a new dinarsoft.com went live with it, and with a store of its own. Drag across the two home pages to see the change.</p>
+        </div>
+        <div class="dsh-brand">
+          <Window kind="panel" title="logo.png" class="dsh-logo-win">
+            <div class="dsh-logo-stage">
+              <img class="dsh-mark" src={mark.src} width="200" height="200" alt="The DinarSoft mark: two red crescents around a red dot." loading="lazy" />
+              <img class="dsh-logo" src={logo.src} width={logo.w} height={logo.h} alt="The DinarSoft logo with its wordmark." loading="lazy" />
+            </div>
+            <figure class="dsh-banner">
+              <img src={banner.src} width={banner.w} height={banner.h} alt="A home-page banner from dinarsoft.com: a glass dome, with the tagline Mobile Software for every need." loading="lazy" />
+            </figure>
+          </Window>
+          <Window kind="panel" title="Colors and type" class="dsh-sw-win">
+            <ul class="dsh-sw">
+              {company.colors.map(c => (
+                <li><button type="button" class="dsh-chip" data-hex={c.hex} style={`--c:${c.hex}`} aria-label={`Copy ${c.name}, ${c.hex}`}><i></i></button><span><b>{c.name}</b> <code class="dsx-mono">{c.hex}</code><br />{c.use}</span></li>
+              ))}
+            </ul>
+            <p class="dsh-type"><span>Verdana</span> Mobile Software for every need</p>
+            <p class="dsh-type dsh-type--a"><span>Arial</span> Handy<b>Switcher</b></p>
+            <p class="dsx-credit" data-copied aria-live="polite">Tap a color to copy it.</p>
+          </Window>
+        </div>
+        <ul class="dsh-words">
+          {apps.map(a => {
+            const ic = icon(a.id);
+            return <li><img src={ic.src} width={ic.w} height={ic.h} alt="" loading="lazy" /><span><span class="dsx-word">{a.pre}<b>{a.post}</b>{a.id === 'hijridate' && ' Plugin'}</span><span class="dsx-slogan">{a.slogan}</span></span></li>;
+          })}
+        </ul>
+        <Relaunch />
+      </div>
+    </section>
+
+    <section class="dsh-sec dsh-free" id="free" aria-labelledby="free-h">
+      <div class="container">
+        <div class="dsh-intro">
+          <h2 id="free-h" class="dsx-h2">Free, since 2026.</h2>
+          <p class="dsx-lede">In October 2026, Yasser Awad released every DinarSoft app as freeware. The original installers are here, {downloads.length} files and {mb} MB, recovered from the Internet Archive and checked byte for byte against their <Term id="sha-256">SHA-256</Term> fingerprints. Each app’s page has its files, a free key that unlocks the full version, and steps for a real Pocket PC or an emulator.</p>
+        </div>
+        <ul class="dsh-get">
+          {apps.map(a => {
+            const ic = icon(a.id);
+            const ds = downloads.filter(d => d.app === a.id);
+            return (
+              <li><a href={`${base}/dinarsoft/${a.id}/#download`}>
+                <img src={ic.src} width="56" height="56" alt="" loading="lazy" />
+                <span class="dsx-word">{a.pre}<b>{a.post}</b></span>
+                <span class="dsh-get-n">{ds.length} {ds.length === 1 ? 'file' : 'files'} · {(ds.reduce((n, d) => n + d.bytes, 0) / 1e6).toFixed(1)} MB</span>
+              </a></li>
+            );
+          })}
+        </ul>
+        <Downloads table={false} />
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .dsh-start { padding: clamp(28px, 4vw, 56px) 0 clamp(56px, 7vw, 96px); background: linear-gradient(oklch(0.86 0.04 250), oklch(0.95 0.015 250)); }
+  .dsh-sp :global(.win-body) { padding: clamp(20px, 3vw, 40px); }
+  .dsh-sp-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(28px, 4vw, 64px); }
+  .dsh-h1 { line-height: 0; }
+  .dsh-h1 img { width: min(100%, 520px); height: auto; animation: dsh-rise 0.8s var(--expo) both; }
+  .dsh-tag { margin-top: 6px; font: 400 clamp(1rem, 0.6vw + 0.85rem, 1.375rem)/1.3 var(--ds-verdana); color: #6e6e6e; animation: dsh-rise 0.8s 0.08s var(--expo) both; }
+  .dsh-big { margin-top: clamp(22px, 3vw, 36px); max-width: 22ch; font: 800 clamp(2rem, 2.6vw + 1rem, 3.5rem)/1.04 var(--font-display); font-stretch: 80%; color: var(--ds-ink); text-wrap: balance; animation: dsh-rise 0.8s 0.16s var(--expo) both; }
+  .dsh-lead { margin-top: 20px; max-width: 58ch; font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.1875rem); line-height: 1.65; color: #333; animation: dsh-slide 0.8s 0.24s var(--expo) both; }
+  .dsh-acts { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
+  @keyframes dsh-rise { from { opacity: 0; translate: 0 14px; } }
+  /* the lead is the page's largest text: it slides in without fading, so it counts as painted at once */
+  @keyframes dsh-slide { from { translate: 0 14px; } }
+
+  .dsh-sp-h { padding: 4px 8px; font: 700 0.9375rem/1.4 var(--ds-verdana); color: #fff; background: linear-gradient(90deg, #3d5fa6, #8aa7d8); letter-spacing: 0; }
+  .dsh-sp-h ~ .dsh-sp-h { margin-top: 22px; }
+  .dsh-recent { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; margin-top: 8px; }
+  .dsh-recent a { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 4px 6px; text-decoration: none; border-radius: 2px; }
+  .dsh-recent a:hover { background: #e8eef9; }
+  .dsh-recent a > span { display: grid; gap: 2px; min-width: 0; }
+  .dsh-recent .dsx-word { font-size: 1.0625rem; }
+  .dsh-recent .dsx-slogan { font-size: 0.75rem; }
+  .dsh-news-p { margin-top: 8px; font: 400 0.875rem/1.5 var(--ds-verdana); color: #444; }
+  .dsh-news { list-style: none; max-height: 330px; overflow-y: auto; margin-top: 8px; padding-right: 6px; border-top: 1px solid var(--rule); scrollbar-width: thin; }
+  .dsh-news:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .dsh-news li { display: grid; grid-template-columns: 9.5em minmax(0, 1fr); gap: 0 10px; padding: 7px 0; border-bottom: 1px solid oklch(0.92 0.01 250); font: 400 0.875rem/1.4 var(--ds-verdana); }
+  .dsh-news time { color: #6b6b6b; font-style: italic; }
+  .dsh-news a { color: #1a3f8f; }
+  .dsh-news a:hover { color: var(--ds-menu); }
+  .dsh-by { grid-column: 2; font-size: 0.75rem; color: var(--ds-rust); }
+
+  .dsh-sec { padding-block: clamp(72px, 9vw, 128px); }
+  .dsh-sec--doc { background: #fff; border-block: 1px solid var(--xp-line); }
+  .dsh-intro { margin-bottom: clamp(28px, 4vw, 48px); }
+
+  .dsh-brand { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); gap: 24px; align-items: start; }
+  .dsh-logo-stage { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: center; padding: 18px 8px; }
+  .dsh-mark { width: clamp(96px, 12vw, 180px); height: auto; }
+  .dsh-logo { width: 100%; height: auto; }
+  .dsh-banner { margin: 6px 0 0; }
+  .dsh-banner img { width: 100%; height: auto; border-bottom: 4px solid #d34b0c; }
+  .dsh-sw { list-style: none; display: grid; gap: 10px; }
+  .dsh-sw li { display: flex; gap: 12px; align-items: center; font: 400 0.8125rem/1.4 var(--ds-verdana); }
+  .dsh-sw b { font-size: 0.875rem; }
+  .dsh-chip { width: 44px; height: 44px; flex: none; padding: 0; border: 1px solid oklch(0 0 0 / 0.2); background: var(--c); cursor: pointer; transition: scale 0.15s var(--quart); }
+  .dsh-chip:hover { scale: 1.06; }
+  .dsh-chip.ok { animation: dsh-ok 0.5s var(--quart); }
+  @keyframes dsh-ok { 40% { scale: 0.88; } }
+  .dsh-type { margin-top: 16px; font: 400 1.125rem/1.3 var(--ds-verdana); color: var(--ds-ink); }
+  .dsh-type span { display: block; font: 700 0.75rem/1.4 var(--ds-verdana); color: #6e6e6e; text-transform: uppercase; letter-spacing: 0.06em; }
+  .dsh-type--a { font-family: var(--ds-arial); font-size: 1.625rem; }
+  .dsh-words { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px 24px; margin: 32px 0 40px; }
+  .dsh-words li { display: flex; align-items: center; gap: 12px; }
+  .dsh-words img { width: 64px; height: 64px; }
+  .dsh-words li > span { display: grid; gap: 4px; }
+  .dsh-words .dsx-word { font-size: 1.625rem; }
+
+  .dsh-free { background: linear-gradient(oklch(0.95 0.015 250), oklch(0.88 0.035 250)); }
+  .dsh-get { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; margin-bottom: 8px; }
+  .dsh-get a { display: grid; justify-items: center; gap: 6px; height: 100%; padding: 16px 8px 14px; text-align: center; text-decoration: none; background: #fff; border: 1px solid var(--xp-line); border-radius: 3px; transition: translate 0.2s var(--quart), box-shadow 0.2s; }
+  .dsh-get a:hover { translate: 0 -3px; box-shadow: 0 8px 20px oklch(0.3 0.05 250 / 0.18); }
+  .dsh-get .dsx-word { font-size: 1.125rem; }
+  .dsh-get-n { font: 400 0.8125rem/1.3 var(--ds-verdana); color: var(--ink-2); }
+
+  @media (max-width: 1100px) {
+    .dsh-sp-grid, .dsh-brand { grid-template-columns: minmax(0, 1fr); }
+    .dsh-get { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 640px) {
+    .dsh-recent { grid-template-columns: minmax(0, 1fr); }
+    .dsh-news li { grid-template-columns: minmax(0, 1fr); }
+    .dsh-by { grid-column: 1; }
+    .dsh-get { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dsh-logo-stage { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  }
+</style>
+
+<script>
+  const note = document.querySelector<HTMLElement>('[data-copied]');
+  document.querySelectorAll<HTMLButtonElement>('.dsh-chip').forEach(b => b.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(b.dataset.hex!); if (note) note.textContent = `Copied ${b.dataset.hex}.`; }
+    catch { if (note) note.textContent = b.dataset.hex!; }
+    b.classList.remove('ok'); void b.offsetWidth; b.classList.add('ok');
+  }));
+</script>

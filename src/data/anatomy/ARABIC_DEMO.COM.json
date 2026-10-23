@@ -1,0 +1,111 @@
+{
+ "file": "ARABIC/DEMO.COM",
+ "regions": [
+  {
+   "start": 0,
+   "end": 19,
+   "kind": "code",
+   "label": "Credit decoder",
+   "note": "Subtracts 4, 5, 6 and so on from the 65 bytes at 01ABh.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#signature"
+  },
+  {
+   "start": 19,
+   "end": 171,
+   "kind": "code",
+   "label": "Slide player",
+   "note": "Sets EGA mode 10h, copies each 9-byte header into its own code, and plots every pixel twice through the BIOS.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#inside"
+  },
+  {
+   "start": 171,
+   "end": 236,
+   "kind": "text",
+   "label": "Scrambled credit",
+   "note": "\"K E M Y A M Software Corp., <c>1991 YASSER MOHAMED ALI.\" after decoding, shown at the end.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#signature"
+  },
+  {
+   "start": 236,
+   "end": 25889,
+   "kind": "image",
+   "label": "Slide script",
+   "note": "15 slides, 23 lines of text, 9,023 vertical pixel runs and the commands x, w, y, z and 88h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#small"
+  },
+  {
+   "start": 25889,
+   "end": 25899,
+   "kind": "unused",
+   "label": "Tail",
+   "note": "Nine more z bytes and 1Ah, the DOS end-of-file mark; the player stops at the first z.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#small"
+  }
+ ],
+ "routines": [
+  {
+   "start": 0,
+   "end": 19,
+   "name": "decode_credit",
+   "note": "Unscrambles the copyright.",
+   "link": "#signature",
+   "lines": [
+    {
+     "off": 8,
+     "note": "Subtract the rising key"
+    }
+   ]
+  },
+  {
+   "start": 19,
+   "end": 171,
+   "name": "player",
+   "note": "Script interpreter and pixel plotter.",
+   "link": "#inside",
+   "lines": [
+    {
+     "off": 22,
+     "note": "EGA mode 10h, which also clears the screen"
+    },
+    {
+     "off": 27,
+     "note": "Copy 5 header bytes into the code"
+    },
+    {
+     "off": 65,
+     "note": "Read the next script byte"
+    },
+    {
+     "off": 108,
+     "note": "Face pixel: INT 10h/0Ch"
+    },
+    {
+     "off": 115,
+     "note": "Patched jump: draw or skip the shadow"
+    },
+    {
+     "off": 117,
+     "note": "Shadow pixel at x + 2, y + 2"
+    },
+    {
+     "off": 137,
+     "note": "Pause: 4,096 DOS calls"
+    },
+    {
+     "off": 148,
+     "note": "End: text mode, print the credit"
+    }
+   ]
+  }
+ ]
+}

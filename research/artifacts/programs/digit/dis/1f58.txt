@@ -1,0 +1,30 @@
+1f58:0000 46             inc si
+1f58:0001 0ceb           or al, 0xeb
+1f58:0003 005dcb         add byte ptr [di - 0x35], bl
+1f58:0006 55             push bp
+1f58:0007 8bec           mov bp, sp
+1f58:0009 56             push si
+1f58:000a 39265c16       cmp word ptr [0x165c], sp
+1f58:000e 7705           ja 0x15
+1f58:0010 9aac290000     lcall 0, 0x29ac
+1f58:0015 eb00           jmp 0x17
+1f58:0017 6a00           push 0
+1f58:0019 9a9b120000     lcall 0, 0x129b
+1f58:001e 59             pop cx
+1f58:001f 8bf0           mov si, ax
+1f58:0021 0bc0           or ax, ax
+1f58:0023 74f2           je 0x17
+1f58:0025 8bc6           mov ax, si
+1f58:0027 eb00           jmp 0x29
+1f58:0029 5e             pop si
+1f58:002a 5d             pop bp
+1f58:002b cb             retf 
+1f58:002c 55             push bp
+1f58:002d 8bec           mov bp, sp
+1f58:002f 39265c16       cmp word ptr [0x165c], sp
+1f58:0033 7705           ja 0x3a
+1f58:0035 9aac290000     lcall 0, 0x29ac
+1f58:003a 1e             push ds
+1f58:003b 68e80c         push 0xce8
+1f58:003e 9a             db
+1f58:003f 06             push es

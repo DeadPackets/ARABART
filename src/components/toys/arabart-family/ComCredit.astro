@@ -1,0 +1,142 @@
+---
+// His hidden signature: the 19-byte decoder at DEMO.COM CS:0100 in the CodeStepper beside the C, over the real 65
+// scrambled bytes at CS:01AB. Below it, the same trick on any name.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import CodeStepper from '../CodeStepper.astro';
+import Window from '../../shell/Window.astro';
+import { CREDIT_AT, CREDIT_LEN, decode } from './com.ts';
+import { hex } from '../arabart/core.ts';
+
+interface Props { id?: string }
+const { id = 'comcredit' } = Astro.props;
+const com = new Uint8Array(readFileSync(join(process.cwd(), 'public/bytes/files/ARABIC_DEMO.COM.mem')));
+const enc = [...com.subarray(CREDIT_AT, CREDIT_AT + CREDIT_LEN)], dec = decode(enc);
+const glyph = (b: number) => (b === 13 ? '↵' : b === 10 ? '' : b >= 32 && b < 127 ? String.fromCharCode(b) : '·');
+const esc = (b: number) => glyph(b).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;');
+
+const ASM = [
+  { off: '0100', code: 'mov  si,01ABh', note: 'the 65 bytes' },
+  { off: '0103', code: 'mov  al,4', note: 'the first key' },
+  { off: '0105', code: 'mov  cx,41h', note: '65 times' },
+  { off: '0108', label: 'next', code: 'mov  ah,[si]', note: 'one byte' },
+  { off: '010A', code: 'sub  ah,al', note: 'minus the key' },
+  { off: '010C', code: 'mov  [si],ah', note: 'written back' },
+  { off: '010E', code: 'inc  si', note: 'the next byte' },
+  { off: '010F', code: 'inc  al', note: 'the next key' },
+  { off: '0111', code: 'loop next' },
+];
+const C = [
+  { code: 'byte *s = credit;', note: '01ABh' },
+  { code: 'byte key = 4;' },
+  { code: 'for (n = 65; n > 0; n--) {' },
+  { code: '  *s = *s - key;', note: 'unscramble' },
+  { code: '  s++;' },
+  { code: '  key++;' },
+  { code: '}' },
+];
+const steps: { a: number; c: number; say: string; regs: { name: string; value: string; means: string }[]; k: number; on: number }[] = [];
+const reg = (si: number, al: number, ah: number | null, cx: number) => [
+  { name: 'SI', value: `${hex(0x1ab + si, 4)}h`, means: `byte ${si + 1} of 65` },
+  { name: 'AL', value: String(al), means: 'the key' },
+  ...(ah === null ? [] : [{ name: 'AH', value: `${hex(ah)}h`, means: `“${glyph(ah)}”` }]),
+  { name: 'CX', value: String(cx), means: 'bytes still to go' },
+];
+steps.push({ a: 0, c: 0, say: 'His read pointer starts at the 65 scrambled bytes. In a file viewer they read as nonsense.', regs: reg(0, 0, null, 0), k: -1, on: 0 });
+steps.push({ a: 1, c: 1, say: 'The first key is <b>4</b>.', regs: reg(0, 4, null, 0), k: -1, on: 0 });
+steps.push({ a: 2, c: 2, say: 'Repeat 65 times, once for every byte.', regs: reg(0, 4, null, 65), k: -1, on: 0 });
+for (let i = 0; i < CREDIT_LEN; i++) {
+  const key = 4 + i, e = enc[i], d = dec[i];
+  if (i < 2) {
+    steps.push({ a: 3, c: 3, say: `Read byte ${i + 1}: <b>${hex(e)}h</b>, “${esc(e)}”.`, regs: reg(i, key, e, 65 - i), k: i, on: i });
+    steps.push({ a: 4, c: 3, say: `Subtract the key: ${hex(e)}h − ${key} = <b>${hex(d)}h</b>, the letter “${esc(d)}”.`, regs: reg(i, key, d, 65 - i), k: i, on: i + 1 });
+    steps.push({ a: 5, c: 3, say: 'Write it back over the scrambled byte.', regs: reg(i, key, d, 65 - i), k: i, on: i + 1 });
+    steps.push({ a: 7, c: 5, say: `The key goes up by one, to ${key + 1}. So every byte has its own key.`, regs: reg(i + 1, key + 1, d, 65 - i), k: i, on: i + 1 });
+    steps.push({ a: 8, c: 6, say: 'And around again.', regs: reg(i + 1, key + 1, d, 64 - i), k: i, on: i + 1 });
+  } else {
+    steps.push({ a: 4, c: 3, say: `${hex(e)}h − ${key} = ${hex(d)}h: “${esc(d)}”.`, regs: reg(i, key, d, 65 - i), k: i, on: i + 1 });
+  }
+}
+const text = dec.map(glyph).join('');
+steps.push({ a: 8, c: 6, say: `Done. When the show ends, the program prints it: <b>${text.replace(/↵+/g, ' ').replace(/\$$/, '').replace(/</g, '&lt;').replace(/>/g, '&gt;').trim()}</b>`, regs: reg(65, 69, null, 0), k: 65, on: 65 });
+---
+
+<div class="comc" data-comcredit data-for={id}>
+  <CodeStepper id={id} title="DEMO.COM  the first 19 bytes" cTitle="The same in C" asm={ASM} c={C} steps={steps} at={0} speed={0.12}>
+    <Window slot="visual" title="HIS CREDIT  65 bytes, as a file viewer shows them" kind="panel" num="4" class="comc-win">
+      <div class="comc-cells" data-cells>
+        {enc.map((e, i) => <span data-i={i} data-e={glyph(e)} data-d={glyph(dec[i])}><b>{glyph(e)}</b><small>{hex(e)}</small></span>)}
+      </div>
+      <div class="comc-line"><span class="comc-lab">Decoded so far</span><code data-line></code></div>
+    </Window>
+  </CodeStepper>
+  <Window title="TRY IT  scramble your own name his way" kind="dialog" class="comc-try">
+    <label class="comc-in"><span>Your name</span><input type="text" maxlength="32" value="Yasser Awad" data-name autocomplete="off" spellcheck="false" /></label>
+    <div class="comc-out" aria-live="polite">
+      <span class="comc-lab">In the file</span><code data-enc></code>
+      <span class="comc-lab">After his loop</span><code data-dec></code>
+    </div>
+    <button type="button" class="button k-btn" data-run>Run his loop</button>
+  </Window>
+</div>
+
+<style is:global>
+  .comc { display: grid; gap: 24px; min-width: 0; }
+  .comc-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 3px; }
+  .comc-cells span { display: grid; justify-items: center; gap: 1px; padding: 4px 0 3px; box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 0.2s var(--quart); }
+  .comc-cells b { font: 700 15px/1.1 var(--font-code); color: var(--ink-2); white-space: pre; }
+  .comc-cells small { font: 500 9px/1.1 var(--font-code); color: var(--ink-2); }
+  .comc-cells span.done b { color: var(--accent); }
+  .comc-cells span.now { background: var(--accent); }
+  .comc-cells span.now b, .comc-cells span.now small { color: var(--surface); }
+  .comc-line { display: grid; gap: 4px; margin-top: 14px; }
+  .comc-lab { font: 600 12px/1.4 var(--font-code); color: var(--accent-2); }
+  .comc-line code, .comc-out code { min-height: 1.5em; font: 700 0.9375rem/1.5 var(--font-code); color: var(--accent); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .comc-try { max-width: 640px; }
+  .comc-in { display: grid; gap: 6px; font: 700 0.875rem/1.3 var(--sans); color: var(--ink); }
+  .comc-in input { min-height: 44px; padding: 0 12px; font: 600 1rem/1 var(--font-code); color: var(--vga-14); background: var(--vga-1); border: 0; box-shadow: inset 0 0 0 2px var(--vga-15); }
+  .comc-in input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .comc-out { display: grid; gap: 4px; margin: 14px 0; }
+  .comc-out code { color: var(--ink); }
+  .comc:not(:has(.k-cs.is-live)) .comc-try { display: none; }
+  @media (prefers-reduced-motion: reduce) { .comc-cells span { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduce } from './vga.ts';
+
+  const glyph = (b: number) => (b === 13 ? '↵' : b === 10 ? '' : b >= 32 && b < 127 ? String.fromCharCode(b) : '·');
+  document.querySelectorAll<HTMLElement>('[data-comcredit]').forEach(wrap => {
+    const root = document.getElementById(wrap.dataset.for!) as HTMLElement & { stepper?: { i: number } };
+    const steps = JSON.parse(root.querySelector('[data-trace]')!.textContent!) as { k: number; on: number }[];
+    const cells = [...wrap.querySelectorAll<HTMLElement>('[data-cells] span')], line = wrap.querySelector<HTMLElement>('[data-line]')!;
+    const paint = (i: number) => {
+      const s = steps[i];
+      cells.forEach((c, j) => {
+        const done = j < s.on;
+        c.classList.toggle('done', done);
+        c.classList.toggle('now', j === s.k);
+        c.querySelector('b')!.textContent = done ? c.dataset.d! : c.dataset.e!;
+      });
+      line.textContent = cells.slice(0, s.on).map(c => c.dataset.d).join('').replace(/↵+/g, ' ');
+    };
+    root.addEventListener('stepper', e => paint((e as CustomEvent).detail.i));
+    paint(root.stepper?.i ?? 0);
+
+    // Your name, scrambled with his rule: byte k + (4 + k)
+    const input = wrap.querySelector<HTMLInputElement>('[data-name]')!, enc = wrap.querySelector<HTMLElement>('[data-enc]')!, dec = wrap.querySelector<HTMLElement>('[data-dec]')!;
+    const bytes = () => [...input.value].map(ch => ch.charCodeAt(0) & 255);
+    const scramble = () => { enc.textContent = bytes().map((b, k) => glyph((b + 4 + k) & 255)).join(''); dec.textContent = ''; };
+    input.addEventListener('input', scramble);
+    let anim: gsap.core.Tween | null = null;
+    wrap.querySelector('[data-run]')!.addEventListener('click', () => {
+      const b = bytes(), out = b.map(x => glyph(x)).join('');
+      anim?.kill();
+      if (reduce()) { dec.textContent = out; return; }
+      const o = { n: 0 };
+      anim = gsap.to(o, { n: b.length, duration: Math.min(1.6, 0.08 * b.length + 0.3), ease: 'none', onUpdate: () => (dec.textContent = out.slice(0, Math.round(o.n))) });
+    });
+    scramble();
+  });
+</script>

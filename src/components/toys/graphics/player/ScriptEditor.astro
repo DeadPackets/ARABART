@@ -1,0 +1,130 @@
+---
+// Write a script for his player. The text compiles to the exact bytes SCREEN.COM reads, and the JS port of his
+// player draws them, stroke by stroke, with his line 1 header: gray ink, red shadow, the pen moving left.
+import Window from '../../../shell/Window.astro';
+import { Player, SCRIPT, X } from './player.ts';
+import { compile, decompile, camera } from './edit.ts';
+import { memSync, png } from '../ssr.ts';
+import { hx } from './screen.ts';
+import './player.css';
+
+const mem = memSync('SCREEN_SCREEN.COM');
+const from = SCRIPT.screen + 9;
+let to = from, cols = 0;
+while (cols < 13) if (mem[to++] === X) cols++; else to++;
+const PRESETS = [
+  { id: 'his', label: 'His first letter', text: decompile(mem, from, to) },
+  { id: 'box', label: 'A box', text: ['10 10  x', ...Array(14).fill('10 01  1F 01  x'), '10 10  x'].join('\n') },
+  { id: 'steps', label: 'Stairs', text: Array.from({ length: 12 }, (_, k) => `${hx(0x30 - 2 * k)} 04  x`).join('\n') },
+  { id: 'clear', label: 'Clear', text: '' },
+];
+const first = compile(PRESETS[0].text);
+const p = new Player(Uint8Array.from(first.bytes), 0);
+const box = [640, 350, -1, -1];
+p.onPlot = (x, y) => { box[0] = Math.min(box[0], x); box[1] = Math.min(box[1], y); box[2] = Math.max(box[2], x); box[3] = Math.max(box[3], y); };
+p.run();
+const { x: X0, y: Y0, w: CW, h: CH } = camera(box);
+const crop = new Uint8Array(CW * CH);
+for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) crop[y * CW + x] = p.pix[(y + Y0) * 640 + x + X0];
+const data = JSON.stringify({ presets: PRESETS }).replace(/</g, '\\u003c');
+---
+
+<div class="gp gpse" data-gp-edit>
+  <script type="application/json" data-cfg set:html={data} />
+  <div class="gpse-grid">
+    <Window title="SCRIPT.TXT  one column per line" kind="editor" active class="gpse-ed">
+      <div class="gpse-presets" role="group" aria-label="Start from" hidden>
+        {PRESETS.map((pr, i) => <button type="button" class="button k-btn" data-preset={pr.id} aria-pressed={String(i === 0)}>{pr.label}</button>)}
+      </div>
+      <label class="gpse-lab" for="gpse-text">Strokes are two hex numbers: rows down from the line top, then length. <b>x</b> moves one column left, <b>w</b> right, <b>y</b> starts a new line.</label>
+      <textarea id="gpse-text" class="gpse-text" rows="11" spellcheck="false" autocapitalize="off" autocomplete="off" data-text>{PRESETS[0].text}</textarea>
+      <p class="gpse-msg" role="status" data-msg>{first.strokes} strokes, {first.bytes.length} bytes. His player draws them as you type.</p>
+    </Window>
+    <div class="gpse-out">
+      <Window title="SCREEN  zoomed to fit" kind="screen" class="gpse-scr">
+        <div class="gp-crt" style="--gp-ar: 16 / 10">
+          <img src={png(crop, CW, CH)} width={CW} height={CH} alt="The first letter of his first line, م, drawn by his player in gray with a red shadow." data-still />
+          <canvas hidden aria-hidden="true"></canvas>
+        </div>
+      </Window>
+      <Window title="AS BYTES  what his player reads" kind="panel" class="gpse-bytes">
+        <ol class="gp-bytes" data-bytes aria-label="The compiled script bytes">
+          {first.bytes.slice(0, 96).map((v, i) => <li class={i < 5 ? 'is-hd' : i < 9 ? 'is-org' : v === X ? 'is-mv' : ''}>{hx(v)}</li>)}
+          {first.bytes.length > 96 && <li>+{first.bytes.length - 96}</li>}
+        </ol>
+      </Window>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .gpse-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .gpse-out { display: grid; gap: 22px; min-width: 0; }
+  .gpse-presets { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .gpse-presets[hidden] { display: none; }
+  .gpse .gpse-lab { display: block; margin-bottom: 10px; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink-2); }
+  .gpse-lab b { color: var(--accent); font-family: var(--font-code); }
+  .gpse-text {
+    display: block; width: 100%; min-height: 16em; padding: 10px 12px; resize: vertical;
+    font: 500 15px/1.6 var(--font-code); color: var(--ink); background: var(--surface-2);
+    border: 0; box-shadow: inset 0 0 0 1px var(--rule); caret-color: var(--accent);
+  }
+  .gpse-text:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .gpse .gpse-msg { margin-top: 12px; min-height: 3em; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink); }
+  .gpse-msg.is-err { color: var(--accent); }
+  .gpse-msg.is-err::before { content: '▲ '; }
+  .gpse-bytes .gp-bytes > * { min-width: 2.3em; height: 22px; font-size: 12px; }
+  @media (max-width: 860px) { .gpse-grid { grid-template-columns: minmax(0, 1fr); } .gpse-text { min-height: 11em; } }
+</style>
+
+<script>
+  import { Player, X } from './player.ts';
+  import { compile, camera } from './edit.ts';
+  import { Screen, loop, reduce, hx } from './screen.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-edit]').forEach(root => {
+    const cfg = JSON.parse(root.querySelector('[data-cfg]')!.textContent!) as { presets: { id: string; text: string }[] };
+    const ta = root.querySelector<HTMLTextAreaElement>('[data-text]')!, msg = root.querySelector<HTMLElement>('[data-msg]')!;
+    const list = root.querySelector<HTMLElement>('[data-bytes]')!;
+    const canvas = root.querySelector('canvas')!;
+    let scr: Screen;
+    // Run the script once without drawing to find what it covers, then frame it
+    const frame = (bytes: number[]) => {
+      const box = [640, 350, -1, -1], q = new Player(Uint8Array.from(bytes), 0);
+      q.onPlot = (x, y) => { box[0] = Math.min(box[0], x); box[1] = Math.min(box[1], y); box[2] = Math.max(box[2], x); box[3] = Math.max(box[3], y); };
+      q.run();
+      const c = camera(box);
+      scr = new Screen(canvas, c.w, c.h, c.x, c.y);
+    };
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-preset]')];
+    let p: Player, timer = 0;
+    const anim = loop(root, () => {
+      for (let n = 0; n < 3; n++) if (!p.step()) { scr.flush(); return false; }
+      scr.flush();
+    });
+    const run = () => {
+      const o = compile(ta.value);
+      msg.classList.toggle('is-err', !!o.error);
+      msg.textContent = o.error || (o.strokes ? `${o.strokes} stroke${o.strokes === 1 ? '' : 's'}, ${o.bytes.length} bytes. His player draws them as you type.` : 'Type a stroke, like 20 04, then x to move on.');
+      list.innerHTML = o.bytes.slice(0, 96).map((v, i) => `<li class="${i < 5 ? 'is-hd' : i < 9 ? 'is-org' : v === X ? 'is-mv' : ''}">${hx(v)}</li>`).join('') + (o.bytes.length > 96 ? `<li>+${o.bytes.length - 96}</li>` : '');
+      frame(o.bytes);
+      p = new Player(Uint8Array.from(o.bytes), 0);
+      p.onPlot = (x, y, c) => scr.set(x, y, c);
+      scr.flush();
+      anim.stop();
+      if (reduce()) { p.run(); scr.flush(); } else anim.start();
+    };
+    ta.addEventListener('input', () => { btns.forEach(b => b.setAttribute('aria-pressed', 'false')); clearTimeout(timer); timer = window.setTimeout(run, 220); });
+    btns.forEach((b, i) => b.addEventListener('click', () => {
+      btns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      ta.value = cfg.presets[i].text;
+      run();
+    }));
+    root.querySelector<HTMLElement>('.gpse-presets')!.hidden = false;
+    canvas.hidden = false;
+    root.querySelector<HTMLElement>('[data-still]')!.hidden = true;
+    const o = compile(ta.value);
+    frame(o.bytes);
+    p = new Player(Uint8Array.from(o.bytes), 0); p.onPlot = (x, y, c) => scr.set(x, y, c); p.run(); scr.flush();
+  });
+</script>

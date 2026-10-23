@@ -1,0 +1,118 @@
+---
+// The magazine's Best Software Awards, app by year. Each cell opens the magazine's own archived page for it.
+// No JS: every cell's page is listed below the grid. `only` shows one app's row and its other honors.
+import Window from '../../shell/Window.astro';
+import Cap from './Cap.astro';
+import { apps, awards, honors, AWARD_YEARS, longDate, type AppId, type Award } from '../../../data/dinarsoft';
+import './ds.css';
+
+interface Props { only?: AppId; pick?: string }
+const { only, pick } = Astro.props;
+const rows = apps.filter(a => (only ? a.id === only : awards.some(w => w.app === a.id)));
+const mine = awards.filter(w => !only || w.app === only);
+const id = (w: Award) => `dsa-${w.app}-${w.year}`;
+const first = (pick && mine.find(w => id(w) === pick)) || [...mine].reverse().find(w => w.level === 'Winner') || mine.at(-1)!;
+const more = honors.filter(h => !only || h.app === only);
+const appName = (a: AppId) => apps.find(x => x.id === a)!.name;
+---
+
+{mine.length > 0 && (
+<div class="dsa" data-dsa>
+  <Window kind="dialog" title="Best Software Awards" class="dsa-win">
+    <table class="dsa-grid">
+      <caption class="sr-only">Pocket PC Magazine’s Best Software Awards, later Smartphone &amp; Pocket PC’s, by app and year</caption>
+      <thead><tr><th scope="col"><span class="sr-only">App</span></th>{AWARD_YEARS.map(y => <th scope="col">{y}</th>)}</tr></thead>
+      <tbody>
+        {rows.map(a => (
+          <tr>
+            <th scope="row">{a.name}</th>
+            {AWARD_YEARS.map(y => {
+              const w = mine.find(x => x.app === a.id && x.year === y);
+              return <td>{w ? (
+                <a class={`dsa-cell dsa-cell--${w.level.toLowerCase()}`} href={`#${id(w)}`} data-cell={id(w)} aria-current={w === first ? 'true' : undefined} aria-label={`${a.name}, ${y}: ${w.level}${w.category ? `, ${w.category}` : ''}`}>
+                  <span class="dsa-full">{w.level}</span><span class="dsa-short" aria-hidden="true">{w.level[0]}</span>
+                </a>
+              ) : <span class="dsa-none"><span class="sr-only">No entry</span></span>}</td>;
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+    <div class="dsa-panels">
+      {mine.map(w => (
+        <section class:list={['dsa-panel', { on: w === first }]} id={id(w)} aria-label={`${appName(w.app)}, ${w.year}`}>
+          <p class="dsa-ph"><span class={`dsx-lv dsx-lv--${w.level.toLowerCase()}`}>{w.level}</span> <span><b>{appName(w.app)}</b>, {w.year}{w.category && <>, {w.category}</>}</span></p>
+          {w.shots.map(s => <Cap shot={s} />)}
+        </section>
+      ))}
+    </div>
+  </Window>
+</div>
+)}
+
+{more.length > 0 && (
+  <ul class="dsa-more" aria-label="More honors">
+    {more.map(h => (
+      <li>
+        <p class="dsa-mt"><b>{h.title}</b></p>
+        <p class="dsa-mb">{h.by} · {!only && <>{appName(h.app)} · </>}{longDate(h.date)}{h.link && <> · <a href={h.link} rel="noopener">{h.link.includes('dinarsoft.com') ? 'DinarSoft’s release' : `${h.by}’s page`}, via the Internet Archive</a></>}</p>
+        {h.shot && <Cap shot={h.shot} />}
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .dsa-win { max-width: 860px; }
+  .dsa-grid { width: 100%; border-collapse: collapse; font: 400 0.9375rem/1.2 var(--ds-verdana); }
+  .dsa-grid th { padding: 6px 4px; font-weight: 700; text-align: center; color: #222; }
+  .dsa-grid tbody th { text-align: left; padding-right: 10px; white-space: nowrap; }
+  .dsa-grid td { padding: 3px; text-align: center; border-left: 1px solid oklch(0.85 0.01 90); }
+  .dsa-cell { display: grid; place-items: center; min-height: 44px; padding: 0 4px; border-radius: 3px; font: 700 0.75rem/1 var(--ds-verdana); text-transform: uppercase; letter-spacing: 0.03em; text-decoration: none; transition: translate 0.15s var(--quart), box-shadow 0.15s; }
+  .dsa-cell--winner { background: #1d1dcc; color: #ffef3d; }
+  .dsa-cell--finalist { background: #8f2238; color: #fff; }
+  .dsa-cell--nominee { background: #fff; color: #3d3d3d; box-shadow: inset 0 0 0 1px #8a8a8a; }
+  .dsa-cell:hover { translate: 0 -2px; color: inherit; }
+  .dsa-cell--winner:hover { color: #ffef3d; } .dsa-cell--finalist:hover { color: #fff; }
+  .dsa-cell[aria-current='true'] { outline: 3px solid var(--xp-sel); outline-offset: 1px; }
+  .dsa-cell:focus-visible { outline: 3px dotted var(--w-black); outline-offset: 1px; }
+  .dsa-short { display: none; }
+  .dsa-none { display: block; min-height: 44px; }
+  .dsa-panels { margin-top: 18px; padding-top: 14px; border-top: 1px solid oklch(0.8 0.02 90); }
+  .dsa-panel + .dsa-panel { margin-top: 22px; }
+  :global(.dsa.is-live) .dsa-panel:not(.on) { display: none; }
+  :global(.dsa.is-live) .dsa-panel.on { animation: dsa-in 0.3s var(--expo); }
+  @keyframes dsa-in { from { opacity: 0; translate: 0 6px; } }
+  .dsa-ph { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-bottom: 10px; font: 400 1rem/1.4 var(--ds-verdana); }
+  .dsa-panel :global(.dsx-cap + .dsx-cap) { margin-top: 14px; }
+
+  .dsa-more { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px 28px; margin-top: 28px; }
+  .dsa-more li { padding-top: 10px; border-top: 2px solid var(--ds-red); min-width: 0; }
+  .dsa-mt { font: 400 1rem/1.35 var(--ds-verdana); }
+  .dsa-mb { margin-top: 4px; font: 400 0.8125rem/1.45 var(--ds-verdana); color: var(--ink-2); }
+  .dsa-mb a { color: var(--accent); }
+  .dsa-more :global(.dsx-cap) { margin-top: 10px; }
+
+  @media (max-width: 640px) {
+    .dsa-full { display: none; }
+    .dsa-short { display: inline; font-size: 0.9375rem; }
+    .dsa-grid { font-size: 0.75rem; }
+    .dsa-grid th { padding: 4px 1px; }
+    .dsa-grid tbody th { padding-right: 4px; font-size: 0.6875rem; }
+    .dsa-grid td { padding: 2px 1px; }
+    .dsa-cell { padding: 0; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dsa]').forEach(root => {
+    const cells = [...root.querySelectorAll<HTMLAnchorElement>('[data-cell]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('.dsa-panel')];
+    cells.forEach(c => c.addEventListener('click', e => {
+      e.preventDefault();
+      cells.forEach(x => (x === c ? x.setAttribute('aria-current', 'true') : x.removeAttribute('aria-current')));
+      panels.forEach(p => p.classList.toggle('on', p.id === c.dataset.cell));
+    }));
+    root.classList.add('is-live');
+  });
+</script>

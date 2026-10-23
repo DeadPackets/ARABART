@@ -1,0 +1,128 @@
+---
+// The switch that runs every menu item: HandyMenu.exe 3.7, 0x151E8 to 0x1527C. Pick an item (here or in the menu above)
+// and step it: the license check, then one subtraction, one shift, one table read, and one jump.
+import CodeStepper from '../CodeStepper.astro';
+import { ITEMS, TABLE, CASE, switchSteps, target, hex } from './hm.ts';
+
+const N0 = 27;
+const steps = switchSteps(N0, false);
+const ASM = [
+  { off: '151E8', code: 'bl   17FC0', note: 'read the key from the registry' },
+  { off: '151EC', code: 'bl   18044', note: 'check the license' },
+  { off: '151F0', code: 'bl   182A8', note: 'r0 = what it found' },
+  { off: '151F4', code: 'cmp  r0,#7', note: '7: the 15 days are over' },
+  { off: '151F8', code: 'bne  15254', note: 'no: go do the item' },
+  { off: '15218', label: 'over', code: 'ldr  r0,[r5,#4]', note: 'this program' },
+  { off: '15220', code: 'mov  r1,#500', note: 'dialog 500: Settings' },
+  { off: '15248', code: 'bl   DialogBoxIndirectParamW', note: 'show it, and stop' },
+  { off: '15254', code: 'cmp  r6,r8', note: 'r8 = 1001, his extra commands' },
+  { off: '15260', code: 'sub  r2,r6,#1', note: 'item number, counted from 0' },
+  { off: '15264', code: 'cmp  r2,#26', note: '27 rows: 0 to 26' },
+  { off: '15268', code: 'bhi  1579C', note: 'anything else: ignore' },
+  { off: '1526C', code: 'lsl  r3,r2,#1', note: 'two bytes a row' },
+  { off: '15270', code: 'add  r3,r3,pc', note: 'pc reads as 15278' },
+  { off: '15274', code: 'ldrh r3,[r3,#4]', note: 'read the row' },
+  { off: '15278', code: 'add  pc,pc,r3', note: 'jump: 15280 + row' },
+  { off: '1527C', code: 'dcw  0034,0058,00CC,...', note: 'his table, 27 rows' },
+  { off: hex(target(N0)), label: 'case', code: CASE[N0][0], note: CASE[N0][1] },
+];
+const C = [
+  { code: 'read_key();', note: 'HMLicKey' },
+  { code: 'check_license();', note: 'on every tap' },
+  { code: 'if (license_state() == 7) {', note: 'trial over' },
+  { code: '  DialogBox(500); return;', note: 'Settings, with Register…' },
+  { code: '}' },
+  { code: 'if (cmd >= 1001) { /* his extras */ }' },
+  { code: 'switch (cmd) {', note: 'built as a jump table' },
+  { code: `  case ${N0}: /* ${ITEMS[N0 - 1][1]} */ break;` },
+  { code: '  /* 26 more cases, one per item */' },
+  { code: '}' },
+];
+---
+
+<div class="hm-sw" data-hm-switch>
+  <div class="hm-sw-ctl" hidden data-ctl>
+    <label class="hm-sw-pick"><span>Menu item</span>
+      <select data-item aria-label="Menu item to run through the switch">
+        {ITEMS.map(([id, t]) => <option value={id} selected={id === N0}>{id}. {t}</option>)}
+      </select>
+    </label>
+    <button type="button" class="button k-btn" role="switch" aria-checked="false" data-expired>Trial is over</button>
+  </div>
+  <CodeStepper id="hm-switch-code" title="HandyMenu.exe  the switch" asm={ASM} c={C} steps={steps} speed={0.7} cTitle="The same in C">
+    <div slot="visual" class="hm-sw-vis">
+      <p class="hm-sw-cap">His table at <b>1527C</b>: one two-byte row per item. Each row says how far past <b>15280</b> that item’s code starts.</p>
+      <ol class="hm-sw-tab" aria-label="The jump table">
+        {TABLE.map((v, i) => (
+          <li><button type="button" class:list={['hm-sw-row', { on: i === N0 - 1 }]} data-row={i} aria-label={`Row ${i}: ${ITEMS[i][1]}, ${hex(v, 4)}`}>
+            <span class="i">{i}</span><span class="v">{hex(v, 4)}</span><span class="n">{ITEMS[i][1]}</span>
+          </button></li>
+        ))}
+      </ol>
+      <p class="hm-sw-jump" aria-live="polite" data-jump>pc = 15280 + {hex(TABLE[N0 - 1], 4)} = <b>{hex(target(N0))}</b>: {ITEMS[N0 - 1][1]}</p>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hm-sw { display: grid; gap: 16px; margin-block: 32px; }
+  .hm-sw-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+  .hm-sw-pick { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font: 600 1rem/1.3 var(--sans); color: var(--ink); }
+  .hm-sw-pick select { min-height: 44px; min-width: min(100%, 260px); padding: 0 10px; font: 500 1rem var(--sans); color: var(--ink); background: var(--surface-2); border: 1px solid var(--xp-line, #7f9db9); border-radius: 3px; }
+  .hm-sw-pick select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hm-sw-vis { display: grid; gap: 12px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-sw-cap, .hm-sw-jump { margin: 0 !important; font-size: 1rem !important; line-height: 1.5 !important; color: var(--ink) !important; max-width: none !important; }
+  .hm-sw-cap b, .hm-sw-jump b { font-family: var(--font-code); color: var(--accent); }
+  .hm-sw-tab { list-style: none !important; margin: 0 !important; padding: 0 !important; display: grid !important; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 3px !important; counter-reset: none; }
+  .hm-sw-tab li { margin: 0; max-width: none !important; }
+  .hm-sw-row { display: grid; grid-template-columns: 2.4ch 4.6ch 1fr; align-items: center; gap: 6px; width: 100%; min-height: 32px; padding: 2px 8px; font: 500 13px/1.2 var(--font-code); text-align: left; color: var(--ink); background: var(--surface); border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+  .hm-sw-row .i { color: var(--ink-2); }
+  .hm-sw-row .v { color: var(--accent-2); font-weight: 700; }
+  .hm-sw-row .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--sans); }
+  .hm-sw-row.on { background: var(--accent); color: #fff; }
+  .hm-sw-row.on :is(.i, .v) { color: #fff; }
+  .hm-sw-row.hot { background: var(--xp-sel, #316ac5); color: #fff; box-shadow: 0 0 0 3px var(--focus); }
+  .hm-sw-row.hot :is(.i, .v) { color: #fff; }
+  .hm-sw-row:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  @media (prefers-reduced-motion: reduce) { .hm-sw-row { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ITEMS, TABLE, CASE, switchSteps, target, hex, reduce, type SwStep } from './hm.ts';
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-switch]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void } }>('[data-stepper]')!;
+    const sel = root.querySelector<HTMLSelectElement>('[data-item]')!, exp = root.querySelector<HTMLButtonElement>('[data-expired]')!;
+    const rows = [...root.querySelectorAll<HTMLButtonElement>('[data-row]')], jump = root.querySelector<HTMLElement>('[data-jump]')!;
+    const caseA = cs.querySelector<HTMLElement>('.k-code--asm li[data-l="17"]')!, caseC = cs.querySelector<HTMLElement>('.k-code--c li[data-l="7"] code')!;
+    let n = +sel.value, expired = false;
+
+    const paint = (s: SwStep) => {
+      rows.forEach((r, i) => { r.classList.toggle('on', i === n - 1 && s.row >= 0); r.classList.toggle('hot', i === n - 1 && s.jump); });
+      jump.innerHTML = expired && s.row < 0 && s.a === 7
+        ? 'The item never runs: <b>Settings</b> opens instead.'
+        : s.row < 0 ? `r6 = <b>${n}</b>: ${ITEMS[n - 1][1]}` : `pc = 15280 + ${hex(TABLE[n - 1], 4)} = <b>${hex(target(n))}</b>: ${ITEMS[n - 1][1]}`;
+      if (s.jump && !reduce()) gsap.fromTo(rows[n - 1], { scale: 1.08 }, { scale: 1, duration: 0.35, ease: 'back.out(2)' });
+    };
+    cs.addEventListener('stepper', e => paint((e as CustomEvent).detail.step as SwStep));
+
+    const load = () => {
+      caseA.querySelector('.off')!.textContent = hex(target(n));
+      caseA.querySelector('code')!.textContent = CASE[n][0];
+      caseA.querySelector('.cm')!.textContent = `; ${CASE[n][1]}`;
+      caseC.textContent = `  case ${n}: /* ${ITEMS[n - 1][1]} */ break;`;
+      const st = switchSteps(n, expired);
+      cs.stepper?.load(st, 0);
+    };
+    sel.addEventListener('change', () => { n = +sel.value; load(); });
+    exp.addEventListener('click', () => { expired = !expired; exp.setAttribute('aria-checked', String(expired)); load(); });
+    rows.forEach((r, i) => r.addEventListener('click', () => { n = i + 1; sel.value = String(n); load(); }));
+    document.addEventListener('hm-pick', e => { n = (e as CustomEvent).detail.id; sel.value = String(n); load(); });
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    const st0 = cs as unknown as { stepper?: { i: number; go(i: number): void } };
+    st0.stepper?.go(st0.stepper.i);
+  });
+</script>

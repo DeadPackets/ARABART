@@ -1,0 +1,80 @@
+---
+// DinarSoft before and after November 2006: the logo (the old one recovered from inside his apps, pixel for pixel at
+// twice its size) and the home page. Drag the divider to wipe from the old site to the new one; the logos follow it.
+// No JS: half and half, both logos, both captions.
+import { img, longDate } from '../../../data/dinarsoft';
+import manifest from '../../../../public/dinarsoft/manifest.json';
+import './ds.css';
+
+const before = img('ds-2006-05-home-frames'), after = img('ds-2006-home-relaunch');
+const oldLogo = img('logo-2005'), oldAr = img('logo-2005-ar'), newLogo = img('logo');
+const m = manifest.images as Record<string, { wayback?: string; timestamp?: string }>;
+const b = m['ds-2006-05-home-frames'], a = m['ds-2006-home-relaunch'];
+const small = (s: string) => s.replace('.webp', '-640.webp');
+---
+
+<figure class="dsw" data-dsw style="--p: 50%; --pn: 0.5">
+  <div class="dsw-logos">
+    <div class="dsw-logo dsw-logo--b">
+      <p class="dsw-when">Before November 2006</p>
+      <div class="dsw-old">
+        <img src={oldLogo.src} width={oldLogo.w * 2} height={oldLogo.h * 2} alt="The DinarSoft logo before November 2006: DiNAR in blue, with a small green globe as the dot of the i." loading="lazy" />
+        <img src={oldAr.src} width={oldAr.w * 2} height={oldAr.h * 2} alt="Its Arabic twin: دينار, Dinar, in the same blue under the same globe." loading="lazy" />
+      </div>
+    </div>
+    <div class="dsw-logo dsw-logo--a">
+      <p class="dsw-when">From November 1, 2006</p>
+      <img class="dsw-new" src={newLogo.src} width={newLogo.w} height={newLogo.h} alt="The new DinarSoft logo: two red crescents around a red dot, and the charcoal wordmark." loading="lazy" />
+    </div>
+  </div>
+  <div class="dsw-stage">
+    <img class="dsw-a" src={after.src} srcset={`${small(after.src)} 640w, ${after.src} 1280w`} sizes="(max-width: 900px) 100vw, 860px" width={after.w} height={after.h} alt="dinarsoft.com in December 2006: the new red logo, a sky banner with the tagline, MemMaid and TapText, the latest news, and a column of award badges." loading="lazy" decoding="async" />
+    <img class="dsw-b" src={before.src} srcset={`${small(before.src)} 640w, ${before.src} 1280w`} sizes="(max-width: 900px) 100vw, 860px" width={before.w} height={before.h} alt="dinarsoft.com in May 2006: a plain frames site, the words DinarSoft :: Mobile software for every need, and MemMaid 1.6, HandyMenu 3.6 and HandySwitcher 2.7." loading="lazy" decoding="async" />
+    <span class="dsw-bar" aria-hidden="true"><i></i></span>
+    <span class="dsw-tag dsw-tag--b" aria-hidden="true">May 2006</span>
+    <span class="dsw-tag dsw-tag--a" aria-hidden="true">December 2006</span>
+    <input class="dsw-range" type="range" min="0" max="100" value="50" aria-label="Wipe from the May 2006 site to the December 2006 site" hidden />
+  </div>
+  <figcaption class="dsx-credit">
+    The old logo was recovered from HijriDate 1.5, which keeps it in full color inside its Today plug-in. MemMaid 1.5a and 1.72 carry the same logo on their About screen. Shown pixel for pixel, at twice its size.
+    Left, <a href={b.wayback} rel="noopener">May 2006, via the Internet Archive, Wayback Machine, {longDate(b.timestamp!)}</a>.
+    Right, <a href={a.wayback} rel="noopener">December 2006, via the Internet Archive, Wayback Machine, {longDate(a.timestamp!)}</a>.
+  </figcaption>
+</figure>
+
+<style>
+  .dsw { margin: 0; max-width: 980px; }
+  .dsw-logos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .dsw-logo { display: grid; align-content: start; gap: 10px; padding: 14px 16px 18px; background: #fff; border: 1px solid var(--xp-line); }
+  .dsw-logo--b img { opacity: calc(0.45 + 0.55 * var(--pn)); }
+  .dsw-logo--a img { opacity: calc(1 - 0.55 * var(--pn)); }
+  .dsw-when { font: 700 0.75rem/1.3 var(--ds-verdana); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ds-rust); }
+  .dsw-old { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
+  .dsw-old img { image-rendering: pixelated; }
+  .dsw-new { width: min(100%, 300px); height: auto; align-self: center; }
+  @media (max-width: 640px) { .dsw-logos { grid-template-columns: minmax(0, 1fr); } }
+  .dsw-stage { position: relative; aspect-ratio: 1280 / 900; overflow: hidden; border: 1px solid var(--xp-line); background: #fff; box-shadow: 0 10px 30px oklch(0.3 0.05 250 / 0.18); }
+  .dsw-stage img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .dsw-b { clip-path: inset(0 calc(100% - var(--p)) 0 0); }
+  .dsw-bar { position: absolute; top: 0; bottom: 0; left: var(--p); width: 0; pointer-events: none; }
+  .dsw-bar::before { content: ''; position: absolute; top: 0; bottom: 0; left: -1.5px; width: 3px; background: var(--ds-red); }
+  .dsw-bar i { position: absolute; top: 50%; left: 0; width: 44px; height: 44px; translate: -50% -50%; border-radius: 50%; background: var(--ds-red); box-shadow: 0 2px 8px oklch(0 0 0 / 0.35); }
+  .dsw-bar i::before, .dsw-bar i::after { content: ''; position: absolute; top: 50%; border: 6px solid transparent; translate: 0 -50%; }
+  .dsw-bar i::before { left: 6px; border-right-color: #fff; }
+  .dsw-bar i::after { right: 6px; border-left-color: #fff; }
+  .dsw-tag { position: absolute; bottom: 10px; padding: 3px 8px; font: 700 0.8125rem/1.3 var(--ds-verdana); color: #fff; background: oklch(0.25 0.01 20 / 0.85); }
+  .dsw-tag--b { left: 10px; }
+  .dsw-tag--a { right: 10px; }
+  .dsw-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+  .dsw-range:focus-visible + * { outline: 0; }
+  .dsw:has(.dsw-range:focus-visible) .dsw-bar i { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .dsw figcaption { margin-top: 10px; max-width: 80ch; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dsw]').forEach(root => {
+    const r = root.querySelector<HTMLInputElement>('.dsw-range')!;
+    r.hidden = false;
+    r.addEventListener('input', () => { root.style.setProperty('--p', `${r.value}%`); root.style.setProperty('--pn', String(+r.value / 100)); });
+  });
+</script>

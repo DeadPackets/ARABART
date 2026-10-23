@@ -1,0 +1,202 @@
+---
+// A TSR is a background service: run ARABART once, watch it put itself in front of the video service and stay in
+// memory after it ends; then run DEMO.EXE and watch its call reach ARABART, or a pixel call pass straight through.
+import Window from '../../shell/Window.astro';
+import { render, svgRuns } from '../arabart/core.ts';
+import { ssrBin } from '../arabart/ssr.ts';
+
+interface Props { id?: string }
+const { id = 'pr-resident' } = Astro.props;
+const img = render(ssrBin(), '~gtk ~guvfd', { font: 3, mode: '3d', color: 14, shadow: 4 });
+const runs = svgRuns(img);
+const JS = [
+  { l: '// ARABART, written as middleware in front of the video service', k: '' },
+  { l: 'videoService.use((call, next) => {', k: 'install' },
+  { l: '  if (call.ah !== 0x36) return next(call);  // not mine: pass it on', k: 'pass' },
+  { l: '  drawArabic(call);                          // 36h: join and draw', k: 'draw' },
+  { l: '});', k: 'install' },
+  { l: '// It runs once. The program ends; the handler stays.', k: '' },
+];
+---
+
+<div class="prt" id={id} data-resident>
+  <Window title="MEMORY" kind="panel" num="1" class="prt-mem">
+    <div class="prt-bar" aria-hidden="true">
+      <span class="prt-b" data-b="ivt"><b>Table</b></span>
+      <span class="prt-b" data-b="dos"><b>DOS</b></span>
+      <span class="prt-b prt-arab" data-b="arab"><b>ARABART</b><small>30,110 bytes</small></span>
+      <span class="prt-b prt-demo" data-b="demo"><b>DEMO.EXE</b><small>running</small></span>
+      <span class="prt-b prt-free" data-b="free"><b>Free</b></span>
+      <span class="prt-b" data-b="scr"><b>Screen</b></span>
+    </div>
+    <p class="prt-mem-say" data-memsay aria-live="polite">ARABART stays in memory after it ends, so every program after it can call it.</p>
+  </Window>
+
+  <div class="prt-mid">
+    <Window title={'C:\\ARABART'} kind="screen" class="prt-scr">
+      <div class="prt-con" data-con><p>C:\ARABART&gt;ARABART</p><p>ARABIC-ART   Ver 4.15   Copyright (c)1993 YASSER MOHAMED ALI.</p><p>C:\ARABART&gt;DEMO</p></div>
+      <svg class="prt-art" data-art viewBox={`0 0 ${img.width} ${img.height}`} shape-rendering="crispEdges" role="img" aria-label="الفن العربي, Arabic art, drawn by ARABART">
+        {runs.map(p => <path fill={p.fill} d={p.d} />)}
+      </svg>
+      <i class="prt-dot" data-dot aria-hidden="true"></i>
+    </Window>
+    <div class="prt-ctl">
+      <button type="button" class="button button--primary k-btn" data-run="arab">Run ARABART.EXE</button>
+      <button type="button" class="button k-btn" data-run="demo" aria-disabled="true">Run DEMO.EXE</button>
+      <button type="button" class="button k-btn" data-run="pixel">Another program draws a pixel</button>
+      <button type="button" class="button k-btn" data-run="reset">Restart the PC</button>
+    </div>
+    <p class="prt-hint" data-hint>DEMO.EXE writes Arabic through ARABART, so run ARABART first.</p>
+  </div>
+
+  <div class="prt-side">
+    <Window title="INT 10h  the video service" kind="editor" num="2" class="prt-chain">
+      <ol class="prt-route" aria-label="Who answers a call to the video service">
+        <li data-n="call"><b data-callname>A call</b><span>int 10h</span></li>
+        <li data-n="arab" class="prt-hook in"><b>ARABART</b><span>is it 36h?</span></li>
+        <li data-n="bios"><b>Video BIOS</b><span>the card’s own code</span></li>
+      </ol>
+    </Window>
+    <Window title="THE SAME IDEA IN JAVASCRIPT" kind="editor" class="prt-js">
+      <ol class="prt-code">{JS.map(j => <li data-k={j.k || undefined}><code>{j.l}</code></li>)}</ol>
+    </Window>
+  </div>
+</div>
+
+<style is:global>
+  .prt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+  .prt-mem { grid-column: 1 / -1; }
+  .prt-bar { display: flex; height: 76px; gap: 2px; }
+  .prt-b { min-width: 0; display: grid; align-content: end; gap: 2px; padding: 6px 8px; overflow: hidden; color: var(--vga-0); flex: 1 1 0; }
+  .prt-b b { font: 700 0.8125rem/1.15 var(--font-code); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .prt-b small { font: 500 0.6875rem/1.2 var(--font-code); white-space: nowrap; }
+  .prt-b[data-b='ivt'] { flex-grow: 0.6; background: var(--vga-14); }
+  .prt-b[data-b='dos'] { flex-grow: 1.4; background: var(--vga-7); }
+  .prt-b[data-b='free'] { flex-grow: 4; background: var(--vga-8); color: var(--vga-15); }
+  .prt-b[data-b='scr'] { flex-grow: 1.2; background: var(--vga-13); }
+  .prt-arab { flex-grow: 2.2; background: var(--vga-14); }
+  .prt-arab.is-loading { background: var(--vga-15); }
+  .prt-demo { flex-grow: 0; padding-inline: 0; background: var(--vga-10); }
+  .prt-mem-say { margin: 12px 0 0; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink); min-height: 1.5em; }
+
+  .prt-scr .win-body { position: relative; }
+  .prt-con { min-height: 9.5em; font: 400 16px/1.25 var(--font-dos); color: var(--vga-7); overflow-wrap: anywhere; }
+  .prt-con p { margin: 0; }
+  .prt-cur { display: inline-block; width: 9px; height: 3px; margin-left: 1px; background: var(--vga-7); animation: prt-blink 1s steps(1) infinite; vertical-align: -2px; }
+  @keyframes prt-blink { 50% { opacity: 0; } }
+  .prt-art { display: block; width: min(100%, 360px); height: auto; margin: 12px auto 4px; }
+  .prt.is-live .prt-art:not(.on) { visibility: hidden; }
+  .prt-dot { position: absolute; right: 22%; bottom: 18%; width: 6px; height: 6px; background: var(--vga-14); opacity: 0; }
+  .prt-ctl { display: flex; flex-wrap: wrap; gap: 12px 14px; margin-top: 22px; }
+  .prt-ctl .k-btn { font-size: 0.9375rem; }
+  .prt-hint { margin: 14px 0 0; font: 500 0.875rem/1.45 var(--sans); color: var(--ink-2); min-height: 1.45em; }
+
+  .prt-side { display: grid; gap: 26px; }
+  .prt-route { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: stretch; margin: 0; padding: 0; list-style: none; }
+  .prt-route li { display: grid; gap: 2px; padding: 10px; background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 45%, transparent); transition: background-color 0.2s, opacity 0.3s; }
+  .prt-route li + li { position: relative; margin-left: 30px; }
+  .prt-route li + li::before { content: '►'; position: absolute; left: -24px; top: 50%; translate: 0 -50%; font: 700 14px var(--font-code); color: var(--accent-2); }
+  .prt-route b { font: 700 0.9375rem/1.2 var(--sans); color: var(--ink); }
+  .prt-route span { font: 500 0.75rem/1.3 var(--font-code); color: var(--ink-2); }
+  .prt-route li.on { background: var(--vga-14); }
+  .prt-route li.on :is(b, span) { color: var(--vga-0); }
+  .prt-route li.skip { opacity: 0.35; }
+  .prt-hook { opacity: 0.25; outline: 1px dashed var(--accent-2); outline-offset: -4px; box-shadow: none !important; background: none !important; }
+  .prt-hook.in { opacity: 1; outline: 0; box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 45%, transparent) !important; background: var(--surface-2) !important; }
+  .prt-hook.in.on { background: var(--vga-14) !important; }
+  .prt-code { margin: 0; padding: 0; list-style: none; font: 500 clamp(11.5px, 0.25vw + 9.5px, 13px)/1.8 var(--font-code); }
+  .prt-code li { padding: 0 8px; white-space: pre-wrap; padding-left: calc(8px + 2ch); text-indent: -2ch; color: var(--ink); transition: background-color 0.15s; }
+  .prt-code li.on { background: var(--accent-2); color: var(--surface); }
+  @media (max-width: 1023px) { .prt { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) {
+    .prt-b { padding: 6px 4px; }
+    .prt-b b { font-size: 0.6875rem; }
+    .prt-b small { display: none; }
+    .prt-route { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+    .prt-route li + li { margin-left: 0; }
+    .prt-route li + li::before { content: '▼'; left: 50%; top: -19px; translate: -50% 0; }
+    .prt-ctl .k-btn { flex: 1 1 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .prt-cur { animation: none; } .prt-route li, .prt-code li { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const BANNER = 'ARABIC-ART   Ver 4.15   Copyright (c)1993 YASSER MOHAMED ALI.';
+  document.querySelectorAll<HTMLElement>('[data-resident]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const con = $('[data-con]'), art = $('[data-art]'), dot = $('[data-dot]'), memsay = $('[data-memsay]'), hint = $('[data-hint]');
+    const arab = $('[data-b="arab"]'), demo = $('[data-b="demo"]'), hook = $('.prt-hook');
+    const node = (n: string) => $(`.prt-route [data-n="${n}"]`);
+    const code = [...root.querySelectorAll<HTMLElement>('.prt-code li')];
+    const demoBtn = $<HTMLButtonElement>('[data-run="demo"]');
+    let resident = false, tl: gsap.core.Timeline | null = null;
+
+    const prompt = '<p>C:\\ARABART&gt;<span class="prt-cur" aria-hidden="true"></span></p>';
+    const out = (lines: string[]) => {
+      con.querySelector('.prt-cur')?.remove();
+      con.insertAdjacentHTML('beforeend', lines.map(l => `<p>${l}</p>`).join(''));
+      while (con.children.length > 7) con.firstElementChild!.remove();
+    };
+    const typed = (cmd: string) => { const last = con.lastElementChild!; last.querySelector('.prt-cur')?.remove(); last.insertAdjacentHTML('beforeend', cmd); };
+    const lightCode = (k: string | null) => code.forEach(c => c.classList.toggle('on', !!k && c.dataset.k === k));
+    const route = (on: string[], skip: string[] = []) => root.querySelectorAll<HTMLElement>('.prt-route li').forEach(li => {
+      li.classList.toggle('on', on.includes(li.dataset.n!)); li.classList.toggle('skip', skip.includes(li.dataset.n!));
+    });
+    const grow = (el: HTMLElement, g: number, d = 0.6) => gsap.to(el, { flexGrow: g, paddingLeft: g ? 8 : 0, paddingRight: g ? 8 : 0, duration: reduce() ? 0 : d, ease: 'power3.inOut', overwrite: true });
+    const run = (build: (t: gsap.core.Timeline) => void) => {
+      tl?.progress(1).kill();
+      tl = gsap.timeline({ onComplete: () => { tl = null; } });
+      build(tl);
+      if (reduce()) tl.progress(1);
+    };
+    const sync = () => {
+      demoBtn.setAttribute('aria-disabled', String(!resident));
+      hint.textContent = resident ? 'ARABART is resident. Run DEMO.EXE, or send a plain pixel call past it.' : 'DEMO.EXE writes Arabic through ARABART, so run ARABART first.';
+    };
+
+    function runArab() {
+      if (resident) {
+        run(t => t.add(() => { typed('ARABART'); out([BANNER, 'This utility is already active in your RAM.']); con.insertAdjacentHTML('beforeend', prompt); memsay.textContent = 'It looked at the video service, found its own name tag, DALYASSER, and stopped. One copy is enough.'; lightCode(null); }));
+        return;
+      }
+      run(t => t
+        .add(() => { typed('ARABART'); arab.classList.add('is-loading'); arab.querySelector('small')!.textContent = 'loading'; memsay.textContent = 'DOS loads ARABART.EXE into free memory, like any program.'; })
+        .add(() => grow(arab, 2.2))
+        .add(() => { out([BANNER]); }, '+=0.5')
+        .add(() => { hook.classList.add('in'); route(['arab']); lightCode('install'); memsay.textContent = 'It writes its own address into entry 10h of the interrupt table: it now stands in front of the video service.'; }, '+=0.4')
+        .add(() => { arab.classList.remove('is-loading'); arab.querySelector('small')!.textContent = '30,110 bytes'; route([]); con.insertAdjacentHTML('beforeend', prompt);
+          memsay.textContent = 'It ends with int 27h, “end, but stay resident”. DOS keeps its 30,110 bytes. The prompt is back, and ARABART is still there.'; resident = true; sync(); }, '+=0.9'));
+    }
+    function runDemo() {
+      if (!resident) { hint.textContent = 'Nobody answers function 36h yet. Run ARABART.EXE first.'; if (!reduce()) gsap.fromTo(hint, { x: -6 }, { x: 0, duration: 0.4, ease: 'elastic.out(1, 0.3)' }); return; }
+      run(t => t
+        .add(() => { typed('DEMO'); grow(demo, 2); art.classList.remove('on'); memsay.textContent = 'DEMO.EXE loads above ARABART.'; $('[data-callname]').textContent = 'DEMO, 36h'; })
+        .add(() => { route(['call']); }, '+=0.6')
+        .add(() => { route(['call', 'arab'], ['bios']); lightCode('draw'); memsay.textContent = 'DEMO calls the video service with 36h. ARABART answers, joins the letters and draws.'; }, '+=0.5')
+        .add(() => { art.classList.add('on'); if (!reduce()) gsap.from(art, { clipPath: 'inset(0 0 0 100%)', duration: 0.9, ease: 'power2.out' }); }, '+=0.3')
+        .add(() => { grow(demo, 0); route([]); lightCode(null); con.insertAdjacentHTML('beforeend', prompt); memsay.textContent = 'DEMO ends and its memory is free again. ARABART stays, ready for the next program.'; }, '+=1.6'));
+    }
+    function runPixel() {
+      run(t => t
+        .add(() => { $('[data-callname]').textContent = 'A call, 0Ch'; route(['call']); })
+        .add(() => { route(resident ? ['call', 'arab'] : ['call']); lightCode(resident ? 'pass' : null); memsay.textContent = resident ? 'Function 0Ch, one pixel. ARABART checks: not 36h. It passes the call on, untouched, in three instructions.' : 'No ARABART in memory: the call goes straight to the video BIOS.'; }, '+=0.5')
+        .add(() => { route(resident ? ['call', 'arab', 'bios'] : ['call', 'bios']); gsap.fromTo(dot, { opacity: 1, scale: 3 }, { scale: 1, duration: reduce() ? 0 : 0.4 }); }, '+=0.6')
+        .add(() => { route([]); lightCode(null); }, '+=1'));
+    }
+    function reset(quiet = false) {
+      tl?.kill(); tl = null; resident = false; sync();
+      grow(arab, 0, quiet ? 0 : 0.4); grow(demo, 0, quiet ? 0 : 0.4);
+      hook.classList.remove('in'); route([]); lightCode(null); art.classList.remove('on'); gsap.set(dot, { opacity: 0 });
+      con.innerHTML = prompt; $('[data-callname]').textContent = 'A call';
+      memsay.textContent = 'The PC has just started: DOS, and free memory for one program.';
+    }
+    root.querySelectorAll<HTMLElement>('[data-run]').forEach(b => b.addEventListener('click', () => {
+      ({ arab: runArab, demo: runDemo, pixel: runPixel, reset: () => reset() } as Record<string, () => void>)[b.dataset.run!]();
+    }));
+    reset(true);
+    root.classList.add('is-live');
+  });
+</script>

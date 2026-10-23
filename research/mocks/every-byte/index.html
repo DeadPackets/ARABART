@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yasser Awad: Every Byte</title>
+<meta name="description" content="The archive and analysis of his software, 1991 to 1993. Every byte he shipped, on one zoomable plate.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wdth,wght@75..112.5,100..800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --white: oklch(1 0 0);
+  --ink: oklch(0.19 0 0);
+  --ink-2: oklch(0.43 0 0);
+  --ink-3: oklch(0.62 0 0);
+  --rule: oklch(0.9 0 0);
+  --wash: oklch(0.97 0 0);
+  /* VGA colours: data classes only */
+  --c-header: oklch(0.3336 0.2312 264.1);   /* 0000AA */
+  --c-reloc: oklch(0.5601 0.2441 275.1);    /* 5555FF */
+  --c-entry: oklch(0 0 0);                  /* 000000 */
+  --c-unpacker: oklch(0.6301 0.2002 142.5); /* 00AA00 */
+  --c-control: oklch(0.738 0 0);            /* AAAAAA */
+  --c-literal: oklch(0.6682 0.1141 194.8);  /* 00AAAA */
+  --c-text: oklch(0.4634 0.1902 29.2);      /* AA0000 */
+  --c-backref: oklch(0.4495 0 0);           /* 555555 */
+  --c-never: oklch(0.5432 0.1359 54.1);     /* AA5500 */
+  --sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --panel: 420px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --z-map: 0; --z-labels: 1; --z-chrome: 2; --z-panel: 3; --z-pop: 5;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--white);color:var(--ink)}
+body{font-family:var(--sans);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;font-variation-settings:"wdth" 100}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.mono{font-family:var(--mono);font-variation-settings:"wdth" 87.5;font-size:0.8em;letter-spacing:0}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- map ---------- */
+#map{position:fixed;inset:0;z-index:var(--z-map);touch-action:none;cursor:grab;outline:none}
+#map.dragging{cursor:grabbing}
+#map:focus-visible{outline:2px solid var(--ink);outline-offset:-6px}
+#gl,#ov,#fallback{position:absolute;inset:0;width:100%;height:100%;display:block}
+#fallback{object-fit:contain;image-rendering:pixelated;padding:12vh 6vw 12vh calc(var(--panel) + 6vw)}
+.has-gl #fallback{display:none}
+#labels{position:fixed;inset:0;pointer-events:none;z-index:var(--z-labels);overflow:hidden}
+.tl{position:absolute;left:0;top:0;pointer-events:auto;border:0;background:var(--white);padding:1px 5px 2px;white-space:nowrap;cursor:pointer;
+  font-weight:620;font-size:13px;line-height:1.25;font-variation-settings:"wdth" 82;transform-origin:0 0;display:none}
+.tl .y{font-family:var(--mono);font-size:10px;font-weight:400;color:var(--ink-2);margin-left:6px;font-variation-settings:"wdth" 87.5}
+.tl.on{display:block}
+.tl:hover{text-decoration:underline;text-underline-offset:3px}
+.tl.big{font-size:clamp(22px,2.4vw,34px);font-weight:700;letter-spacing:-0.02em;line-height:1.05;padding:2px 0 6px;font-variation-settings:"wdth" 92;background:none}
+.tl.big .y{display:block;font-size:11px;letter-spacing:0;margin:6px 0 0;font-weight:400}
+.cl{position:absolute;left:0;top:0;pointer-events:none;display:none;max-width:420px;background:var(--white);padding:6px 10px 8px;margin:-6px 0 0 -10px}
+.cl.plate{background:none}
+.cl.on{display:block}
+.cl h3{margin:0;font-size:17px;font-weight:700;line-height:1.15;font-variation-settings:"wdth" 90}
+.cl .when{font-family:var(--mono);font-size:10.5px;color:var(--ink-2);margin:3px 0 8px;font-variation-settings:"wdth" 87.5}
+.cl ul{margin:0;padding:0;list-style:none;font-size:13px;line-height:1.35}
+.cl li{margin:0 0 4px;padding-left:14px;position:relative}
+.cl li::before{content:"";position:absolute;left:0;top:0.55em;width:6px;height:6px;border:1px solid var(--ink-3);border-radius:50%}
+.cl .pat{font-family:var(--mono);font-size:11px;font-variation-settings:"wdth" 87.5}
+.cl.compact ul,.cl.compact .when{display:none}
+.cl.compact h3{font-size:13px}
+.cl.plate h3{font-size:14px}
+.callout{position:absolute;left:0;top:0;display:none;pointer-events:none;background:var(--white);border:1.5px solid var(--ink);padding:8px 11px 9px;max-width:300px;font-size:14px;line-height:1.35}
+.callout.on{display:block}
+.callout .ins{font-family:var(--mono);font-size:12px;font-weight:600;display:block;margin-bottom:2px;font-variation-settings:"wdth" 87.5}
+
+/* ---------- chrome over the map ---------- */
+#top{position:fixed;z-index:var(--z-chrome);left:calc(var(--panel) + 24px);top:18px;right:24px;display:flex;gap:12px;align-items:center;pointer-events:none}
+#crumbs{pointer-events:auto;display:flex;flex-wrap:wrap;align-items:center;gap:2px;background:var(--white);padding:4px 6px;margin:0;list-style:none;font-size:14px}
+#crumbs li{display:flex;align-items:center}
+#crumbs li+li::before{content:"\203A";color:var(--ink-3);margin:0 6px 0 4px}
+#crumbs button{border:0;background:none;padding:3px 4px;cursor:pointer;font-weight:500}
+#crumbs button:hover{text-decoration:underline;text-underline-offset:3px}
+#crumbs [aria-current]{font-weight:700}
+#crumbs .f{font-family:var(--mono);font-size:12px;font-variation-settings:"wdth" 87.5}
+.topbtns{margin-left:auto;display:flex;gap:8px;pointer-events:auto}
+.btn{border:1px solid var(--ink);background:var(--white);padding:7px 12px;cursor:pointer;font-weight:600;font-size:13px;line-height:1;border-radius:999px;transition:background .15s,color .15s}
+.btn:hover{background:var(--ink);color:var(--white)}
+.btn:active{transform:scale(.97)}
+
+#ctrl{position:fixed;z-index:var(--z-chrome);right:24px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.zoom{display:flex;flex-direction:column;border:1px solid var(--ink);background:var(--white)}
+.zoom button{width:40px;height:40px;border:0;background:var(--white);cursor:pointer;font-size:20px;line-height:1;display:grid;place-items:center}
+.zoom button+button{border-top:1px solid var(--ink)}
+.zoom button:hover{background:var(--ink);color:var(--white)}
+.zoom svg{width:16px;height:16px}
+#ladder{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;background:var(--white);padding:6px 0}
+#ladder button{display:flex;align-items:center;justify-content:flex-end;gap:9px;width:100%;border:0;background:none;cursor:pointer;padding:4px 0 4px 8px;font-size:12.5px;color:var(--ink-2);font-weight:500}
+#ladder button::after{content:"";width:9px;height:9px;border:1.5px solid currentColor;border-radius:50%;transition:background .2s,transform .3s var(--ease)}
+#ladder button[aria-current]{color:var(--ink);font-weight:700}
+#ladder button[aria-current]::after{background:var(--ink);transform:scale(1.15)}
+#ladder button:hover{color:var(--ink)}
+
+#mini{position:fixed;z-index:var(--z-chrome);right:24px;bottom:24px;background:var(--white);border:1px solid var(--ink);cursor:crosshair;touch-action:none}
+#mini canvas{display:block;width:176px;height:128px}
+#scale{position:fixed;z-index:var(--z-chrome);left:calc(var(--panel) + 28px);bottom:26px;font-family:var(--mono);font-size:11px;font-variation-settings:"wdth" 87.5;background:var(--white);padding:3px 6px;pointer-events:none}
+#scale i{display:block;height:6px;border:1.5px solid var(--ink);border-top:0;margin-top:4px;transition:width .12s}
+
+/* ---------- panel ---------- */
+#panel{position:fixed;z-index:var(--z-panel);left:0;top:0;bottom:0;width:var(--panel);background:var(--white);border-right:1px solid var(--rule);overflow-y:auto;overscroll-behavior:contain;padding:0 32px 28px;display:flex;flex-direction:column}
+#brand{position:sticky;top:0;background:var(--white);padding:22px 0 14px;margin:0 -2px;z-index:1;display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+#brand a{text-decoration:none;color:inherit}
+#brand .wm{font-size:21px;font-weight:760;letter-spacing:-0.015em;font-variation-settings:"wdth" 88;line-height:1}
+#brand .desc{display:block;font-size:12.5px;color:var(--ink-2);font-weight:450;margin-top:5px;letter-spacing:0}
+#sheetToggle{display:none}
+.sec{padding:10px 0 4px}
+.js .sec{display:none}
+.js .sec.on{display:block;animation:secIn .45s var(--ease) both}
+@keyframes secIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(2.1rem,3.4vw,3.15rem);line-height:1;letter-spacing:-0.03em;font-weight:780;margin:18px 0 16px;text-wrap:balance;font-variation-settings:"wdth" 84}
+h2{font-size:26px;line-height:1.05;letter-spacing:-0.02em;font-weight:740;margin:8px 0 10px;text-wrap:balance;font-variation-settings:"wdth" 86}
+h3{font-size:15px;font-weight:700;margin:26px 0 10px;letter-spacing:-0.005em}
+p{margin:0 0 12px;text-wrap:pretty}
+.lede{font-size:17px;line-height:1.45}
+.lede strong{font-weight:700}
+.hint{color:var(--ink-2);font-size:14px}
+.meta{font-family:var(--mono);font-size:11px;color:var(--ink-2);margin:0 0 6px;font-variation-settings:"wdth" 87.5;letter-spacing:0}
+.glance{font-size:19px;line-height:1.35;font-weight:560;margin-bottom:14px;text-wrap:balance}
+
+.legend{display:grid;grid-template-columns:14px 1fr auto;gap:7px 10px;align-items:baseline;font-size:13.5px;margin:0;padding:0;list-style:none}
+.legend li{display:contents}
+.legend .sw{width:12px;height:12px;align-self:center}
+.legend b{font-weight:640}
+.legend span.d{color:var(--ink-2)}
+.legend .n{font-family:var(--mono);font-size:11px;text-align:right;font-variation-settings:"wdth" 87.5;color:var(--ink-2)}
+.sw{display:inline-block;width:10px;height:10px;flex:none}
+details.method{margin:16px 0 4px;font-size:13.5px;color:var(--ink-2)}
+details.method summary{cursor:pointer;color:var(--ink);font-weight:600}
+details.method p{margin:8px 0 0}
+
+.progs{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.progs button{display:grid;grid-template-columns:44px 1fr auto;gap:10px;width:100%;text-align:left;border:0;border-bottom:1px solid var(--rule);background:none;padding:9px 0;cursor:pointer;align-items:baseline}
+.progs button:hover .t{text-decoration:underline;text-underline-offset:3px}
+.progs .yr,.progs .sz{font-family:var(--mono);font-size:11px;color:var(--ink-2);font-variation-settings:"wdth" 87.5}
+.progs .t{font-weight:600;font-size:14px}
+.progs .lib .t::after{content:" library";font-weight:400;color:var(--ink-2)}
+
+.bar{display:flex;height:10px;margin:6px 0 8px;overflow:hidden}
+.bar i{display:block;height:100%}
+.facts{display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:13.5px;margin:0}
+.facts dt{color:var(--ink-2)}
+.facts dd{margin:0;font-family:var(--mono);font-size:11.5px;text-align:right;font-variation-settings:"wdth" 87.5}
+.frags{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.frags button{border:0;background:var(--wash);padding:5px 8px;text-align:left;cursor:pointer;font-family:var(--mono);font-size:11.5px;line-height:1.45;font-variation-settings:"wdth" 87.5;word-break:break-all;width:100%}
+.frags button:hover{background:var(--ink);color:var(--white)}
+.frags .gap{color:var(--c-control)}
+.frags button:hover .gap{color:var(--white)}
+.regs{list-style:none;margin:0;padding:0}
+.regs button{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:baseline;width:100%;border:0;border-top:1px solid var(--rule);background:none;text-align:left;padding:8px 0;cursor:pointer;font-size:14px}
+.regs button:hover b{text-decoration:underline;text-underline-offset:3px}
+.regs .sw{width:10px;height:10px}
+.regs small{display:block;color:var(--ink-2);font-size:13px;line-height:1.4;margin-top:2px}
+.regs .n{font-family:var(--mono);font-size:11px;color:var(--ink-2);font-variation-settings:"wdth" 87.5}
+figure{margin:16px 0 4px}
+figure img{width:100%;height:auto;display:block;image-rendering:pixelated;aspect-ratio:962/600;background:var(--wash)}
+figcaption{font-size:12.5px;color:var(--ink-2);margin-top:6px}
+
+[role=tablist]{display:flex;gap:0;border:1px solid var(--ink);margin:4px 0 16px;width:max-content}
+[role=tab]{border:0;background:var(--white);padding:8px 16px;cursor:pointer;font-weight:600;font-size:13.5px}
+[role=tab]+[role=tab]{border-left:1px solid var(--ink)}
+[role=tab][aria-selected=true]{background:var(--ink);color:var(--white)}
+.js [role=tabpanel][hidden]{display:none}
+.listing{list-style:none;margin:0 0 10px;padding:0;font-family:var(--mono);font-size:11.5px;font-variation-settings:"wdth" 87.5}
+.listing button{display:grid;grid-template-columns:42px 1fr;gap:2px 10px;width:100%;text-align:left;border:0;border-top:1px solid var(--rule);background:none;padding:7px 4px;cursor:pointer;line-height:1.45}
+.listing button:hover,.listing button[aria-current]{background:var(--wash)}
+.listing button[aria-current]{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.listing .o{color:var(--ink-2)}
+.listing .i{font-weight:600}
+.listing .b{color:var(--ink-2);margin-left:8px;font-weight:400}
+.listing .c{grid-column:2;font-family:var(--sans);font-size:13px;color:var(--ink);font-variation-settings:"wdth" 100}
+.note{font-size:13px;color:var(--ink-2)}
+
+.insp{font-size:14px;border:1px solid var(--rule);padding:12px 14px;margin:8px 0 6px}
+.insp .big{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1;margin:2px 0 8px;font-variation-settings:"wdth" 100;display:flex;gap:14px;align-items:baseline}
+.insp .big small{font-size:12px;font-weight:400;color:var(--ink-2)}
+.insp p{margin:6px 0 0}
+
+.career dl{margin:0}
+.career dt{font-weight:700;font-size:16px;margin-top:20px;line-height:1.2}
+.career dt .when{display:block;font-family:var(--mono);font-size:11px;font-weight:400;color:var(--ink-2);margin-top:4px;font-variation-settings:"wdth" 87.5}
+.career dd{margin:8px 0 0}
+.career ul{margin:0;padding-left:18px;font-size:14px}
+.career li{margin-bottom:4px}
+
+#brand{order:-2}#sheetToggle{order:-1}
+#terms{margin-top:auto;padding-top:22px;order:100}
+footer{order:101}
+#terms .lab{font-size:12.5px;color:var(--ink-2);margin:0 0 7px}
+#terms ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+#terms li{animation:chipIn .4s var(--ease) both;animation-delay:calc(var(--i,0) * 45ms)}
+@keyframes chipIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.chip{border:1px solid var(--ink);background:var(--white);padding:4px 10px;border-radius:999px;font-size:12.5px;cursor:pointer}
+.chip.new::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:7px;vertical-align:1px}
+.chip:hover{background:var(--ink);color:var(--white)}
+footer{font-size:12.5px;color:var(--ink-2);padding-top:16px;margin-top:18px;border-top:1px solid var(--rule)}
+
+.term{border:0;background:none;padding:0;cursor:help;text-decoration:underline dotted var(--ink-2);text-decoration-thickness:1.5px;text-underline-offset:3px;font:inherit;color:inherit}
+.term:hover,.term[aria-expanded=true]{text-decoration-style:solid;text-decoration-color:var(--ink)}
+#pop{position:fixed;z-index:var(--z-pop);max-width:300px;background:var(--ink);color:var(--white);padding:12px 14px 13px;font-size:14px;line-height:1.42;display:none}
+#pop.on{display:block;animation:popIn .2s var(--ease) both}
+@keyframes popIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+#pop b{display:block;font-size:13px;margin-bottom:3px}
+#pop button{margin-top:8px;border:0;background:none;color:var(--white);text-decoration:underline;text-underline-offset:3px;padding:0;cursor:pointer;font-size:12.5px}
+
+dialog{border:1px solid var(--ink);padding:0;max-width:760px;width:calc(100% - 32px);max-height:calc(100% - 64px);color:var(--ink)}
+dialog::backdrop{background:oklch(0.19 0 0 / 0.45)}
+dialog .in{padding:28px 32px 32px}
+dialog h2{font-size:30px;margin:0 0 4px}
+dialog .close{position:sticky;top:0;float:right;margin:16px 16px 0 0}
+.gl{columns:2 280px;column-gap:36px;margin:20px 0 0}
+.gl div{break-inside:avoid;margin:0 0 16px}
+.gl dt{font-weight:700}
+.gl dd{margin:3px 0 0;font-size:14.5px;color:var(--ink)}
+
+@media (max-width: 760px){
+  :root{--panel:0px}
+  body{font-size:15px}
+  #panel{top:auto;left:0;right:0;width:auto;height:40vh;height:40dvh;border-right:0;border-top:1px solid var(--ink);padding:0 18px 18px;transition:height .35s var(--ease)}
+  #panel.open{height:82vh;height:82dvh}
+  #brand{position:fixed;top:0;left:0;right:0;padding:12px 16px 10px;margin:0;border-bottom:1px solid var(--rule);z-index:var(--z-chrome)}
+  #brand .wm{font-size:18px}
+  #brand .desc{font-size:11.5px;margin-top:3px}
+  #sheetToggle{display:flex;position:sticky;top:0;z-index:1;background:var(--white);width:100%;justify-content:center;border:0;padding:10px 0 8px;cursor:pointer;font-size:12.5px;font-weight:600;gap:8px;align-items:center}
+  #sheetToggle::before{content:"";width:36px;height:4px;border-radius:2px;background:var(--ink-3)}
+  #top{left:12px;right:12px;top:66px}
+  #crumbs{font-size:13px;padding:2px 4px}
+  .topbtns{display:none}
+  #ctrl{right:auto;left:10px;top:auto;bottom:calc(40dvh + 10px);transform:none}
+  #ladder{display:none}
+  .zoom{flex-direction:row}
+  .zoom button{width:42px;height:42px}
+  .zoom button+button{border-top:0;border-left:1px solid var(--ink)}
+  #mini{right:10px;top:auto;bottom:calc(40dvh + 10px)}
+  #mini canvas{width:96px;height:70px}
+  #scale{left:148px;bottom:calc(40dvh + 12px)}
+  .sheet-open #ctrl,.sheet-open #mini,.sheet-open #scale{visibility:hidden}
+  h1{font-size:2.15rem;margin-top:4px}
+  #fallback{padding:120px 12px 44vh}
+  .callout{max-width:240px;font-size:13px}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+<div id="map" tabindex="0" role="application" aria-roledescription="zoomable map" aria-label="Byte map. Each pixel is one byte. Plus and minus zoom, arrow keys move, Escape goes up one level." aria-describedby="live">
+  <img id="fallback" src="plate.png" alt="All 293,858 bytes of the 16 files as coloured pixels, one rectangle per program.">
+  <canvas id="gl"></canvas>
+  <canvas id="ov"></canvas>
+</div>
+<div id="labels" aria-hidden="false"></div>
+
+<div id="top">
+  <ol id="crumbs" aria-label="Where you are"><li><button aria-current="page" data-go="archive">All work</button></li></ol>
+  <div class="topbtns">
+    <button class="btn" data-go="career">Career map</button>
+    <button class="btn" data-open-glossary>Glossary</button>
+  </div>
+</div>
+
+<div id="ctrl">
+  <ol id="ladder" aria-label="Zoom levels">
+    <li><button data-go="career">Career</button></li>
+    <li><button data-go="archive" aria-current="true">All work</button></li>
+    <li><button data-go="program">Program</button></li>
+    <li><button data-go="bytes">Bytes</button></li>
+    <li><button data-go="code">Code</button></li>
+  </ol>
+  <div class="zoom">
+    <button id="zin" aria-label="Zoom in"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="1.6"/></svg></button>
+    <button id="zout" aria-label="Zoom out"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 8h12" stroke="currentColor" stroke-width="1.6"/></svg></button>
+    <button id="zfit" aria-label="Show all work"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg></button>
+  </div>
+</div>
+<div id="mini" aria-label="Minimap. Select a point to move there." role="img"><canvas width="352" height="256"></canvas></div>
+<div id="scale" aria-hidden="true"><span>64 bytes</span><i style="width:80px"></i></div>
+
+<aside id="panel" aria-label="About this view">
+  <div id="brand">
+    <a href="./"><span class="wm">Yasser Awad</span><span class="desc">The archive and analysis of his software, 1991 to 1993.</span></a>
+  </div>
+  <button id="sheetToggle" aria-expanded="false" aria-controls="panel">More</button>
+
+  <section class="sec on" id="s-archive" data-level="archive">
+    <h1>Every byte he shipped.</h1>
+    <p class="lede">The 15 programs and the ARABART library he wrote in Port Said, 1991 to 1993: <strong>293,858 bytes</strong>, one pixel per <button class="term" data-term="byte">byte</button>.</p>
+    <p class="hint">Zoom in to read the bytes. Zoom out to see what came after.</p>
+    <h3>What the colours mean</h3>
+    <ul class="legend" id="legend"></ul>
+    <details class="method">
+      <summary>How we coloured them</summary>
+      <p>Every one of the 16 files is packed by an <button class="term" data-term="packer">executable packer</button>: it rebuilds itself in memory when it starts. We ran each file's own unpacker in an emulator and logged what it did with every byte it read. That log is the colour. Nothing here is guessed from the look of the bytes.</p>
+      <p>282,675 bytes are the 15 programs. 11,183 are ARABART.EXE, the library.</p>
+    </details>
+    <h3>The programs, by year</h3>
+    <ul class="progs" id="progs"></ul>
+  </section>
+
+  <section class="sec" id="s-exhibit" data-level="program" aria-labelledby="ex-h">
+    <p class="meta">1991 to 1993 · Assembly · ARABART/ARABART.EXE · 11,183 bytes</p>
+    <h2 id="ex-h">ARABART, the library</h2>
+    <div role="tablist" aria-label="Depth">
+      <button role="tab" id="t-glance" aria-selected="true" aria-controls="p-glance" data-depth="glance">Glance</button>
+      <button role="tab" id="t-story" aria-selected="false" aria-controls="p-story" data-depth="story" tabindex="-1">Story</button>
+      <button role="tab" id="t-code" aria-selected="false" aria-controls="p-code" data-depth="code" tabindex="-1">Code</button>
+    </div>
+    <div role="tabpanel" id="p-glance" aria-labelledby="t-glance">
+      <p class="glance">ARABART taught DOS graphics mode to write Arabic.</p>
+      <p class="note">Zoom into the territory, or choose Story.</p>
+    </div>
+    <div role="tabpanel" id="p-story" aria-labelledby="t-story" hidden>
+      <p class="glance">ARABART taught DOS graphics mode to write Arabic.</p>
+      <p>Yasser wrote it in <button class="term" data-term="assembly">Assembly</button> in 1991 and kept improving it until 1993. It is a <button class="term" data-term="tsr">TSR</button>: it stays in memory, so other programs can use it to draw Arabic in different fonts, colours and styles.</p>
+      <p>It does <button class="term" data-term="shaping">auto-shaping</button>: each Arabic letter takes its isolated, initial, medial or final form from the letters next to it.</p>
+      <p>His name is still in the file: <span class="mono">Copyright (c)1993 YASSER</span>. On the plate, the <button class="term" data-term="packer">packer</button> has cut it into pieces.</p>
+    </div>
+    <div role="tabpanel" id="p-code" aria-labelledby="t-code" hidden>
+      <p>The first instructions that run. They move the packed body higher in memory, one <button class="term" data-term="paragraph">paragraph</button> at a time, then jump to the unpacker.</p>
+      <ol class="listing" id="listing">
+        <li><button data-a="3"><span class="o">00003</span><span><span class="i">cld</span><span class="b">FC</span></span><span class="c">string copies run forward</span></button></li>
+        <li><button data-a="4"><span class="o">00004</span><span><span class="i">push es</span><span class="b">06</span></span><span class="c">remember the segments DOS gave us</span></button></li>
+        <li><button data-a="5"><span class="o">00005</span><span><span class="i">push ds</span><span class="b">1E</span></span><span class="c"></span></button></li>
+        <li><button data-a="7"><span class="o">00007</span><span><span class="i">mov ax, cs</span><span class="b">8C C8</span></span><span class="c">where our own code was loaded</span></button></li>
+        <li><button data-a="13"><span class="o">0000D</span><span><span class="i">mov dx, 02C3h</span><span class="b">BA C3 02</span></span><span class="c">size of the packed body, in 16-byte paragraphs</span></button></li>
+        <li><button data-a="31"><span class="o">0001F</span><span><span class="i">mov cx, 8</span><span class="b">B9 08 00</span></span><span class="c">8 words = one 16-byte paragraph</span></button></li>
+        <li><button data-a="34"><span class="o">00022</span><span><span class="i">rep movsw</span><span class="b">F3 A5</span></span><span class="c">copy one paragraph upward in memory</span></button></li>
+        <li><button data-a="36"><span class="o">00024</span><span><span class="i">dec bx / dec ax / dec dx</span><span class="b">4B 48 4A</span></span><span class="c">step back one paragraph</span></button></li>
+        <li><button data-a="39"><span class="o">00027</span><span><span class="i">jns 00017</span><span class="b">79 EE</span></span><span class="c">repeat until the whole body has moved</span></button></li>
+        <li><button data-a="51"><span class="o">00033</span><span><span class="i">mov dl, 10h</span><span class="b">B2 10</span></span><span class="c">16-bit buffer for the decompressor's bit reader</span></button></li>
+        <li><button data-a="53"><span class="o">00035</span><span><span class="i">jmp far 0759:04D6</span><span class="b">EA D6 04 59 07</span></span><span class="c">jump into the unpacker, which rebuilds the real program</span></button></li>
+      </ol>
+      <p class="note">Offsets count from the start of the load image, 32 bytes into the file. Select a line to fly to its bytes.</p>
+    </div>
+    <div id="ex-inside"></div>
+  </section>
+
+  <section class="sec" id="s-program" data-level="program" aria-live="off"></section>
+
+  <section class="sec" id="s-bytes" data-level="bytes">
+    <h2 id="b-h">Bytes</h2>
+    <p id="b-reg"></p>
+    <div class="insp" id="insp"><p class="note">Point at a byte, or tap it, to read it.</p></div>
+  </section>
+
+  <section class="sec career" id="s-career" data-level="career">
+    <h2>The DOS years are the only part mapped byte by byte.</h2>
+    <p>The rest of his work is documented, not yet mapped. On the map, area shows years, not bytes.</p>
+    <dl>
+      <dt>Port Said, DOS programs<span class="when">1991 to 1993 · 16 files · 293,858 bytes</span></dt>
+      <dd>Fully mapped. Zoom into the plate.</dd>
+      <dt>Sakhr Software, Cairo<span class="when">Project Leader · Jun 1993 to Sep 1996</span></dt>
+      <dd><ul>
+        <li>A multi-threaded printing core, used by several ArabicOffice products</li>
+        <li>An object-oriented bilingual, multi-style, multi-font text displayer, used in the Ustaz Arabic word processor</li>
+        <li>Common Arabic APIs, so applications ran on Arabic and non-Arabic Windows</li>
+        <li>The company's first multimedia installer framework, adopted by almost all departments</li>
+      </ul></dd>
+      <dt>Newbridge Networks → Alcatel, Kanata<span class="when">Senior Designer and team leader, OSS interfaces · Oct 1996 to Nov 2006</span></dt>
+      <dd><p class="note">He joined Newbridge Networks. Alcatel bought Newbridge in 2000.</p><ul>
+        <li>Architect of the 5620 CORBA product: distributed, multi-threaded, JIDM standard</li>
+        <li>Contributor to JIDM discussions at the ITU, and a regular member of the company's ITU conference team</li>
+        <li>Designed jidmTester, a script-based automated tester adopted by Alcatel labs</li>
+        <li>Designed a custom CORBA EventChannel, measured at twice the speed of the standard one</li>
+        <li>Named on <span class="mono">US 2006/0288020</span>, granted in 2009 as <span class="mono">US 7,603,377 B2</span>: "Method and data structure for indexed storage of hierarchically interrelated information in a relational database". A second application, <span class="mono">US 2007/0130192</span>, was abandoned.</li>
+      </ul></dd>
+      <dt>DinarSoft Corporation, Kanata, Ontario<span class="when">Founded Nov 2002 · 2003 to 2008</span></dt>
+      <dd><p>Six utilities for Pocket PC and Windows Mobile: MemMaid, HandySwitcher, HandyMenu, HandyLauncher, TapText and HijriDate.</p></dd>
+    </dl>
+  </section>
+
+  <div id="terms" aria-live="polite"><p class="lab">Terms at this depth</p><ul></ul></div>
+  <footer>Built by Youssef Awad for his father.</footer>
+</aside>
+
+<div id="pop" role="dialog" aria-modal="false" aria-labelledby="pop-t"><b id="pop-t"></b><span id="pop-d"></span><br><button data-open-glossary>Open the glossary</button></div>
+<p id="live" class="vh" aria-live="polite"></p>
+
+<dialog id="glossary" aria-labelledby="g-h">
+  <button class="btn close" data-close>Close</button>
+  <div class="in">
+    <h2 id="g-h">Glossary</h2>
+    <p class="note">Plain words for the terms on this map.</p>
+    <dl class="gl">
+      <div id="g-byte"><dt>Byte</dt><dd>Eight bits: one number from 0 to 255. On this plate, one byte is one pixel.</dd></div>
+      <div id="g-paragraph"><dt>Paragraph</dt><dd>16 bytes. Real-mode x86 builds memory addresses from 16-byte steps, so DOS counts memory in paragraphs.</dd></div>
+      <div id="g-exe"><dt>EXE file</dt><dd>A DOS program with a header. The header tells DOS how big the program is, where it starts, and which addresses to fix up.</dd></div>
+      <div id="g-com"><dt>COM file</dt><dd>The simplest DOS program. DOS copies the file into memory and starts at its first byte. No header, and at most 64 KB.</dd></div>
+      <div id="g-packer"><dt>Executable packer</dt><dd>A tool that compresses a program and adds a small unpacker. When the file starts, the unpacker rebuilds the real program in memory and runs it.</dd></div>
+      <div id="g-literal"><dt>Literal</dt><dd>A byte the packer stored as-is. Literals are bytes of the original program.</dd></div>
+      <div id="g-backref"><dt>Back-reference</dt><dd>An instruction to the unpacker: copy some bytes it already rebuilt, instead of storing them again.</dd></div>
+      <div id="g-control"><dt>Control bits</dt><dd>16-bit words that the unpacker reads one bit at a time. Each bit helps it decide what comes next: a literal, or a back-reference and its size.</dd></div>
+      <div id="g-tsr"><dt>TSR</dt><dd>Terminate and Stay Resident. A DOS program that ends but leaves its code in memory, so other programs can use it.</dd></div>
+      <div id="g-assembly"><dt>Assembly</dt><dd>The readable form of the processor's own instructions. One line, such as <span class="mono">mov ax, cs</span>, becomes one instruction.</dd></div>
+      <div id="g-shaping"><dt>Auto-shaping</dt><dd>Choosing the correct form of each Arabic letter (isolated, initial, medial or final) from the letters next to it.</dd></div>
+      <div id="g-ligature"><dt>Ligature</dt><dd>Two or more letters drawn as one joined shape. Arabic script uses some ligatures, such as lam with alif.</dd></div>
+      <div id="g-vga"><dt>VGA</dt><dd>The IBM PC graphics standard from 1987. Its best-known modes use 16 fixed colours. Those 16 colours are the only colours on this plate.</dd></div>
+      <div id="g-bgi"><dt>BGI</dt><dd>Borland Graphics Interface. The graphics library that came with Borland's C compilers. Drivers such as EGAVGA.BGI draw on the screen.</dd></div>
+      <div id="g-interrupt"><dt>Interrupt</dt><dd>A numbered call into DOS or the BIOS. A program puts a request in registers and runs, for example, <span class="mono">int 21h</span> to ask DOS for a service.</dd></div>
+      <div id="g-bcd"><dt>BCD</dt><dd>Binary-coded decimal. Each decimal digit is kept in 4 bits, so a program can do exact decimal arithmetic.</dd></div>
+      <div id="g-borland"><dt>Borland C++ and Turbo C</dt><dd>C and C++ compilers from Borland International, popular on DOS. Their names are still in the bytes of several of these programs.</dd></div>
+      <div id="g-dosbox"><dt>DOSBox and js-dos</dt><dd>DOSBox emulates a DOS PC. js-dos runs DOSBox in a web browser, so each of these programs can run on this site.</dd></div>
+    </dl>
+  </div>
+</dialog>
+
+<script src="../../data.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

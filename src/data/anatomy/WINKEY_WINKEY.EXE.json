@@ -1,0 +1,291 @@
+{
+ "file": "WINKEY/WINKEY.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 28,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header: 3 relocations, initial stack at 01AE:0080. Rebuilt by the museum unpacker after removing DIET.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 28,
+   "end": 32,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Unused header bytes before the relocation table.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 44,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "3 addresses that DOS adjusts for the load segment.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 44,
+   "end": 48,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Zero bytes that round the header up to 3 paragraphs.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 48,
+   "end": 617,
+   "kind": "startup",
+   "label": "Turbo C++ start-up (c0)",
+   "note": "Sets up segments and the stack, then calls main.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 617,
+   "end": 2630,
+   "kind": "code",
+   "label": "His drawing library",
+   "note": "15 routines of inline assembly in C functions, including routines for menus and selections that this demo does not need yet, and the button style table at 09B2h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#wk-made"
+  },
+  {
+   "start": 2630,
+   "end": 4124,
+   "kind": "code",
+   "label": "main",
+   "note": "Plain C: sets EGA mode 10h, loads the icons, draws the panel and presses 8 buttons 11 times each.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#wk-button"
+  },
+  {
+   "start": 4124,
+   "end": 6208,
+   "kind": "library",
+   "label": "Turbo C runtime library",
+   "note": "Exit code, DOS memory and I/O helpers (2,084 bytes).",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 6208,
+   "end": 6928,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "Turbo C++ copyright string, runtime messages and variables. WINKEY keeps no data of its own here.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 6928,
+   "end": 7056,
+   "kind": "stack",
+   "label": "Initial stack",
+   "note": "128 bytes at 01AE:0080, from the header.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 617,
+   "end": 684,
+   "name": "load_menu_file",
+   "note": "Opens MENU2.DAT (name stored in the code) and reads up to 4,000 bytes.",
+   "link": "#wk-icons",
+   "lines": [
+    {
+     "off": 629,
+     "note": "DS = CS: the file name lives in the code"
+    }
+   ]
+  },
+  {
+   "start": 684,
+   "end": 899,
+   "name": "draw_icon",
+   "note": "Draws a run-length icon with Set/Reset and Bit Mask, one write per byte.",
+   "link": "#wk-pixels",
+   "lines": [
+    {
+     "off": 768,
+     "note": "EFh: one row up"
+    },
+    {
+     "off": 804,
+     "note": "x mod 8, his way: shift 3 bits out, reversed ..."
+    },
+    {
+     "off": 817,
+     "note": "... and reverse them back with the table at 033Dh"
+    },
+    {
+     "off": 828,
+     "note": "Bit Mask register"
+    },
+    {
+     "off": 848,
+     "note": "Latch read, then write"
+    }
+   ]
+  },
+  {
+   "start": 899,
+   "end": 915,
+   "name": "gc_reset",
+   "note": "Turns Set/Reset off and the Bit Mask back to FFh.",
+   "link": "#wk-pixels",
+   "lines": []
+  },
+  {
+   "start": 915,
+   "end": 939,
+   "name": "set_color",
+   "note": "Enable Set/Reset = 0Fh, Set/Reset = color.",
+   "link": "#wk-pixels",
+   "lines": []
+  },
+  {
+   "start": 939,
+   "end": 1006,
+   "name": "image_size",
+   "note": "Bytes needed to save a screen area: ready for menus.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1006,
+   "end": 1050,
+   "name": "dos_alloc",
+   "note": "INT 21h AH=48h: ask DOS for memory.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1050,
+   "end": 1195,
+   "name": "save_area",
+   "note": "Copies a screen area plane by plane to memory: the save-under for a menu.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1195,
+   "end": 1287,
+   "name": "restore_area",
+   "note": "Copies a saved area back to the screen when a menu closes.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1287,
+   "end": 1299,
+   "name": "dos_free",
+   "note": "INT 21h AH=49h.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1299,
+   "end": 1514,
+   "name": "xor_highlight",
+   "note": "Flips plane 3 in a rectangle: a selection highlight.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1514,
+   "end": 1695,
+   "name": "bar",
+   "note": "Filled rectangle in the current color.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1695,
+   "end": 1941,
+   "name": "checker_fill",
+   "note": "Fills a rectangle with a checkerboard: a grayed-out area.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 1941,
+   "end": 2188,
+   "name": "hv_line",
+   "note": "Horizontal or vertical line.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 2188,
+   "end": 2259,
+   "name": "rectangle",
+   "note": "Rectangle outline.",
+   "link": "#wk-made",
+   "lines": []
+  },
+  {
+   "start": 2259,
+   "end": 2630,
+   "name": "button_3d",
+   "note": "Draws rings from the style table at 09B2h, then fills the face.",
+   "link": "#wk-button",
+   "lines": [
+    {
+     "off": 2313,
+     "note": "Top-left color of this ring"
+    },
+    {
+     "off": 2390,
+     "note": "Bottom-right color"
+    },
+    {
+     "off": 2530,
+     "note": "Style table starts here"
+    }
+   ]
+  },
+  {
+   "start": 2630,
+   "end": 4124,
+   "name": "main",
+   "note": "Mode 10h, allocate, load, draw the panel, then 8 copies of the same block: press and release one button 11 times.",
+   "link": "#wk-button",
+   "lines": [
+    {
+     "off": 2640,
+     "note": "INT 10h AX=0010h: EGA 640 x 350"
+    },
+    {
+     "off": 2689,
+     "note": "Panel: button(5,5,200,306, style 40h)"
+    },
+    {
+     "off": 2722,
+     "note": "Pressed: style 50h"
+    },
+    {
+     "off": 2747,
+     "note": "Icon moved 2 pixels"
+    },
+    {
+     "off": 2776,
+     "note": "Pause: count to 40,000"
+    },
+    {
+     "off": 4114,
+     "note": "Free the memory and end"
+    }
+   ]
+  }
+ ]
+}

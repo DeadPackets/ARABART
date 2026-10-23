@@ -1,0 +1,148 @@
+---
+// Segment plus offset: two 16-bit numbers make one 20-bit address. Drag either; the segment slides one hex digit left
+// (times 16), the offset adds on, and the address lands somewhere on the memory map.
+import Window from '../../shell/Window.astro';
+import { REGIONS, hex, regionOf, posOf, pct } from './mem';
+
+interface Props { id?: string; seg?: number; off?: number }
+const { id = 'pr-segadd', seg = 0xa000, off = 0x1f4c } = Astro.props;
+const PRESETS = [
+  { seg: 0xa000, off: 0x1f4c, label: 'A pixel', note: 'The byte for pixel (100, 100) in the 640 × 480 mode: row 100 × 80 bytes, plus 100 ÷ 8.' },
+  { seg: 0xb800, off: 0x0000, label: 'The text screen', note: 'The first letter of the color text screen, top left.' },
+  { seg: 0x0000, off: 0x0084, label: 'DOS’s entry', note: 'Entry 21h of the interrupt table: 21h × 4 = 84h. This is where every call to DOS is routed.' },
+  { seg: 0xf000, off: 0xfff0, label: 'Power-on', note: 'The very first instruction a PC runs when you switch it on, inside the BIOS chip.' },
+];
+const addr = (s: number, o: number) => (s * 16 + o) % 0x100000;
+const a0 = addr(seg, off), r0 = regionOf(a0);
+const digits = (n: number, w: number) => hex(n, w).split('');
+---
+
+<div class="prs" id={id} data-segadd data-seg={seg} data-off={off}>
+  <Window title="ADDRESS  segment × 16 + offset" kind="editor" active class="prs-win">
+    <div class="prs-sum" aria-hidden="true">
+      <div class="prs-row" data-row="seg"><span class="prs-lab">Segment</span><span class="prs-d">{['', ...digits(seg, 4)].map(c => <i>{c}</i>)}</span></div>
+      <div class="prs-row" data-row="x16"><span class="prs-lab">× 16</span><span class="prs-d">{[...digits(seg, 4), '0'].map((c, k) => <i class:list={{ z: k === 4 }}>{c}</i>)}</span></div>
+      <div class="prs-row" data-row="off"><span class="prs-lab">+ Offset</span><span class="prs-d">{['', ...digits(off, 4)].map(c => <i>{c}</i>)}</span></div>
+      <div class="prs-row prs-eq" data-row="sum"><span class="prs-lab">= Address</span><span class="prs-d">{digits(a0, 5).map(c => <i>{c}</i>)}</span></div>
+    </div>
+    <p class="sr-only" aria-live="polite" data-said>{hex(seg, 4)}:{hex(off, 4)} is address {hex(a0)}h, in {r0.name}.</p>
+    <div class="prs-sl">
+      <label class="prs-f"><span>Segment <b data-o="seg">{hex(seg, 4)}h</b></span>
+        <input type="range" min="0" max="65535" step="1" value={seg} data-k="seg" aria-valuetext={`${hex(seg, 4)}h`} />
+      </label>
+      <label class="prs-f"><span>Offset <b data-o="off">{hex(off, 4)}h</b></span>
+        <input type="range" min="0" max="65535" step="1" value={off} data-k="off" aria-valuetext={`${hex(off, 4)}h`} />
+      </label>
+    </div>
+    <pre class="prs-js"><code>memory[(<b data-js="seg">0x{hex(seg, 4)}</b> &lt;&lt; 4) + <b data-js="off">0x{hex(off, 4)}</b>]  <span class="cm">// = memory[<span data-js="sum">0x{hex(a0)}</span>]</span></code></pre>
+  </Window>
+
+  <Window title="WHERE IT LANDS" kind="panel" num="2" class="prs-where">
+    <div class="prs-map" aria-hidden="true">
+      {REGIONS.map(r => <span data-r={r.id} style={`flex:${pct(r)} 1 0`} class:list={{ on: r === r0 }}></span>)}
+      <i class="prs-pin" style={`left:${posOf(a0) * 100}%`}></i>
+    </div>
+    <p class="prs-name" data-name>{r0.name}</p>
+    <p class="prs-alias" data-alias></p>
+    <div class="prs-pre" role="group" aria-label="Try a famous address">
+      {PRESETS.map((p, k) => <button type="button" class="button k-btn" data-p={k} data-seg={p.seg} data-off={p.off} data-note={p.note} aria-pressed={String(k === 0 && p.seg === seg && p.off === off)}>{p.label}</button>)}
+    </div>
+    <p class="prs-note" data-noteline>{PRESETS[0].note}</p>
+  </Window>
+</div>
+
+<style is:global>
+  .prs { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+  .prs-sum { display: grid; gap: 8px; font: 700 clamp(1.25rem, 1.4vw + 0.8rem, 2rem)/1 var(--font-code); }
+  .prs-row { display: grid; grid-template-columns: 9ch auto; align-items: center; gap: 12px; }
+  .prs-lab { font: 500 0.875rem/1.2 var(--font-code); color: var(--accent-2); text-align: right; }
+  .prs-d { display: grid; grid-template-columns: repeat(5, 1.7em); gap: 4px; }
+  .prs-d i { display: grid; place-items: center; height: 1.7em; font-style: normal; color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 50%, transparent); }
+  .prs-d i:empty { background: none; box-shadow: none; }
+  .prs-d i.z { color: var(--accent-2); }
+  .prs-eq .prs-d i { background: var(--ink); color: var(--surface); box-shadow: none; }
+  .prs-eq { padding-top: 10px; border-top: 2px solid var(--ink); }
+  .prs-sl { display: grid; gap: 8px; margin-top: 22px; }
+  .prs-f { display: grid; gap: 2px; font: 500 0.9375rem/1.3 var(--sans); color: var(--ink); }
+  .prs-f b { font: 700 1rem var(--font-code); color: var(--accent); }
+  .prs-f input { width: 100%; min-height: 44px; margin: 0; accent-color: var(--vga-14); }
+  .prs-js { margin: 16px 0 0; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--surface-2); font: 500 0.8125rem/1.6 var(--font-code); color: var(--ink); }
+  .prs-js b { color: var(--accent); }
+  .prs-js .cm { color: var(--ink-2); }
+  .prs-map { position: relative; display: flex; gap: 2px; height: 40px; margin: 6px 0 4px; }
+  .prs-map span { background: var(--vga-8); }
+  .prs-map span.on { background: var(--vga-14); }
+  .prs-pin { position: absolute; top: -6px; bottom: -6px; width: 3px; margin-left: -1px; background: var(--vga-15); box-shadow: 0 0 0 2px var(--vga-0); }
+  .prs-name { margin: 14px 0 0; font: 800 1.375rem/1.2 var(--font-display); font-stretch: 85%; color: var(--accent); }
+  .prs-alias { margin: 6px 0 0; font: 500 0.8125rem/1.5 var(--font-code); color: var(--ink-2); }
+  .prs-alias:empty { display: none; }
+  .prs-pre { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  .prs-pre .k-btn { font-size: 0.875rem; padding: 0 12px; }
+  .prs-note { margin: 14px 0 0; font: 500 0.9375rem/1.55 var(--sans); color: var(--ink); min-height: 3.1em; }
+  @media (max-width: 1023px) { .prs { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 420px) { .prs-row { grid-template-columns: 7ch auto; gap: 8px; } .prs-sum { font-size: 1.125rem; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { hex, regionOf, posOf } from './mem';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-segadd]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const ins = [...root.querySelectorAll<HTMLInputElement>('input[data-k]')];
+    const cells = (row: string) => [...root.querySelectorAll<HTMLElement>(`[data-row="${row}"] i`)];
+    const pres = [...root.querySelectorAll<HTMLButtonElement>('[data-p]')];
+    let seg = +root.dataset.seg!, off = +root.dataset.off!;
+
+    const put = (row: string, chars: string[], flash: boolean) => cells(row).forEach((c, k) => {
+      if (c.textContent === chars[k]) return;
+      c.textContent = chars[k];
+      if (flash && !reduce()) gsap.fromTo(c, { y: -10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.28, ease: 'power3.out' });
+    });
+
+    function show(flash = true) {
+      const lin = seg * 16 + off, a = lin % 0x100000, r = regionOf(a);
+      put('seg', ['', ...hex(seg, 4)], flash);
+      put('x16', [...hex(seg, 4), '0'], flash);
+      put('off', ['', ...hex(off, 4)], flash);
+      put('sum', [...hex(a, 5)], flash);
+      for (const i of ins) {
+        const v = i.dataset.k === 'seg' ? seg : off;
+        i.value = String(v); i.setAttribute('aria-valuetext', `${hex(v, 4)}h`);
+        $(`[data-o="${i.dataset.k}"]`).textContent = `${hex(v, 4)}h`;
+        $(`[data-js="${i.dataset.k}"]`).textContent = `0x${hex(v, 4)}`;
+      }
+      $('[data-js="sum"]').textContent = `0x${hex(a)}`;
+      $('[data-name]').textContent = r.name;
+      root.querySelectorAll<HTMLElement>('.prs-map span').forEach(s => s.classList.toggle('on', s.dataset.r === r.id));
+      const pin = $('.prs-pin');
+      if (reduce() || !flash) pin.style.left = `${posOf(a) * 100}%`;
+      else gsap.to(pin, { left: `${posOf(a) * 100}%`, duration: 0.3, ease: 'power2.out', overwrite: true });
+      // Other names for the same byte: many segment:offset pairs reach it
+      const alts: string[] = [];
+      for (const s of [a >> 4, (a >> 4) - 0x100, (a >> 4) - 0x1000]) {
+        const o = a - s * 16;
+        if (s >= 0 && o >= 0 && o <= 0xffff && !(s === seg && o === off) && alts.length < 2) alts.push(`${hex(s, 4)}:${hex(o, 4)}`);
+      }
+      $('[data-alias]').textContent = lin > 0xfffff
+        ? `Past 1 MB: on the original 8086 the count wraps around to the start, ${hex(a)}h.`
+        : alts.length ? `The same byte also answers to ${alts.join(' and ')}.` : '';
+      $('[data-said]').textContent = `${hex(seg, 4)}:${hex(off, 4)} is address ${hex(a)}h, in ${r.name}.`;
+    }
+
+    ins.forEach(i => i.addEventListener('input', () => {
+      if (i.dataset.k === 'seg') seg = +i.value; else off = +i.value;
+      pres.forEach(b => b.setAttribute('aria-pressed', 'false'));
+      $("[data-noteline]").textContent = '';
+      show();
+    }));
+    pres.forEach(b => b.addEventListener('click', () => {
+      seg = +b.dataset.seg!; off = +b.dataset.off!;
+      pres.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      $("[data-noteline]").textContent = b.dataset.note!;
+      show();
+    }));
+    show(false);
+  });
+</script>

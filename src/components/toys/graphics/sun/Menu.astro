@@ -1,0 +1,150 @@
+---
+// His main menu, live: the screen his program shows (04DA:0E06 and 04DA:1080), drawn by the same code as the toys
+// above, with his five choices. Pick one (arrows, Enter, or tap) to see the part of his program behind it, and where
+// it sits among his eight modules.
+import Window from '../../../shell/Window.astro';
+import { png } from '../ssr.ts';
+import { ssrBin } from '../../arabart/ssr.ts';
+import { Scr, menuOps, menuText, crop } from './sun.ts';
+
+interface Mod { seg: string; name: string; bytes: number; body: string }
+// His code, module by module, measured from segment to segment in his unpacked program: 33,586 bytes in all.
+const MODS: Mod[] = [
+  { seg: '02DE', name: 'Help', bytes: 576, body: 'F1 works on every screen. It saves the picture under its box with <code>getimage</code>, lists the keys, and puts the picture back with <code>putimage</code>, the way a modal dialog returns you to the page underneath.' },
+  { seg: '0302', name: 'main()', bytes: 160, body: 'The start: it checks that ARABART is in memory, shows the opening verse, the title card and his poem to the sun, then runs the menu again and again.' },
+  { seg: '030C', name: 'The sun in the Quran', bytes: 6816, body: 'An illustrated introduction, with a mosque and a decorated Quran drawn line by line, then the fifteen verse cards.' },
+  { seg: '04B6', name: 'His ARABART helpers', bytes: 576, body: 'Small C functions with a few lines of assembly inside: they ask ARABART to pick a font, set a color, measure and draw, plus his shadow and outline.' },
+  { seg: '04DA', name: 'Screen kit', bytes: 5360, body: 'Everything shared: starting the graphics, his 16 colors, panels and edges, this menu, the sun, the keyboard, and the closing card with his name.' },
+  { seg: '0629', name: 'Opening screens', bytes: 2704, body: 'His prose poem to the sun, beside a night sky with a moon and clouds.' },
+  { seg: '06D2', name: 'The sun and nature', bytes: 5536, body: 'The solar system with its moving planets. Then the sun’s heat and spots, its gravity, its distance (8 minutes and 18 seconds of light) and how it makes its energy. Last, its size beside Earth, its mass on a balance, and its pulse every 2 hours and 40 minutes.' },
+  { seg: '082C', name: 'Cycle of life', bytes: 11858, body: 'The biggest part. The sun and Earth: day and night, the yearly orbit, the seasons with the dates of the solstices and equinoxes. The sun and the Moon: eight phases and the Hijri calendar. The sun and water: the water cycle in six stages.' },
+];
+const ITEMS = [
+  { en: 'The sun and nature', ar: 'الشمس و الطبيعة', mod: 6 },
+  { en: 'Cycle of life', ar: 'دورة الحياة', mod: 7 },
+  { en: 'The sun in the Quran', ar: 'الشمس في القرآن', mod: 2 },
+  { en: 'Help', ar: 'مساعدة', mod: 0 },
+  { en: 'End the program', ar: 'انهاء البرنامج', mod: 4 },
+];
+const EXIT = { ...MODS[4], name: 'End the program', body: 'His closing card, with his name, then back to DOS. It lives in his screen kit, with everything the screens share: starting the graphics, his 16 colors, the panels and edges, this menu, the sun and the keyboard.' };
+const total = MODS.reduce((s, m) => s + m.bytes, 0);
+const bin = ssrBin();
+const s = new Scr();
+for (const o of menuOps()) o.run(s);
+menuText(s, bin, 0);
+const still = png(crop(s, 0, 60, 640, 360), 640, 360, s.rgb());
+const n = (x: number) => x.toLocaleString('en-US');
+---
+
+<div class="mn" data-menu>
+  <Window title="SUN.EXE  the main menu" kind="screen" class="mn-win">
+    <div class="mn-scr">
+      <img class="mn-still" src={still} width="640" height="360" alt="His main menu: the glowing sun on a starry sky beside five choices in blue Arabic, the first one in red." />
+      <canvas class="mn-cv" width="640" height="360" hidden role="img" aria-label="His main menu with the chosen line in red."></canvas>
+      <div class="mn-hit" aria-hidden="true">
+        {ITEMS.map((_, i) => <span class="mn-spot" data-i={i} style={`--y:${(97 + 48 * i) / 3.6}%`}></span>)}
+      </div>
+    </div>
+  </Window>
+  <div class="mn-side">
+    <div class="mn-choices" role="radiogroup" aria-label="His five menu choices">
+      {ITEMS.map((it, i) => (
+        <button type="button" role="radio" class="mn-item" data-i={i} aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1}>
+          <span class="mn-en">{it.en}</span><span class="mn-ar" lang="ar" dir="rtl">{it.ar}</span>
+        </button>
+      ))}
+    </div>
+    <Window title="What is behind it" kind="dialog" class="mn-info">
+      <div aria-live="polite">
+        {[...MODS, EXIT].map((m, i) => (
+          <section class="mn-pane" data-pane={i} hidden={i !== 6}>
+            <h3>{m.name}</h3>
+            <p class="mn-meta"><code>{m.seg}</code> · <b>{n(m.bytes)}</b> bytes of his code</p>
+            <p set:html={m.body} />
+          </section>
+        ))}
+      </div>
+    </Window>
+    <div class="mn-bar" role="group" aria-label={`His eight modules, ${n(total)} bytes, to scale`}>
+      {MODS.map((m, i) => (
+        <button type="button" class="mn-mod" data-mod={i} style={`--w:${m.bytes}`} aria-pressed={String(i === 6)} aria-label={`${m.name}: ${n(m.bytes)} bytes`}><span>{m.name}</span></button>
+      ))}
+    </div>
+    <p class="mn-total"><b>{n(total)}</b> bytes of his C in eight modules. Each width is its size, and the three smallest are widened so you can tap them.</p>
+  </div>
+</div>
+
+<style is:global>
+  .mn { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .mn-scr { position: relative; aspect-ratio: 16 / 9; background: var(--vga-0); }
+  .mn-scr :is(img, canvas) { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .mn-hit { position: absolute; inset: 0; }
+  .mn-spot { position: absolute; left: 57%; right: 5.6%; top: var(--y); height: 11.6%; cursor: pointer; }
+  .mn-choices { display: grid; gap: 4px; }
+  .mn-item {
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; padding: 4px 12px; cursor: pointer;
+    font: 600 0.9375rem/1.3 var(--sans); color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule); text-align: left;
+  }
+  .mn-ar { font: 700 1rem/1.3 var(--font-ar); color: var(--accent-2); }
+  .mn-item:hover { box-shadow: inset 0 0 0 2px var(--accent-2); }
+  .mn-item[aria-checked='true'] { background: var(--accent); color: var(--surface); box-shadow: none; }
+  .mn-item[aria-checked='true'] .mn-ar { color: var(--surface); }
+  .mn-item:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .mn-side { display: grid; gap: 14px; min-width: 0; }
+  .mn-pane h3 { margin: 0 !important; font: 800 1.25rem/1.2 var(--font-display) !important; color: var(--ink) !important; }
+  .mn-pane p { margin: 8px 0 0 !important; font-size: 0.9375rem !important; line-height: 1.55 !important; color: var(--ink) !important; max-width: none !important; }
+  .mn-meta { font: 500 12px/1.4 var(--font-code) !important; }
+  .mn-meta b { color: inherit; }
+  .mn-bar { display: flex; gap: 2px; height: 44px; }
+  .mn-mod { flex: var(--w) 1 0; min-width: 24px; padding: 0; border: 0; background: var(--accent-2); cursor: pointer; position: relative; overflow: hidden; }
+  .mn-mod span { position: absolute; inset: auto 4px 4px; font: 600 10px/1.1 var(--font-code); color: var(--surface); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+  .mn-mod:hover { background: var(--ink); }
+  .mn-mod[aria-pressed='true'] { background: var(--accent); }
+  .mn-mod:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; z-index: 1; }
+  .mn-total { margin: 0 !important; font: 500 12px/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  .mn-total b { color: var(--accent); }
+  @media (max-width: 860px) { .mn { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 640px) { .mn-scr :is(img, canvas) { image-rendering: auto; } }
+</style>
+
+<script>
+  import { fonts } from '../../arabart/core.ts';
+  import { blit } from '../ega.ts';
+  import { Scr, menuOps, menuText, crop, type RGB6 } from './sun.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-menu]').forEach(async root => {
+    const bin = await fonts();
+    const base = new Scr();
+    for (const o of menuOps()) o.run(base);
+    const cv = root.querySelector<HTMLCanvasElement>('.mn-cv')!;
+    const items = [...root.querySelectorAll<HTMLButtonElement>('.mn-item')];
+    const mods = [...root.querySelectorAll<HTMLButtonElement>('.mn-mod')];
+    const MODOF = [6, 7, 2, 0, 4];
+    const pickMod = (m: number, pane = m) => {
+      mods.forEach((b, i) => b.setAttribute('aria-pressed', String(i === m)));
+      root.querySelectorAll<HTMLElement>('[data-pane]').forEach(p => (p.hidden = +p.dataset.pane! !== pane));
+    };
+    const pick = (i: number) => {
+      const s = new Scr(); s.px.set(base.px); s.pal = base.pal.map(c => [...c] as RGB6);
+      menuText(s, bin, i);
+      blit(cv, crop(s, 0, 60, 640, 360), 640, 360, s.rgb());
+      items.forEach((b, j) => { b.setAttribute('aria-checked', String(j === i)); b.tabIndex = j === i ? 0 : -1; });
+      pickMod(MODOF[i], i === 4 ? 8 : MODOF[i]);
+    };
+    items.forEach((b, i) => {
+      b.addEventListener('click', () => pick(i));
+      // His menu wraps around at both ends; so does this one
+      b.addEventListener('keydown', e => {
+        const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        const to = (i + d + items.length) % items.length; pick(to); items[to].focus();
+      });
+    });
+    mods.forEach((b, i) => b.addEventListener('click', () => pickMod(i)));
+    root.querySelectorAll<HTMLElement>('.mn-spot').forEach(sp => sp.addEventListener('click', () => { pick(+sp.dataset.i!); items[+sp.dataset.i!].focus(); }));
+    pick(0);
+    cv.hidden = false;
+    root.querySelector<HTMLElement>('.mn-still')!.hidden = true;
+  });
+</script>

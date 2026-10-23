@@ -1,0 +1,94 @@
+---
+// The 14 files MemMaid 2.3 installs, to scale. Pick one to see what it does and how it talks to the system.
+import Window from '../../shell/Window.astro';
+import { PARTS } from './data';
+
+const max = Math.max(...PARTS.map(p => p.bytes));
+const total = PARTS.reduce((a, p) => a + p.bytes, 0);
+const n = (x: number) => x.toLocaleString('en-US');
+const KIND: Record<string, string> = { app: 'the app', art: 'pictures', lang: 'a language', help: 'help', helper: 'a helper' };
+const first = PARTS[0];
+---
+
+<div class="mpt" data-mm-parts>
+  <Window title={`MemMaid 2.3, Build 230: 14 files, ${n(total)} bytes`} kind="panel" active class="mpt-list-w">
+    <ol class="mpt-list">
+      {PARTS.map((p, i) => (
+        <li>
+          <button type="button" class="mpt-row" data-i={i} data-kind={p.kind} aria-pressed={String(i === 0)}>
+            <span class="mpt-name">{p.name}</span>
+            <span class="mpt-bar" aria-hidden="true"><i style={`--w:${p.bytes / max}`}></i></span>
+            <span class="mpt-num">{n(p.bytes)}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+    <p class="mpt-key" aria-hidden="true">{Object.entries(KIND).map(([k, v]) => <span data-kind={k}><i></i>{v}</span>)}</p>
+  </Window>
+  <Window title="Properties" kind="dialog" class="mpt-info">
+    <dl aria-live="polite">
+      <div><dt>File</dt><dd data-f="name">{first.name}</dd></div>
+      <div><dt>Size</dt><dd><span data-f="bytes">{n(first.bytes)}</span> bytes</dd></div>
+      <div><dt>Installs to</dt><dd data-f="dir">{first.dir}</dd></div>
+      <div><dt>What it does</dt><dd data-f="what">{first.what}</dd></div>
+      <div><dt>How it talks</dt><dd data-f="calls">{first.calls}</dd></div>
+    </dl>
+  </Window>
+  <script type="application/json" data-parts set:html={JSON.stringify(PARTS)} />
+</div>
+
+<style is:global>
+  .mpt { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .mpt-list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .mpt-row { display: grid; grid-template-columns: 10.5em minmax(0, 1fr) 5.5em; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 0 8px; font: inherit; color: var(--ink); text-align: left; background: none; border: 0; border-radius: 3px; cursor: pointer; }
+  .mpt-row:hover { background: color-mix(in oklch, var(--accent) 8%, transparent); }
+  .mpt-row[aria-pressed='true'] { background: color-mix(in oklch, var(--accent) 16%, transparent); box-shadow: inset 3px 0 0 var(--accent); }
+  .mpt-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .mpt-name { font: 600 0.8125rem/1.2 var(--font-code); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mpt-bar i { display: block; width: calc(var(--w) * 100%); min-width: 3px; height: 14px; border-radius: 1px; background: var(--k); transform-origin: 0 50%; }
+  .mpt-num { font: 600 0.8125rem/1 var(--font-code); color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+  [data-kind='app'] { --k: var(--accent); }
+  [data-kind='art'] { --k: var(--accent-2); }
+  [data-kind='lang'] { --k: oklch(0.6 0.13 150); }
+  [data-kind='help'] { --k: oklch(0.65 0.12 75); }
+  [data-kind='helper'] { --k: var(--hot); }
+  .mpt-key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px !important; font-size: 0.8125rem !important; color: var(--ink-2) !important; }
+  .mpt-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .mpt-key i { width: 12px; height: 12px; border-radius: 2px; background: var(--k); }
+  .mpt-info dl { display: grid; gap: 12px; margin: 0; }
+  .mpt-info dt { font-size: 0.8125rem; color: var(--ink-2); }
+  .mpt-info dd { margin: 2px 0 0; font-size: 0.9375rem; line-height: 1.5; color: var(--ink); overflow-wrap: anywhere; }
+  .mpt-info [data-f='name'] { font: 700 1.125rem var(--font-code); }
+  .mpt-info [data-f='dir'] { font-family: var(--font-code); font-size: 0.875rem; }
+  @media (max-width: 1023px) { .mpt { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 480px) { .mpt-row { grid-template-columns: minmax(0, 1fr) 5em; row-gap: 4px; padding: 6px 8px; } .mpt-bar { grid-column: 1 / -1; grid-row: 2; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-mm-parts]').forEach(root => {
+    const parts = JSON.parse(root.querySelector('[data-parts]')!.textContent!) as Record<string, string | number>[];
+    const rows = [...root.querySelectorAll<HTMLButtonElement>('.mpt-row')];
+    const f = (k: string) => root.querySelector<HTMLElement>(`[data-f="${k}"]`)!;
+    const pick = (i: number) => {
+      rows.forEach((r, n) => r.setAttribute('aria-pressed', String(n === i)));
+      const p = parts[i];
+      for (const k of ['name', 'dir', 'what', 'calls']) f(k).textContent = String(p[k]);
+      f('bytes').textContent = (p.bytes as number).toLocaleString('en-US');
+      if (!reduce()) gsap.fromTo(root.querySelector('.mpt-info dl'), { opacity: 0.3, x: 8 }, { opacity: 1, x: 0, duration: 0.3 });
+    };
+    rows.forEach((r, i) => r.addEventListener('click', () => pick(i)));
+    // The bars grow to scale the first time they come into view
+    if (!reduce()) {
+      const bars = root.querySelectorAll('.mpt-bar i');
+      gsap.set(bars, { scaleX: 0 });
+      new IntersectionObserver((es, io) => {
+        if (!es[0].isIntersecting) return;
+        io.disconnect();
+        gsap.to(bars, { scaleX: 1, duration: 0.9, ease: 'power3.out', stagger: 0.04 });
+      }, { threshold: 0.3 }).observe(root);
+    }
+  });
+</script>

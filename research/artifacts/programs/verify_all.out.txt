@@ -1,0 +1,32 @@
+unpacked ARABART/ARABART.EXE cc6847cb3348a97af3c7234c075db6cf
+unpacked ARABART/DEMO.EXE 06f94b560e438513db5daa847ba054a6
+unpacked ARABART/EDITOR.EXE 4e78c5ee016a0a977e9d5ead94418865
+unpacked ARABIC/DEMO.COM fa0f974f0ef94ee98e377f3bc3554b31
+unpacked DIGI_T/MAIN.EXE e98fe26c2c32e368ee86a094f30df795
+unpacked EDIT/EDIT.EXE edf0ba4c6aaf9effde417be66821d936
+unpacked EDIT/EDITOR.EXE 10bf691db17fad8c45a55cbb3dc094db
+unpacked FORM_X/FORM_X.EXE d62a7ea0433e4eed355fd3b901b2c9fc
+unpacked KVC/KVC.EXE d273205477dc7a13982e537c8f7f656e
+unpacked NAMES/NAMES.COM c311ae4a915e6be1cf678aa9fd3b5e0f
+unpacked PESM/PESM.EXE 6e807a74765a8adf94eafbeeebf4accc
+unpacked PORTSAID/PORTSAID.EXE 1aebeb152dd8a950d47dfb2bcb38b0eb
+unpacked SCREEN/SCREEN.COM 715364055eb199d67940efd9f5118a78
+unpacked SUN/ARAB-ART.EXE 8c9fe20aa94d5ad80b6c23f7d794d0c7
+unpacked SUN/SUN.EXE 5ce198208951919d8fff4838a7cadf37
+unpacked TAHER/TAHER.COM f19953690d1ba84c62aa8588344ca43f
+unpacked WINKEY/WINKEY.EXE 47d37ada37b17bff797d6dadf8d05a6f
+FORM_X (x-3)*(x+2)/7 at -1.5 -> -0.321428 (truncated), OK
+FORM_X x/0 -> OVERFLOW, OK
+FORM_X 1/6 -> 0.166666 (truncation, not rounding), OK
+FORM_X JMP at 0F13 patched to E9 45 FD (-> 0C5B credits), decoded credit on screen, OK
+FORM_X one-byte tamper -> JMP becomes E9 46 FE (-> 0D5C), OK
+render render/screen.png f80345842fc433ad19fd30f146ee588f pixels written 7223 distinct 6398 kb polls 1 mode 3
+render render/taher.png e8890f0c326dfd90d018f5c8d0fe602d snapshot at poll 1 pixels 9144
+render render/arabicdemo_sheet.png f8eaf60cb54bd8f78e14de29f55337d3 15 frames
+render render/pesm.png b811b9584e8acf37c8724c8112bb3311 mode 0x12 [(16, 0), (33, 76)]
+E2E OK: COM restored byte-exact; EXE truncated to 1056 with CS:IP/SS:SP restored (SP marker C0C1h removed), page count fixed
+DIGI_T: 70 data files parse to their size trailer, 170/170 wire paths re-trace, OK
+EDITOR.EXE: feof bug adds FF per load/save; Del at col 100 of a 150-char line turns next line HELLO into ELLO, OK
+NAMES.COM and PORTSAID.EXE share 153 identical code bytes, OK
+SUN orbital-period floats at DS:19C1..19CD = 225, 88, 356 (Earth, should be ~365.25), 687, OK
+ARABART 4.15 and ARAB-ART 7.15 share the 12-byte install signature EB 0A 90 "DALYASSER", OK

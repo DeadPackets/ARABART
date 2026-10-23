@@ -1,273 +1,283 @@
-/* ═══════════════════════════════════════════════════
-   DOSArchive — Global Styles
-   Design: CRT Terminal / Digital Archaeology
-   ═══════════════════════════════════════════════════ */
+@layer reset, jsdos;
 
-/* ── Design Tokens ─────────────────────────────── */
-:root {
-  --color-bg: #050505;
-  --color-surface: #0a0a0a;
-  --color-card: #0d0d0d;
-  --color-border: #1a1a1a;
-  --color-border-bright: #2a2a2a;
+@view-transition { navigation: auto; }
 
-  --color-phosphor: #33ff33;
-  --color-phosphor-dim: #1a8c1a;
-  --color-phosphor-bright: #66ff66;
-  --color-amber: #ffb000;
-  --color-amber-dim: #996a00;
-  --color-red: #ff4444;
-
-  --color-text: #b0b0b0;
-  --color-text-bright: #e0e0e0;
-  --color-text-muted: #555555;
-
-  --font-display: 'VT323', monospace;
-  --font-body: 'IBM Plex Mono', 'Courier New', monospace;
-
-  --max-width: 1200px;
-  --header-height: 56px;
-
-  --glow-sm: 0 0 4px rgba(51, 255, 51, 0.4);
-  --glow-md: 0 0 8px rgba(51, 255, 51, 0.3), 0 0 16px rgba(51, 255, 51, 0.1);
-  --glow-lg: 0 0 12px rgba(51, 255, 51, 0.4), 0 0 24px rgba(51, 255, 51, 0.15), 0 0 48px rgba(51, 255, 51, 0.05);
-  --glow-amber: 0 0 8px rgba(255, 176, 0, 0.3), 0 0 16px rgba(255, 176, 0, 0.1);
-
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+/* IBM VGA font from The Ultimate Oldschool PC Font Pack by VileR (int10h.org), CC BY-SA 4.0. Bitmap-exact at 16, 32 and 48 px only */
+@font-face {
+  font-family: 'Web437 IBM VGA 9x16';
+  src: url('/ARABART/fonts/oldschool/Web437_IBM_VGA_9x16.woff') format('woff');
+  font-display: swap;
+}
+/* Pixelify's 2 and 5 read as 8 and S at UI sizes, so the Windows-era pixel face takes its digits from the VGA font */
+@font-face {
+  font-family: 'Pixel Digits';
+  src: url('/ARABART/fonts/oldschool/Web437_IBM_VGA_9x16.woff') format('woff');
+  unicode-range: U+0030-0039;
+  size-adjust: 102.4%;
+  font-display: swap;
 }
 
-/* ── Reset ──────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+:root {
+  color-scheme: dark;
+
+  /* Joined palette: the Borland Turbo C / C++ IDE. Writeups use these directly; they keep these values on every page */
+  --blue: oklch(0.334 0.231 264.1);
+  --blue-deep: oklch(0.271 0.188 264.1);
+  --night: oklch(0.17 0.1 264);
+  --yellow: oklch(0.971 0.183 109.4);
+  --cyan: oklch(0.915 0.136 195);
+  --cyan-dk: oklch(0.668 0.114 194.8);
+  --gray: oklch(0.738 0 0);
+  --green: oklch(0.639 0.218 142.5);
+  --red: oklch(0.72 0.18 25);
+  --black: oklch(0 0 0);
+  --dos-ink: oklch(0.97 0.015 264);
+  --dos-ink-2: oklch(0.86 0.05 264);
+
+  /* The 16 VGA colors, and the Windows system colors of each era */
+  --vga-0: #000; --vga-1: #0000aa; --vga-2: #00aa00; --vga-3: #00aaaa; --vga-4: #aa0000; --vga-5: #aa00aa; --vga-6: #aa5500; --vga-7: #aaaaaa;
+  --vga-8: #555555; --vga-9: #5555ff; --vga-10: #55ff55; --vga-11: #55ffff; --vga-12: #ff5555; --vga-13: #ff55ff; --vga-14: #ffff55; --vga-15: #fff;
+  --w-black: #000; --w-white: #fff; --w-silver: #c0c0c0; --w-gray: #808080; --w-navy: #000080; --w-teal: #008080;
+  --xp-beige: #ece9d8; --xp-line: #7f9db9; --xp-sel: #316ac5; --xp-tip: #ffffe1;
+  --xp-luna-1: #3d95ff; --xp-luna-2: #0a5fe8; --xp-luna-3: #0054e3; --xp-luna-4: #0042c0;
+  --vs-key: #0000ff; --vs-comment: #008000; --vs-string: #a31515;
+  --vs-well-1: #fbfaf6; --vs-well-2: #e6e3d6; --vs-cap-1: #f3f1e8; --vs-cap-2: #d9d5c6; --vs-act-1: #4b8df5; --vs-act-2: #1c5ad0;
+
+  --ar: 'Reem Kufi', 'Geeza Pro', 'Noto Kufi Arabic', sans-serif;
+  --sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'Martian Mono', ui-monospace, Menlo, monospace;
+  /* Text-mode font: the real IBM VGA 9x16. Use it only at 16, 32 or 48 px */
+  --font-dos: 'Web437 IBM VGA 9x16', ui-monospace, Menlo, monospace;
+  --font-pixel: 'Pixel Digits', 'Pixelify Sans', 'MS Sans Serif', Tahoma, sans-serif;
+
+  --expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  --gut: clamp(16px, 4.5vw, 72px);
+  --mb: 36px;
+  --sl: 32px;
+
+  --z-word: 3;
+  --z-bar: 10;
+  --z-pop: 20;
+  --z-skip: 30;
+}
+
+/* Semantic tokens. :root and dos are the same; each later era redefines them. Any element can carry data-era */
+:root, [data-era='dos'] {
+  --surface: var(--blue); --surface-2: var(--blue-deep); --ink: var(--dos-ink); --ink-2: var(--dos-ink-2);
+  --accent: var(--yellow); --accent-2: var(--cyan); --hot: oklch(0.364 0.149 29.2); --good: var(--green);
+  --rule: oklch(0.915 0.136 195 / 0.28); --focus: var(--yellow);
+  --font-ui: var(--font-dos); --font-code: var(--mono); --font-display: var(--sans); --font-ar: var(--ar);
+  --btn-bg: var(--gray); --btn-ink: var(--black);
+  --era-scheme: dark;
+}
+[data-era='win31'] {
+  --surface: #000080; --surface-2: var(--w-silver); --ink: var(--w-white); --ink-2: oklch(0.89 0.04 264);
+  --accent: #ffff00; --accent-2: #00ffff; --hot: #800000; --good: #008000;
+  --rule: oklch(1 0 0 / 0.3); --focus: #ffff00;
+  --font-ui: var(--font-pixel); --font-code: var(--mono); --font-display: var(--sans); --font-ar: var(--ar);
+  --btn-bg: var(--w-silver); --btn-ink: var(--w-black);
+}
+[data-era='win9x'] {
+  --surface: #007070; --surface-2: var(--w-silver); --ink: var(--w-white); --ink-2: oklch(0.96 0.02 195);
+  --accent: var(--vga-14); --accent-2: #aaffff; --hot: #800000; --good: #008000;
+  --rule: oklch(1 0 0 / 0.35); --focus: var(--vga-14);
+  --font-ui: var(--font-pixel); --font-code: var(--mono); --font-display: var(--sans); --font-ar: var(--ar);
+  --btn-bg: var(--w-silver); --btn-ink: var(--w-black);
+}
+[data-era='vs2005'] {
+  --surface: oklch(0.93 0.025 250); --surface-2: var(--xp-beige); --ink: oklch(0.22 0.03 255); --ink-2: oklch(0.4 0.03 255);
+  --accent: oklch(0.48 0.2 262); --accent-2: oklch(0.45 0.15 145); --hot: var(--vs-string); --good: oklch(0.45 0.15 145);
+  --rule: oklch(0.45 0.05 255 / 0.3); --focus: var(--xp-sel);
+  --font-ui: var(--sans); --font-code: var(--mono); --font-display: var(--sans); --font-ar: var(--ar);
+  --btn-bg: var(--xp-beige); --btn-ink: var(--w-black);
+  color-scheme: light;
+}
+[data-era] { background-color: var(--surface); color: var(--ink); }
+
+@media (max-width: 760px), (pointer: coarse) {
+  :root { --mb: 44px; --sl: 44px; }
+}
+@media (max-width: 760px) {
+  :root { --mb: 0px; --sl: 56px; }
+}
+
+/* Lowest layer, so js-dos's own utility classes (layer jsdos) still win inside the emulator UI */
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 }
 
 html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  scrollbar-color: var(--color-phosphor-dim) var(--color-surface);
+  scrollbar-color: var(--cyan-dk) var(--blue-deep);
+  scroll-padding-top: calc(var(--mb) + 16px);
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  line-height: 1.65;
-  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  color: var(--ink);
+  font: 400 1.0625rem/1.65 var(--sans);
+  font-stretch: 100%;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  padding-bottom: var(--sl);
 }
 
-/* ── Scrollbar ──────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
+main { flex: 1; }
 
-::-webkit-scrollbar-track {
-  background: var(--color-surface);
-}
+img, canvas, svg { display: block; max-width: 100%; }
 
-::-webkit-scrollbar-thumb {
-  background: var(--color-phosphor-dim);
-  border-radius: 4px;
-}
+::selection { background: var(--yellow); color: var(--black); }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-phosphor);
-}
-
-/* ── Selection ──────────────────────────────────── */
-::selection {
-  background: var(--color-phosphor);
-  color: var(--color-bg);
-}
-
-/* ── Typography ─────────────────────────────────── */
-h1, h2, h3, h4 {
+h1, h2, h3 {
   font-family: var(--font-display);
-  color: var(--color-phosphor);
-  text-shadow: var(--glow-sm);
-  line-height: 1.2;
-  letter-spacing: 0.02em;
+  font-weight: 800;
+  font-stretch: 85%;
+  color: var(--ink);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
-h1 { font-size: 3rem; }
-h2 { font-size: 2rem; }
+h1 { font-size: clamp(2.75rem, 4vw + 1.25rem, 5.5rem); font-stretch: 80%; }
+h2 { font-size: clamp(2rem, 2.4vw + 1rem, 3.25rem); font-stretch: 80%; }
 h3 { font-size: 1.5rem; }
-h4 { font-size: 1.25rem; }
 
-p {
-  margin-bottom: 1rem;
-}
+p { text-wrap: pretty; }
+strong { font-weight: 700; }
 
-a {
-  color: var(--color-phosphor);
-  text-decoration: none;
-  transition: text-shadow 0.2s ease, color 0.2s ease;
-}
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { color: var(--accent); }
 
-a:hover {
-  text-shadow: var(--glow-sm);
-  color: var(--color-phosphor-bright);
-}
+code { font: 500 0.875em var(--mono); color: var(--accent); }
+:is(p, li, dd) code { overflow-wrap: anywhere; } /* long paths and keys wrap on phones instead of widening the page */
 
-strong {
-  color: var(--color-text-bright);
-}
-
-code {
-  font-family: var(--font-body);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  padding: 0.15em 0.4em;
-  border-radius: 2px;
-  font-size: 0.85em;
-  color: var(--color-amber);
-}
-
-hr {
-  border: none;
-  border-top: 1px solid var(--color-border);
-  margin: 2rem 0;
-}
-
-/* ── Layout ─────────────────────────────────────── */
-.container {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-.page-content {
-  padding-top: calc(var(--header-height) + 2rem);
-  padding-bottom: 4rem;
-  min-height: 100vh;
-}
-
-/* ── Program Grid ───────────────────────────────── */
-.program-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-@media (max-width: 960px) {
-  .program-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 600px) {
-  .program-grid { grid-template-columns: 1fr; }
-}
-
-/* ── Buttons ────────────────────────────────────── */
-.btn {
+/* Keycaps: the IDE's gray buttons, with its hard black shadow */
+kbd {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  letter-spacing: 0.05em;
-  padding: 0.5rem 1.25rem;
-  border: 1px solid var(--color-phosphor-dim);
-  background: transparent;
-  color: var(--color-phosphor);
-  cursor: pointer;
-  transition: all 0.2s ease;
+  justify-content: center;
+  min-width: 2.2em;
+  padding: 0.1em 0.55em;
+  font: 600 0.8125rem/1.5 var(--mono);
+  color: var(--black);
+  background: var(--gray);
+  box-shadow: 3px 3px 0 var(--black);
+  white-space: nowrap;
+}
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+/* Buttons. dos: Borland dialog buttons, gray, green for the default action, hard shadow, press moves into it */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-height: 44px;
+  padding: 0 1.15rem;
+  font: 700 0.9375rem/1 var(--sans);
   text-decoration: none;
+  color: var(--btn-ink);
+  background: var(--btn-bg);
+  border: 0;
+  box-shadow: 5px 5px 0 var(--black);
+  cursor: pointer;
+  transition: background-color 0.15s var(--quart), translate 0.1s var(--quart), box-shadow 0.1s var(--quart);
+}
+.button:hover { color: var(--black); background: var(--yellow); }
+.button:active { translate: 3px 3px; box-shadow: 2px 2px 0 var(--black); }
+.button--primary { background: var(--green); }
+.button[disabled] { opacity: 0.5; cursor: not-allowed; translate: none; }
+.button[disabled]:hover { background: var(--btn-bg); }
+.button--primary[disabled]:hover { background: var(--green); }
+.button:focus-visible { outline-color: var(--focus); outline-offset: 4px; }
+
+/* Windows 3.1 and 95: silver push buttons with a bevel; the default button gets a black outline */
+@scope ([data-era='win31'], [data-era='win9x']) to ([data-era]) {
+  .button {
+    color: var(--w-black); background: var(--w-silver); border-radius: 0;
+    box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray), inset 2px 2px oklch(0.88 0 0);
+    font-family: var(--font-pixel); font-weight: 500;
+  }
+  .button:hover { background: var(--w-silver); color: var(--w-black); }
+  .button:active { translate: none; box-shadow: inset 1px 1px var(--w-black), inset -1px -1px var(--w-white), inset 2px 2px var(--w-gray); padding-top: 2px; }
+  .button--primary { outline: 1px solid var(--w-black); outline-offset: 0; }
+  .button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -6px; }
+}
+@scope ([data-era='win31']) to ([data-era]) {
+  .button { border-radius: 4px; border: 1px solid var(--w-black); box-shadow: inset -2px -2px var(--w-gray), inset 2px 2px var(--w-white); }
+  .button:active { box-shadow: inset 2px 2px var(--w-gray); }
+  .button--primary { border-width: 2px; outline: 0; }
+}
+/* Windows XP, as Visual Studio 2005 drew it: soft gradient, rounded, navy border; the default button glows blue */
+@scope ([data-era='vs2005']) to ([data-era]) {
+  .button {
+    color: var(--w-black); border: 1px solid #003c74; border-radius: 3px; font-weight: 600;
+    background: linear-gradient(#fff, #f3f2ec 60%, #d8d5c6);
+    box-shadow: inset 0 -2px 0 oklch(0.85 0.03 90);
+  }
+  .button:hover { color: var(--w-black); background: linear-gradient(#fff, #f3f2ec 60%, #d8d5c6); box-shadow: inset 0 0 0 2px #f8b33e, inset 0 -2px 0 #e58e1a; }
+  .button:active { translate: none; background: linear-gradient(#e5e4dc, #f2f1ea); box-shadow: none; }
+  .button--primary { box-shadow: inset 0 0 0 2px #8db2f4, inset 0 -2px 0 #4f7ed8; }
+  .button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -5px; }
 }
 
-.btn:hover {
-  background: var(--color-phosphor);
-  color: var(--color-bg);
-  box-shadow: var(--glow-md);
-  text-shadow: none;
+/* Layout */
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--gut);
 }
 
-.btn-amber {
-  border-color: var(--color-amber-dim);
-  color: var(--color-amber);
-}
+/* Shared page head: a large condensed title and the one fact that matters */
+.page-head { padding-top: clamp(40px, 6vw, 88px); }
+.page-head .lead { margin-top: 18px; max-width: 46ch; font-size: clamp(1.25rem, 0.6vw + 1rem, 1.5rem); line-height: 1.45; font-weight: 500; color: var(--ink); }
+.crumb { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 8px; font-size: 0.9375rem; color: var(--accent-2); text-decoration: none; }
+.crumb:hover { color: var(--accent); }
 
-.btn-amber:hover {
-  background: var(--color-amber);
-  color: var(--color-bg);
-  box-shadow: var(--glow-amber);
-}
-
-.btn-sm {
-  font-size: 0.95rem;
-  padding: 0.35rem 0.85rem;
-}
-
-/* ── Badges ─────────────────────────────────────── */
-.badge {
-  display: inline-block;
-  font-family: var(--font-display);
-  font-size: 0.95rem;
-  padding: 0.1rem 0.6rem;
-  border: 1px solid;
-  letter-spacing: 0.03em;
-}
-
-.badge-year {
-  border-color: var(--color-amber-dim);
-  color: var(--color-amber);
-}
-
-.badge-lang {
-  border-color: var(--color-phosphor-dim);
-  color: var(--color-phosphor);
-}
-
-.badge-category {
-  border-color: var(--color-border-bright);
-  color: var(--color-text-muted);
-}
-
-/* ── Skip Link (a11y) ───────────────────────────── */
 .skip-link {
-  position: absolute;
-  top: -100%;
-  left: 1rem;
-  background: var(--color-phosphor);
-  color: var(--color-bg);
-  padding: 0.5rem 1rem;
-  z-index: 10000;
-  font-family: var(--font-body);
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: var(--z-skip);
+  padding: 10px 16px;
+  font-weight: 700;
+  color: var(--black);
+  background: var(--yellow);
 }
+.skip-link:not(:focus) { width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.skip-link:focus {
-  top: 0.5rem;
-}
-
-/* ── Focus Indicators ───────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--color-phosphor);
-  outline-offset: 2px;
-}
-
-/* ── Utility ────────────────────────────────────── */
-.text-phosphor { color: var(--color-phosphor); }
-.text-amber { color: var(--color-amber); }
-.text-muted { color: var(--color-text-muted); }
-.text-center { text-align: center; }
 .sr-only {
   position: absolute;
   width: 1px;
   height: 1px;
-  padding: 0;
-  margin: -1px;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
-/* ── Responsive ─────────────────────────────────── */
-@media (max-width: 768px) {
-  h1 { font-size: 2.25rem; }
-  h2 { font-size: 1.5rem; }
-  .container { padding: 0 1rem; }
+[lang='ar'] { direction: rtl; unicode-bidi: isolate; font-family: var(--ar); }
+
+/* Component display rules must never un-hide an element */
+[hidden] { display: none !important; }
+
+/* Page to page: the screen redraws like an old monitor, a quick dissolve with a short rise */
+::view-transition-old(root) { animation: 160ms var(--quart) both vt-out; }
+::view-transition-new(root) { animation: 360ms var(--expo) both vt-in; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; clip-path: inset(0 0 100% 0); } to { opacity: 1; clip-path: inset(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }

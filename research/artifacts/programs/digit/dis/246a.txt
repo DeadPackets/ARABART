@@ -1,0 +1,719 @@
+246a:0000 b90800         mov cx, 8
+246a:0003 9a32290000     lcall 0, 0x2932
+246a:0008 5d             pop bp
+246a:0009 cb             retf 
+246a:000a 55             push bp
+246a:000b 8bec           mov bp, sp
+246a:000d 39265c16       cmp word ptr [0x165c], sp
+246a:0011 7705           ja 0x18
+246a:0013 9aac290000     lcall 0, 0x29ac
+246a:0018 b91400         mov cx, 0x14
+246a:001b 3de803         cmp ax, 0x3e8
+246a:001e 7405           je 0x25
+246a:0020 b8e803         mov ax, 0x3e8
+246a:0023 eb03           jmp 0x28
+246a:0025 b84006         mov ax, 0x640
+246a:0028 50             push ax
+246a:0029 50             push ax
+246a:002a b0b6           mov al, 0xb6
+246a:002c e643           out 0x43, al
+246a:002e 58             pop ax
+246a:002f e642           out 0x42, al
+246a:0031 88e0           mov al, ah
+246a:0033 e642           out 0x42, al
+246a:0035 e461           in al, 0x61
+246a:0037 0c03           or al, 3
+246a:0039 e661           out 0x61, al
+246a:003b 58             pop ax
+246a:003c 51             push cx
+246a:003d b900ff         mov cx, 0xff00
+246a:0040 e2fe           loop 0x40
+246a:0042 59             pop cx
+246a:0043 e2d6           loop 0x1b
+246a:0045 e461           in al, 0x61
+246a:0047 24fc           and al, 0xfc
+246a:0049 e661           out 0x61, al
+246a:004b 5d             pop bp
+246a:004c cb             retf 
+246a:004d c8080000       enter 8, 0
+246a:0051 56             push si
+246a:0052 57             push di
+246a:0053 39265c16       cmp word ptr [0x165c], sp
+246a:0057 7705           ja 0x5e
+246a:0059 9aac290000     lcall 0, 0x29ac
+246a:005e c746fe2201     mov word ptr [bp - 2], 0x122
+246a:0063 c746fc8200     mov word ptr [bp - 4], 0x82
+246a:0068 c646fa08       mov byte ptr [bp - 6], 8
+246a:006c c646fb08       mov byte ptr [bp - 5], 8
+246a:0070 807e0600       cmp byte ptr [bp + 6], 0
+246a:0074 7504           jne 0x7a
+246a:0076 c646fb0c       mov byte ptr [bp - 5], 0xc
+246a:007a 807e0601       cmp byte ptr [bp + 6], 1
+246a:007e 7504           jne 0x84
+246a:0080 c646fa0a       mov byte ptr [bp - 6], 0xa
+246a:0084 6a00           push 0
+246a:0086 9a3d1a0d27     lcall 0x270d, 0x1a3d
+246a:008b 59             pop cx
+246a:008c c746f80000     mov word ptr [bp - 8], 0
+246a:0091 e9bd00         jmp 0x151
+246a:0094 8b46f8         mov ax, word ptr [bp - 8]
+246a:0097 ba1e00         mov dx, 0x1e
+246a:009a f7ea           imul dx
+246a:009c 8b56fe         mov dx, word ptr [bp - 2]
+246a:009f 03d0           add dx, ax
+246a:00a1 8bf2           mov si, dx
+246a:00a3 8b46fc         mov ax, word ptr [bp - 4]
+246a:00a6 05fdff         add ax, 0xfffd
+246a:00a9 8bf8           mov di, ax
+246a:00ab 6a0f           push 0xf
+246a:00ad 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:00b2 59             pop cx
+246a:00b3 8bc7           mov ax, di
+246a:00b5 050c00         add ax, 0xc
+246a:00b8 50             push ax
+246a:00b9 8bc6           mov ax, si
+246a:00bb 40             inc ax
+246a:00bc 50             push ax
+246a:00bd 8bc7           mov ax, di
+246a:00bf 050c00         add ax, 0xc
+246a:00c2 50             push ax
+246a:00c3 8bc6           mov ax, si
+246a:00c5 050c00         add ax, 0xc
+246a:00c8 50             push ax
+246a:00c9 9a251c0d27     lcall 0x270d, 0x1c25
+246a:00ce 83c408         add sp, 8
+246a:00d1 8bc7           mov ax, di
+246a:00d3 40             inc ax
+246a:00d4 50             push ax
+246a:00d5 8bc6           mov ax, si
+246a:00d7 050c00         add ax, 0xc
+246a:00da 50             push ax
+246a:00db 8bc7           mov ax, di
+246a:00dd 050c00         add ax, 0xc
+246a:00e0 50             push ax
+246a:00e1 8bc6           mov ax, si
+246a:00e3 050c00         add ax, 0xc
+246a:00e6 50             push ax
+246a:00e7 9a251c0d27     lcall 0x270d, 0x1c25
+246a:00ec 83c408         add sp, 8
+246a:00ef 6a00           push 0
+246a:00f1 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:00f6 59             pop cx
+246a:00f7 57             push di
+246a:00f8 8bc6           mov ax, si
+246a:00fa 050c00         add ax, 0xc
+246a:00fd 50             push ax
+246a:00fe 57             push di
+246a:00ff 56             push si
+246a:0100 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0105 83c408         add sp, 8
+246a:0108 8bc7           mov ax, di
+246a:010a 050c00         add ax, 0xc
+246a:010d 50             push ax
+246a:010e 56             push si
+246a:010f 57             push di
+246a:0110 56             push si
+246a:0111 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0116 83c408         add sp, 8
+246a:0119 8d5efa         lea bx, [bp - 6]
+246a:011c 035ef8         add bx, word ptr [bp - 8]
+246a:011f 368a07         mov al, byte ptr ss:[bx]
+246a:0122 b400           mov ah, 0
+246a:0124 50             push ax
+246a:0125 6a01           push 1
+246a:0127 9a30120d27     lcall 0x270d, 0x1230
+246a:012c 59             pop cx
+246a:012d 59             pop cx
+246a:012e 8bc7           mov ax, di
+246a:0130 050900         add ax, 9
+246a:0133 50             push ax
+246a:0134 8bc6           mov ax, si
+246a:0136 050900         add ax, 9
+246a:0139 50             push ax
+246a:013a 8bc7           mov ax, di
+246a:013c 050300         add ax, 3
+246a:013f 50             push ax
+246a:0140 8bc6           mov ax, si
+246a:0142 050300         add ax, 3
+246a:0145 50             push ax
+246a:0146 9a881c0d27     lcall 0x270d, 0x1c88
+246a:014b 83c408         add sp, 8
+246a:014e ff46f8         inc word ptr [bp - 8]
+246a:0151 837ef801       cmp word ptr [bp - 8], 1
+246a:0155 7f03           jg 0x15a
+246a:0157 e93aff         jmp 0x94
+246a:015a 807e0600       cmp byte ptr [bp + 6], 0
+246a:015e 7504           jne 0x164
+246a:0160 0e             push cs
+246a:0161 e8a6fe         call 0xa
+246a:0164 5f             pop di
+246a:0165 5e             pop si
+246a:0166 c9             leave 
+246a:0167 cb             retf 
+246a:0168 c82c0000       enter 0x2c, 0
+246a:016c 56             push si
+246a:016d 57             push di
+246a:016e 39265c16       cmp word ptr [0x165c], sp
+246a:0172 7705           ja 0x179
+246a:0174 9aac290000     lcall 0, 0x29ac
+246a:0179 c746fe3f00     mov word ptr [bp - 2], 0x3f
+246a:017e c746fc2800     mov word ptr [bp - 4], 0x28
+246a:0183 6a07           push 7
+246a:0185 6a01           push 1
+246a:0187 9a30120d27     lcall 0x270d, 0x1230
+246a:018c 59             pop cx
+246a:018d 59             pop cx
+246a:018e 8b46fe         mov ax, word ptr [bp - 2]
+246a:0191 c1e002         shl ax, 2
+246a:0194 05d8ff         add ax, 0xffd8
+246a:0197 8bf8           mov di, ax
+246a:0199 8b46fc         mov ax, word ptr [bp - 4]
+246a:019c c1e002         shl ax, 2
+246a:019f 05d8ff         add ax, 0xffd8
+246a:01a2 8bf0           mov si, ax
+246a:01a4 8b46fe         mov ax, word ptr [bp - 2]
+246a:01a7 051d00         add ax, 0x1d
+246a:01aa c1e002         shl ax, 2
+246a:01ad 052800         add ax, 0x28
+246a:01b0 8946fa         mov word ptr [bp - 6], ax
+246a:01b3 8b46fc         mov ax, word ptr [bp - 4]
+246a:01b6 051700         add ax, 0x17
+246a:01b9 c1e002         shl ax, 2
+246a:01bc 052800         add ax, 0x28
+246a:01bf 8946f8         mov word ptr [bp - 8], ax
+246a:01c2 83ee28         sub si, 0x28
+246a:01c5 ff76f8         push word ptr [bp - 8]
+246a:01c8 ff76fa         push word ptr [bp - 6]
+246a:01cb 56             push si
+246a:01cc 57             push di
+246a:01cd 9a881c0d27     lcall 0x270d, 0x1c88
+246a:01d2 83c408         add sp, 8
+246a:01d5 6a00           push 0
+246a:01d7 9a3d1a0d27     lcall 0x270d, 0x1a3d
+246a:01dc 59             pop cx
+246a:01dd 6a0f           push 0xf
+246a:01df 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:01e4 59             pop cx
+246a:01e5 ff76f8         push word ptr [bp - 8]
+246a:01e8 57             push di
+246a:01e9 56             push si
+246a:01ea 57             push di
+246a:01eb 9a251c0d27     lcall 0x270d, 0x1c25
+246a:01f0 83c408         add sp, 8
+246a:01f3 56             push si
+246a:01f4 ff76fa         push word ptr [bp - 6]
+246a:01f7 56             push si
+246a:01f8 57             push di
+246a:01f9 9a251c0d27     lcall 0x270d, 0x1c25
+246a:01fe 83c408         add sp, 8
+246a:0201 8b46f8         mov ax, word ptr [bp - 8]
+246a:0204 48             dec ax
+246a:0205 50             push ax
+246a:0206 8bc7           mov ax, di
+246a:0208 40             inc ax
+246a:0209 50             push ax
+246a:020a 8bc6           mov ax, si
+246a:020c 40             inc ax
+246a:020d 50             push ax
+246a:020e 8bc7           mov ax, di
+246a:0210 40             inc ax
+246a:0211 50             push ax
+246a:0212 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0217 83c408         add sp, 8
+246a:021a 8bc6           mov ax, si
+246a:021c 40             inc ax
+246a:021d 50             push ax
+246a:021e 8b46fa         mov ax, word ptr [bp - 6]
+246a:0221 48             dec ax
+246a:0222 50             push ax
+246a:0223 8bc6           mov ax, si
+246a:0225 40             inc ax
+246a:0226 50             push ax
+246a:0227 8bc7           mov ax, di
+246a:0229 40             inc ax
+246a:022a 50             push ax
+246a:022b 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0230 83c408         add sp, 8
+246a:0233 6a00           push 0
+246a:0235 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:023a 59             pop cx
+246a:023b ff76f8         push word ptr [bp - 8]
+246a:023e 57             push di
+246a:023f ff76f8         push word ptr [bp - 8]
+246a:0242 ff76fa         push word ptr [bp - 6]
+246a:0245 9a251c0d27     lcall 0x270d, 0x1c25
+246a:024a 83c408         add sp, 8
+246a:024d 56             push si
+246a:024e ff76fa         push word ptr [bp - 6]
+246a:0251 ff76f8         push word ptr [bp - 8]
+246a:0254 ff76fa         push word ptr [bp - 6]
+246a:0257 9a251c0d27     lcall 0x270d, 0x1c25
+246a:025c 83c408         add sp, 8
+246a:025f 8b46f8         mov ax, word ptr [bp - 8]
+246a:0262 48             dec ax
+246a:0263 50             push ax
+246a:0264 8bc7           mov ax, di
+246a:0266 48             dec ax
+246a:0267 50             push ax
+246a:0268 8b46f8         mov ax, word ptr [bp - 8]
+246a:026b 48             dec ax
+246a:026c 50             push ax
+246a:026d 8b46fa         mov ax, word ptr [bp - 6]
+246a:0270 48             dec ax
+246a:0271 50             push ax
+246a:0272 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0277 83c408         add sp, 8
+246a:027a 8bc6           mov ax, si
+246a:027c 48             dec ax
+246a:027d 50             push ax
+246a:027e 8b46fa         mov ax, word ptr [bp - 6]
+246a:0281 48             dec ax
+246a:0282 50             push ax
+246a:0283 8b46f8         mov ax, word ptr [bp - 8]
+246a:0286 48             dec ax
+246a:0287 50             push ax
+246a:0288 8b46fa         mov ax, word ptr [bp - 6]
+246a:028b 48             dec ax
+246a:028c 50             push ax
+246a:028d 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0292 83c408         add sp, 8
+246a:0295 83c708         add di, 8
+246a:0298 83c608         add si, 8
+246a:029b 836efa08       sub word ptr [bp - 6], 8
+246a:029f 836ef808       sub word ptr [bp - 8], 8
+246a:02a3 6a0f           push 0xf
+246a:02a5 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:02aa 59             pop cx
+246a:02ab ff76f8         push word ptr [bp - 8]
+246a:02ae 57             push di
+246a:02af ff76f8         push word ptr [bp - 8]
+246a:02b2 ff76fa         push word ptr [bp - 6]
+246a:02b5 9a251c0d27     lcall 0x270d, 0x1c25
+246a:02ba 83c408         add sp, 8
+246a:02bd 56             push si
+246a:02be ff76fa         push word ptr [bp - 6]
+246a:02c1 ff76f8         push word ptr [bp - 8]
+246a:02c4 ff76fa         push word ptr [bp - 6]
+246a:02c7 9a251c0d27     lcall 0x270d, 0x1c25
+246a:02cc 83c408         add sp, 8
+246a:02cf 8b46f8         mov ax, word ptr [bp - 8]
+246a:02d2 48             dec ax
+246a:02d3 50             push ax
+246a:02d4 8bc7           mov ax, di
+246a:02d6 40             inc ax
+246a:02d7 50             push ax
+246a:02d8 8bc6           mov ax, si
+246a:02da 40             inc ax
+246a:02db 50             push ax
+246a:02dc 8bc7           mov ax, di
+246a:02de 40             inc ax
+246a:02df 50             push ax
+246a:02e0 9a251c0d27     lcall 0x270d, 0x1c25
+246a:02e5 83c408         add sp, 8
+246a:02e8 8bc6           mov ax, si
+246a:02ea 40             inc ax
+246a:02eb 50             push ax
+246a:02ec 8b46fa         mov ax, word ptr [bp - 6]
+246a:02ef 48             dec ax
+246a:02f0 50             push ax
+246a:02f1 8bc6           mov ax, si
+246a:02f3 40             inc ax
+246a:02f4 50             push ax
+246a:02f5 8bc7           mov ax, di
+246a:02f7 40             inc ax
+246a:02f8 50             push ax
+246a:02f9 9a251c0d27     lcall 0x270d, 0x1c25
+246a:02fe 83c408         add sp, 8
+246a:0301 6a00           push 0
+246a:0303 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:0308 59             pop cx
+246a:0309 8b46f8         mov ax, word ptr [bp - 8]
+246a:030c 48             dec ax
+246a:030d 50             push ax
+246a:030e 57             push di
+246a:030f 8b46f8         mov ax, word ptr [bp - 8]
+246a:0312 48             dec ax
+246a:0313 50             push ax
+246a:0314 8b46fa         mov ax, word ptr [bp - 6]
+246a:0317 48             dec ax
+246a:0318 50             push ax
+246a:0319 9a251c0d27     lcall 0x270d, 0x1c25
+246a:031e 83c408         add sp, 8
+246a:0321 56             push si
+246a:0322 8b46fa         mov ax, word ptr [bp - 6]
+246a:0325 48             dec ax
+246a:0326 50             push ax
+246a:0327 8b46f8         mov ax, word ptr [bp - 8]
+246a:032a 48             dec ax
+246a:032b 50             push ax
+246a:032c 8b46fa         mov ax, word ptr [bp - 6]
+246a:032f 48             dec ax
+246a:0330 50             push ax
+246a:0331 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0336 83c408         add sp, 8
+246a:0339 8b46f8         mov ax, word ptr [bp - 8]
+246a:033c 48             dec ax
+246a:033d 50             push ax
+246a:033e 57             push di
+246a:033f 56             push si
+246a:0340 57             push di
+246a:0341 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0346 83c408         add sp, 8
+246a:0349 56             push si
+246a:034a 8b46fa         mov ax, word ptr [bp - 6]
+246a:034d 48             dec ax
+246a:034e 50             push ax
+246a:034f 56             push si
+246a:0350 57             push di
+246a:0351 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0356 83c408         add sp, 8
+246a:0359 6a03           push 3
+246a:035b 8bc6           mov ax, si
+246a:035d 48             dec ax
+246a:035e 50             push ax
+246a:035f 8bc7           mov ax, di
+246a:0361 050600         add ax, 6
+246a:0364 50             push ax
+246a:0365 9af8177b19     lcall 0x197b, 0x17f8
+246a:036a 83c406         add sp, 6
+246a:036d 6a03           push 3
+246a:036f 6a00           push 0
+246a:0371 6a01           push 1
+246a:0373 9a85160d27     lcall 0x270d, 0x1685
+246a:0378 83c406         add sp, 6
+246a:037b 6a01           push 1
+246a:037d 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:0382 59             pop cx
+246a:0383 1e             push ds
+246a:0384 680c12         push 0x120c
+246a:0387 8bc6           mov ax, si
+246a:0389 050600         add ax, 6
+246a:038c 50             push ax
+246a:038d 8bc7           mov ax, di
+246a:038f 054f00         add ax, 0x4f
+246a:0392 50             push ax
+246a:0393 9a801f0d27     lcall 0x270d, 0x1f80
+246a:0398 83c408         add sp, 8
+246a:039b 83c708         add di, 8
+246a:039e 83c63e         add si, 0x3e
+246a:03a1 836efa08       sub word ptr [bp - 6], 8
+246a:03a5 836ef808       sub word ptr [bp - 8], 8
+246a:03a9 6a00           push 0
+246a:03ab 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:03b0 59             pop cx
+246a:03b1 ff76f8         push word ptr [bp - 8]
+246a:03b4 57             push di
+246a:03b5 56             push si
+246a:03b6 57             push di
+246a:03b7 9a251c0d27     lcall 0x270d, 0x1c25
+246a:03bc 83c408         add sp, 8
+246a:03bf 56             push si
+246a:03c0 ff76fa         push word ptr [bp - 6]
+246a:03c3 56             push si
+246a:03c4 57             push di
+246a:03c5 9a251c0d27     lcall 0x270d, 0x1c25
+246a:03ca 83c408         add sp, 8
+246a:03cd 8b46f8         mov ax, word ptr [bp - 8]
+246a:03d0 48             dec ax
+246a:03d1 50             push ax
+246a:03d2 8bc7           mov ax, di
+246a:03d4 40             inc ax
+246a:03d5 50             push ax
+246a:03d6 8bc6           mov ax, si
+246a:03d8 40             inc ax
+246a:03d9 50             push ax
+246a:03da 8bc7           mov ax, di
+246a:03dc 40             inc ax
+246a:03dd 50             push ax
+246a:03de 9a251c0d27     lcall 0x270d, 0x1c25
+246a:03e3 83c408         add sp, 8
+246a:03e6 8bc6           mov ax, si
+246a:03e8 40             inc ax
+246a:03e9 50             push ax
+246a:03ea 8b46fa         mov ax, word ptr [bp - 6]
+246a:03ed 48             dec ax
+246a:03ee 50             push ax
+246a:03ef 8bc6           mov ax, si
+246a:03f1 40             inc ax
+246a:03f2 50             push ax
+246a:03f3 8bc7           mov ax, di
+246a:03f5 40             inc ax
+246a:03f6 50             push ax
+246a:03f7 9a251c0d27     lcall 0x270d, 0x1c25
+246a:03fc 83c408         add sp, 8
+246a:03ff 6a0f           push 0xf
+246a:0401 9ab21d0d27     lcall 0x270d, 0x1db2
+246a:0406 59             pop cx
+246a:0407 ff76f8         push word ptr [bp - 8]
+246a:040a 57             push di
+246a:040b ff76f8         push word ptr [bp - 8]
+246a:040e ff76fa         push word ptr [bp - 6]
+246a:0411 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0416 83c408         add sp, 8
+246a:0419 56             push si
+246a:041a ff76fa         push word ptr [bp - 6]
+246a:041d ff76f8         push word ptr [bp - 8]
+246a:0420 ff76fa         push word ptr [bp - 6]
+246a:0423 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0428 83c408         add sp, 8
+246a:042b 8b46f8         mov ax, word ptr [bp - 8]
+246a:042e 48             dec ax
+246a:042f 50             push ax
+246a:0430 8bc7           mov ax, di
+246a:0432 48             dec ax
+246a:0433 50             push ax
+246a:0434 8b46f8         mov ax, word ptr [bp - 8]
+246a:0437 48             dec ax
+246a:0438 50             push ax
+246a:0439 8b46fa         mov ax, word ptr [bp - 6]
+246a:043c 48             dec ax
+246a:043d 50             push ax
+246a:043e 9a251c0d27     lcall 0x270d, 0x1c25
+246a:0443 83c408         add sp, 8
+246a:0446 8bc6           mov ax, si
+246a:0448 48             dec ax
+246a:0449 50             push ax
+246a:044a 8b46fa         mov ax, word ptr [bp - 6]
+246a:044d 48             dec ax
+246a:044e 50             push ax
+246a:044f 8b46f8         mov ax, word ptr [bp - 8]
+246a:0452 48             dec ax
+246a:0453 50             push ax
+246a:0454 8b46fa         mov ax, word ptr [bp - 6]
+246a:0457 48             dec ax
+246a:0458 50             push ax
+246a:0459 9a251c0d27     lcall 0x270d, 0x1c25
+246a:045e 83c408         add sp, 8
+246a:0461 47             inc di
+246a:0462 47             inc di
+246a:0463 46             inc si
+246a:0464 46             inc si
+246a:0465 836efa02       sub word ptr [bp - 6], 2
+246a:0469 836ef802       sub word ptr [bp - 8], 2
+246a:046d 6a02           push 2
+246a:046f 6a01           push 1
+246a:0471 9a30120d27     lcall 0x270d, 0x1230
+246a:0476 59             pop cx
+246a:0477 59             pop cx
+246a:0478 ff76f8         push word ptr [bp - 8]
+246a:047b ff76fa         push word ptr [bp - 6]
+246a:047e 56             push si
+246a:047f 57             push di
+246a:0480 9a881c0d27     lcall 0x270d, 0x1c88
+246a:0485 83c408         add sp, 8
+246a:0488 68fa00         push 0xfa
+246a:048b 0e             push cs
+246a:048c e8befb         call 0x4d
+246a:048f 59             pop cx
+246a:0490 6a01           push 1
+246a:0492 ff7608         push word ptr [bp + 8]
+246a:0495 ff7606         push word ptr [bp + 6]
+246a:0498 6a00           push 0
+246a:049a 6a05           push 5
+246a:049c 6a0e           push 0xe
+246a:049e 8b46fc         mov ax, word ptr [bp - 4]
+246a:04a1 050600         add ax, 6
+246a:04a4 50             push ax
+246a:04a5 8b46fe         mov ax, word ptr [bp - 2]
+246a:04a8 050b00         add ax, 0xb
+246a:04ab 50             push ax
+246a:04ac 9a0604bd0f     lcall 0xfbd, 0x406
+246a:04b1 83c410         add sp, 0x10
+246a:04b4 8d46e6         lea ax, [bp - 0x1a]
+246a:04b7 16             push ss
+246a:04b8 50             push ax
+246a:04b9 1e             push ds
+246a:04ba 68e811         push 0x11e8
+246a:04bd b91200         mov cx, 0x12
+246a:04c0 9a32290000     lcall 0, 0x2932
+246a:04c5 6a01           push 1
+246a:04c7 16             push ss
+246a:04c8 8d46e6         lea ax, [bp - 0x1a]
+246a:04cb 50             push ax
+246a:04cc 8b46fc         mov ax, word ptr [bp - 4]
+246a:04cf 050400         add ax, 4
+246a:04d2 50             push ax
+246a:04d3 8b46fe         mov ax, word ptr [bp - 2]
+246a:04d6 050500         add ax, 5
+246a:04d9 50             push ax
+246a:04da 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:04df 83c40a         add sp, 0xa
+246a:04e2 c646ea06       mov byte ptr [bp - 0x16], 6
+246a:04e6 6a01           push 1
+246a:04e8 16             push ss
+246a:04e9 8d46e6         lea ax, [bp - 0x1a]
+246a:04ec 50             push ax
+246a:04ed 8b46fc         mov ax, word ptr [bp - 4]
+246a:04f0 050700         add ax, 7
+246a:04f3 50             push ax
+246a:04f4 8b46fe         mov ax, word ptr [bp - 2]
+246a:04f7 050500         add ax, 5
+246a:04fa 50             push ax
+246a:04fb 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0500 83c40a         add sp, 0xa
+246a:0503 c646e906       mov byte ptr [bp - 0x17], 6
+246a:0507 6a01           push 1
+246a:0509 16             push ss
+246a:050a 8d46e6         lea ax, [bp - 0x1a]
+246a:050d 50             push ax
+246a:050e 8b46fc         mov ax, word ptr [bp - 4]
+246a:0511 050a00         add ax, 0xa
+246a:0514 50             push ax
+246a:0515 8b46fe         mov ax, word ptr [bp - 2]
+246a:0518 050500         add ax, 5
+246a:051b 50             push ax
+246a:051c 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0521 83c40a         add sp, 0xa
+246a:0524 c646e806       mov byte ptr [bp - 0x18], 6
+246a:0528 6a01           push 1
+246a:052a 16             push ss
+246a:052b 8d46e6         lea ax, [bp - 0x1a]
+246a:052e 50             push ax
+246a:052f 8b46fc         mov ax, word ptr [bp - 4]
+246a:0532 050d00         add ax, 0xd
+246a:0535 50             push ax
+246a:0536 8b46fe         mov ax, word ptr [bp - 2]
+246a:0539 050500         add ax, 5
+246a:053c 50             push ax
+246a:053d 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0542 83c40a         add sp, 0xa
+246a:0545 c646e809       mov byte ptr [bp - 0x18], 9
+246a:0549 6a01           push 1
+246a:054b 16             push ss
+246a:054c 8d46e6         lea ax, [bp - 0x1a]
+246a:054f 50             push ax
+246a:0550 8b46fc         mov ax, word ptr [bp - 4]
+246a:0553 051000         add ax, 0x10
+246a:0556 50             push ax
+246a:0557 8b46fe         mov ax, word ptr [bp - 2]
+246a:055a 050500         add ax, 5
+246a:055d 50             push ax
+246a:055e 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0563 83c40a         add sp, 0xa
+246a:0566 c646e909       mov byte ptr [bp - 0x17], 9
+246a:056a 6a01           push 1
+246a:056c 16             push ss
+246a:056d 8d46e6         lea ax, [bp - 0x1a]
+246a:0570 50             push ax
+246a:0571 8b46fc         mov ax, word ptr [bp - 4]
+246a:0574 051300         add ax, 0x13
+246a:0577 50             push ax
+246a:0578 8b46fe         mov ax, word ptr [bp - 2]
+246a:057b 050500         add ax, 5
+246a:057e 50             push ax
+246a:057f 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0584 83c40a         add sp, 0xa
+246a:0587 c646ea09       mov byte ptr [bp - 0x16], 9
+246a:058b 6a01           push 1
+246a:058d 16             push ss
+246a:058e 8d46e6         lea ax, [bp - 0x1a]
+246a:0591 50             push ax
+246a:0592 8b46fc         mov ax, word ptr [bp - 4]
+246a:0595 051600         add ax, 0x16
+246a:0598 50             push ax
+246a:0599 8b46fe         mov ax, word ptr [bp - 2]
+246a:059c 050500         add ax, 5
+246a:059f 50             push ax
+246a:05a0 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:05a5 83c40a         add sp, 0xa
+246a:05a8 8d46d4         lea ax, [bp - 0x2c]
+246a:05ab 16             push ss
+246a:05ac 50             push ax
+246a:05ad 1e             push ds
+246a:05ae 68fa11         push 0x11fa
+246a:05b1 b91200         mov cx, 0x12
+246a:05b4 9a32290000     lcall 0, 0x2932
+246a:05b9 6a01           push 1
+246a:05bb 16             push ss
+246a:05bc 8d46d4         lea ax, [bp - 0x2c]
+246a:05bf 50             push ax
+246a:05c0 8b46fc         mov ax, word ptr [bp - 4]
+246a:05c3 050400         add ax, 4
+246a:05c6 50             push ax
+246a:05c7 8b46fe         mov ax, word ptr [bp - 2]
+246a:05ca 051700         add ax, 0x17
+246a:05cd 50             push ax
+246a:05ce 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:05d3 83c40a         add sp, 0xa
+246a:05d6 c646d804       mov byte ptr [bp - 0x28], 4
+246a:05da 6a01           push 1
+246a:05dc 16             push ss
+246a:05dd 8d46d4         lea ax, [bp - 0x2c]
+246a:05e0 50             push ax
+246a:05e1 8b46fc         mov ax, word ptr [bp - 4]
+246a:05e4 050700         add ax, 7
+246a:05e7 50             push ax
+246a:05e8 8b46fe         mov ax, word ptr [bp - 2]
+246a:05eb 051700         add ax, 0x17
+246a:05ee 50             push ax
+246a:05ef 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:05f4 83c40a         add sp, 0xa
+246a:05f7 c646d704       mov byte ptr [bp - 0x29], 4
+246a:05fb 6a01           push 1
+246a:05fd 16             push ss
+246a:05fe 8d46d4         lea ax, [bp - 0x2c]
+246a:0601 50             push ax
+246a:0602 8b46fc         mov ax, word ptr [bp - 4]
+246a:0605 050a00         add ax, 0xa
+246a:0608 50             push ax
+246a:0609 8b46fe         mov ax, word ptr [bp - 2]
+246a:060c 051700         add ax, 0x17
+246a:060f 50             push ax
+246a:0610 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0615 83c40a         add sp, 0xa
+246a:0618 c646d604       mov byte ptr [bp - 0x2a], 4
+246a:061c 6a01           push 1
+246a:061e 16             push ss
+246a:061f 8d46d4         lea ax, [bp - 0x2c]
+246a:0622 50             push ax
+246a:0623 8b46fc         mov ax, word ptr [bp - 4]
+246a:0626 050d00         add ax, 0xd
+246a:0629 50             push ax
+246a:062a 8b46fe         mov ax, word ptr [bp - 2]
+246a:062d 051700         add ax, 0x17
+246a:0630 50             push ax
+246a:0631 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0636 83c40a         add sp, 0xa
+246a:0639 c646d607       mov byte ptr [bp - 0x2a], 7
+246a:063d 6a01           push 1
+246a:063f 16             push ss
+246a:0640 8d46d4         lea ax, [bp - 0x2c]
+246a:0643 50             push ax
+246a:0644 8b46fc         mov ax, word ptr [bp - 4]
+246a:0647 051000         add ax, 0x10
+246a:064a 50             push ax
+246a:064b 8b46fe         mov ax, word ptr [bp - 2]
+246a:064e 051700         add ax, 0x17
+246a:0651 50             push ax
+246a:0652 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0657 83c40a         add sp, 0xa
+246a:065a c646d707       mov byte ptr [bp - 0x29], 7
+246a:065e 6a01           push 1
+246a:0660 16             push ss
+246a:0661 8d46d4         lea ax, [bp - 0x2c]
+246a:0664 50             push ax
+246a:0665 8b46fc         mov ax, word ptr [bp - 4]
+246a:0668 051300         add ax, 0x13
+246a:066b 50             push ax
+246a:066c 8b46fe         mov ax, word ptr [bp - 2]
+246a:066f 051700         add ax, 0x17
+246a:0672 50             push ax
+246a:0673 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0678 83c40a         add sp, 0xa
+246a:067b c646d807       mov byte ptr [bp - 0x28], 7
+246a:067f 6a01           push 1
+246a:0681 16             push ss
+246a:0682 8d46d4         lea ax, [bp - 0x2c]
+246a:0685 50             push ax
+246a:0686 8b46fc         mov ax, word ptr [bp - 4]
+246a:0689 051600         add ax, 0x16
+246a:068c 50             push ax
+246a:068d 8b46fe         mov ax, word ptr [bp - 2]
+246a:0690 051700         add ax, 0x17
+246a:0693 50             push ax
+246a:0694 9a6e0dbd0f     lcall 0xfbd, 0xd6e
+246a:0699 83c40a         add sp, 0xa
+246a:069c 5f             pop di
+246a:069d 5e             pop si
+246a:069e c9             leave 
+246a:069f cb             retf 

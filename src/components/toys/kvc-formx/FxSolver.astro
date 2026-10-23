@@ -1,0 +1,258 @@
+---
+// The live solver: type a formula and an x range; his key filter guards the typing, his program prints its real table
+// (createProgram from the exact port), and his method solves the chosen row step by step (evaluate with a trace).
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { createProgram, solve } from '../../../lib/formx/formx';
+import { views, PRESETS } from './fxview';
+
+const [F0, A0, B0] = PRESETS[0];
+const p = createProgram();
+for (const k of `${F0}\r${A0}\r${B0}\r`) p.key(k);
+const screen = p.screen();
+const table = solve(F0, A0, B0).rows;
+const rows = table.map(r => r.xText.trim());
+const V = views(F0, rows[0]);
+const last = V[V.length - 1];
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+---
+
+<div class="kxf" data-fxsolver>
+  <div class="kxf-in">
+    <label class="kxf-f"><span>F(x) =</span><input type="text" value={F0} maxlength="69" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="text" data-f aria-describedby="kxf-note" /></label>
+    <label class="kxf-x"><span>first x</span><input type="text" value={A0} inputmode="decimal" autocomplete="off" data-x0 aria-describedby="kxf-note" /></label>
+    <label class="kxf-x"><span>last x</span><input type="text" value={B0} inputmode="decimal" autocomplete="off" data-x1 aria-describedby="kxf-note" /></label>
+  </div>
+  <p class="kxf-note" id="kxf-note" aria-live="polite" data-note>His filter guards the typing: a key he would refuse never reaches the formula.</p>
+  <div class="kxf-presets" role="group" aria-label="Try one of these">
+    {PRESETS.map(([f, a, b], i) => <button type="button" class="button k-btn" data-preset={i} aria-pressed={String(i === 0)}>{f}</button>)}
+  </div>
+
+  <Window title="HIS METHOD  one row, step by step" kind="editor" active class="kxf-win">
+    <div class="kxf-lines">
+      <div class="kxf-line"><span class="kxf-l">formula</span><div class="kxf-toks" data-main set:html={last.main} /></div>
+      <div class="kxf-line"><span class="kxf-l">this bracket</span><div class="kxf-toks" data-scratch set:html={last.scratch} /></div>
+    </div>
+    <div class="kxf-calc" data-calc set:html={last.calc} />
+    <div class="kxf-say" aria-live="polite" data-say>{V.map((v, i) => <div class="kxf-sl" data-k={i + 1}><span set:html={v.say} /></div>)}</div>
+    <Scrubber n={V.length} at={V.length - 1} label="Step through his method" />
+  </Window>
+
+  <Window title="FORM_X.EXE  his screen" kind="screen" class="kxf-scr">
+    <svg class="kxf-svg" viewBox="0 8 720 344" role="img" aria-label="His result table, as FORM_X prints it" data-svg>
+      <rect class="kxf-hi" x="0" y={(11 + 0) * 16} width="720" height="16" data-hi />
+      <g data-rows>{screen.slice(0, 22).map((l, i) => l.trim() && <text x="0" y={i * 16 + 13} xml:space="preserve" set:html={esc(l.trimEnd())} />)}</g>
+    </svg>
+    <p class="kxf-ph" data-ph>F(x)=({F0})</p>
+    <div class="kxf-pick" role="radiogroup" aria-label="Trace the row for x =" data-pick>
+      {table.map((r, i) => <button type="button" class="button k-btn" role="radio" aria-checked={String(i === 0)} tabindex={i ? -1 : 0} data-row={i}><span class="kxf-px">{rows[i]}</span><span class="kxf-pa" aria-hidden="true">→</span><span class="kxf-pf">{r.fxText.trim()}</span></button>)}
+    </div>
+  </Window>
+</div>
+
+<style is:global>
+  .kxf { display: grid; gap: 16px; min-width: 0; }
+  .kxf-in { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 12px 16px; align-items: end; }
+  .kxf-in label { display: grid; gap: 6px; font: 600 0.8125rem/1.2 var(--font-code); color: var(--accent-2); }
+  .kxf-in input { width: 100%; min-height: 48px; padding: 0 12px; font: 400 20px var(--font-dos); color: var(--vga-15); background: var(--vga-0); border: 2px solid var(--vga-7); border-radius: 0; }
+  .kxf-x input { width: 12ch; }
+  .kxf-in input:focus-visible { outline: 3px solid var(--vga-14); outline-offset: 2px; }
+  .kxf-in input[aria-invalid='true'] { border-color: var(--vga-12); }
+  .kxf-in input.no { animation: kxf-no 0.3s; }
+  @keyframes kxf-no { 25% { translate: -6px; } 75% { translate: 6px; } }
+  .kxf-note { margin: 0 !important; min-height: 3em; font-size: 0.9375rem !important; line-height: 1.5 !important; color: var(--ink-2) !important; }
+  .kxf-note.err { color: var(--vga-14) !important; }
+  .kxf-note b { color: var(--ink); }
+  .kxf-presets { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kxf-presets .k-btn { font: 600 0.875rem var(--font-code); }
+  .kxf-lines { display: grid; gap: 10px; }
+  .kxf-line { display: grid; grid-template-columns: 12ch minmax(0, 1fr); gap: 12px; align-items: center; min-height: 48px; }
+  .kxf-l { font: 600 12px/1.3 var(--font-code); color: var(--accent-2); }
+  .kxf-toks { display: flex; flex-wrap: wrap; gap: 4px; min-height: 40px; align-items: center; }
+  .kxf-toks i { font-style: normal; display: inline-grid; place-items: center; min-width: 30px; height: 40px; padding: 0 9px; font: 400 20px/1 var(--font-dos); color: var(--vga-15); background: var(--vga-0); }
+  .kxf-toks i.o { min-width: 24px; padding: 0 4px; color: var(--vga-14); background: none; }
+  .kxf-toks i.in { background: var(--vga-4); }
+  .kxf-toks i.o.in { background: var(--vga-4); }
+  .kxf-toks i.res { background: var(--vga-14); color: var(--vga-0); }
+  .kxf-toks .none { font: 400 0.875rem var(--sans); color: var(--ink-2); }
+  .kxf-calc { min-height: 132px; margin-top: 16px; padding: 12px 14px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .kxf-calc .c-eq { font: 400 22px/1.3 var(--font-dos); color: var(--vga-15); }
+  .kxf-calc .c-eq b { font-weight: 400; color: var(--vga-14); }
+  .kxf-calc .c-rows { display: grid; gap: 4px; margin-top: 10px; }
+  .kxf-calc .c-row { display: grid; grid-template-columns: 9ch minmax(0, 1fr); gap: 10px; align-items: center; font: 600 12px/1.3 var(--font-code); color: var(--ink-2); }
+  .kxf-calc .c-d { display: flex; gap: 1px; font: 600 clamp(10px, 1.2vw, 14px)/1 var(--font-code); overflow: hidden; }
+  .kxf-calc .c-d span { flex: 1 1 0; min-width: 0; max-width: 22px; padding: 4px 0; text-align: center; color: var(--ink); background: var(--blue-deep); }
+  .kxf-calc .c-d span.z { color: color-mix(in oklch, var(--ink) 35%, transparent); }
+  .kxf-calc .c-d span.f { box-shadow: inset 0 -2px 0 var(--accent-2); }
+  .kxf-calc .c-d span.p { margin-left: 5px; }
+  .kxf-calc .c-d.neg span:not(.z) { color: var(--vga-12); }
+  .kxf-calc .c-res .c-d span { background: var(--vga-14); color: var(--vga-0); }
+  .kxf-calc .c-res .c-d span.z { color: color-mix(in oklch, var(--vga-0) 40%, transparent); }
+  .kxf-calc .c-note { margin-top: 8px; font: 400 0.8125rem/1.4 var(--sans); color: var(--ink-2); }
+  .kxf-say { margin: 16px 0 14px; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .kxf-say .kxf-sl { display: grid; grid-template-columns: 5ch 1fr; gap: 10px; padding: 4px 6px; font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+  .kxf-say .kxf-sl::before { content: attr(data-k); font: 600 0.8125rem/1.8 var(--font-code); color: var(--accent-2); }
+  .kxf-say b { color: var(--ink); }
+  .kxf.is-live .kxf-say .kxf-sl:not(.now) { display: none; }
+  .kxf.is-live .kxf-say .kxf-sl { min-height: 4.6em; font-size: 1rem; color: var(--ink); }
+  .kxf.is-live .kxf-say .kxf-sl::before { content: attr(data-k) '/' attr(data-n); }
+  .kxf-svg { display: block; width: 100%; height: auto; }
+  .kxf-svg text { font: 16px var(--font-dos); fill: var(--vga-7); }
+  .kxf-hi { fill: var(--vga-1); transition: y 0.3s var(--expo); }
+  .kxf-pick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .kxf-pick .k-btn { min-width: 0; padding: 0 10px; font: 600 0.875rem var(--font-code); }
+  .kxf-pick .k-btn[aria-checked='true'] { background: var(--vga-14); color: var(--vga-0); }
+  .kxf-pick:empty { display: none; }
+  .kxf-pa, .kxf-pf, .kxf-ph, .kxf-one { display: none; }
+  @media (max-width: 640px) {
+    .kxf-svg { display: none; }
+    .kxf-ph { display: block; margin: 0; padding: 6px 4px; font: 400 16px/1.3 var(--font-dos); color: var(--vga-7); overflow-wrap: anywhere; }
+    .kxf-pick { display: grid; gap: 4px; margin-top: 6px; }
+    .kxf-pick .k-btn { display: grid; grid-template-columns: 1fr auto 1.2fr; justify-items: end; gap: 10px; min-height: 44px; padding: 0 10px; font: 400 16px var(--font-dos); color: var(--vga-7); background: var(--vga-0); box-shadow: none; }
+    .kxf-pick .k-btn[aria-checked='true'] { background: var(--vga-1); color: var(--vga-15); }
+    .kxf-pa, .kxf-pf { display: inline; }
+    .kxf-pa { justify-self: center; color: var(--vga-8); }
+    .kxf-one { display: block; padding: 10px 4px; font: 400 16px var(--font-dos); color: var(--vga-15); }
+  }
+  @media (max-width: 640px) {
+    .kxf-in { grid-template-columns: 1fr 1fr; }
+    .kxf-f { grid-column: 1 / -1; }
+    .kxf-x input { width: 100%; }
+    .kxf-line { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .kxf-toks i { height: 34px; min-width: 24px; padding: 0 6px; font-size: 16px; }
+    .kxf-calc .c-row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+    .kxf-calc .c-d span.p { margin-left: 3px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .kxf-hi { transition: none; } .kxf-in input.no { animation: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+  import { createProgram, solve, filterKey, START_MASK } from '../../../lib/formx/formx';
+  import { views, PRESETS, type View } from './fxview';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const X = /^-?\d{1,7}(\.\d{1,3})?$/;
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const NAMES: Record<string, string> = { '(': 'an opening bracket', ')': 'a closing bracket', x: 'x', X: 'x', '.': 'a point', '-': 'a minus', '+': 'a plus', '*': 'a times', '/': 'a divide', ' ': 'a space' };
+
+  document.querySelectorAll<HTMLElement>('[data-fxsolver]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const fin = $<HTMLInputElement>('[data-f]'), x0 = $<HTMLInputElement>('[data-x0]'), x1 = $<HTMLInputElement>('[data-x1]');
+    const note = $('[data-note]'), main = $('[data-main]'), scratch = $('[data-scratch]'), calc = $('[data-calc]'), sayList = $('[data-say]');
+    const rowsG = $<SVGGElement>('[data-rows]'), hi = $<SVGRectElement>('[data-hi]'), pick = $('[data-pick]'), ph = $('[data-ph]');
+    const presets = [...root.querySelectorAll<HTMLButtonElement>('[data-preset]')];
+    let V: View[] = [], xs: string[] = [], row = 0, good = fin.value, shown = -1, played = false;
+
+    const say = (html: string, err = false) => { note.innerHTML = html; note.classList.toggle('err', err); };
+    function paint(i: number, how: How) {
+      const v = V[i];
+      main.innerHTML = v.main; scratch.innerHTML = v.scratch; calc.innerHTML = v.calc;
+      [...sayList.children].forEach((li, k) => li.classList.toggle('now', k === i));
+      if (how !== 'jump' && how !== 'scrub' && !reduce() && i === shown + 1) {
+        gsap.from(root.querySelectorAll('.kxf-toks i.res, .kxf-toks i.in'), { scale: 1.3, opacity: 0, duration: 0.45, ease: 'expo.out', stagger: 0.03 });
+        gsap.from(calc.children, { y: 8, opacity: 0, duration: 0.4, ease: 'power3.out', stagger: 0.05 });
+      }
+      shown = i;
+    }
+    const scrub = scrubber($('[data-scrub]'), paint, { speed: 1.6 });
+
+    function trace(autoplay: boolean) {
+      V = views(good, xs[row] ?? '0');
+      sayList.innerHTML = V.map((v, i) => `<div class="kxf-sl" data-k="${i + 1}" data-n="${V.length}"><span>${v.say}</span></div>`).join('');
+      shown = -1;
+      scrub.resize(V.length, autoplay ? 0 : V.length - 1);
+      if (autoplay && !reduce()) scrub.play();
+      hi.setAttribute('y', String((11 + row) * 16));
+    }
+
+    // His program, key by key, for the real screen
+    function run(f: string, a: string, b: string, usedX: boolean) {
+      const p = createProgram();
+      for (const k of usedX ? `${f}\r${a}\r${b}\r` : `${f}\r`) p.key(k);
+      rowsG.innerHTML = p.screen().slice(0, 22).map((l, i) => (l.trim() ? `<text x="0" y="${i * 16 + 13}" xml:space="preserve">${esc(l.trimEnd())}</text>` : '')).join('');
+      hi.style.display = usedX ? '' : 'none';
+    }
+
+    function update(autoplay = false) {
+      const f = fin.value, a = x0.value.trim(), b = x1.value.trim();
+      const badX = [x0, x1].filter(el => !X.test(el.value.trim()));
+      [x0, x1].forEach(el => el.setAttribute('aria-invalid', String(badX.includes(el))));
+      let r: ReturnType<typeof solve>;
+      try {
+        r = solve(f, badX.length ? '0' : a, badX.length ? '0' : b);
+      } catch (e) {
+        fin.setAttribute('aria-invalid', 'true');
+        return say(f ? `When you press Enter, he checks the end and the brackets. Here he would say: <b>${esc((e as Error).message.trim())}</b>` : 'Type a formula in x.', true);
+      }
+      fin.setAttribute('aria-invalid', 'false');
+      [x0, x1].forEach(el => (el.disabled = !r.usedX));
+      if (r.usedX && badX.length) return say('He takes x as up to 7 digits, then up to 3 after the point, with a minus if you like: <b>-12.5</b>.', true);
+      good = f;
+      xs = r.usedX ? r.rows.map(q => q.xText.trim()) : ['0'];
+      row = Math.min(row, xs.length - 1);
+      pick.innerHTML = r.usedX
+        ? r.rows.map((q, k) => `<button type="button" class="button k-btn" role="radio" aria-checked="${k === row}" tabindex="${k === row ? 0 : -1}" data-row="${k}"><span class="kxf-px">${xs[k]}</span><span class="kxf-pa" aria-hidden="true">→</span><span class="kxf-pf">${esc(q.fxText.trim())}</span></button>`).join('')
+        : `<p class="kxf-one">F(x)= ${esc(r.rows[0].fxText.trim())}</p>`;
+      ph.textContent = `F(x)=(${f})`;
+      run(f, a, b, r.usedX);
+      say(r.usedX
+        ? `Ten rows, from ${esc(a)} to ${esc(b)} in equal steps. Pick a row below his table to watch him solve it.`
+        : 'No x, so he skips the questions and prints one line. Every digit is exact decimal: no binary rounding anywhere.');
+      trace(autoplay);
+    }
+
+    // His filter replays the whole text: any edit his program would refuse is undone, with the reason
+    fin.addEventListener('input', () => {
+      let m = START_MASK;
+      const v = fin.value;
+      for (let i = 0; i < v.length; i++) {
+        const n = filterKey(m, v.charCodeAt(i));
+        if (n < 0) {
+          const pos = Math.max(0, (fin.selectionStart ?? v.length) - (v.length - good.length));
+          fin.value = good;
+          fin.setSelectionRange(pos, pos);
+          fin.classList.remove('no'); void fin.offsetWidth; fin.classList.add('no');
+          return say(`He refuses ${NAMES[v[i]] ?? (/\d/.test(v[i]) ? 'a digit' : `“${esc(v[i])}”`)} there. ${i ? `After <b>${esc(v[i - 1])}</b>` : 'At the start'} his filter only lets through what can come next.`, true);
+        }
+        m = n;
+      }
+      presets.forEach(p => p.setAttribute('aria-pressed', 'false'));
+      good = v;
+      update();
+    });
+    for (const el of [x0, x1]) el.addEventListener('input', () => update());
+    for (const el of [fin, x0, x1]) el.addEventListener('keydown', e => { if (e.key === 'Enter') update(true); });
+
+    presets.forEach(b => b.addEventListener('click', () => {
+      const [f, a, c] = PRESETS[+b.dataset.preset!];
+      fin.value = good = f;
+      if (a) { x0.value = a; x1.value = c; }
+      row = 0;
+      presets.forEach(p => p.setAttribute('aria-pressed', String(p === b)));
+      update(true);
+    }));
+    const choose = (k: number, focus = false) => {
+      row = k;
+      pick.querySelectorAll<HTMLButtonElement>('[data-row]').forEach(x => { const on = +x.dataset.row! === k; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; if (on && focus) x.focus(); });
+      trace(true);
+    };
+    pick.addEventListener('click', e => { const b = (e.target as Element).closest<HTMLButtonElement>('[data-row]'); if (b) choose(+b.dataset.row!); });
+    pick.addEventListener('keydown', e => {
+      const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[(e as KeyboardEvent).key];
+      if (!d) return;
+      e.preventDefault();
+      choose((row + d + xs.length) % xs.length, true);
+    });
+
+    root.classList.add('is-live');
+    update();
+    // The first time it comes into view, he solves the first row on his own
+    new IntersectionObserver(([e], io) => {
+      if (!e.isIntersecting || played) return;
+      played = true; io.disconnect();
+      if (!reduce()) { scrub.go(0, 'jump'); scrub.play(); }
+    }, { threshold: 0.35 }).observe($('.kxf-win'));
+  });
+</script>

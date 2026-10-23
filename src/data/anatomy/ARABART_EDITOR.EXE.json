@@ -1,0 +1,175 @@
+{
+ "file": "ARABART/EDITOR.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 28,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "The DOS EXE header, rebuilt by the museum's unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured",
+   "link": "#loop"
+  },
+  {
+   "start": 28,
+   "end": 32,
+   "kind": "unused",
+   "label": "Header gap",
+   "note": "Four zero bytes before the relocation table.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 664,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "158 addresses that DOS patches with the real load segment when the program starts.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#loop"
+  },
+  {
+   "start": 664,
+   "end": 672,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Zeros that round the header up to a 16-byte paragraph.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 672,
+   "end": 8093,
+   "kind": "library",
+   "label": "Borland C++ startup and runtime",
+   "note": "Start-up code, getch and the stack check.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#loop"
+  },
+  {
+   "start": 8093,
+   "end": 8664,
+   "kind": "code",
+   "label": "main()",
+   "note": "The whole editor: 571 bytes of C with inline assembly for every ARABART call.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#loop"
+  },
+  {
+   "start": 8664,
+   "end": 8672,
+   "kind": "unused",
+   "label": "Padding",
+   "note": "Zeros up to the next 16-byte segment.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 8672,
+   "end": 24144,
+   "kind": "library",
+   "label": "Borland graphics library (BGI)",
+   "note": "initgraph, cleardevice, closegraph and the code that loads EGAVGA.BGI.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#loop"
+  },
+  {
+   "start": 24144,
+   "end": 24290,
+   "kind": "data",
+   "label": "Borland data",
+   "note": "The \"Borland C++ - Copyright 1991\" string and runtime variables.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 24290,
+   "end": 24475,
+   "kind": "data",
+   "label": "His buffers",
+   "note": "An empty driver path at DS:0092, the text buffer at DS:0093 and the copy that is drawn at DS:00EF.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#keys"
+  },
+  {
+   "start": 24475,
+   "end": 26818,
+   "kind": "data",
+   "label": "Borland data",
+   "note": "Graphics library tables, the driver name EGAVGA and its error texts.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 26818,
+   "end": 26960,
+   "kind": "unused",
+   "label": "Uninitialized variables",
+   "note": "Zeros in the file; variables that start at 0 (BSS).",
+   "by": "borland",
+   "evidence": "inferred"
+  },
+  {
+   "start": 26960,
+   "end": 27088,
+   "kind": "stack",
+   "label": "Stack",
+   "note": "128 bytes, from SS:SP 066B:0080 in the header.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 8093,
+   "end": 8664,
+   "name": "main",
+   "note": "Key loop: read, store, clear, redraw.",
+   "link": "#loop",
+   "lines": [
+    {
+     "off": 8169,
+     "note": "Is ARABART loaded? AX must be 5944h"
+    },
+    {
+     "off": 8239,
+     "note": "getch()"
+    },
+    {
+     "off": 8262,
+     "note": "Q: font 1 (fn 3)"
+    },
+    {
+     "off": 8384,
+     "note": "Shift+C: the next color, then back to 1"
+    },
+    {
+     "off": 8478,
+     "note": "| switches 3607h and 3608h"
+    },
+    {
+     "off": 8504,
+     "note": "Command keys are 0 by now: nothing to store"
+    },
+    {
+     "off": 8530,
+     "note": "Backspace: clear the key at i"
+    },
+    {
+     "off": 8602,
+     "note": "cleardevice()"
+    },
+    {
+     "off": 8616,
+     "note": "Draw at x 639, line bottom 100"
+    }
+   ]
+  }
+ ]
+}

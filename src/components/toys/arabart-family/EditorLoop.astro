@@ -1,0 +1,73 @@
+---
+// The whole of EDITOR.EXE: his key loop in the CodeStepper beside the C, with a picture of the loop that lights the
+// path one key takes. It loads the path of the last key typed in EditorSim ('editorkey'); its buttons press keys there.
+import CodeStepper from '../CodeStepper.astro';
+import Window from '../../shell/Window.astro';
+import { ASM, C, NODES, START, loopTrace } from './editor.ts';
+
+interface Props { id?: string }
+const { id = 'editorloop' } = Astro.props;
+const steps = loopTrace({ ...START, keys: '~gt' }, 'k');
+const asm = ASM.map(({ k, ...l }) => l), c = C.map(({ k, ...l }) => l);
+const TRY: [string, string][] = [['k', 'A letter'], ['@', 'A style key'], ['E', '⇧E Font'], ['C', '⇧C Color'], ['|', '| 3-D'], ['bs', 'Backspace'], ['esc', 'Esc']];
+---
+
+<div class="el" data-editorloop data-for={id}>
+  <div class="el-try" role="group" aria-label="Trace the path of a key">
+    <span class="el-lab">Trace a key:</span>
+    {TRY.map(([k, l]) => <button type="button" class="button k-btn" data-press={k}>{l}</button>)}
+  </div>
+  <CodeStepper id={id} title="EDITOR.EXE  main(), the key loop" cTitle="The same in C" asm={asm} c={c} steps={steps} at={0} speed={0.7}>
+    <Window slot="visual" title="THE LOOP  one pass per key" kind="panel" num="4" class="el-win">
+      <div class="el-flow" role="list" data-flow>
+        {NODES.map((n, i) => <div role="listitem" class="el-n" data-n={i}><span>{i + 1}</span>{n}</div>)}
+      </div>
+    </Window>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .el { display: grid; gap: 16px; min-width: 0; }
+  .el-try { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .el-lab { font: 700 0.9375rem/1.3 var(--sans); color: var(--ink); margin-right: 4px; }
+  .el:not(:has(.k-cs.is-live)) .el-try { display: none; }
+  .el-flow { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px 22px; padding-right: 6px; }
+  .el-n { position: relative; display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 10px; font: 600 0.875rem/1.3 var(--font-code); color: var(--ink-2); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 0.25s var(--quart), color 0.25s var(--quart); }
+  .el-n span { font-size: 0.75rem; color: var(--accent-2); }
+  .el-n.past { color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent-2); }
+  .el-n.now { color: var(--surface); background: var(--accent); box-shadow: none; }
+  .el-n.now span { color: var(--surface); }
+  .el-n.skip { opacity: 0.35; }
+  @media (prefers-reduced-motion: reduce) { .el-n { transition: none; } }
+</style>
+
+<script>
+  import { loopTrace, type Ed } from './editor.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-editorloop]').forEach(wrap => {
+    const root = document.getElementById(wrap.dataset.for!) as HTMLElement & { stepper?: { load(s: unknown[], at?: number): void; i: number } };
+    const nodes = [...wrap.querySelectorAll<HTMLElement>('[data-n]')];
+    let steps = JSON.parse(root.querySelector('[data-trace]')!.textContent!) as { node: number }[];
+    const paint = (i: number) => {
+      const visited = new Set(steps.slice(0, i + 1).map(s => s.node)), all = new Set(steps.map(s => s.node));
+      nodes.forEach((n, j) => {
+        n.classList.toggle('now', j === steps[i]?.node);
+        n.classList.toggle('past', visited.has(j) && j !== steps[i]?.node);
+        n.classList.toggle('skip', !all.has(j));
+      });
+    };
+    root.addEventListener('stepper', e => paint((e as CustomEvent).detail.i));
+    let seen = false;
+    new IntersectionObserver(([e]) => (seen = e.isIntersecting), { threshold: 0.2 }).observe(root);
+    document.addEventListener('editorkey', e => {
+      const { before, key } = (e as CustomEvent).detail as { before: Ed; key: string };
+      if (!key || !root.stepper) return;
+      steps = loopTrace(before, key);
+      root.stepper.load(steps, 0);
+      if (seen) root.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+    });
+    wrap.querySelectorAll<HTMLButtonElement>('[data-press]').forEach(b => b.addEventListener('click', () =>
+      document.dispatchEvent(new CustomEvent('editor-press', { detail: { key: b.dataset.press } }))));
+    paint(root.stepper?.i ?? 0);
+  });
+</script>

@@ -1,0 +1,149 @@
+---
+// HandySwitcher's close routine (2.7, 0x17D4C): polite first, then patient, then firm. Pick a program and step it.
+import CodeStepper from '../CodeStepper.astro';
+import { closeSteps, type AppKind } from './hs.ts';
+
+const KINDS: { k: AppKind; name: string; says: string }[] = [
+  { k: 'polite', name: 'Notes', says: 'closes when asked' },
+  { k: 'player', name: 'Windows Media', says: 'keeps playing' },
+  { k: 'slow', name: 'Pocket Word', says: 'needs a moment' },
+  { k: 'frozen', name: 'Bubble Breaker', says: 'stopped responding' },
+];
+const steps = closeSteps('frozen');
+const end = steps[steps.length - 1];
+const ASM = [
+  { off: '17D78', code: 'bl   SetForegroundWindow', note: 'bring it to the front' },
+  { off: '17D88', code: 'bl   GetClassNameW', note: 'what kind of window?' },
+  { off: '17D98', code: 'cmp  r3,#87', note: '"W", then "M", "P": Media Player?' },
+  { off: '17DDC', code: 'bl   keybd_event', note: 'Ctrl, Q: its own Quit keys' },
+  { off: '17E6C', code: 'bl   PostMessageW', note: 'WM_CLOSE: please close' },
+  { off: '17E74', code: 'bl   Sleep', note: '500 ms' },
+  { off: '17E7C', code: 'bl   IsWindow', note: 'gone?' },
+  { off: '17E98', code: 'bl   SetCursor', note: 'the wait cursor' },
+  { off: '17EA8', label: 'wait', code: 'bl   Sleep', note: '500 ms, up to 11 times' },
+  { off: '17F24', code: 'bl   MessageBoxW', note: 'still there: ask you' },
+  { off: '17F40', code: 'bl   GetWindowThreadProcessId', note: 'whose window?' },
+  { off: '17F6C', code: 'bl   TerminateProcess', note: 'end it' },
+];
+const C = [
+  { code: 'SetForegroundWindow(w);' },
+  { code: 'GetClassName(w, cls, 16);' },
+  { code: 'if (!wcsncmp(cls, L"WMP ", 4))', note: 'Media Player' },
+  { code: "  PressKeys(VK_CONTROL, 'Q');", note: 'its Quit' },
+  { code: '' },
+  { code: 'PostMessage(w, WM_CLOSE, 0, 0);' },
+  { code: 'Sleep(500);' },
+  { code: 'if (!IsWindow(w)) return TRUE;' },
+  { code: 'SetCursor(LoadCursor(0, IDC_WAIT));' },
+  { code: 'for (n = 11; n && IsWindow(w); n--)' },
+  { code: '  Sleep(500);' },
+  { code: 'if (!IsWindow(w)) return TRUE;' },
+  { code: 'if (MessageBox(0, msg, title,' },
+  { code: '      MB_YESNO) != IDYES) return FALSE;' },
+  { code: 'GetWindowThreadProcessId(w, &pid);' },
+  { code: 'h = OpenProcess(PROCESS_ALL_ACCESS,' },
+  { code: '                0, pid);' },
+  { code: 'TerminateProcess(h, 1);' },
+];
+---
+
+<div class="hs-cl" data-hscl>
+  <fieldset class="hs-cl-pick" hidden>
+    <legend>Close this program:</legend>
+    {KINDS.map(x => (
+      <label><input type="radio" name="hs-cl-k" value={x.k} checked={x.k === 'frozen'} /><span><b>{x.name}</b> {x.says}</span></label>
+    ))}
+  </fieldset>
+  <CodeStepper id="hs-closer" title="HANDYSWITCHER.EXE  closing a program (0x17D4C)" asm={ASM} c={C} steps={steps} speed={0.45}>
+    <div slot="visual" class="hs-cl-vis" data-vis>
+      <div class="hs-cl-app" data-app data-state={end.state}>
+        <p class="hs-cl-name" data-name>Bubble Breaker</p>
+        <p class="hs-cl-state" data-statetext>Ended. Its memory is free again.</p>
+        <span class="hs-cl-keys" data-keys aria-hidden="true">Ctrl + Q</span>
+        <span class="hs-cl-wait" data-wait aria-hidden="true"></span>
+        <div class="hs-cl-box" data-box role="img" aria-label="HandySwitcher's warning: the program is not responding; terminate it anyway?">
+          <b>Warning...</b>
+          <span><span data-boxname>Bubble Breaker</span> is not responding because it is busy, waiting for a response from you, or has stopped running.</span>
+          <span>Do you want HandySwitcher to terminate the program anyway?</span>
+          <i>Yes</i><i>No</i>
+        </div>
+      </div>
+      <div class="hs-cl-time" aria-hidden="true">
+        <div class="hs-cl-track"><span class="hs-cl-fill" data-fill style={`width:${(end.ms / 6000) * 100}%`}></span>
+          {Array.from({ length: 13 }, (_, n) => <i style={`left:${(n * 500 / 6000) * 100}%`}></i>)}
+        </div>
+        <p><span>0 s</span><span>elapsed: <b data-ms>{(end.ms / 1000).toFixed(1)} s</b></span><span>6 s</span></p>
+      </div>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hs-cl { display: grid; gap: 16px; }
+  .hs-cl-pick { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; border: 0; }
+  .hs-cl-pick legend { width: 100%; margin-bottom: 8px; font: 600 0.9375rem/1.3 var(--sans); color: var(--ink); }
+  .hs-cl-pick label { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 12px; background: #fff; border: 1px solid var(--xp-line, #7f9db9); border-radius: 3px; cursor: pointer; font: 400 0.9375rem/1.25 var(--sans); }
+  .hs-cl-pick label:has(input:checked) { background: oklch(0.9 0.05 258); border-color: var(--accent); }
+  .hs-cl-pick input { accent-color: var(--accent); width: 18px; height: 18px; margin: 0; }
+  .hs-cl-pick label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hs-cl-vis { display: grid; gap: 14px; padding: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--rule); }
+  .hs-cl-app { position: relative; display: grid; align-content: start; gap: 4px; min-height: 190px; padding: 14px; background: linear-gradient(oklch(0.97 0.01 250), oklch(0.92 0.02 250)); border: 1px solid var(--rule); overflow: hidden; transition: opacity 0.3s, filter 0.3s; }
+  .hs-cl-name { margin: 0 !important; font: 700 1.125rem/1.2 var(--sans) !important; color: var(--ink); }
+  .hs-cl-state { margin: 0 !important; font-size: 0.9375rem !important; color: var(--ink-2); }
+  .hs-cl-app[data-state='gone'], .hs-cl-app[data-state='ended'] { opacity: 0.45; filter: grayscale(1); }
+  .hs-cl-keys { position: absolute; right: 14px; top: 14px; padding: 6px 10px; font: 700 0.875rem/1 var(--font-code); color: #fff; background: var(--ink); border-radius: 4px; opacity: 0; }
+  .hs-cl-app.keys .hs-cl-keys { opacity: 1; }
+  .hs-cl-wait { position: absolute; right: 18px; bottom: 16px; width: 26px; height: 26px; border-radius: 50%; border: 4px solid oklch(0.85 0.03 250); border-top-color: var(--accent); opacity: 0; }
+  .hs-cl-app.wait .hs-cl-wait { opacity: 1; animation: hs-spin 0.9s linear infinite; }
+  @keyframes hs-spin { to { rotate: 360deg; } }
+  .hs-cl-box { position: absolute; inset: auto 10px 10px; display: none; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px; font: 400 0.8125rem/1.35 Tahoma, Verdana, sans-serif; color: #000; background: #fff; border: 1px solid #000; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.3); }
+  .hs-cl-box > b, .hs-cl-box > span { grid-column: 1 / -1; }
+  .hs-cl-box > b { color: #fff; background: linear-gradient(oklch(0.48 0.15 258), oklch(0.32 0.14 262)); margin: -10px -10px 0; padding: 4px 10px; }
+  .hs-cl-box i { display: grid; place-items: center; height: 26px; font-style: normal; border: 1px solid #555; background: linear-gradient(#fff, #e3e3e3); }
+  .hs-cl-app[data-state='ask-you'] .hs-cl-box { display: grid; }
+  .hs-cl-time p { display: flex; justify-content: space-between; margin: 6px 0 0 !important; font: 600 12px/1 var(--font-code) !important; color: var(--ink-2); }
+  .hs-cl-track { position: relative; height: 14px; background: var(--surface); border-radius: 7px; overflow: hidden; }
+  .hs-cl-fill { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 7px; }
+  .hs-cl-track i { position: absolute; top: 3px; width: 2px; height: 8px; background: oklch(1 0 0 / 0.7); }
+  @media (prefers-reduced-motion: reduce) { .hs-cl-app.wait .hs-cl-wait { animation: none; } .hs-cl-app { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { closeSteps, reduce, type AppKind, type CloseStep } from './hs.ts';
+
+  const NAMES: Record<AppKind, string> = { polite: 'Notes', player: 'Windows Media', slow: 'Pocket Word', frozen: 'Bubble Breaker' };
+  const TEXT: Record<CloseStep['state'], string> = {
+    open: 'Running.', asked: 'Asked to close.', waiting: 'Still open. Busy?', 'ask-you': 'Not responding.', gone: 'Closed. It saved and ended on its own.', ended: 'Ended. Its memory is free again.',
+  };
+
+  document.querySelectorAll<HTMLElement & { hs?: boolean }>('[data-hscl]').forEach(root => {
+    if (root.hs) return;
+    root.hs = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void } }>('[data-stepper]')!;
+    const app = root.querySelector<HTMLElement>('[data-app]')!, fill = root.querySelector<HTMLElement>('[data-fill]')!;
+    const ms = root.querySelector<HTMLElement>('[data-ms]')!, name = root.querySelector<HTMLElement>('[data-name]')!;
+    const state = root.querySelector<HTMLElement>('[data-statetext]')!, boxName = root.querySelector<HTMLElement>('[data-boxname]')!;
+    let kind: AppKind = 'frozen';
+
+    cs.addEventListener('stepper', e => {
+      const { step: s, how } = (e as CustomEvent).detail as { step: CloseStep; how: string };
+      app.dataset.state = s.state;
+      app.classList.toggle('keys', !!s.keys);
+      app.classList.toggle('wait', !!s.cursor);
+      name.textContent = boxName.textContent = NAMES[kind];
+      state.textContent = TEXT[s.state];
+      ms.textContent = `${(s.ms / 1000).toFixed(1)} s`;
+      const w = `${(s.ms / 6000) * 100}%`;
+      if (reduce() || how === 'jump' || how === 'scrub') fill.style.width = w;
+      else gsap.to(fill, { width: w, duration: 0.35, ease: 'power2.out' });
+      if (!reduce() && how !== 'jump' && (s.state === 'gone' || s.state === 'ended')) gsap.fromTo(app, { scale: 1 }, { scale: 0.96, duration: 0.3, yoyo: true, repeat: 1 });
+    });
+    root.querySelectorAll<HTMLInputElement>('input[name="hs-cl-k"]').forEach(r => r.addEventListener('change', () => {
+      kind = r.value as AppKind;
+      const st = closeSteps(kind);
+      cs.stepper?.load(st, 0);
+    }));
+    root.querySelector<HTMLElement>('.hs-cl-pick')!.hidden = false;
+  });
+</script>

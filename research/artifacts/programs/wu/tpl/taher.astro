@@ -1,0 +1,108 @@
+---
+import Term from '../components/explain/Term.astro';
+import Figure from '../components/explain/Figure.astro';
+import Steps from '../components/explain/Steps.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+// TAHER.COM loads at 0100h, so file offset = address - 100h
+const map = (addr: number) => `/DOSArchive/bytes/?f=TAHER_TAHER.COM&layer=memory&at=${(addr - 0x100).toString(16)}`;
+const player = '/ARABART/program/portsaid-it-screensaver/';
+---
+
+<section id="th-tldr">
+  <ul class="tldr">
+    <li>TAHER.COM (1991) draws one line of calligraphy, the name طاهر ابراهيم الصرفي (Taher Ibrahim El-Sarafy), with 901 short strokes.</li>
+    <li>It runs on the same drawing player as the <a href={player}>Port Said screensaver</a>, plus three additions: a hidden credit, a pause and an end command.</li>
+    <li>Its first 241 bytes are identical to the ARABIC/DEMO.COM advertisement: one engine, two client jobs.</li>
+  </ul>
+</section>
+
+<section id="th-file">
+  <h2>What is different in TAHER.COM?</h2>
+  <p class="lead">It is the screensaver player with a 19-byte decoder in front of it and a 65-byte scrambled credit behind it. The rest is script.</p>
+  <Figure title="TAHER.COM, every byte" caption="Measured in the unpacked file. The 241 shared bytes cover the decoder, the player, the credit and the first 5 script bytes.">
+    @@th-file@@
+  </Figure>
+  <p>How the player turns bytes into strokes, and how each line's header rewrites the player's own code, is explained once on the <a href={`${player}#scr-strokes`}>Port Said screensaver page</a>. TAHER's script is a single line: 901 strokes and 297 column steps in 2,109 bytes, grey strokes with a red shadow (header <code>4B 43 00 07 04</code>, the same as the screensaver's first line).</p>
+</section>
+
+<section id="th-credit">
+  <h2>Why is his name scrambled?</h2>
+  <p class="lead">So that nobody can find the credit with a text search and change it. At start-up, 19 bytes of code subtract 4, 5, 6 and so on from 65 bytes, and the text appears.</p>
+  <Steps
+    title="TAHER.COM decodes its credit"
+    steps={[
+      'In the file, the credit is 65 bytes at 01AB that read as nonsense: <code>4F 25 4B 27 55 29</code>...',
+      'The key starts at 4 and goes up by 1 for each byte.',
+      'Stored byte minus key: "K E M Y A M Software Corp., &lt;c&gt;1991 YASSER MOHAMED ALI.", printed when the program ends.',
+    ]}
+  >
+    @@th-credit@@
+  </Steps>
+  <p>TAHER came with a paid job and DEMO.COM was an advertisement; both hide the credit this way. The screensaver, a gift to the governorate, prints the same credit from plain text. The trick is <Term id="obfuscation">obfuscation</Term>, not encryption: the key is simply the position. It stops a quick edit with a hex editor, which was the likely threat in 1991.</p>
+  <Deep title="For engineers: the decoder">
+    <Listing
+      title="TAHER.COM 0100 to 0112"
+      lines={[
+        { off: '0100', code: 'mov  si, 01ABh', note: 'the scrambled credit' },
+        { off: '0103', code: 'mov  al, 4', note: 'first key' },
+        { off: '0105', code: 'mov  cx, 41h', note: '65 bytes' },
+        { off: '0108', code: 'mov  ah, [si]' },
+        { off: '010A', code: 'sub  ah, al', note: 'byte - key', hi: true },
+        { off: '010C', code: 'mov  [si], ah', note: 'write the letter back' },
+        { off: '010E', code: 'inc  si / inc al', note: 'next byte, next key' },
+        { off: '0111', code: 'loop 0108' },
+      ]}
+    />
+    <p><a href={map(0x1ab)}>See the scrambled credit in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="th-commands">
+  <h2>What did the player learn?</h2>
+  <p class="lead">Two new commands. <code>88h</code> waits, clears the screen and goes on to the next picture. <code>z</code> waits, prints the credit and ends.</p>
+  <Figure title="Script commands, before and after" caption="TAHER's script uses only z. The 15-slide DEMO.COM uses 88h between its slides.">
+    @@th-cmds@@
+  </Figure>
+  <p>The wait is 4,096 calls to the DOS "is a key waiting?" function, and it ignores the answer, so you cannot skip or quit, and the wait is shorter on a faster CPU. "Clear" just sets video mode 10h again. The screensaver's color cycle is gone: TAHER draws its picture once.</p>
+  <Deep title="For engineers: the new commands">
+    <Listing
+      title="TAHER.COM 0159 to 01A9"
+      lines={[
+        { off: '0159', code: "cmp  dl, 'z' / je 0194", note: 'end of script' },
+        { off: '015E', code: 'cmp  dl, 88h / je 0189', note: 'end of slide' },
+        { off: '0189', code: 'mov  cx, 1000h', note: '4,096 times:' },
+        { off: '018C', code: 'mov  ah, 0Bh / int 21h / loop 018C', note: 'ask for a key, ignore the answer', hi: true },
+        { off: '0192', code: 'jmp  0116', note: 'mode 10h again (clears), then the next header' },
+        { off: '0194', code: 'mov  cx, 1000h / ... loop 0197', note: 'the same wait' },
+        { off: '019D', code: 'mov  ax, 3 / int 10h', note: 'back to text mode' },
+        { off: '01A2', code: 'mov  ah, 9 / mov dx, 01ABh / int 21h', note: 'print the decoded credit' },
+        { off: '01A9', code: 'int  20h', note: 'exit' },
+      ]}
+    />
+  </Deep>
+</section>
+
+<section id="th-now">
+  <h2>What would this be in 2026?</h2>
+  <p class="lead">A content file for an engine you already have, and a string hidden from casual search.</p>
+  <ThenNow
+    rows={[
+      { then: 'A calligraphy splash and a 15-slide advertisement on one 152-byte player', now: 'One game engine, many level files', why: 'New work becomes new data, not new code.' },
+      { then: 'A credit stored as bytes minus 4, 5, 6...', now: 'String obfuscation in app protectors', why: 'It hides text from a simple search; it does not stop a determined reader.' },
+      { then: 'A pause made of 4,096 DOS calls', now: 'A timer such as setTimeout or sleep', why: 'Modern code waits on the clock, not on CPU speed.' },
+    ]}
+  />
+</section>
+
+<section id="th-him">
+  <h2>What this tells us about him</h2>
+  <p class="lead">He turned a gift into a reusable tool, and changed it only as much as each new job needed.</p>
+  <ul>
+    <li><strong>Reuse:</strong> the player moved from the screensaver to two client jobs with three small additions.</li>
+    <li><strong>Business sense:</strong> work for clients hides his credit; the gift does not.</li>
+    <li><strong>Weak spots:</strong> the waits ignore the keyboard and depend on CPU speed, and there is no way to quit early.</li>
+    <li><strong>A harmless leftover:</strong> the default <code>x</code> and <code>w</code> opcodes in the code are swapped compared with the screensaver, but every header overwrites them, so nothing changes on screen.</li>
+  </ul>
+</section>

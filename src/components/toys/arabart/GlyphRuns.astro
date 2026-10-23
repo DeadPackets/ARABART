@@ -1,0 +1,216 @@
+---
+// His five fonts, and how one letter is stored: a width, a start row, then runs of pixels, drawn from the bottom up
+// and right to left. Pick a font and a letter, then step or run through his bytes as the letter paints itself.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { glyphBytes, glyphTokens, draw, svgMarkup, fromUnicode, translate, hex, type Tok } from './core.ts';
+import { ssrBin } from './ssr.ts';
+
+interface Props { id?: string }
+const { id = 'glyphruns' } = Astro.props;
+const bin = ssrBin();
+const FONTS = [
+  { n: 1, h: 18, glyphs: 95, bytes: 3442 },
+  { n: 2, h: 27, glyphs: 103, bytes: 5676 },
+  { n: 3, h: 34, glyphs: 141, bytes: 10838 },
+  { n: 4, h: 38, glyphs: 87, bytes: 6937 },
+  { n: 5, h: 50, glyphs: 6, bytes: 1039 },
+];
+const ALPHA = [...'ابتثجحخدذرزسشصضطظعغفقكلمنهوي'].map(ar => ({ ar, code: translate(bin, fromUnicode(ar))[0] & 0x3f }));
+const SUN = [['ا', 0x2a], ['ل', 0xa9], ['ش', 0xe3], ['م', 0xee], ['س', 0x75]] as const;
+const font = 1, code = 0x28;
+const toks = glyphTokens(glyphBytes(bin, font, code));
+
+function box(t: Tok[]) {
+  let minX = -(t[0] as { adv: number }).adv + 1, minY = 0;
+  for (const k of t) {
+    if (k.t === 'run') minX = Math.min(minX, -(k.skip + k.len - 1));
+    if (k.t === 'run' || k.t === 'up') minY = Math.min(minY, k.y);
+  }
+  return { x: minX - 1, y: minY - 1, w: -minX + 3, h: -minY + 3 };
+}
+const v = box(toks);
+const runs = toks.map((k, i) => (k.t === 'run' ? { i, x: -(k.skip + k.len - 1), y: k.y, w: k.len } : null)).filter(Boolean) as { i: number; x: number; y: number; w: number }[];
+const picks = (f: number) => (f === 5 ? SUN.map(([ar, c]) => ({ ar, code: c })) : ALPHA);
+const thumb = (f: number, c: number) => svgMarkup(draw(bin, [c], { font: f, color: 14 }), 1, '');
+const fmt = (n: number) => n.toLocaleString('en-US');
+---
+
+<div class="gr" id={id} data-glyphruns data-font={font} data-code={code}>
+  <Window title="FONTS" kind="dialog" class="gr-pick">
+    <div class="gr-fonts" role="radiogroup" aria-label="Font">
+      {FONTS.map(f => (
+        <button type="button" role="radio" class="gr-font" data-font={f.n} aria-checked={String(f.n === font)} tabindex={f.n === font ? 0 : -1}>
+          <b>Font {f.n}</b><span>{f.h} px tall, {f.glyphs === 6 ? '6 glyphs of its own' : `${f.glyphs} glyphs`}, {fmt(f.bytes)} bytes</span>
+        </button>
+      ))}
+    </div>
+    <p class="gr-lab" id={`${id}-ll`}>Pick a letter</p>
+    <div class="gr-letters" role="radiogroup" aria-labelledby={`${id}-ll`} data-letters>
+      {picks(font).map(l => (
+        <button type="button" role="radio" class="gr-l" data-code={l.code} aria-checked={String(l.code === code)} tabindex={l.code === code ? 0 : -1} aria-label={l.ar} set:html={thumb(font, l.code)} />
+      ))}
+    </div>
+  </Window>
+  <Window title="GLYPH  his bytes, one run at a time" kind="editor" active class="gr-view">
+    <div class="gr-stage">
+      <svg class="gr-svg" data-svg viewBox={`${v.x} ${v.y} ${v.w} ${v.h}`} shape-rendering="crispEdges" role="img" aria-label="The letter, drawn from its runs">
+        <defs><pattern id={`${id}-grid`} width="1" height="1" patternUnits="userSpaceOnUse"><path d="M1 0H0V1" fill="none" stroke="currentColor" stroke-width="0.04" /></pattern></defs>
+        <rect class="gr-grid" x={v.x} y={v.y} width={v.w} height={v.h} fill={`url(#${id}-grid)`} />
+        <rect class="gr-row" x={v.x} y="0" width={v.w} height="1" opacity="0" />
+        <line class="gr-base" x1={v.x} x2={v.x + v.w} y1="1" y2="1" />
+        <line class="gr-pen" x1="1" x2="1" y1={v.y} y2={v.y + v.h} />
+        <g data-runs>{runs.map(r => <rect class="gr-run" data-k={r.i} x={r.x} y={r.y} width={r.w} height="1" />)}</g>
+      </svg>
+      <div class="gr-side">
+        <p class="gr-bytes" data-bytes aria-label="His bytes for this letter">
+          {toks.map((k, i) => <span data-k={i} class={`gr-b gr-b--${k.t}`}>{k.b.map(b => hex(b)).join(' ')}</span>)}
+        </p>
+        <p class="gr-say" aria-live="polite" data-say>{toks.length} steps: the header, {runs.length} runs and the end. Press Run to watch his loop paint it.</p>
+      </div>
+    </div>
+    <Scrubber n={toks.length} at={toks.length - 1} label="Step through the letter's bytes" />
+  </Window>
+</div>
+
+<style is:global>
+  .gr { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr); gap: 22px 26px; align-items: start; }
+  .gr-fonts { display: grid; gap: 6px; }
+  .gr-font { display: grid; gap: 2px; min-height: 48px; padding: 8px 12px; text-align: left; font: inherit; color: var(--ink); background: none; border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; }
+  .gr-font b { font: 800 1.0625rem/1.1 var(--font-display); }
+  .gr-font span { font-size: 0.875rem; color: var(--ink-2); }
+  .gr-font[aria-checked='true'] { background: var(--ink); color: var(--surface); box-shadow: none; }
+  .gr-font[aria-checked='true'] span { color: var(--surface); }
+  .gr-font:focus-visible, .gr-l:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .gr-lab { margin: 16px 0 8px; font: 700 0.875rem/1.3 var(--sans); color: var(--ink); }
+  .gr-letters { display: flex; flex-wrap: wrap; gap: 4px; direction: rtl; }
+  .gr-l { display: grid; place-items: center; min-width: 44px; height: 56px; padding: 4px; background: var(--vga-0); border: 0; cursor: pointer; }
+  .gr-l svg { height: 40px; width: auto; max-width: 64px; }
+  .gr-l[aria-checked='true'] { outline: 3px solid var(--ink); outline-offset: -3px; background: var(--vga-1); }
+  .gr-stage { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 0.8fr); gap: 20px; align-items: start; margin-bottom: 18px; }
+  .gr-svg { width: 100%; max-height: 440px; background: var(--vga-0); color: color-mix(in oklch, var(--vga-7) 40%, transparent); }
+  .gr-run { fill: var(--vga-14); }
+  .gr-row { fill: var(--vga-11); }
+  .gr-base { stroke: var(--vga-12); stroke-width: 0.08; stroke-dasharray: 0.3 0.2; }
+  .gr-pen { stroke: var(--vga-11); stroke-width: 0.12; }
+  .gr-bytes { display: flex; flex-wrap: wrap; gap: 4px; margin: 0; font: 600 0.875rem/1 var(--font-code); }
+  .gr-b { padding: 5px 6px; color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 0.15s, color 0.15s; }
+  .gr-b--head { color: var(--accent-2); }
+  .gr-b--up { color: var(--ink-2); }
+  .gr-b--end { color: var(--accent); }
+  .gr-b.is-done { color: var(--ink); }
+  .gr-b.is-now { color: var(--surface); background: var(--accent-2); box-shadow: none; }
+  .gr-say { margin-top: 14px; font-size: 1rem; line-height: 1.55; color: var(--ink); min-height: 4.65em; }
+  .gr-say b { color: var(--accent); }
+  @media (max-width: 1100px) { .gr { grid-template-columns: minmax(0, 1fr); } .gr-fonts { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+  @media (max-width: 640px) {
+    .gr-stage { grid-template-columns: minmax(0, 1fr); }
+    .gr-letters { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }
+    .gr-svg { max-height: 300px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gr-b { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, glyphBytes, glyphTokens, draw, svgMarkup, hex, type Tok } from './core.ts';
+  import { scrubber, type How } from '../scrubber';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SUN = [['ا', 0x2a], ['ل', 0xa9], ['ش', 0xe3], ['م', 0xee], ['س', 0x75]] as const;
+  const ALPHA = 'ابتثجحخدذرزسشصضطظعغفقكلمنهوي';
+
+  document.querySelectorAll<HTMLElement>('[data-glyphruns]').forEach(async root => {
+    const bin = await fonts();
+    const svg = root.querySelector<SVGSVGElement>('[data-svg]')!, runsG = root.querySelector('[data-runs]')!;
+    const row = svg.querySelector<SVGRectElement>('.gr-row')!, bytes = root.querySelector<HTMLElement>('[data-bytes]')!;
+    const say = root.querySelector<HTMLElement>('[data-say]')!, letters = root.querySelector<HTMLElement>('[data-letters]')!;
+    let font = +root.dataset.font!, code = +root.dataset.code!, toks: Tok[] = [];
+    // The alphabet's isolated codes come from his key table, as on the server
+    const alpha = [...ALPHA].map(ar => ({ ar, code: letters.querySelector<HTMLElement>(`[aria-label="${ar}"]`)?.dataset.code }));
+    const alphaCodes = new Map<string, number>(alpha.filter(a => a.code).map(a => [a.ar, +a.code!]));
+
+    function load(f: number, c: number) {
+      font = f; code = c;
+      toks = glyphTokens(glyphBytes(bin, f, c));
+      let minX = -(toks[0] as { adv: number }).adv + 1, minY = 0;
+      for (const k of toks) { if (k.t === 'run') minX = Math.min(minX, -(k.skip + k.len - 1)); if (k.t !== 'head' && k.t !== 'end') minY = Math.min(minY, k.y); }
+      const v = { x: minX - 1, y: minY - 1, w: -minX + 3, h: -minY + 3 };
+      svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
+      for (const el of svg.querySelectorAll('.gr-grid, .gr-row')) { el.setAttribute('x', String(v.x)); el.setAttribute('width', String(v.w)); }
+      svg.querySelector('.gr-grid')!.setAttribute('y', String(v.y));
+      svg.querySelector('.gr-grid')!.setAttribute('height', String(v.h));
+      const base = svg.querySelector('.gr-base')!, pen = svg.querySelector('.gr-pen')!;
+      base.setAttribute('x1', String(v.x)); base.setAttribute('x2', String(v.x + v.w));
+      pen.setAttribute('y1', String(v.y)); pen.setAttribute('y2', String(v.y + v.h));
+      runsG.innerHTML = toks.map((k, i) => (k.t === 'run' ? `<rect class="gr-run" data-k="${i}" x="${-(k.skip + k.len - 1)}" y="${k.y}" width="${k.len}" height="1"/>` : '')).join('');
+      bytes.innerHTML = toks.map((k, i) => `<span data-k="${i}" class="gr-b gr-b--${k.t}">${k.b.map(b => hex(b)).join(' ')}</span>`).join('');
+      opt.speed = Math.min(0.32, 5 / toks.length);
+      s.resize(toks.length, toks.length - 1);
+    }
+
+    const total = () => toks.reduce((n, k) => n + k.b.length, 0);
+    const nRuns = () => toks.filter(k => k.t === 'run').length;
+    function show(i: number, how: How) {
+      const anim = how !== 'jump' && !reduce();
+      runsG.querySelectorAll<SVGRectElement>('rect').forEach(r => {
+        const k = +r.dataset.k!, on = k <= i;
+        const was = r.style.visibility !== 'hidden';
+        r.style.visibility = on ? 'visible' : 'hidden';
+        if (on && !was && anim && k === i) gsap.fromTo(r, { scaleX: 0, transformOrigin: '100% 50%' }, { scaleX: 1, duration: 0.35, ease: 'power2.out' });
+      });
+      bytes.querySelectorAll<HTMLElement>('[data-k]').forEach(b => { const k = +b.dataset.k!; b.classList.toggle('is-now', k === i); b.classList.toggle('is-done', k < i); });
+      const t = toks[i];
+      const y = t.t === 'run' || t.t === 'up' ? t.y : t.t === 'head' ? -(toks[0] as { d: number }).d : null;
+      if (y === null || i === toks.length - 1) gsap.to(row, { opacity: 0, duration: 0.2 });
+      else gsap.to(row, { attr: { y }, opacity: 0.18, duration: anim ? 0.25 : 0, ease: 'power2.out' });
+      const B = (b: number[]) => `<b>${b.map(x => hex(x)).join(' ')}</b>`;
+      say.innerHTML = t.t === 'head' ? `${B(t.b)}: the letter is <b>${t.adv} pixels</b> wide, and its first row starts <b>${t.d} rows</b> above the line.`
+        : t.t === 'run' ? `${B(t.b)}: skip <b>${t.skip}</b> pixels left of the pen, then paint <b>${t.len}</b>. One run, and the loop never touches an empty pixel.`
+        : t.t === 'up' ? `${B(t.b)}: move up one row.`
+        : `${B(t.b)}: the end. <b>${nRuns()} runs</b> drew this whole letter, from <b>${total()} bytes</b>.`;
+    }
+    // A whole letter plays in about 5 seconds, however many runs it has
+    const opt = { speed: 0.32 };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, opt);
+
+    const radios = (sel: string, onPick: (b: HTMLButtonElement) => void) => {
+      root.querySelector(sel)!.addEventListener('click', e => {
+        const b = (e.target as Element).closest<HTMLButtonElement>('[role=radio]');
+        if (b) onPick(b);
+      });
+      root.querySelector(sel)!.addEventListener('keydown', e => {
+        const ke = e as KeyboardEvent, list = [...root.querySelectorAll<HTMLButtonElement>(`${sel} [role=radio]`)];
+        const k = list.indexOf(document.activeElement as HTMLButtonElement), d = ['ArrowDown', 'ArrowRight'].includes(ke.key) ? 1 : ['ArrowUp', 'ArrowLeft'].includes(ke.key) ? -1 : 0;
+        if (k < 0 || !d) return;
+        e.preventDefault();
+        const rtl = sel === '[data-letters]' && (ke.key === 'ArrowLeft' || ke.key === 'ArrowRight') ? -d : d;
+        const t = list[(k + rtl + list.length) % list.length]; onPick(t); t.focus();
+      });
+    };
+    const check = (list: HTMLButtonElement[], b: HTMLButtonElement) => list.forEach(x => { x.setAttribute('aria-checked', String(x === b)); x.tabIndex = x === b ? 0 : -1; });
+
+    function fillLetters(f: number) {
+      const list = f === 5 ? SUN.map(([ar, c]) => ({ ar, code: c })) : [...alphaCodes].map(([ar, c]) => ({ ar, code: c }));
+      const keep = list.find(l => l.code === code) ?? list[1];
+      letters.innerHTML = list.map(l => `<button type="button" role="radio" class="gr-l" data-code="${l.code}" aria-checked="${l.code === keep.code}" tabindex="${l.code === keep.code ? 0 : -1}" aria-label="${l.ar}">${svgMarkup(draw(bin, [l.code], { font: f, color: 14 }), 1, '')}</button>`).join('');
+      return keep.code;
+    }
+    radios('.gr-fonts', b => {
+      check([...root.querySelectorAll<HTMLButtonElement>('.gr-font')], b);
+      const f = +b.dataset.font!;
+      load(f, fillLetters(f));
+      s.play();
+    });
+    radios('[data-letters]', b => {
+      check([...letters.querySelectorAll<HTMLButtonElement>('.gr-l')], b);
+      load(font, +b.dataset.code!);
+      s.play();
+    });
+
+    toks = glyphTokens(glyphBytes(bin, font, code));
+    // Play it once when it first comes into view
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); if (!reduce()) s.play(); } }, { threshold: 0.5 });
+    io.observe(svg);
+  });
+</script>

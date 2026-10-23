@@ -1,0 +1,139 @@
+---
+// PESM's sixteen calls, one step each: the line draws itself right to left, his five instructions show the values of
+// that call, and four switches show the styles, which count from 0 to 15. Without JS: the real screenshot.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import BitField from '../BitField.astro';
+import { CALLS } from './pesm.ts';
+import { hex } from '../arabart/core.ts';
+import { NAMES } from './vga.ts';
+
+interface Props { id?: string }
+const { id = 'pesmwalk' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const last = CALLS[15];
+const code = (c: typeof last) => [
+  [hex(c.off, 4), `mov  dx,${hex(c.text, 4)}h`, 'the text'],
+  [hex(c.off + 3, 4), `mov  ax,36${hex(c.color)}h`, `AL: ${NAMES[c.color]}`],
+  [hex(c.off + 6, 4), `mov  cx,${hex(c.x, 4)}h`, `x = ${c.x}`],
+  [hex(c.off + 9, 4), `mov  bx,${hex(c.y, 4)}h`, `y = ${c.y}`],
+  [hex(c.off + 12, 4), 'call 0284h', 'his engine'],
+];
+---
+
+<div class="pesmw" id={id} data-pesmwalk>
+  <div class="pesmw-main">
+    <Window title={'C:\\PESM\\PESM.EXE'} kind="screen" class="pesmw-win">
+      <div class="pesmw-screen">
+        <img class="pesmw-shot" src={`${base}/images/arabic-basmallah.png`} width="962" height="600" loading="lazy"
+          alt="PESM's screen: بسم الله الرحمن الرحيم sixteen times in two columns, each line in a new color and mix of styles." />
+        <canvas class="pesmw-canvas" width="640" height="480" aria-hidden="true"></canvas>
+      </div>
+      <p class="sr-only" aria-live="polite" data-said></p>
+    </Window>
+    <Window title="CALL 16 of 16" kind="panel" num="2" class="pesmw-side">
+      <div class="pesmw-code" data-code>
+        {code(last).map(([o, c, n]) => <div><span class="o">{o}</span><code>{c}</code><span class="n">{n}</span></div>)}
+      </div>
+      <div class="pesmw-pre"><span class="pesmw-lab">Style keys in front of the text</span><span class="pesmw-keys" data-pre><kbd>@</kbd></span></div>
+      <div class="pesmw-bits">
+        <span class="pesmw-lab">The four switches after them</span>
+        <BitField label="Style switches" bits={4} value={15} readonly size="lg" id={`${id}-bits`}
+          groups={[{ bits: 1, label: 'Double', tone: 'c' }, { bits: 1, label: 'Italic' }, { bits: 1, label: 'Underline' }, { bits: 1, label: 'Bold', tone: 'a' }]} />
+      </div>
+      <div class="pesmw-say" data-say>Call 16: every switch is on. Fifteen in binary.</div>
+    </Window>
+  </div>
+  <div class="pesmw-ctl"><Scrubber n={17} at={16} label="Step through his 16 calls" /></div>
+</div>
+
+<style is:global>
+  .pesmw { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; min-width: 0; }
+  .pesmw-main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(270px, 1fr); gap: 22px; align-items: start; }
+  .pesmw-screen { position: relative; background: var(--vga-0); }
+  .pesmw.is-live .pesmw-screen { aspect-ratio: 4 / 3; }
+  .pesmw-shot { display: block; width: 100%; height: auto; }
+  .pesmw.is-live .pesmw-shot { display: none; }
+  .pesmw-canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .pesmw:not(.is-live) .pesmw-canvas, .pesmw:not(.is-live) .pesmw-side, .pesmw:not(.is-live) .pesmw-ctl { display: none; }
+  .pesmw:not(.is-live) .pesmw-main { grid-template-columns: minmax(0, 1fr); }
+  .pesmw-code { font: 500 13px/1.9 var(--font-code); }
+  .pesmw-code > div { display: grid; grid-template-columns: 4.5ch 13.5ch 1fr; gap: 1ch; padding: 0 6px; white-space: pre; }
+  .pesmw-code .o { color: var(--ink-2); }
+  .pesmw-code code { font: inherit; color: var(--accent); }
+  .pesmw-code .n { color: var(--ink); white-space: normal; }
+  .pesmw-code > div:last-child { color: var(--surface); background: var(--accent-2); }
+  .pesmw-code > div:last-child :is(.o, code, .n) { color: var(--surface); }
+  .pesmw-lab { display: block; margin-bottom: 6px; font: 600 12px/1.4 var(--font-code); color: var(--accent-2); }
+  .pesmw-pre { margin-top: 16px; }
+  .pesmw-keys { display: flex; gap: 6px; min-height: 36px; align-items: center; font: 500 0.875rem/1 var(--sans); color: var(--ink-2); }
+  .pesmw-keys kbd { font-size: 1rem; }
+  .pesmw-bits { margin-top: 14px; }
+  .pesmw-bits .k-bits { --cell: 66px; }
+  .pesmw-bits .k-bits-lab { white-space: nowrap; font-size: 11px; }
+  .pesmw-say { margin-top: 14px; min-height: 3.2em; font: 400 1rem/1.55 var(--sans); color: var(--ink); }
+  .pesmw-say b { color: var(--accent); }
+  .pesmw-ctl { position: sticky; bottom: calc(var(--sl, 0px) + 8px); z-index: 2; padding: 10px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--rule), 8px 8px 0 oklch(0 0 0 / 0.55); margin-right: 14px; }
+  @media (max-width: 1023px) { .pesmw-main { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 640px) { .pesmw-ctl { margin-right: 0; padding: 8px; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, hex } from '../arabart/core.ts';
+  import { scrubber } from '../scrubber.ts';
+  import { CALLS, draw } from './pesm.ts';
+  import { frame, stamp, show, NAMES, reduce } from './vga.ts';
+
+  const FLIP = ['bold', 'underline', 'italic', 'double size'];
+  document.querySelectorAll<HTMLElement>('[data-pesmwalk]').forEach(async root => {
+    const bin = await fonts();
+    const canvas = root.querySelector<HTMLCanvasElement>('canvas')!, codeBox = root.querySelector<HTMLElement>('[data-code]')!;
+    const pre = root.querySelector<HTMLElement>('[data-pre]')!, say = root.querySelector<HTMLElement>('[data-say]')!, said = root.querySelector<HTMLElement>('[data-said]')!;
+    const title = root.querySelector<HTMLElement>('.pesmw-side .win-title')!;
+    const bits = root.querySelector<HTMLElement & { bitfield?: { set(v: number, quiet?: boolean): void } }>('[data-bitfield]')!;
+    const imgs = CALLS.map(c => draw(bin, c));
+    const f = frame();
+    let anim: gsap.core.Tween | null = null;
+
+    const compose = (n: number, partial = -1) => {
+      f.data.fill(0);
+      for (let i = 0; i < n; i++) stamp(f, imgs[i], CALLS[i].x, CALLS[i].y, i === n - 1 && partial >= 0 ? partial : -1);
+      show(canvas, f);
+    };
+    const go = (k: number, how: string) => {
+      anim?.kill(); anim = null;
+      const c = CALLS[k - 1];
+      if (!c) {
+        compose(0);
+        title.textContent = 'BEFORE THE FIRST CALL';
+        codeBox.innerHTML = `<div><span class="o">0000</span><code>mov  ax,0012h</code><span class="n">640 x 480</span></div><div><span class="o">0003</span><code>int  10h</code><span class="n">a black screen</span></div>`;
+        pre.innerHTML = '';
+        bits.bitfield?.set(0, true);
+        say.innerHTML = 'Graphics mode 12h: 640 by 480 pixels, 16 colors. Every switch starts off.';
+        return;
+      }
+      title.textContent = `CALL ${k} OF 16`;
+      codeBox.innerHTML = [
+        [hex(c.off, 4), `mov  dx,${hex(c.text, 4)}h`, 'the text'],
+        [hex(c.off + 3, 4), `mov  ax,36${hex(c.color)}h`, `AL: ${NAMES[c.color]}`],
+        [hex(c.off + 6, 4), `mov  cx,${hex(c.x, 4)}h`, `x = ${c.x}`],
+        [hex(c.off + 9, 4), `mov  bx,${hex(c.y, 4)}h`, `y = ${c.y}`],
+        [hex(c.off + 12, 4), 'call 0284h', 'his engine'],
+      ].map(([o, code, n]) => `<div><span class="o">${o}</span><code>${code}</code><span class="n">${n}</span></div>`).join('');
+      pre.innerHTML = c.pre ? [...c.pre].map(ch => `<kbd>${ch}</kbd>`).join('') : 'none';
+      bits.bitfield?.set(c.state, true);
+      const flips = [0, 1, 2, 3].filter(b => (c.state ^ c.before) & (1 << b)).map(b => `${FLIP[b]} ${c.state & (1 << b) ? 'on' : 'off'}`);
+      say.innerHTML = `Line ${k}, in ${NAMES[c.color]}${k === 9 ? ', with <b>*</b> to clear every switch first' : ''}. ${flips.length ? `It flips ${flips.join(', ')}.` : 'No style keys: plain text.'} The switches now read <b>${c.state.toString(2).padStart(4, '0')}</b>, which is <b>${c.state}</b>.`;
+      if (how !== 'play') said.textContent = say.textContent!;
+      // The new line writes itself from the right, the way Arabic is written
+      if (how === 'jump' || how === 'scrub' || reduce()) { compose(k); return; }
+      const o = { x: c.x };
+      compose(k, c.x);
+      anim = gsap.to(o, { x: c.x - imgs[k - 1].x - 2, duration: 0.7, ease: 'power1.inOut', onUpdate: () => compose(k, o.x) });
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, go, { speed: 1.1 });
+    root.classList.add('is-live');
+    s.go(16, 'jump');
+  });
+</script>

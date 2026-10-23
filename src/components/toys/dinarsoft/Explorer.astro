@@ -1,0 +1,165 @@
+---
+// The six apps as a Visual Studio solution: pick a project in Solution Explorer, see it run on the Pocket PC beside it,
+// read its Properties, then open its page. Without JS every project's links still show, and MemMaid is on the device.
+import Window from '../../shell/Window.astro';
+import Device from './Device.astro';
+import { apps, icon, awards, reviews, downloads, longDate, type AppId } from '../../../data/dinarsoft';
+import './ds.css';
+
+const base = import.meta.env.BASE_URL;
+const page = (id: AppId, hash = '') => `${base}/dinarsoft/${id}/${hash}`;
+const years = (id: AppId, lv: string) => awards.filter(a => a.app === id && a.level === lv).map(a => a.year);
+const list = (ys: number[]) => ys.length > 2 && ys.every((y, i) => !i || y === ys[i - 1] + 1) ? `${ys[0]} to ${ys.at(-1)}` : ys.join(', ').replace(/, (\d+)$/, ' and $1');
+const honors = (id: AppId) => {
+  const out = [];
+  for (const lv of ['Winner', 'Finalist', 'Nominee']) {
+    const ys = years(id, lv);
+    if (ys.length) out.push(`${lv}, ${list(ys)}`);
+  }
+  return out;
+};
+const rows = apps.map(a => {
+  const r = a.releases;
+  return {
+    a, ic: icon(a.id),
+    first: `${r[0].v}, ${longDate(r[0].date.slice(0, 7))}`,
+    last: `${r.at(-1)!.v}, ${longDate(r.at(-1)!.date.slice(0, 7))}`,
+    honors: honors(a.id),
+    nRev: reviews.filter(x => x.app === a.id).length,
+    nDl: downloads.filter(x => x.app === a.id).length,
+  };
+});
+---
+
+<div class="dse" data-dse>
+  <Window kind="panel" title="Solution Explorer" active class="dse-sol">
+    <p class="dse-root"><span class="dse-sln" aria-hidden="true"></span>Solution ‘DinarSoft’ (6 projects)</p>
+    <ul class="dse-tree" aria-label="DinarSoft’s six apps">
+      {rows.map(({ a, ic, nRev, nDl, honors }, i) => (
+        <li class="dse-proj" data-proj={a.id}>
+          <button type="button" id={`dse-t-${a.id}`} aria-controls={`dse-p-${a.id}`} aria-current={i === 0 ? 'true' : undefined} aria-expanded={i === 0 ? 'true' : 'false'}>
+            <span class="dse-tw" aria-hidden="true"></span>
+            <img src={ic.src} width="24" height="24" alt="" />
+            <span class="dse-name">{a.name}</span>
+          </button>
+          <ul class="dse-kids">
+            <li><a href={page(a.id)}><span class="dse-f dse-f--doc" aria-hidden="true"></span>Story and screens</a></li>
+            <li><a href={page(a.id, '#inside')}><span class="dse-f dse-f--cpp" aria-hidden="true"></span>How it works</a></li>
+            {(nRev > 0 || honors.length > 0) && <li><a href={page(a.id, '#press')}><span class="dse-f dse-f--star" aria-hidden="true"></span>{nRev ? `Awards and reviews (${nRev})` : 'Awards'}</a></li>}
+            <li><a href={page(a.id, '#download')}><span class="dse-f dse-f--cab" aria-hidden="true"></span>Downloads ({nDl})</a></li>
+            <li><a href={page(a.id, '#unlock')}><span class="dse-f dse-f--key" aria-hidden="true"></span>Free unlock key</a></li>
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </Window>
+
+  {rows.map(({ a, ic, first, last, honors, nRev }, i) => (
+    <div class="dse-pane" id={`dse-p-${a.id}`} role="region" aria-labelledby={`dse-t-${a.id}`} hidden={i !== 0} data-pane={a.id}>
+      <Device app={a} class="dse-dev" />
+      <Window kind="panel" title="Properties" class="dse-props">
+        <div class="dse-head">
+          <img src={ic.src} width={ic.w} height={ic.h} alt="" loading="lazy" />
+          <div>
+            <p class="dsx-word dse-word">{a.pre}<b>{a.post}</b></p>
+            <p class="dsx-slogan">{a.slogan}</p>
+          </div>
+        </div>
+        <p class="dse-one">{a.one}</p>
+        <dl class="dse-grid">
+          <div><dt>First</dt><dd>{first}</dd></div>
+          <div><dt>Latest</dt><dd>{last}</dd></div>
+          <div><dt>Price then</dt><dd>{a.price}</dd></div>
+          <div><dt>Runs on</dt><dd>{a.runs}</dd></div>
+          {honors.length > 0 && <div><dt>Awards</dt><dd>{honors.map(h => <span class="dse-h">{h}</span>)}</dd></div>}
+          {nRev > 0 && <div><dt>Reviews</dt><dd>{nRev} archived</dd></div>}
+          <div><dt>Today</dt><dd>Free, with a free unlock key</dd></div>
+        </dl>
+        <a class="button button--primary dse-open" href={page(a.id)}>Open {a.name}</a>
+      </Window>
+    </div>
+  ))}
+</div>
+
+<style>
+  .dse { display: grid; grid-template-columns: minmax(250px, 0.75fr) minmax(0, 2fr); gap: 24px; align-items: start; }
+  .dse-pane { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: start; }
+  .dse-pane:not([hidden]) { animation: dse-in 0.32s var(--expo); }
+  @keyframes dse-in { from { opacity: 0; translate: 0 8px; } }
+
+  .dse-root { display: flex; align-items: center; gap: 8px; padding: 2px 4px 6px; font: 700 0.9375rem/1.3 var(--ds-verdana); }
+  .dse-sln { width: 16px; height: 16px; background: linear-gradient(135deg, #8c6bc8 0 50%, #6a4aa8 50%); border-radius: 2px; }
+  .dse-tree { list-style: none; padding-left: 10px; }
+  .dse-proj > button {
+    display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 8px 0 2px;
+    font: 400 1rem/1 var(--ds-verdana); color: var(--ink); background: none; border: 1px solid transparent; cursor: pointer; text-align: left;
+  }
+  .dse-proj > button[aria-current='true'] { background: var(--xp-sel); color: var(--w-white); }
+  .dse-proj > button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -3px; }
+  .dse-proj > button img { width: 24px; height: 24px; }
+  .dse-tw { width: 9px; height: 9px; border: 1px solid #919b9c; background: #fff; position: relative; flex: none; }
+  .dse-tw::before, .dse-tw::after { content: ''; position: absolute; left: 1px; right: 1px; top: 3px; height: 1px; background: #1a1a1a; }
+  .dse-tw::after { left: 3px; right: auto; top: 1px; width: 1px; height: 5px; }
+  [aria-expanded='true'] > .dse-tw::after { display: none; }
+  .dse-kids { list-style: none; margin: 0 0 6px 30px; border-left: 1px dotted #a0a0a0; }
+  :global(.dse.is-live) .dse-proj:not(.open) .dse-kids { display: none; }
+  .dse-kids a { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px 0 10px; font: 400 0.9375rem/1.2 var(--ds-verdana); color: var(--ink); text-decoration: none; }
+  .dse-kids a:hover { color: var(--accent); text-decoration: underline; }
+  .dse-f { width: 14px; height: 16px; flex: none; border: 1px solid #7a8aa6; background: #fff; position: relative; }
+  .dse-f::after { content: ''; position: absolute; inset: 3px 2px auto; height: 6px; }
+  .dse-f--doc::after { background: repeating-linear-gradient(#7a8aa6 0 1px, transparent 1px 3px); }
+  .dse-f--cab::after { background: #c8a43c; inset: 3px 2px 3px; }
+  .dse-f--key::after { background: radial-gradient(circle at 30% 50%, #d4a017 2px, transparent 2.5px), linear-gradient(#d4a017, #d4a017) 4px 2px / 6px 2px no-repeat; }
+  .dse-f--star::after { background: var(--ds-red); clip-path: polygon(50% 0, 62% 38%, 100% 38%, 69% 60%, 80% 100%, 50% 76%, 20% 100%, 31% 60%, 0 38%, 38% 38%); inset: 2px 1px auto; height: 9px; }
+  .dse-f--cpp::after { background: none; content: '++'; font: 700 7px/6px var(--ds-arial); color: #2b5bb8; inset: 4px 0 auto; text-align: center; }
+
+  .dse-dev { width: 300px; }
+  .dse-head { display: flex; align-items: center; gap: 14px; }
+  .dse-head img { width: 72px; height: 72px; flex: none; }
+  .dse-word { font-size: clamp(1.75rem, 1.2vw + 1rem, 2.25rem); }
+  .dse-one { margin-top: 14px; font-size: 1.0625rem; line-height: 1.55; }
+  .dse-grid { display: grid; margin-top: 16px; font-size: 0.9375rem; border-top: 1px solid var(--rule); }
+  .dse-grid div { display: grid; grid-template-columns: 7.5em minmax(0, 1fr); border-bottom: 1px solid var(--rule); }
+  .dse-grid dt { padding: 7px 8px; background: var(--xp-beige); color: oklch(0.3 0 0); font-family: var(--ds-verdana); font-size: 0.875rem; }
+  .dse-grid dd { padding: 7px 8px; line-height: 1.45; }
+  .dse-h { display: block; }
+  .dse-open { margin-top: 18px; }
+
+  @media (max-width: 1100px) {
+    .dse { grid-template-columns: minmax(0, 1fr); }
+    .dse-tree { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0 12px; }
+  }
+  @media (max-width: 700px) {
+    .dse-pane { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+    .dse-props { width: 100%; }
+    .dse-dev { width: min(300px, 100%); }
+    .dse-tree { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dse]').forEach(root => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('.dse-proj > button')];
+    const panes = [...root.querySelectorAll<HTMLElement>('[data-pane]')];
+    const show = (i: number, focus = false) => {
+      tabs.forEach((t, k) => {
+        if (k === i) t.setAttribute('aria-current', 'true'); else t.removeAttribute('aria-current');
+        t.setAttribute('aria-expanded', String(k === i));
+        t.closest('.dse-proj')!.classList.toggle('open', k === i);
+      });
+      panes.forEach((p, k) => (p.hidden = k !== i));
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => show(i));
+      t.addEventListener('keydown', e => {
+        const d = { ArrowDown: 1, ArrowUp: -1 }[e.key];
+        if (d) { e.preventDefault(); show((i + d + tabs.length) % tabs.length, true); }
+        if (e.key === 'Home') { e.preventDefault(); show(0, true); }
+        if (e.key === 'End') { e.preventDefault(); show(tabs.length - 1, true); }
+      });
+    });
+    root.classList.add('is-live');
+    show(0);
+  });
+</script>

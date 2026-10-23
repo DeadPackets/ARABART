@@ -1,0 +1,76 @@
+---
+// Windows Mobile 2003 split one RAM chip between files and programs. MemMaid's slider (2.3: 56C54) measures it in
+// 4 KB pages: the range is all of RAM, the marked band is where the split may go, and on release it calls
+// SetSystemMemoryDivision. A sample 64 MB Pocket PC.
+import Window from '../../shell/Window.astro';
+
+const TOTAL = 16384, STORE = 7680, USED = 4608, FREEPROG = 3482;
+const MIN = USED, MAX = STORE + FREEPROG;
+const mb = (p: number) => (p / 256).toFixed(1);
+---
+
+<div class="msp" data-mm-split data-total={TOTAL} data-store={STORE} data-min={MIN} data-max={MAX}>
+  <Window title="System Info: memory  a sample 64 MB Pocket PC" kind="dialog" active>
+    <div class="msp-bar" aria-hidden="true">
+      <i class="msp-files" data-files style={`--w:${STORE / TOTAL}`}><span>Files <b data-fmb>{mb(STORE)}</b> MB</span></i>
+      <i class="msp-progs"><span>Programs <b data-pmb>{mb(TOTAL - STORE)}</b> MB</span></i>
+    </div>
+    <label class="msp-lab" for="msp-r">Move the split</label>
+    <div class="msp-track" style={`--a:${MIN / TOTAL};--b:${MAX / TOTAL}`} aria-hidden="true"><i>where the split may go</i></div>
+    <input id="msp-r" class="msp-r" type="range" min="0" max={TOTAL} step="256" value={STORE} data-r aria-valuetext={`${mb(STORE)} MB for files`} />
+    <p class="msp-call"><code>SetSystemMemoryDivision(<b data-pages>{STORE}</b>)</code> <span data-res>pages of 4,096 bytes for files</span></p>
+    <p class="msp-say" data-say aria-live="polite">The marked band is where the split may go: not below the files you have, not above the memory programs leave free.</p>
+  </Window>
+</div>
+
+<style is:global>
+  .msp-bar { position: relative; display: flex; height: 54px; border-radius: 3px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--rule); }
+  .msp-bar > i { display: flex; align-items: center; min-width: 0; font-style: normal; }
+  .msp-files { flex: 0 0 calc(var(--w) * 100%); background: var(--accent-2); }
+  .msp-progs { flex: 1 1 0; justify-content: flex-end; background: var(--accent); }
+  .msp-bar span { padding: 0 10px; font: 600 0.8125rem/1.2 var(--font-ui); color: #fff; white-space: nowrap; }
+  .msp-track { position: relative; height: 22px; margin-top: 6px; }
+  .msp-track i { position: absolute; top: 0; bottom: 0; left: calc(var(--a) * 100%); width: calc((var(--b) - var(--a)) * 100%); display: grid; place-items: center; font: 600 0.75rem/1 var(--font-ui); font-style: normal; color: var(--ink); background: repeating-linear-gradient(135deg, color-mix(in oklch, var(--good) 30%, transparent) 0 6px, color-mix(in oklch, var(--good) 12%, transparent) 6px 12px); box-shadow: inset 0 0 0 1px var(--good); border-radius: 2px; white-space: nowrap; overflow: hidden; }
+  @media (max-width: 420px) { .msp-track { height: 30px; } .msp-track i { white-space: normal; line-height: 1.1; text-align: center; } } /* the band is under 100 px wide on a phone: the label takes two lines */
+  .msp-lab { display: block; margin-top: 16px; font-size: 0.875rem; color: var(--ink-2); }
+  .msp-r { width: 100%; height: 44px; margin: 0; accent-color: var(--accent); }
+  .msp-r:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .msp-call { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; margin-top: 6px !important; font-size: 0.875rem !important; color: var(--ink-2) !important; }
+  .msp-call code { font: 600 0.9375rem var(--font-code); color: var(--ink); }
+  .msp-call b { color: var(--accent); }
+  .msp-say { margin-top: 10px !important; min-height: 3em; font-size: 0.9375rem !important; color: var(--ink) !important; }
+  .msp-say.is-no { color: var(--hot) !important; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-mm-split]').forEach(root => {
+    const [T, MIN, MAX] = ['total', 'min', 'max'].map(k => +root.dataset[k]!);
+    let store = +root.dataset.store!;
+    const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const r = $('[data-r]') as HTMLInputElement, files = $('[data-files]'), say = $('[data-say]');
+    const mb = (p: number) => (p / 256).toFixed(1);
+    const show = (p: number, d = 0) => {
+      gsap.to(files, { '--w': p / T, duration: d, ease: 'power2.out' });
+      $('[data-fmb]').textContent = mb(p); $('[data-pmb]').textContent = mb(T - p); $('[data-pages]').textContent = String(p);
+      r.setAttribute('aria-valuetext', `${mb(p)} MB for files, ${mb(T - p)} MB for programs`);
+    };
+    r.addEventListener('input', () => { show(+r.value); say.classList.remove('is-no'); say.textContent = 'Let go to ask the system.'; });
+    // On release, the system decides; MemMaid reads the split back a second later and puts the slider where it really is
+    r.addEventListener('change', () => {
+      const p = +r.value;
+      const ok = p >= MIN && p <= MAX;
+      say.classList.toggle('is-no', !ok);
+      if (ok) {
+        store = p;
+        say.textContent = p > MIN + (MAX - MIN) / 2 ? `Done: ${mb(p)} MB for files. Room for more documents, less for running programs.` : `Done: ${mb(T - p)} MB for programs. More room to run, less for files.`;
+      } else {
+        say.textContent = p < MIN ? `No. Your files already fill ${mb(MIN)} MB. The system leaves the split where it was.` : `No. Running programs need that memory. The system leaves the split where it was.`;
+        r.value = String(store);
+        show(store, reduce() ? 0 : 0.5);
+      }
+    });
+  });
+</script>

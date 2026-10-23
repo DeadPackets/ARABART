@@ -1,0 +1,123 @@
+---
+// Compact, static map of one program's bytes; every region links into the full explorer at /bytes/
+import Term from './explain/Term.astro';
+import Window from './shell/Window.astro';
+import { loadBytes, filesFor } from '../scripts/bytes/data';
+import { MEM_RGB, DISK_RGB, MEM_NAME, DISK_NAME, BY_NAME, rgb, deepLink } from '../scripts/bytes/regions';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const { files, anatomy, memRegions } = loadBytes();
+const n = (v: number) => v.toLocaleString('en-US');
+const pct = (a: number, b: number) => (a / b < 0.001 ? '<0.1%' : `${((a / b) * 100).toFixed(a / b < 0.1 ? 1 : 0)}%`);
+const DISK_ORDER = ['header', 'reloc', 'entry', 'control', 'literal', 'text', 'backref', 'unpacker', 'never'];
+
+const maps = filesFor(files, id).map(f => {
+  const size = f.mem.size;
+  const w = Math.max(16, Math.round(Math.sqrt(size / 0.32) / 16) * 16);
+  const h = Math.ceil(size / w);
+  const stair = (a: number, b: number) => {
+    const r0 = Math.floor(a / w), c0 = a % w, r1 = Math.floor((b - 1) / w), c1 = ((b - 1) % w) + 1;
+    return r0 === r1 ? `M${c0} ${r0}H${c1}V${r0 + 1}H${c0}Z` : `M${c0} ${r0}H${w}V${r1}H${c1}V${r1 + 1}H0V${r0 + 1}H${c0}Z`;
+  };
+  const regions = memRegions(f).map(r => ({ ...r, d: stair(r.start, r.end), href: deepLink(base, f.key, 'memory', r.start), fill: rgb(MEM_RGB[r.kind] ?? MEM_RGB.data) }));
+  const kinds = new Map<string, number>();
+  for (const r of regions) { const k = r.kind === 'unknown' ? 'data' : r.kind; kinds.set(k, (kinds.get(k) ?? 0) + r.end - r.start); }
+  const his = regions.filter(r => r.by === 'yasser').reduce((s, r) => s + r.end - r.start, 0);
+  const disk = DISK_ORDER.filter(k => f.disk.counts[k]).map(k => ({ k, v: f.disk.counts[k] }));
+  return {
+    f, w, h, regions, his, disk, authored: !!anatomy[f.key],
+    kinds: [...kinds].sort((a, b) => b[1] - a[1]),
+    top: [...regions].sort((a, b) => +(b.by === 'yasser') - +(a.by === 'yasser') || (b.end - b.start) - (a.end - a.start)).slice(0, 6),
+    name: f.path.split('/').pop()!,
+  };
+});
+---
+
+{maps.length > 0 && (
+  <section class="bm" id="bytes" aria-labelledby="bytes-h">
+    <h2 id="bytes-h" data-toc>Every Byte{maps.length === 1 && ` of ${maps[0].name}`}</h2>
+    <p class="bm-lead">Each square is one <Term id="byte">byte</Term> of the program in memory, colored by what it is. Tap a part to open it in the full map, down to the single instruction.</p>
+
+    {maps.map(m => (
+      <Window title={`C:\\${m.f.path.replace("/", "\\")}`} kind="editor" as="figure" class="bm-win">
+        <div class="bm-sizes">
+          <p><b>{n(m.f.disk.size)}</b> bytes on the disk, packed by <Term id="diet">DIET</Term></p>
+          <p><b>{n(m.f.mem.size)}</b> bytes in memory{m.authored && m.his > 0 && <>, <b class="bm-his">{n(m.his)}</b> of them his own code</>}</p>
+        </div>
+
+        <a class="bm-disk" href={deepLink(base, m.f.key, 'disk')} style={`width:${Math.max(4, (m.f.disk.size / m.f.mem.size) * 100)}%`} aria-label={`On disk: ${n(m.f.disk.size)} bytes. Open the packed file in the byte map.`}>
+          {m.disk.map(d => <i style={`flex:${d.v};background:${rgb(DISK_RGB[d.k])}`} title={`${DISK_NAME[d.k]}: ${n(d.v)} bytes`}></i>)}
+        </a>
+
+        <svg class="bm-map" viewBox={`0 0 ${m.w} ${m.h}`} aria-hidden="true" focusable="false">
+          <rect width={m.w} height={m.h} class="bm-sea" />
+          {m.regions.map(r => (
+            <a href={r.href} tabindex="-1">
+              <title>{`${r.label} · ${n(r.end - r.start)} bytes`}</title>
+              <path d={r.d} fill={r.fill} />
+            </a>
+          ))}
+        </svg>
+
+        <ul class="bm-legend" aria-label="What the bytes are">
+          {m.kinds.map(([k, v]) => (
+            <li><i style={`background:${rgb(MEM_RGB[k] ?? MEM_RGB.data)}`}></i>{MEM_NAME[k] ?? k}<span>{pct(v, m.f.mem.size)}</span></li>
+          ))}
+        </ul>
+
+        <h3 class="bm-h">The biggest parts, his first</h3>
+        <ol class="bm-top">
+          {m.top.map(r => (
+            <li>
+              <a href={r.href}><i style={`background:${r.fill}`}></i><span class="t">{r.label}</span><span class="n">{n(r.end - r.start)} bytes</span></a>
+              <span class="by">{BY_NAME[r.by] ?? r.by}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="bm-src">{m.authored ? 'Mapped by hand from the program’s own bytes.' : 'Mapped from the bytes: header, fix-ups, code, text and empty space.'}</p>
+        <p class="bm-go">
+          <a class="button button--primary" href={deepLink(base, m.f.key, 'memory')}>Open in the byte map</a>
+          <a class="button" href={deepLink(base, m.f.key, 'disk')}>See the packed file</a>
+        </p>
+      </Window>
+    ))}
+  </section>
+)}
+
+<style>
+  .bm { margin-top: clamp(72px, 9vw, 120px); max-width: 980px; }
+  .bm h2 { font: 800 clamp(2rem, 2.4vw + 1rem, 3.25rem)/1.05 var(--sans); font-stretch: 80%; letter-spacing: -0.01em; color: var(--ink); text-wrap: balance; }
+  .bm-lead { margin-top: 14px; max-width: 60ch; font-size: 1.0625rem; line-height: 1.6; color: var(--ink); }
+  .bm-win { margin-top: 40px; }
+  .bm-sizes { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; font-size: 0.9375rem; color: var(--ink-2); }
+  .bm-sizes b { font: 700 1rem var(--mono); color: var(--ink); }
+  .bm-sizes .bm-his { color: var(--yellow); }
+  .bm-disk { display: flex; height: 14px; margin-top: 12px; outline: 1px solid var(--ink-2); }
+  .bm-disk:hover, .bm-disk:focus-visible { outline: 2px solid var(--yellow); }
+  .bm-disk i { min-width: 1px; }
+  .bm-map { display: block; width: 100%; height: auto; margin-top: 10px; max-height: 70svh; }
+  .bm-sea { fill: oklch(0.271 0.188 264.1); }
+  .bm-map path { stroke: oklch(0.334 0.231 264.1); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .bm-map a:hover path { stroke: var(--yellow); stroke-width: 3; paint-order: stroke; }
+  .bm-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; list-style: none; font-size: 0.875rem; color: var(--ink); }
+  .bm-legend li { display: flex; align-items: center; gap: 6px; }
+  .bm-legend span { font: 500 0.75rem var(--mono); color: var(--ink-2); }
+  i { flex: none; display: inline-block; width: 12px; height: 12px; }
+  .bm-legend i, .bm-top i { outline: 1px solid var(--black); }
+  .bm-h { margin-top: 24px; font: 600 0.8125rem/1.4 var(--mono); color: var(--cyan); }
+  .bm-top { list-style: none; margin-top: 8px; display: grid; gap: 2px; }
+  .bm-top li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; border-bottom: 1px solid var(--rule); }
+  .bm-top a { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 44px; padding: 4px 6px; color: var(--ink); text-decoration: none; }
+  .bm-top a:hover, .bm-top a:focus-visible { background: var(--green); color: var(--black); outline: 0; }
+  .bm-top .t { font-weight: 600; }
+  .bm-top .n { font: 500 0.75rem var(--mono); }
+  .bm-top .by { font-size: 0.8125rem; color: var(--ink-2); text-align: right; }
+  .bm-src { margin-top: 14px; font-size: 0.875rem; color: var(--ink-2); }
+  .bm-go { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-top: 20px; }
+  @media (max-width: 640px) {
+    .bm-top li { grid-template-columns: 1fr; gap: 0; padding-bottom: 6px; }
+    .bm-top .by { text-align: left; padding-left: 28px; }
+  }
+</style>

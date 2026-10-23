@@ -1,0 +1,102 @@
+---
+// FORM_X (1992), Yasser Awad's formula solver: pure assembly, no library, exact decimals. Facts:
+// research/artifacts/programs/formx-port/HOW.md, research/programs.md section 3, and FORM_X.EXE (unpacked, code segment 016A).
+// Every result on this page comes from src/lib/formx/formx.ts, his program ported routine by routine.
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import FxSolver from '../components/toys/kvc-formx/FxSolver.astro';
+import DigitMath from '../components/toys/kvc-formx/DigitMath.astro';
+import KeyFilter from '../components/toys/kvc-formx/KeyFilter.astro';
+import Protect from '../components/toys/kvc-formx/Protect.astro';
+---
+
+<section id="fx-solve" class="fxw">
+  <h2>Type a formula. Watch him solve it.</h2>
+  <p class="lead">In 1992 someone challenged Yasser, and offered to pay him: do exact decimal math on a PC with nothing but assembly. No math chip, no library. His answer was FORM_X, 3,546 bytes on disk.</p>
+  <p>You give it a formula in x, a first value and a last one, and it prints a table of ten results. Below, his program runs in your browser, ported from his code routine by routine. Over 349 test formulas it printed the very same screen as his original, every time. Pick a row under his table and watch his method: <strong>innermost brackets first, then times and divide, then plus and minus</strong>. Every result goes back into the formula until one number is left.</p>
+  <FxSolver />
+  <div class="fxw-cols">
+    <p>For a modern developer it is a find-and-replace loop on a string: find the innermost brackets, replace them with their value, repeat. He did it on raw bytes, with no parser and no regular expressions. And every number he stores is exactly 20 bytes long. So the two numbers around any sign always sit 20 bytes to its left and 20 bytes to its right. He never has to search for where a number begins.</p>
+    <p>Try <code>0.1+0.2</code>. His program prints <code>0.300000</code>, exactly. JavaScript, running in your browser right now, prints <code>0.30000000000000004</code>, because it stores numbers in binary. His are decimal, digit by digit, all the way down.</p>
+  </div>
+  <Deep title="For engineers: the solver in his assembly">
+    <Listing
+      title="FORM_X.EXE 016A:0A58 and 0AA4, condensed"
+      lines={[
+        { off: '0A58', code: 'push si', note: 'SI points at a "("' },
+        { off: '0A59', code: 'inc  si / mov al,[si]', note: 'walk right' },
+        { off: '0A5C', code: "cmp  al,')' / je 0A69", note: 'a ")" closes this level', hi: true },
+        { off: '0A60', code: "cmp  al,'(' / jne 0A59" },
+        { off: '0A64', code: 'call 0A58', note: 'a "(" goes one level deeper: the routine calls itself', hi: true },
+        { off: '0A69', code: 'mov  di,si / pop si', note: 'SI and DI: this bracket' },
+        { off: '0A6C', code: 'call 0AA4', note: 'solve it and write the number back' },
+        { off: '0AB7', code: 'mov  di,0DC3h / rep movsb', note: 'copy the inside to scratch, end it with $' },
+        { off: '0AC2', code: "cmp  byte [si],'-'", note: 'starts with a minus? flip the first number' },
+        { off: '0AEB', code: "lodsb / cmp al,'/' ... '*'", note: 'pass 1: the leftmost * or /, again and again', hi: true },
+        { off: '0B06', code: "lodsb / cmp al,'-' ... '+'", note: 'pass 2: the leftmost + or -', hi: true },
+      ]}
+      foot="The whole formula sits inside one more pair of brackets that he adds himself, so the last bracket solved is the formula, and its value is the answer."
+    />
+  </Deep>
+</section>
+
+<section id="fx-digits" class="fxw">
+  <h2>Twenty digits, by hand</h2>
+  <p class="lead">He could not use the math chip, and the PC had no number that kept decimals exact. So he built his own: 20 decimal digits, one digit per byte, 14 before the point and 6 after. Then he taught the PC to add, subtract and multiply them the way you learned at school.</p>
+  <div class="fxw-cols">
+    <p>Think of money stored as whole cents, but in millionths: 2.5 is stored as <code>00000000000002500000</code>. Every number has the same 20 bytes, so lining up two numbers is free. Adding goes column by column, then one carry pass runs from right to left. There, a single divide by 10 gives each column its digit and its carry at once.</p>
+    <p>A negative number works like a car’s odometer rolled back past zero: −1.5 is stored with 9s at the front. The gift of that choice: to subtract, he flips a number and adds it, so one adding routine does both jobs. Dividing is long division by counting how many times the divisor fits. The processor has its own helpers for decimal math; he used none of them. Every step is his.</p>
+  </div>
+  <DigitMath />
+</section>
+
+<section id="fx-keys" class="fxw">
+  <h2>A keyboard that only says yes to a formula</h2>
+  <p class="lead">While you type, FORM_X refuses every key that cannot come next. A single byte keeps track, and each of its eight bits stands for one kind of key.</p>
+  <p>It is the idea behind a form that grays out the buttons you cannot press yet, and it costs one byte. After a digit, it allows another digit, a point, a closing bracket or an operator. After an operator, only a bracket, a digit or x. The top bit, marked seen, remembers that this number already has a point, so a second one is refused. Every key also saves the byte from before it, so Backspace steps back exactly. Type here, or press his keys, and watch the bits.</p>
+  <KeyFilter />
+  <p>Only valid keys ever reach the formula, so his solver can trust every formula it gets. When you press Enter he makes three last checks. The formula must end in a digit, x or a closing bracket. The brackets must balance. And no number can carry more than 7 digits before its point.</p>
+  <Deep title="For engineers: the filter, line by line">
+    <Listing
+      title="FORM_X.EXE 016A:0075, condensed"
+      lines={[
+        { off: '0075', code: 'mov  ah,7 / int 21h', note: 'wait for a key, show nothing yet' },
+        { off: '0079', code: 'mov  bl,[0282h] / mov bh,bl', note: 'the filter byte' },
+        { off: '007F', code: "cmp  al,'(' / je 00C4" },
+        { off: '00C4', code: 'and  bh,2 / cmp bh,0 / je 0075', note: 'its bit is off: ignore the key', hi: true },
+        { off: '00CC', code: 'mov  byte [0282h],2Eh', note: 'after "(": ( digit x -' },
+        { off: '011A', code: 'and  bh,0C0h / cmp bh,40h', note: 'a point needs bit 40h, and no point yet' },
+        { off: '0138', code: 'and  byte [0282h],80h', note: 'after a digit: keep "this number has a point"' },
+        { off: '013D', code: 'or   byte [0282h],75h', note: 'and allow ) digit operator - .', hi: true },
+        { off: '014D', code: 'mov  [si+0232h],bl', note: 'save the old byte for Backspace' },
+      ]}
+    />
+  </Deep>
+</section>
+
+<section id="fx-guard" class="fxw">
+  <h2>Signed, and guarded</h2>
+  <p class="lead">FORM_X was paid work, so Yasser signed it in a way that is hard to take out. His name hides inside his own instructions, scrambled, and three small blocks of code bring it back. Each one runs exactly once, then switches itself off.</p>
+  <div class="fxw-cols">
+    <p>Each block starts with a byte that does nothing, and the first thing a block does is overwrite that byte with <code>RET</code>, “return”. The next time anything calls it, it returns at once. Block 1 fixes five bytes of the scrambled text. Block 2 unscrambles it: each letter is its byte minus the byte stored before it.</p>
+    <p>Block 3 adds up 53 bytes of code, block 1 included. It adds that total into the program’s exit jump, which the file stores as a jump of zero bytes. Untouched, the jump lands on the code that writes his credit on the screen and ends the program. Change one byte, and it lands somewhere else. It works like a hash on a script tag: change the file, and it no longer runs.</p>
+  </div>
+  <Protect />
+  <ThenNow
+    rows={[
+      { then: '20 decimal digits, one per byte, 6 after the point', now: 'SQL <code>DECIMAL(20,6)</code>, Java <code>BigDecimal</code>, Python <code>decimal</code>', why: 'Exact decimals for money and measurement. SQL’s DECIMAL(20,6) is his exact format.' },
+      { then: 'Odometer numbers: 9s at the front mean negative', now: 'Two’s complement in every CPU', why: 'The same trick in base 2: subtracting is adding the flipped number.' },
+      { then: 'One byte that lets only valid keys in', now: 'Input masks and live validation', why: 'Stop bad input at the keyboard, not after the fact.' },
+      { then: 'A checksum of his code that completes the exit jump', now: 'Code signing and Subresource Integrity hashes', why: 'Both notice a changed program and refuse to treat it as the real one.' },
+    ]}
+  />
+</section>
+
+<style>
+  .fxw :global([data-fxsolver]), .fxw :global([data-digitmath]), .fxw :global([data-keyfilter]), .fxw :global([data-protect]) { margin-block: 32px; }
+  .fxw-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(24px, 4vw, 48px); margin-top: 14px; }
+  .fxw-cols p { margin: 0 !important; }
+  @media (max-width: 760px) { .fxw-cols { grid-template-columns: minmax(0, 1fr); } .fxw-cols p + p { margin-top: 1em !important; } }
+</style>
+

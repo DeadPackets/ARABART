@@ -1,0 +1,257 @@
+---
+// DinarSoft year by year: every release of every app on its own lane, the magazine's awards under them, and the
+// company's milestones in a Visual Studio Output window. Run it, step it, or tap any dot for what that version added.
+// No JS: the whole chart, every year's log and MemMaid 2.0's notes are on the page.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { apps, awards, honors, icon, longDate, type AppId } from '../../../data/dinarsoft';
+import './ds.css';
+
+const YEARS = [2002, 2003, 2004, 2005, 2006, 2007, 2008];
+const W = 1000, L = 150, R = 20, TOP = 44, LANE = 56;
+const t0 = Date.UTC(2002, 9, 1), t1 = Date.UTC(2009, 0, 1);
+const x = (d: string) => {
+  const [y, m = 7, day = 1] = d.split('-').map(Number);
+  return +(L + ((Date.UTC(y, m - 1, day) - t0) / (t1 - t0)) * (W - L - R)).toFixed(1);
+};
+const H = TOP + apps.length * LANE + 12;
+const laneY = (i: number) => TOP + i * LANE + LANE / 2;
+const yearOf = (d: string) => +d.slice(0, 4);
+const short = (d: string) => longDate(d).replace(/^(\w{3})\w*/, '$1').replace(/, \d{4}$/, '');
+
+const dots = apps.flatMap((a, li) => a.releases.map((r, ri) => ({ a, li, ri, r, major: /^\d+\.0$/.test(r.v), cx: x(r.date), lift: 0 })));
+// Two major versions close together on one lane: the second label sits higher
+for (let k = 1; k < dots.length; k++) {
+  const p = dots.slice(0, k).reverse().find(d => d.li === dots[k].li && d.major);
+  if (dots[k].major && p && dots[k].cx - p.cx < 34) dots[k].lift = p.lift ? 0 : 15;
+}
+const marks = awards.map(w => ({ w, li: apps.findIndex(a => a.id === w.app), cx: x(`${w.year}-11-01`) }));
+const total = dots.length;
+
+// The Output window: one group of lines per year
+type Line = { d: string; text: string; kind: 'rel' | 'win' | 'co'; tag?: string };
+const log: Record<number, Line[]> = Object.fromEntries(YEARS.map(y => [y, []]));
+log[2002].push({ d: '2002-11', text: 'DinarSoft Corporation is founded in Kanata, Ontario', kind: 'co' });
+for (const { a, r } of dots) log[yearOf(r.date)].push({ d: r.date, text: `${a.name} ${r.v}${r.v === '1.0' ? ', the first release' : ''}`, kind: 'rel' });
+for (const { w } of marks) log[w.year].push({ d: `${w.year}-12-31`, tag: 'Award', text: `${w.level}: ${apps.find(a => a.id === w.app)!.name}${w.category ? `, ${w.category}` : ''}`, kind: 'win' });
+for (const h of honors) if (h.date.length > 4) log[yearOf(h.date)].push({ d: h.date, text: `${h.by}: ${h.title}, ${apps.find(a => a.id === h.app)!.name}`, kind: 'win' });
+log[2006].push({ d: '2006-11-01', text: 'A new logo for DinarSoft', kind: 'co' }, { d: '2006-11-15', text: 'The new dinarsoft.com goes live, with its own store', kind: 'co' });
+for (const y of YEARS) log[y].sort((p, q) => p.d.localeCompare(q.d));
+const sum = (y: number) => {
+  const rel = log[y].filter(l => l.kind === 'rel').length, aw = marks.filter(m => m.w.year === y).length;
+  const parts = [rel && `${rel} release${rel > 1 ? 's' : ''}`, aw && `${aw} award${aw > 1 ? 's' : ''} and nomination${aw > 1 ? 's' : ''}`].filter(Boolean);
+  return parts.length ? parts.join(', ') : 'the company is born';
+};
+const pick = dots.find(d => d.a.id === 'memmaid' && d.r.v === '2.0')!;
+const data = apps.map(a => ({ id: a.id, name: a.name, icon: icon(a.id).src, releases: a.releases.map(r => ({ ...r, when: longDate(r.date) })) }));
+---
+
+<div class="dsy" data-dsy data-pick={`${pick.li}:${pick.ri}`}>
+  <Window kind="editor" title="Releases.timeline" active class="dsy-win">
+    <div class="dsy-scroll" tabindex="0" role="region" aria-label="The release chart, scrolls sideways">
+      <svg class="dsy-svg" viewBox={`0 0 ${W} ${H}`} role="group" aria-labelledby="dsy-t">
+        <title id="dsy-t">{`Every DinarSoft release from 2003 to 2008, one lane per app, ${total} in all, with the magazine's awards under each lane.`}</title>
+        {YEARS.slice(1).map(y => (
+          <g class="dsy-yr">
+            <line x1={x(`${y}-01-01`)} x2={x(`${y}-01-01`)} y1={TOP - 14} y2={H - 6} />
+            <text x={x(`${y}-07-01`)} y={TOP - 18} text-anchor="middle">{y}</text>
+          </g>
+        ))}
+        <g class="dsy-found" data-y="2002">
+          <path d={`M${x('2002-11-15')} ${TOP - 30} l7 8 l-7 8 l-7 -8 z`} />
+          <text x={x('2002-11-15') - 12} y={TOP - 18} text-anchor="end">Founded</text>
+        </g>
+        {apps.map((a, i) => (
+          <g class="dsy-lane">
+            <line x1={L} x2={W - R} y1={laneY(i)} y2={laneY(i)} />
+            <image href={icon(a.id).src} x="0" y={laneY(i) - 15} width="30" height="30" />
+            <text x="36" y={laneY(i) + 5}>{a.name}</text>
+          </g>
+        ))}
+        {marks.map(({ w, li, cx }) => (
+          <g class={`dsy-aw dsy-aw--${w.level.toLowerCase()}`} data-y={w.year}>
+            <rect x={cx - 9} y={laneY(li) + 11} width="18" height="13" rx="2" />
+            <text x={cx} y={laneY(li) + 21} text-anchor="middle">{w.level[0]}</text>
+          </g>
+        ))}
+        {dots.map(({ a, li, ri, r, major, cx, lift }) => (
+          <g class:list={['dsy-dot', { major }]} data-y={yearOf(r.date)} data-k={`${li}:${ri}`} tabindex="0" role="button" aria-label={`${a.name} ${r.v}, ${longDate(r.date)}`}>
+            <circle class="dsy-hit" cx={cx} cy={laneY(li)} r="15" />
+            <circle class="dsy-c" cx={cx} cy={laneY(li)} r={major ? 8 : 5.5} />
+            {major && <text x={cx} y={laneY(li) - 14 - lift} text-anchor="middle">{r.v}</text>}
+          </g>
+        ))}
+        <g class="dsy-head" aria-hidden="true">
+          <line x1="0" x2="0" y1={TOP - 34} y2={H - 4} />
+        </g>
+      </svg>
+    </div>
+    <ul class="dsy-key" aria-label="Key">
+      <li><i class="dsy-k-dot"></i>A release</li><li><i class="dsy-k-dot big"></i>A major version</li>
+      <li><span class="dsx-lv dsx-lv--winner">W</span> Winner</li><li><span class="dsx-lv dsx-lv--finalist">F</span> Finalist</li><li><span class="dsx-lv dsx-lv--nominee">N</span> Nominee</li>
+    </ul>
+    <Scrubber n={YEARS.length} at={YEARS.length - 1} label="Year, from 2002 to 2008" />
+  </Window>
+
+  <div class="dsy-side">
+    <Window kind="panel" title="Properties" class="dsy-props">
+      <div class="dsy-rel" aria-live="polite">
+        <div class="dsy-rel-h">
+          <img data-r-icon src={icon(pick.a.id).src} width="40" height="40" alt="" />
+          <div>
+            <p class="dsy-rel-n" data-r-name>{pick.a.name} {pick.r.v}</p>
+            <p class="dsy-rel-d" data-r-date>{longDate(pick.r.date)}</p>
+          </div>
+        </div>
+        <ul class="dsy-notes" data-r-notes>{pick.r.notes.map(n => <li>{n}</li>)}</ul>
+      </div>
+      <div class="dsy-step" hidden>
+        <button type="button" class="button k-btn" data-r="-1" aria-label="The version before">◄ Before</button>
+        <button type="button" class="button k-btn" data-r="1" aria-label="The version after">After ►</button>
+      </div>
+    </Window>
+    <Window kind="panel" title="Output" class="dsy-out">
+      <p class="dsy-show">Show output from: <b>DinarSoft</b></p>
+      <div class="dsy-log" aria-live="polite" tabindex="0">
+        {YEARS.map(y => (
+          <ol class="dsy-group" data-y={y}>
+            <li class="dsy-sep">------ {y} ------</li>
+            {log[y].map((l, i) => <li class={`dsy-l dsy-l--${l.kind}`} style={`--i:${i}`}><span>{l.tag ?? (l.d.length > 7 ? short(l.d) : longDate(l.d).split(' ')[0].slice(0, 3))}</span> {l.text}</li>)}
+            <li class="dsy-sep">====== {y}: {sum(y)} ======</li>
+          </ol>
+        ))}
+      </div>
+    </Window>
+  </div>
+  <script type="application/json" data-dsy-json set:html={JSON.stringify(data)} />
+</div>
+
+<style>
+  .dsy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 24px; align-items: start; }
+  .dsy-scroll { overflow-x: auto; scrollbar-width: thin; }
+  .dsy-scroll:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .dsy-svg { width: 100%; min-width: 640px; height: auto; font-family: var(--ds-verdana); }
+  .dsy-yr line { stroke: oklch(0.8 0.02 250); stroke-dasharray: 2 4; }
+  .dsy-yr text { font-size: 16px; font-weight: 700; fill: oklch(0.35 0.03 255); }
+  .dsy-found path { fill: var(--ds-red); }
+  .dsy-found text { font-size: 13px; fill: var(--ds-red); font-weight: 700; }
+  .dsy-lane line { stroke: oklch(0.82 0.02 250); stroke-width: 2; }
+  .dsy-lane text { font-size: 15px; fill: #222; }
+  .dsy-dot { cursor: pointer; outline: none; }
+  .dsy-hit { fill: transparent; }
+  .dsy-c { fill: #fff; stroke: var(--ds-red); stroke-width: 3; transition: r 0.2s var(--quart); }
+  .dsy-dot.major .dsy-c { fill: var(--ds-red); }
+  .dsy-dot text { font-size: 13px; font-weight: 700; fill: var(--ds-ink); }
+  .dsy-dot:hover .dsy-c, .dsy-dot:focus-visible .dsy-c { stroke: var(--xp-sel); stroke-width: 4; }
+  .dsy-dot:focus-visible .dsy-hit { stroke: var(--focus); stroke-width: 2; }
+  .dsy-dot.on .dsy-c { stroke: var(--xp-sel); fill: var(--xp-sel); }
+  .dsy-aw rect { stroke-width: 1; }
+  .dsy-aw text { font-size: 11px; font-weight: 700; }
+  .dsy-aw--winner rect { fill: #1d1dcc; } .dsy-aw--winner text { fill: #ffef3d; }
+  .dsy-aw--finalist rect { fill: #8f2238; } .dsy-aw--finalist text { fill: #fff; }
+  .dsy-aw--nominee rect { fill: #fff; stroke: #8a8a8a; } .dsy-aw--nominee text { fill: #3d3d3d; }
+  /* Things that have not happened yet at the playhead fade back */
+  .dsy-dot, .dsy-aw, .dsy-found { transition: opacity 0.35s var(--quart); }
+  .dsy-svg .later { opacity: 0.14; }
+  .dsy-head { display: none; }
+  :global(.dsy.is-live) .dsy-head { display: block; }
+  .dsy-head line { stroke: var(--xp-sel); stroke-width: 3; }
+  .dsy-key { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; margin: 10px 0 14px; font: 400 0.8125rem/1.6 var(--ds-verdana); color: var(--ink-2); }
+  .dsy-key li { display: flex; align-items: center; gap: 6px; }
+  .dsy-k-dot { width: 10px; height: 10px; border-radius: 50%; border: 2.5px solid var(--ds-red); background: #fff; }
+  .dsy-k-dot.big { width: 14px; height: 14px; background: var(--ds-red); }
+
+  .dsy-side { display: grid; gap: 18px; }
+  .dsy-rel-h { display: flex; gap: 12px; align-items: center; }
+  .dsy-rel-n { font: 700 1.25rem/1.2 var(--ds-arial); color: var(--ds-ink); }
+  .dsy-rel-d { font: 400 0.875rem/1.4 var(--ds-verdana); color: var(--ds-rust); }
+  .dsy-notes { margin: 12px 0 0 18px; font-size: 0.9375rem; line-height: 1.5; }
+  .dsy-notes li + li { margin-top: 4px; }
+  .dsy-step { display: flex; gap: 10px; margin-top: 14px; }
+  .dsy-step .k-btn { box-shadow: none; flex: 1; }
+  .dsy-show { padding-bottom: 6px; margin-bottom: 6px; border-bottom: 1px solid var(--rule); font: 400 0.8125rem/1.4 var(--ds-verdana); }
+  .dsy-log { max-height: 300px; overflow-y: auto; font: 400 0.8125rem/1.55 var(--mono); }
+  .dsy-group { list-style: none; }
+  :global(.dsy.is-live) .dsy-group:not(.on) { display: none; }
+  .dsy-sep { color: oklch(0.45 0.02 255); white-space: pre-wrap; }
+  .dsy-l span { display: inline-block; min-width: 6.5ch; color: oklch(0.45 0.02 255); }
+  .dsy-l--win { color: #1d1dcc; font-weight: 600; }
+  .dsy-l--co { color: var(--ds-red); font-weight: 600; }
+  :global(.dsy.is-live) .dsy-group.on .dsy-l { animation: dsy-type 0.3s var(--quart) both; animation-delay: calc(var(--i) * 45ms); }
+  @keyframes dsy-type { from { opacity: 0; translate: -6px 0; } }
+
+  @media (max-width: 1100px) {
+    .dsy { grid-template-columns: minmax(0, 1fr); }
+    .dsy-side { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber } from '../scrubber';
+
+  type R = { v: string; date: string; when: string; notes: string[] };
+  type A = { id: string; name: string; icon: string; releases: R[] };
+  const YEARS = [2002, 2003, 2004, 2005, 2006, 2007, 2008];
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-dsy]').forEach(root => {
+    const data: A[] = JSON.parse(root.querySelector('[data-dsy-json]')!.textContent!);
+    const svg = root.querySelector<SVGSVGElement>('.dsy-svg')!;
+    const scroll = root.querySelector<HTMLElement>('.dsy-scroll')!;
+    const head = root.querySelector<SVGGElement>('.dsy-head')!;
+    const timed = [...svg.querySelectorAll<SVGGElement>('[data-y]')];
+    const groups = [...root.querySelectorAll<HTMLElement>('.dsy-group')];
+    const dots = [...svg.querySelectorAll<SVGGElement>('.dsy-dot')];
+    const vb = svg.viewBox.baseVal;
+    // The playhead sits at the end of the chosen year: x of 1 January of the next year
+    const xEnd = (y: number) => {
+      const t0 = Date.UTC(2002, 9, 1), t1 = Date.UTC(2009, 0, 1);
+      return 150 + ((Date.UTC(y + 1, 0, 1) - t0) / (t1 - t0)) * (vb.width - 150 - 20);
+    };
+    let px = xEnd(2008);
+    head.setAttribute('transform', `translate(${px} 0)`);
+
+    const year = (i: number, how: string) => {
+      const y = YEARS[i];
+      timed.forEach(el => el.classList.toggle('later', +el.dataset.y! > y));
+      groups.forEach(g => g.classList.toggle('on', +g.dataset.y! === y));
+      const to = xEnd(y);
+      const o = { x: px };
+      gsap.to(o, { x: to, duration: how === 'jump' || reduce() ? 0 : 0.6, ease: 'power2.inOut', onUpdate: () => head.setAttribute('transform', `translate(${o.x} 0)`) });
+      px = to;
+      // On a narrow screen the chart scrolls: keep the playhead in view
+      const want = to * (svg.getBoundingClientRect().width / vb.width) - scroll.clientWidth * 0.7;
+      if (scroll.scrollWidth > scroll.clientWidth) scroll.scrollTo({ left: Math.max(0, want), behavior: reduce() ? 'instant' : 'smooth' });
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, year, { speed: 1.4 });
+
+    // Properties: the chosen release, with the versions before and after it
+    let [ai, ri] = root.dataset.pick!.split(':').map(Number);
+    const pick = (a: number, r: number) => {
+      ai = a; ri = r;
+      const app = data[a], rel = app.releases[r];
+      root.querySelector<HTMLImageElement>('[data-r-icon]')!.src = app.icon;
+      root.querySelector('[data-r-name]')!.textContent = `${app.name} ${rel.v}`;
+      root.querySelector('[data-r-date]')!.textContent = rel.when;
+      const ul = root.querySelector('[data-r-notes]')!;
+      ul.replaceChildren(...rel.notes.map(n => Object.assign(document.createElement('li'), { textContent: n })));
+      dots.forEach(d => d.classList.toggle('on', d.dataset.k === `${a}:${r}`));
+      root.querySelectorAll<HTMLButtonElement>('[data-r]').forEach(b => b.setAttribute('aria-disabled', String(+b.dataset.r! < 0 ? r === 0 : r === app.releases.length - 1)));
+    };
+    dots.forEach(d => {
+      const [a, r] = d.dataset.k!.split(':').map(Number);
+      d.addEventListener('click', () => pick(a, r));
+      d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(a, r); } });
+    });
+    root.querySelector<HTMLElement>('.dsy-step')!.hidden = false;
+    root.querySelectorAll<HTMLButtonElement>('[data-r]').forEach(b => b.addEventListener('click', () => {
+      const r = ri + +b.dataset.r!;
+      if (r >= 0 && r < data[ai].releases.length) pick(ai, r);
+    }));
+
+    root.classList.add('is-live');
+    pick(ai, ri);
+    s.go(YEARS.length - 1, 'jump');
+  });
+</script>

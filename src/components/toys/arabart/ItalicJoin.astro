@@ -1,0 +1,62 @@
+---
+// Why his italic keeps letters joined: the slant is measured from the line, the same for every letter, so the
+// joining strokes on the line never move apart. Measured from each letter's own top, they would.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { slanted, pixPath } from './core.ts';
+import { ssrBin } from './ssr.ts';
+
+interface Props { id?: string; keys?: string }
+const { id = 'italicjoin', keys = '~guvfd' } = Astro.props;
+const N = 8;
+const bin = ssrBin();
+const VB = '-112 -35 136 37';
+const his = pixPath(slanted(bin, keys, 3, 1, 'line')), top = pixPath(slanted(bin, keys, 3, 1, 'top'));
+---
+
+<div class="ij" id={id} data-italicjoin data-keys={keys} data-n={N}>
+  <div class="ij-pair">
+    <Window title="HIS WAY  slant from the line" kind="screen" class="ij-a">
+      <svg viewBox={VB} class="ij-svg" shape-rendering="crispEdges" role="img" aria-label="العربي in his italic: every letter still joined">
+        <line class="ij-line" x1="-112" x2="24" y1="-1.5" y2="-1.5" />
+        <path class="ij-px" data-a="line" d={his} />
+      </svg>
+    </Window>
+    <Window title="THE OTHER WAY  slant from each letter's top" kind="screen" class="ij-b">
+      <svg viewBox={VB} class="ij-svg" shape-rendering="crispEdges" role="img" aria-label="العربي slanted from each letter's top: the joins break apart">
+        <line class="ij-line" x1="-112" x2="24" y1="-1.5" y2="-1.5" />
+        <path class="ij-px ij-px--b" data-a="top" d={top} />
+      </svg>
+    </Window>
+  </div>
+  <Scrubber n={N + 1} at={N} label="How far the letters slant" />
+</div>
+
+<style is:global>
+  .ij-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-bottom: 18px; }
+  .ij-svg { width: 100%; height: auto; background: var(--vga-0); padding: 6%; overflow: visible; }
+  .ij-px { fill: var(--vga-14); }
+  .ij-px--b { fill: var(--vga-12); }
+  .ij-line { stroke: var(--vga-11); stroke-width: 0.25; stroke-dasharray: 1 1; opacity: 0.7; }
+  @media (max-width: 760px) { .ij-pair { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  import { fonts, slanted, pixPath } from './core.ts';
+  import { scrubber } from '../scrubber';
+
+  document.querySelectorAll<HTMLElement>('[data-italicjoin]').forEach(async root => {
+    const bin = await fonts();
+    const N = +root.dataset.n!, keys = root.dataset.keys!;
+    const paths = [...root.querySelectorAll<SVGPathElement>('[data-a]')];
+    // Precompute every frame: nine slants for each way
+    const frames = paths.map(p => Array.from({ length: N + 1 }, (_, i) => pixPath(slanted(bin, keys, 3, i / N, p.dataset.a as 'line' | 'top'))));
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, i => paths.forEach((p, k) => p.setAttribute('d', frames[k][i])), { speed: 0.14 });
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { s.go(0, 'jump'); s.play(); }
+    }, { threshold: 0.6 });
+    io.observe(root);
+  });
+</script>

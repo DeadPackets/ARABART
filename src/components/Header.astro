@@ -1,191 +1,229 @@
 ---
-const base = import.meta.env.BASE_URL;
-const currentPath = Astro.url.pathname;
+// One menu, the same items in the same order in every era. The era (on <html>) only changes how it is drawn:
+// Borland menu bar and Norton Commander key bar, Windows 3.1 menu, Windows 95 menu and taskbar, Visual Studio 2005 menu and toolbar.
+// On phones the menu opens from a bottom bar (native popover, works without JS).
+import { ERAS, type Era } from '../lib/eras/eras';
 
-const navItems = [
-  { label: 'Archive', href: `${base}` },
-  { label: 'Timeline', href: `${base}/timeline` },
-  { label: 'Terminal', href: `${base}/terminal` },
-  { label: 'About', href: `${base}/about` },
-];
-
-function isActive(href: string): boolean {
-  const normalized = currentPath.replace(/\/$/, '');
-  const normalizedHref = href.replace(/\/$/, '');
-  if (normalizedHref === base.replace(/\/$/, '')) {
-    return normalized === normalizedHref;
-  }
-  return normalized.startsWith(normalizedHref);
+interface Props {
+  era: Era;
+  keys?: { k: string; label: string; href?: string; act?: string }[];
+  when?: [string, string];
 }
+const { era, keys = [], when } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const here = Astro.url.pathname.replace(/\/$/, '');
+
+const items = [
+  { label: 'Home', hk: 0, href: `${base}/`, on: here === base || here === '' },
+  { label: 'ARABART', hk: 0, href: `${base}/arabart/`, on: here.startsWith(`${base}/arabart`) },
+  { label: 'Programs', hk: 0, href: `${base}/#programs`, on: here.startsWith(`${base}/program/`) },
+  { label: 'Career', hk: 0, href: `${base}/career/`, on: here.startsWith(`${base}/career`) },
+  { label: 'Patents', hk: 2, href: `${base}/patents/`, on: here.startsWith(`${base}/patents`) },
+  { label: 'DinarSoft', hk: 0, href: `${base}/dinarsoft/`, on: here.startsWith(`${base}/dinarsoft`) },
+  { label: 'Every Byte', hk: 0, href: `${base}/bytes/`, on: here.startsWith(`${base}/bytes`) },
+  { label: 'Glossary', hk: 0, href: `${base}/glossary/`, on: here.startsWith(`${base}/glossary`) },
+];
+const all = [...keys, { k: 'F1', label: 'Glossary', href: `${base}/glossary/` }];
+const [place, year] = when ?? ERAS[era].when;
 ---
 
-<header class="site-header" role="banner">
-  <div class="header-inner container">
-    <a href={base} class="header-brand" aria-label="DOSArchive home">
-      <span class="header-prompt" aria-hidden="true">C:\&gt;</span>
-      <span class="header-title">DOSArchive</span>
-    </a>
-
-    <button class="mobile-toggle" aria-label="Toggle navigation" aria-expanded="false" id="nav-toggle">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
-    <nav class="header-nav" id="main-nav" aria-label="Main navigation">
-      {navItems.map(item => (
-        <a
-          href={item.href}
-          class:list={['nav-link', { 'nav-link--active': isActive(item.href) }]}
-        >
-          {item.label}
-        </a>
-      ))}
+<header class="sh" data-sh>
+  <div class="sh-top">
+    <span class="sh-logo" aria-hidden="true"><i></i></span>
+    <nav class="sh-nav" id="sh-nav" aria-label="Main" popover>
+      <p class="sh-banner" aria-hidden="true"><b>ARABART</b> Yasser Awad</p>
+      <ul>
+        {items.map((it, i) => (
+          <li>
+            <a href={it.href} accesskey={it.label[it.hk].toLowerCase()} aria-current={it.on ? 'page' : undefined} style={`--i:${i}`}>
+              <span class="sh-ico" aria-hidden="true"></span>
+              <span class="sh-lbl">{it.label.slice(0, it.hk)}<span class="hk">{it.label[it.hk]}</span>{it.label.slice(it.hk + 1)}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </nav>
+    <span class="sh-tools" aria-hidden="true"><i></i><i></i><i></i><i class="go"></i></span>
+    <p class="sh-when" aria-hidden="true"><span><b>Yasser Awad</b> · <span data-when-place>{place}</span>, <span data-when-year>{year}</span></span></p>
+  </div>
+
+  <div class="sh-low">
+    <button class="sh-menu" type="button" popovertarget="sh-nav" aria-label="Menu"><span class="sh-flag" aria-hidden="true"></span><span class="sh-menu-l">Menu</span></button>
+    <a class="sh-start" href={`${base}/`} aria-label="Start, home"><span class="sh-flag" aria-hidden="true"></span>Start</a>
+    <ul class="sh-keys" aria-label="Keys">
+      {all.map(it => (
+        <li>
+          {it.href ? <a href={it.href}><b>{it.k}</b>{it.label}</a>
+          : it.act ? <button type="button" data-act={it.act}><b>{it.k}</b>{it.label}</button>
+          : <span><b>{it.k}</b>{it.label}</span>}
+        </li>
+      ))}
+    </ul>
+    <span class="sh-tray" aria-hidden="true"><span data-when-year>{year}</span></span>
   </div>
 </header>
 
-<style>
-  .site-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    height: var(--header-height);
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
-    backdrop-filter: blur(8px);
+<style is:global>
+  /* Shared skeleton. Both bars are fixed, so an era change never moves the page */
+  .sh-top, .sh-low { position: fixed; left: 0; right: 0; z-index: var(--z-bar); display: flex; align-items: stretch; white-space: nowrap; }
+  .sh-top { top: 0; height: var(--mb); padding-inline: calc(var(--gut) - 12px); view-transition-name: sh-top; }
+  .sh-low { bottom: 0; height: var(--sl); gap: 2px; padding-inline: calc(var(--gut) - 12px); view-transition-name: sh-low; }
+  body { padding-top: var(--mb); }
+  .sh-nav[popover] { display: flex; position: static; inset: auto; width: auto; height: auto; margin: 0; padding: 0; border: 0; background: none; color: inherit; overflow: visible; }
+  .sh-nav ul { display: flex; list-style: none; }
+  .sh-nav a, .sh-keys :is(a, button, span), .sh-menu, .sh-start {
+    display: flex; align-items: center; height: 100%; padding: 0 12px; color: inherit; font: inherit; text-decoration: none; background: none; border: 0; cursor: pointer;
+  }
+  .sh-keys { display: flex; list-style: none; min-width: 0; overflow: hidden; }
+  .sh-keys span { cursor: default; }
+  .sh-banner, .sh-ico, .sh-tools, .sh-menu, .sh-start, .sh-tray, .sh-flag { display: none; }
+  .sh-when { margin-left: auto; display: flex; align-items: center; gap: 0.4em; padding: 0 8px; }
+  .sh-logo { display: flex; align-items: center; padding: 0 10px; }
+  .sh.redraw :is(.sh-top, .sh-low) { animation: sh-redraw 0.42s steps(6, end); }
+  @keyframes sh-redraw { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+
+  /* dos: Borland menu bar on top, Norton Commander key bar at the bottom */
+  @scope ([data-era='dos']) to ([data-era]) {
+    .sh-top { background: var(--gray); color: var(--black); font: 400 16px/1 var(--font-dos); }
+    .sh-logo i::before { content: '\2261'; }
+    .sh-nav a:is(:hover, :focus-visible, [aria-current='page']) { background: var(--green); color: var(--black); outline: 0; }
+    .sh-nav .hk { color: var(--hot); }
+    .sh-nav a:is(:hover, :focus-visible, [aria-current='page']) .hk { color: inherit; }
+    .sh-when b { font-weight: 400; }
+    .sh-low { gap: 0; padding-inline: 0; background: var(--black); color: var(--black); font: 400 16px/1 var(--font-dos); }
+    .sh-keys li { display: flex; }
+    .sh-keys :is(a, button, span) { padding: 0 14px 0 0; margin-left: 10px; background: var(--vga-3); }
+    .sh-keys b { align-self: stretch; display: flex; align-items: center; margin-right: 8px; padding: 0 4px 0 6px; font-weight: 400; color: var(--vga-15); background: var(--black); }
+    .sh-keys :is(a, button):is(:hover, :focus-visible) { background: var(--vga-11); outline: 0; }
   }
 
-  .header-inner {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    gap: 2rem;
+  /* win31: a white menu bar with underlined hotkeys, a silver status line */
+  @scope ([data-era='win31']) to ([data-era]) {
+    .sh-top { background: var(--w-white); color: var(--w-black); font: 500 0.9375rem/1 var(--font-pixel); border-bottom: 1px solid var(--w-black); }
+    .sh-logo { padding: 0; margin: 6px 10px 6px 0; width: 26px; justify-content: center; background: var(--w-silver); border: 1px solid var(--w-black); }
+    .sh-logo i { width: 14px; height: 5px; background: var(--w-white); border: 1px solid var(--w-black); box-shadow: 1px 1px 0 var(--w-gray); }
+    .sh-nav .hk { text-decoration: underline; text-underline-offset: 2px; }
+    .sh-nav a:is(:hover, :focus-visible, [aria-current='page']) { background: var(--w-navy); color: var(--w-white); outline: 0; }
+    .sh-low { background: var(--w-silver); color: var(--w-black); font: 500 0.875rem/1 var(--font-pixel); border-top: 1px solid var(--w-black); }
+    .sh-keys b { margin-right: 6px; font-weight: 700; }
+    .sh-keys :is(a, button):is(:hover, :focus-visible) { text-decoration: underline; outline: 0; }
   }
 
-  .header-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    flex-shrink: 0;
+  /* win9x: a silver menu bar, and the taskbar: Start, buttons, and a tray clock showing the year */
+  @scope ([data-era='win9x']) to ([data-era]) {
+    .sh-top { background: var(--w-silver); color: var(--w-black); font: 400 0.9375rem/1 var(--font-pixel); box-shadow: inset 0 -1px var(--w-gray), inset 0 1px var(--w-white); }
+    .sh-logo i { width: 18px; height: 16px; background: linear-gradient(var(--w-navy) 0 4px, var(--w-white) 4px); border: 1px solid var(--w-black); }
+    .sh-nav .hk { text-decoration: underline; text-underline-offset: 2px; }
+    .sh-nav a { padding: 0 10px; }
+    .sh-nav a:is(:hover, :focus-visible, [aria-current='page']) { background: var(--w-navy); color: var(--w-white); outline: 0; }
+    .sh-low { gap: 4px; padding: 3px 3px 2px; background: var(--w-silver); color: var(--w-black); font: 400 0.875rem/1 var(--font-pixel); box-shadow: inset 0 1px var(--w-silver), inset 0 2px var(--w-white); }
+    .sh-start, .sh-keys :is(a, button, span), .sh-tray { box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray); }
+    .sh-start { display: flex; gap: 5px; padding: 0 8px 0 5px; font-weight: 700; }
+    .sh-start:active { box-shadow: inset 1px 1px var(--w-black), inset -1px -1px var(--w-white); }
+    .sh-flag { display: block; width: 16px; height: 14px; background: conic-gradient(from 90deg, #00a000 25%, #ffd000 0 50%, #0040ff 0 75%, #ff2000 0); transform: skewY(-8deg); }
+    .sh-keys { gap: 3px; }
+    .sh-keys :is(a, button, span) { min-width: 120px; padding: 0 10px; }
+    .sh-keys b { margin-right: 6px; }
+    .sh-tray { display: flex; align-items: center; margin-left: auto; padding: 0 12px; box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white); }
+    .sh-low .sh-keys :is(a, button):focus-visible, .sh-start:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -5px; }
   }
 
-  .header-prompt {
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
+  /* vs2005: Office 2003 style menu and toolbar on Windows XP; a status bar that says Ready */
+  @scope ([data-era='vs2005']) to ([data-era]) {
+    .sh-top { background: linear-gradient(#fbfbfb, #eceae0); color: var(--w-black); font: 400 0.9375rem/1 var(--sans); border-bottom: 1px solid #c5c2b2; }
+    .sh-logo i { width: 18px; height: 18px; border-radius: 3px; background: linear-gradient(135deg, #8a6fd6, #4e2f9e); box-shadow: inset 0 0 0 2px oklch(1 0 0 / 0.35); }
+    .sh-nav .hk { text-decoration: underline; text-underline-offset: 2px; }
+    .sh-nav a { margin: 4px 0; padding: 0 9px; border: 1px solid transparent; }
+    .sh-nav a:is(:hover, :focus-visible, [aria-current='page']) { background: #c1d2ee; border-color: var(--xp-sel); color: var(--w-black); outline: 0; }
+    .sh-tools { display: flex; align-items: center; gap: 4px; padding: 0 10px; margin-left: 8px; border-left: 1px solid #c5c2b2; }
+    .sh-tools i { width: 16px; height: 16px; border-radius: 2px; background: linear-gradient(#fff, #c9d6ec); border: 1px solid #8ea2c6; }
+    .sh-tools i.go { width: 0; height: 0; margin-left: 6px; border: 7px solid transparent; border-left: 11px solid #2e9b2e; border-right: 0; border-radius: 0; background: none; }
+    .sh-low { background: linear-gradient(#f3f1e8, #e2dfd1); color: oklch(0.25 0.03 255); font: 400 0.875rem/1 var(--sans); border-top: 1px solid #c5c2b2; }
+    .sh-low::before { content: 'Ready'; display: flex; align-items: center; padding: 0 14px; border-right: 1px solid #c5c2b2; }
+    .sh-keys b { margin-right: 6px; font-weight: 600; }
+    .sh-keys :is(a, button):is(:hover, :focus-visible) { background: #c1d2ee; outline: 1px solid var(--xp-sel); outline-offset: -1px; }
+    .sh-tray { display: flex; align-items: center; margin-left: auto; padding: 0 14px; border-left: 1px solid #c5c2b2; }
   }
 
-  .header-title {
-    font-family: var(--font-display);
-    font-size: 1.6rem;
-    color: var(--color-phosphor);
-    text-shadow: var(--glow-sm);
-    letter-spacing: 0.04em;
+  /* The current page's item is already highlighted, so its keyboard focus needs its own mark */
+  .sh-nav a[aria-current='page']:focus-visible { outline: 2px dotted currentColor; outline-offset: -6px; }
+  /* Tablets and small laptops: every menu item stays on one line and nothing is cut; the place and year return at 1200 px */
+  @media (min-width: 761px) and (max-width: 1199px) {
+    .sh-top .sh-when { display: none; }
   }
-
-  .header-brand:hover .header-title {
-    text-shadow: var(--glow-md);
+  @media (min-width: 761px) and (max-width: 999px) {
+    .sh-top .sh-tools { display: none; }
+    .sh-top .sh-nav a { padding-inline: 8px; }
   }
-
-  .header-nav {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    margin-left: auto;
-  }
-
-  .nav-link {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    color: var(--color-text-muted);
-    text-decoration: none;
-    padding: 0.35rem 0.85rem;
-    border: 1px solid transparent;
-    transition: all 0.2s ease;
-    letter-spacing: 0.04em;
-  }
-
-  .nav-link:hover {
-    color: var(--color-phosphor);
-    border-color: var(--color-border);
-    text-shadow: var(--glow-sm);
-  }
-
-  .nav-link--active {
-    color: var(--color-phosphor);
-    border-color: var(--color-phosphor-dim);
-    background: rgba(51, 255, 51, 0.04);
-    text-shadow: var(--glow-sm);
-  }
-
-  /* ── Mobile Toggle ──── */
-  .mobile-toggle {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    background: none;
-    border: 1px solid var(--color-border);
-    padding: 8px 6px;
-    cursor: pointer;
-    margin-left: auto;
-  }
-
-  .mobile-toggle span {
-    display: block;
-    width: 18px;
-    height: 2px;
-    background: var(--color-phosphor);
-    transition: transform 0.2s ease, opacity 0.2s ease;
-  }
-
-  .mobile-toggle[aria-expanded="true"] span:nth-child(1) {
-    transform: rotate(45deg) translate(4px, 4px);
-  }
-  .mobile-toggle[aria-expanded="true"] span:nth-child(2) {
-    opacity: 0;
-  }
-  .mobile-toggle[aria-expanded="true"] span:nth-child(3) {
-    transform: rotate(-45deg) translate(4px, -4px);
-  }
-
-  @media (max-width: 640px) {
-    .mobile-toggle {
-      display: flex;
+  /* Phones: no top bar; a bottom bar you reach with your thumb, and the menu pops up from it */
+  @media (max-width: 760px) {
+    .sh-top { height: 0; padding: 0; overflow: visible; }
+    .sh-top > :not(.sh-nav) { display: none; }
+    .sh-low { padding: 0 6px env(safe-area-inset-bottom); height: calc(var(--sl) + env(safe-area-inset-bottom)); align-items: center; }
+    .sh-low > * { height: 44px; }
+    .sh-menu { display: flex; gap: 8px; padding: 0 14px; }
+    .sh-start { display: none !important; }
+    .sh-keys { flex: 1; }
+    .sh-keys li:not(:first-child) { display: none; }
+    .sh-tray { display: flex; align-items: center; margin-left: auto; padding: 0 10px; }
+    .sh-nav:not(:popover-open) { display: none; }
+    .sh-nav:popover-open {
+      position: fixed; inset: auto auto calc(var(--sl) + env(safe-area-inset-bottom) + 6px) 6px; width: min(300px, calc(100vw - 12px));
+      display: flex; flex-direction: column; padding: 6px; overflow: auto; max-height: calc(100svh - var(--sl) - 24px);
     }
+    .sh-nav ul { flex-direction: column; }
+    .sh-nav a { min-height: 48px; padding: 0 14px; }
+    .sh-nav:popover-open a { animation: sh-item 0.32s var(--expo) both; animation-delay: calc(var(--i) * 22ms); }
+    @keyframes sh-item { from { opacity: 0; translate: 0 8px; } }
 
-    .header-nav {
-      display: none;
-      position: absolute;
-      top: var(--header-height);
-      left: 0;
-      right: 0;
-      flex-direction: column;
-      background: var(--color-bg);
-      border-bottom: 1px solid var(--color-border);
-      padding: 0.5rem;
+    @scope ([data-era='dos']) to ([data-era]) {
+      .sh-low { gap: 6px; padding-left: 6px; background: var(--black); }
+      .sh-menu, .sh-keys :is(a, button, span) { background: var(--vga-3); color: var(--black); }
+      .sh-menu-l::before { content: 'F10 '; color: var(--vga-15); }
+      .sh-tray { color: var(--vga-3); }
+      .sh-nav:popover-open { background: var(--gray); color: var(--black); font: 400 16px/1 var(--font-dos); border: 0; box-shadow: inset 0 0 0 4px var(--gray), inset 0 0 0 5px var(--black), 10px 10px 0 oklch(0 0 0 / 0.55); padding: 10px; }
     }
+    @scope ([data-era='win31']) to ([data-era]) {
+      .sh-menu { background: var(--w-silver); border: 1px solid var(--w-black); border-radius: 4px; box-shadow: inset -2px -2px var(--w-gray), inset 2px 2px var(--w-white); }
+      .sh-nav:popover-open { background: var(--w-white); color: var(--w-black); border: 1px solid var(--w-black); box-shadow: 4px 4px 0 oklch(0 0 0 / 0.5); font: 500 1.0625rem/1 var(--font-pixel); }
+    }
+    @scope ([data-era='win9x']) to ([data-era]) {
+      .sh-menu { padding: 0 10px; font-weight: 700; box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray); }
+      .sh-menu:is([aria-expanded='true'], :active) { box-shadow: inset 1px 1px var(--w-black), inset -1px -1px var(--w-white); }
+      .sh-menu-l { font-size: 0; }
+      .sh-menu-l::before { content: 'Start'; font-size: 0.9375rem; }
+      .sh-keys :is(a, button, span) { min-width: 0; }
+      .sh-nav:popover-open {
+        flex-direction: row; padding: 3px; background: var(--w-silver); color: var(--w-black); font: 400 1.0625rem/1 var(--font-pixel); border: 0;
+        box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-silver), inset -2px -2px var(--w-gray), inset 2px 2px var(--w-white);
+      }
+      .sh-banner { display: flex; align-items: flex-end; gap: 6px; width: 30px; padding: 10px 0; writing-mode: vertical-rl; rotate: 180deg; background: linear-gradient(var(--w-gray), var(--w-navy)); color: var(--w-silver); font: 400 1.125rem/30px var(--sans); }
+      .sh-banner b { color: var(--w-white); font-weight: 800; }
+      .sh-nav:popover-open ul { flex: 1; }
+      .sh-nav .sh-ico { display: block; width: 22px; height: 20px; margin-right: 10px; background: linear-gradient(var(--w-navy) 0 5px, var(--w-white) 5px); border: 1px solid var(--w-black); box-shadow: 2px 2px 0 var(--w-gray); }
+    }
+    @scope ([data-era='vs2005']) to ([data-era]) {
+      .sh-low::before { display: none; }
+      .sh-menu { border: 1px solid transparent; }
+      .sh-menu::before { content: '\2630'; }
+      .sh-nav:popover-open { background: linear-gradient(90deg, #f1efe6 0 34px, #fcfcf9 34px); color: var(--w-black); border: 1px solid #8a867a; box-shadow: 3px 3px 6px oklch(0 0 0 / 0.25); font: 400 1.0625rem/1 var(--sans); }
+      .sh-nav .sh-ico { display: block; width: 16px; height: 16px; margin: 0 18px 0 -6px; border-radius: 2px; background: linear-gradient(#fff, #c9d6ec); border: 1px solid #8ea2c6; }
+    }
+  }
 
-    .header-nav.open {
-      display: flex;
-    }
-
-    .nav-link {
-      padding: 0.6rem 1rem;
-      width: 100%;
-    }
+  @media (prefers-reduced-motion: reduce) {
+    .sh.redraw :is(.sh-top, .sh-low) { animation: none; }
   }
 </style>
 
 <script>
-  const toggle = document.getElementById('nav-toggle');
-  const nav = document.getElementById('main-nav');
-  toggle?.addEventListener('click', () => {
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!expanded));
-    nav?.classList.toggle('open');
+  // F1 opens the glossary, as F1 opened help in every program of the era
+  addEventListener('keydown', e => {
+    if (e.key !== 'F1') return;
+    e.preventDefault();
+    if (!location.pathname.endsWith('/glossary/')) location.href = `${import.meta.env.BASE_URL}/glossary/`;
   });
+  // A link inside the phone menu closes it, so a same-page anchor does not leave the menu open
+  const nav = document.getElementById('sh-nav');
+  nav?.addEventListener('click', e => { if ((e.target as Element).closest('a') && nav.matches(':popover-open')) nav.hidePopover(); });
 </script>

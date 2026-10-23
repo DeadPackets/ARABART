@@ -1,0 +1,137 @@
+<svg class="dg" viewBox="0 0 640 196" role="img" aria-labelledby="fx-number-t">
+<title id="fx-number-t">Two FORM_X numbers as 20 bytes each: x = -1.5 stored in ten's complement, and the constant 3.</title>
+<text class="t-cy" x="90" y="20">14 digits before the point</text>
+<text class="t-cy" x="454" y="20">6 after</text>
+<text x="10" y="57">x=-1.5</text>
+<rect class="box" x="90" y="36" width="24" height="30" />
+<text x="102" y="57" text-anchor="middle">9</text>
+<rect class="box" x="116" y="36" width="24" height="30" />
+<text x="128" y="57" text-anchor="middle">9</text>
+<rect class="box" x="142" y="36" width="24" height="30" />
+<text x="154" y="57" text-anchor="middle">9</text>
+<rect class="box" x="168" y="36" width="24" height="30" />
+<text x="180" y="57" text-anchor="middle">9</text>
+<rect class="box" x="194" y="36" width="24" height="30" />
+<text x="206" y="57" text-anchor="middle">9</text>
+<rect class="box" x="220" y="36" width="24" height="30" />
+<text x="232" y="57" text-anchor="middle">9</text>
+<rect class="box" x="246" y="36" width="24" height="30" />
+<text x="258" y="57" text-anchor="middle">9</text>
+<rect class="box" x="272" y="36" width="24" height="30" />
+<text x="284" y="57" text-anchor="middle">9</text>
+<rect class="box" x="298" y="36" width="24" height="30" />
+<text x="310" y="57" text-anchor="middle">9</text>
+<rect class="box" x="324" y="36" width="24" height="30" />
+<text x="336" y="57" text-anchor="middle">9</text>
+<rect class="box" x="350" y="36" width="24" height="30" />
+<text x="362" y="57" text-anchor="middle">9</text>
+<rect class="box" x="376" y="36" width="24" height="30" />
+<text x="388" y="57" text-anchor="middle">9</text>
+<rect class="box" x="402" y="36" width="24" height="30" />
+<text x="414" y="57" text-anchor="middle">9</text>
+<rect class="box" x="428" y="36" width="24" height="30" />
+<text x="440" y="57" text-anchor="middle">8</text>
+<rect class="box-ink" x="454" y="36" width="24" height="30" />
+<text class="t-bk" x="466" y="57" text-anchor="middle">5</text>
+<rect class="box-ink" x="480" y="36" width="24" height="30" />
+<text class="t-bk" x="492" y="57" text-anchor="middle">0</text>
+<rect class="box-ink" x="506" y="36" width="24" height="30" />
+<text class="t-bk" x="518" y="57" text-anchor="middle">0</text>
+<rect class="box-ink" x="532" y="36" width="24" height="30" />
+<text class="t-bk" x="544" y="57" text-anchor="middle">0</text>
+<rect class="box-ink" x="558" y="36" width="24" height="30" />
+<text class="t-bk" x="570" y="57" text-anchor="middle">0</text>
+<rect class="box-ink" x="584" y="36" width="24" height="30" />
+<text class="t-bk" x="596" y="57" text-anchor="middle">0</text>
+<text x="10" y="117">3</text>
+<rect class="box" x="90" y="96" width="24" height="30" />
+<text x="102" y="117" text-anchor="middle">0</text>
+<rect class="box" x="116" y="96" width="24" height="30" />
+<text x="128" y="117" text-anchor="middle">0</text>
+<rect class="box" x="142" y="96" width="24" height="30" />
+<text x="154" y="117" text-anchor="middle">0</text>
+<rect class="box" x="168" y="96" width="24" height="30" />
+<text x="180" y="117" text-anchor="middle">0</text>
+<rect class="box" x="194" y="96" width="24" height="30" />
+<text x="206" y="117" text-anchor="middle">0</text>
+<rect class="box" x="220" y="96" width="24" height="30" />
+<text x="232" y="117" text-anchor="middle">0</text>
+<rect class="box" x="246" y="96" width="24" height="30" />
+<text x="258" y="117" text-anchor="middle">0</text>
+<rect class="box" x="272" y="96" width="24" height="30" />
+<text x="284" y="117" text-anchor="middle">0</text>
+<rect class="box" x="298" y="96" width="24" height="30" />
+<text x="310" y="117" text-anchor="middle">0</text>
+<rect class="box" x="324" y="96" width="24" height="30" />
+<text x="336" y="117" text-anchor="middle">0</text>
+<rect class="box" x="350" y="96" width="24" height="30" />
+<text x="362" y="117" text-anchor="middle">0</text>
+<rect class="box" x="376" y="96" width="24" height="30" />
+<text x="388" y="117" text-anchor="middle">0</text>
+<rect class="box" x="402" y="96" width="24" height="30" />
+<text x="414" y="117" text-anchor="middle">0</text>
+<rect class="box" x="428" y="96" width="24" height="30" />
+<text x="440" y="117" text-anchor="middle">3</text>
+<rect class="box-ink" x="454" y="96" width="24" height="30" />
+<text class="t-bk" x="466" y="117" text-anchor="middle">0</text>
+<rect class="box-ink" x="480" y="96" width="24" height="30" />
+<text class="t-bk" x="492" y="117" text-anchor="middle">0</text>
+<rect class="box-ink" x="506" y="96" width="24" height="30" />
+<text class="t-bk" x="518" y="117" text-anchor="middle">0</text>
+<rect class="box-ink" x="532" y="96" width="24" height="30" />
+<text class="t-bk" x="544" y="117" text-anchor="middle">0</text>
+<rect class="box-ink" x="558" y="96" width="24" height="30" />
+<text class="t-bk" x="570" y="117" text-anchor="middle">0</text>
+<rect class="box-ink" x="584" y="96" width="24" height="30" />
+<text class="t-bk" x="596" y="117" text-anchor="middle">0</text>
+<path class="wire-hi" d="M453 30 V132" />
+<text x="10" y="160">One byte per digit. First digit 9 is above 4: negative.</text>
+<text class="t-yl" x="10" y="184">99999999999998.5 is -1.5 in ten's complement.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 180" role="img" aria-labelledby="fx-number-tn">
+<title id="fx-number-tn">x = -1.5 stored as 20 digit bytes.</title>
+<text class="t-cy" x="10" y="18">x = -1.5, 20 bytes</text>
+<rect class="box" x="10" y="30" width="26" height="30" />
+<text x="23" y="51" text-anchor="middle">9</text>
+<rect class="box" x="38" y="30" width="26" height="30" />
+<text x="51" y="51" text-anchor="middle">9</text>
+<rect class="box" x="66" y="30" width="26" height="30" />
+<text x="79" y="51" text-anchor="middle">9</text>
+<rect class="box" x="94" y="30" width="26" height="30" />
+<text x="107" y="51" text-anchor="middle">9</text>
+<rect class="box" x="122" y="30" width="26" height="30" />
+<text x="135" y="51" text-anchor="middle">9</text>
+<rect class="box" x="150" y="30" width="26" height="30" />
+<text x="163" y="51" text-anchor="middle">9</text>
+<rect class="box" x="178" y="30" width="26" height="30" />
+<text x="191" y="51" text-anchor="middle">9</text>
+<rect class="box" x="206" y="30" width="26" height="30" />
+<text x="219" y="51" text-anchor="middle">9</text>
+<rect class="box" x="234" y="30" width="26" height="30" />
+<text x="247" y="51" text-anchor="middle">9</text>
+<rect class="box" x="262" y="30" width="26" height="30" />
+<text x="275" y="51" text-anchor="middle">9</text>
+<rect class="box" x="10" y="66" width="26" height="30" />
+<text x="23" y="87" text-anchor="middle">9</text>
+<rect class="box" x="38" y="66" width="26" height="30" />
+<text x="51" y="87" text-anchor="middle">9</text>
+<rect class="box" x="66" y="66" width="26" height="30" />
+<text x="79" y="87" text-anchor="middle">9</text>
+<rect class="box" x="94" y="66" width="26" height="30" />
+<text x="107" y="87" text-anchor="middle">8</text>
+<rect class="box-ink" x="122" y="66" width="26" height="30" />
+<text class="t-bk" x="135" y="87" text-anchor="middle">5</text>
+<rect class="box-ink" x="150" y="66" width="26" height="30" />
+<text class="t-bk" x="163" y="87" text-anchor="middle">0</text>
+<rect class="box-ink" x="178" y="66" width="26" height="30" />
+<text class="t-bk" x="191" y="87" text-anchor="middle">0</text>
+<rect class="box-ink" x="206" y="66" width="26" height="30" />
+<text class="t-bk" x="219" y="87" text-anchor="middle">0</text>
+<rect class="box-ink" x="234" y="66" width="26" height="30" />
+<text class="t-bk" x="247" y="87" text-anchor="middle">0</text>
+<rect class="box-ink" x="262" y="66" width="26" height="30" />
+<text class="t-bk" x="275" y="87" text-anchor="middle">0</text>
+<text x="10" y="124">Light: the 6 digits after</text>
+<text x="10" y="146">the point. First digit 9</text>
+<text class="t-yl" x="10" y="168">is above 4: negative.</text>
+</svg>

@@ -1,0 +1,168 @@
+---
+import Term from '../components/explain/Term.astro';
+import Figure from '../components/explain/Figure.astro';
+import Steps from '../components/explain/Steps.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+// Offsets in the unpacked KVC.EXE: 64-byte header, then segment 0
+const map = (at: number) => `/DOSArchive/bytes/?f=KVC_KVC.EXE&layer=memory&at=${(64 + at).toString(16)}`;
+---
+
+<section id="kvc-tldr">
+  <ul class="tldr">
+    <li>KVC 1.05 (1993) hunts one virus, Koko, in memory and in every program file on a disk, and removes it.</li>
+    <li>It finds Koko in memory by asking the virus its own secret question, then cuts it off with the address the virus hid for itself.</li>
+    <li>It repairs each infected file from the bytes Koko saved. Our test files came back exactly as they were before.</li>
+  </ul>
+</section>
+
+<section id="kvc-memory">
+  <h2>How does KVC find a virus that hides in memory?</h2>
+  <p class="lead">It asks a question only Koko answers: <code>INT 21h</code> with <code>AX = FF0Ch</code>. Koko replies <code>C0C1h</code>; plain DOS never does.</p>
+  <Steps
+    title="KVC.EXE: finding and freezing Koko"
+    steps={[
+      'KVC calls <code>INT 21h</code> with <code>AX = FF0Ch</code>. Entry 21h of the interrupt table points at Koko, so Koko gets the call first.',
+      'Koko answers <code>AX = C0C1h</code>. KVC prints "Found --KoKo (1) virus-- active in RAM".',
+      'Koko parks the real DOS address in entry 3, its private line to DOS. KVC uses the same line: it prints its alarm with <code>INT 3</code>, then sounds a 20-tone siren.',
+      '<code>AX = 3503h</code> through <code>INT 3</code>: DOS reports what entry 3 holds. That is the real DOS address.',
+      '<code>AX = 2521h</code> through <code>INT 3</code>: DOS writes that address into entry 21h. Programs now reach DOS directly.',
+      'KVC asks <code>FF0Ch</code> again. Nobody answers, so it prints "##### Virus Freezed #####". Koko is still in memory, but nothing calls it.',
+    ]}
+  >
+    @@kvc-ram@@
+  </Steps>
+  <p>Koko is a <Term id="tsr">resident</Term> virus. It <Term id="hook">hooks</Term> <Term id="int-21h">INT 21h</Term>, the call every program uses to open, read and run files, so it sees each program before DOS does. It also answers a private call that DOS does not have, and KVC uses that call as its detector.</p>
+  <p>KVC cannot delete Koko's code from memory, so it disconnects it. Koko parks the real DOS address in entry 3 of the <Term id="ivt">interrupt table</Term> (KVC's code only works if it does, and we have no copy of the virus to confirm it). KVC copies it into entry 21h with two DOS calls made through that same entry, past the virus. If Koko still answers after that, KVC tells you to switch off and boot from a clean disk.</p>
+  <Deep title="For engineers: the memory check, line by line">
+    <Listing
+      title="KVC.EXE 0000:07EF, Assembly module"
+      lines={[
+        { off: '07EF', code: 'mov  ax, 0FF0Ch', note: 'the secret question' },
+        { off: '07F2', code: 'int  21h' },
+        { off: '07F4', code: 'cmp  ax, 0C0C1h', note: 'only Koko gives this answer', hi: true },
+        { off: '07F7', code: 'jne  0864', note: 'no answer: memory is clean' },
+        { off: '07F9', code: 'mov  ah, 9 / mov dx, 0877h', note: '"Found --KoKo (1) virus-- active in RAM"' },
+        { off: '080B', code: 'int  3', note: 'print it through the line Koko keeps for itself' },
+        { off: '080C', code: 'mov  cx, 14h', note: '20 tones on the PC speaker' },
+        { off: '0840', code: 'mov  ax, 3503h', note: 'where does entry 3 point?' },
+        { off: '0843', code: 'int  3', hi: true },
+        { off: '0844', code: 'push es / pop ds' },
+        { off: '0846', code: 'mov  dx, bx', note: 'DS:DX = the real DOS address' },
+        { off: '0848', code: 'mov  ax, 2521h', note: 'make entry 21h point there' },
+        { off: '084B', code: 'int  3', hi: true },
+      ]}
+      foot="Then it jumps back to 07ED and asks again."
+    />
+    <p>The siren drives the <Term id="pc-speaker">PC speaker</Term> directly. It switches between two timer divisors, 3E8h (about 1,190 Hz) and 640h (about 750 Hz), 20 times, with a busy loop of FF00h turns between tones, so it runs faster on a faster CPU. <a href={map(0x7ef)}>See these bytes in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="kvc-com">
+  <h2>How does it repair an infected COM file?</h2>
+  <p class="lead">Koko keeps a copy of everything it changes inside its own body. KVC checks that body, copies the saved bytes back and cuts the file to its old size.</p>
+  <Steps
+    title="Repairing a COM file, real KVC run"
+    steps={[
+      'KVC reads the first 26 bytes. Bytes 5 to 25 must be Koko\'s jump code and its name, <code>KoKo (1)</code>. It does not check bytes 0 to 2.',
+      'Bytes 3 and 4 hold <code>0012h</code>: the virus body starts 12h paragraphs (of 16 bytes) into the file, at byte 288.',
+      'Second check: body + 127h must be <code>BF 00 01 BE 22 01</code>. That is Koko\'s own code for putting the bytes back (<code>mov di,100h / mov si,122h</code>).',
+      'Koko stored the old size at body + 18h (<code>0116h</code>, 278 bytes) and the 26 bytes it overwrote at body + 22h.',
+      'KVC writes those 26 bytes back at offset 0, then sets the file date and time back.',
+      'The C part calls <code>chsize</code> with 278. The 522 bytes after it are gone, and the file matches the original byte for byte.',
+    ]}
+  >
+    @@kvc-com@@
+  </Steps>
+  <p>A <Term id="file-infector">file infector</Term> must keep its host program working, or people notice. So Koko saves what it overwrites, and KVC uses that copy. KVC never guesses: it checks two <Term id="virus-signature">virus signatures</Term> at fixed places before it writes a byte, and if one is wrong it stops with "Strange signeture, --> Please contact KEMYAM Computer Group."</p>
+  <p>We do not have the Koko virus. So we built test files that pass KVC's own checks and ran the unpacked KVC on a virtual disk in an <Term id="emulator">emulator</Term>: 3 files scanned, 2 infected, 2 cleaned, and the <Term id="com-file">COM</Term> file came back byte for byte.</p>
+  <Deep title="For engineers: the COM check and repair">
+    <Listing
+      title="KVC.EXE 0000:0D76, condensed"
+      lines={[
+        { off: '0D76', code: 'mov  cx, 1Ah / mov ah, 3Fh', note: 'read 26 bytes to DS:0511' },
+        { off: '0D82', code: 'mov  si, 0511h / add si, 5', note: 'file bytes 5 to 25' },
+        { off: '0D88', code: 'mov  di, 059Fh / mov cx, 15h', note: 'Koko stub and name, 21 bytes' },
+        { off: '0D8F', code: 'repe cmpsb', hi: true },
+        { off: '0D99', code: 'mov  dl, [0514h] / mov dh, [0515h]', note: 'bytes 3 and 4' },
+        { off: '0DA1', code: 'shl  dx, 1   (4 times)', note: 'paragraphs x 16 = body offset' },
+        { off: '0DD8', code: 'add  dx, 127h', note: 'seek to body + 127h' },
+        { off: '0E12', code: 'repe cmpsb', note: 'vs BF 00 01 BE 22 01', hi: true },
+        { off: '0E8D', code: 'mov  ax, 5700h / int 21h', note: 'keep the date and time' },
+        { off: '0EC3', code: 'call 07A0h', note: 'reopen for writing, read-only bit cleared' },
+        { off: '0EDC', code: 'mov  cx, 1Ah / mov dx, 052Fh + 22h', note: 'the 26 saved bytes' },
+        { off: '0EEC', code: 'int  21h', note: 'AH = 40h: write them at offset 0', hi: true },
+        { off: '0EF0', code: 'mov  ax, 5701h / int 21h', note: 'date and time back' },
+      ]}
+      foot="The C caller then cuts the file with chsize() to the size read from body + 18h."
+    />
+    <p>Before it writes, the helper at 07A0 clears the <Term id="file-attribute">read-only attribute</Term>. KVC never sets it back. <a href={map(0xcf7)}>See the COM checker in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="kvc-exe">
+  <h2>And an infected EXE file?</h2>
+  <p class="lead">Koko marks an EXE by setting its start-up stack pointer to <code>C0C1h</code>, the same number as its memory reply. KVC puts back four start-up fields and cuts the virus off.</p>
+  <Figure title="EXE header, before and after KVC" caption="Our test file. The real Koko values are unknown; the C0C1h mark and the field positions come from KVC's code.">
+    @@kvc-exe@@
+  </Figure>
+  <p>An <Term id="exe-file">EXE</Term> file starts with a header that tells DOS where the first instruction is (CS:IP) and where the stack goes (SS:SP). Koko points CS:IP at itself and keeps the old values in its body. KVC checks three signatures (the virus entry starts <code>EB 60 90 EA</code>, 20 bytes at entry + 5F0h, Koko's name at entry + 6DAh), then copies the old values back from entry + 4Dh to + 54h.</p>
+  <p>The clean size is the virus entry minus 100h, and KVC computes the page count from it. Two flaws: the EXE path does not set the date and time back (the COM path does), and it always adds 1 to the page count, which is wrong when the size is an exact multiple of 512.</p>
+  <Deep title="For engineers: the EXE check and repair">
+    <Listing
+      title="KVC.EXE 0000:1024, condensed"
+      lines={[
+        { off: '1024', code: 'cmp  byte [0521h], 0C1h', note: 'header SP, low byte' },
+        { off: '102E', code: 'cmp  byte [0522h], 0C0h', note: 'SP = C0C1h: Koko\'s mark', hi: true },
+        { off: '103A', code: '(header paragraphs + CS) x 16 + IP', note: 'file offset of the virus entry' },
+        { off: '1096', code: 'cmp  word [si], 60EBh', note: 'entry starts EB 60 ...' },
+        { off: '109F', code: 'cmp  word [si+2], 0EA90h', note: '... 90 EA' },
+        { off: '10DB', code: 'mov  ax, [si+51h] / mov [di+14h], ax', note: 'IP back' },
+        { off: '10E1', code: 'mov  ax, [si+53h] / mov [di+10h], ax', note: 'SP back' },
+        { off: '10E7', code: 'mov  ax, [si+4Dh] / mov [di+16h], ax', note: 'CS back' },
+        { off: '10ED', code: 'mov  ax, [si+4Fh] / mov [di+0Eh], ax', note: 'SS back' },
+        { off: '1194', code: 'sub  word cs:[0FB3h], 100h', note: 'clean size = entry - 100h', hi: true },
+        { off: '11AA', code: 'mov  bx, 200h / div bx / inc ax', note: 'pages: always +1' },
+      ]}
+    />
+    <p><a href={map(0xf95)}>See the EXE checker in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="kvc-build">
+  <h2>What did he write in C, and what in Assembly?</h2>
+  <p class="lead">C for plain logic, <Term id="assembly">Assembly</Term> for anything that touches bytes, ports or interrupts.</p>
+  <Figure title="KVC.EXE, who wrote which bytes" caption="Measured in the unpacked file. 'Data' holds Borland's tables and his messages.">
+    @@kvc-map@@
+  </Figure>
+  <p>The C part, built with <Term id="borland-cpp">Borland C++</Term>, reads the options (<code>/NS</code> no subfolders, <code>/NC</code> scan only, <code>/H</code> help), walks every folder, counts files and prints the totals. One small helper does both "find first" and "find next" by computing <code>AH = 4Eh + flag</code>. The Assembly module does the memory check, the siren, both file checks and the repairs, and keeps its own variables inside its code.</p>
+  <p>Borland's start-up code and <Term id="runtime-library">runtime library</Term> take 6,653 bytes. His C and Assembly take 4,229 bytes, plus 3,326 bytes of help text.</p>
+</section>
+
+<section id="kvc-now">
+  <h2>How does this compare with antivirus in 2026?</h2>
+  <p class="lead">KVC is pure signature detection for one virus. Modern tools also watch behavior, because new malware appears every day.</p>
+  <ThenNow
+    rows={[
+      { then: 'Fixed bytes at fixed places: "KoKo (1)", BF 00 01 BE 22 01, SP = C0C1h', now: 'Antivirus signatures and YARA rules', why: 'Still the fastest way to name a known family. Useless against a new one.' },
+      { then: 'Asking the virus its own "are you there?" question', now: "Using a malware family's own markers, like the WannaCry kill-switch domain in 2017", why: "The attacker's own check becomes the defender's tool." },
+      { then: 'Pointing INT 21h back at DOS so the virus is never called', now: 'EDR killing a process or isolating a computer', why: 'Stop it running first, clean up second.' },
+      { then: 'Repairing each file from the copy the virus kept', now: 'Restoring from backup, or an EDR rollback', why: 'KVC could undo Koko exactly because Koko kept the original bytes.' },
+      { then: 'A new KVC version for each new virus (its help screen promises one)', now: 'Signature updates many times a day, plus behavior detection', why: 'Behavior rules can catch malware nobody has seen yet.' },
+    ]}
+  />
+  <p>An <Term id="edr">EDR</Term> tool watches what programs do. Koko's habits, hooking INT 21h and rewriting every program it runs, are exactly what <Term id="behavior-detection">behavior detection</Term> looks for. KVC knew none of that. It knew Koko perfectly instead.</p>
+</section>
+
+<section id="kvc-him">
+  <h2>What this tells us about him</h2>
+  <p class="lead">He took a virus apart by hand and wrote a cure that checks before it changes anything.</p>
+  <ul>
+    <li><strong>Careful:</strong> two independent signature checks for each file type before any write, and a clear stop message when one fails.</li>
+    <li><strong>Inventive:</strong> Koko's reply became the detector, and Koko's own hiding place for the DOS address became the cure.</li>
+    <li><strong>Practical:</strong> C where C is enough, Assembly where he needed exact bytes.</li>
+    <li><strong>A team player:</strong> the help screen credits Ebrahim El-Etr and quotes Yasser: "It is a funny virus, all its tricks are untricky."</li>
+    <li><strong>Weak spots:</strong> the EXE repair loses the file date and time; the read-only bit is never set back; folders whose attribute is not exactly 10h are skipped; the siren speed depends on the CPU; the EXE page count is off by one at exact multiples of 512.</li>
+  </ul>
+</section>

@@ -1,0 +1,201 @@
+[
+ {
+  "page": "tp-2004-04-pocketpclife-handymenu",
+  "name": "rating",
+  "rx": "^(Software Developer|Title:|Rating:)",
+  "union": true,
+  "shows": "Review box: developer DinarSoft, HandyMenu 2.0, star rating (5 of 5)"
+ },
+ {
+  "page": "tp-2004-04-pocketpclife-handyswitcher",
+  "name": "rating",
+  "rx": "^(Software Developer|Title:|Rating:)",
+  "union": true,
+  "shows": "Review box: developer DinarSoft, HandySwitcher 2.0, star rating (4 of 5)"
+ },
+ {
+  "page": "tp-2004-09-emobie-memmaid",
+  "name": "verdict",
+  "rx": "^(Rating:|MemMaid is the Swiss Army)",
+  "union": true,
+  "shows": "Star rating and verdict: \"MemMaid is the Swiss Army Knife of PPC utilities\""
+ },
+ {
+  "page": "tp-2004-11-pocketpcreviews-memmaid",
+  "name": "headline",
+  "rx": "^MemMaid 1\\.3 from DinarSoft",
+  "replaces": [
+   "tp-2004-11-pocketpcreviews-memmaid--headline.png"
+  ],
+  "shows": "Headline: MemMaid 1.3 from DinarSoft",
+  "pad": 1
+ },
+ {
+  "page": "tp-2004-11-pocketpcreviews-memmaid",
+  "name": "verdict",
+  "rx": "^(Conclusion|For a reviewer a must)",
+  "union": true,
+  "shows": "Conclusion: \"MemMaid is a godsend!\""
+ },
+ {
+  "page": "tp-2005-01-pocketnow-memmaid",
+  "name": "verdict",
+  "rx": "^OVERALL IMPRESSION",
+  "shows": "Overall impression: \"it certainly has found a place in my must-have list\""
+ },
+ {
+  "page": "tp-2005-03-aximsite-taptext",
+  "name": "headline",
+  "rx": "^(Knowledge Base|Developer/Vendor)",
+  "union": true,
+  "replaces": [
+   "tp-2005-03-aximsite-taptext--headline.png"
+  ],
+  "shows": "Headline, reviewer, developer DinarSoft and star rating (4 of 5)"
+ },
+ {
+  "page": "tp-2006-03-pdablast-handyswitcher",
+  "name": "headline",
+  "clip": [
+   181,
+   195,
+   916,
+   90
+  ],
+  "text": "HandySwitcher Task Management for Your Pocket PC / By: pdaBlast! Staff / March 27, 2006",
+  "replaces": [
+   "tp-2006-03-pdablast-handyswitcher--headline.png"
+  ],
+  "shows": "Headline: HandySwitcher Task Management for Your Pocket PC (pdaBlast! Staff, 2006-03-27)"
+ },
+ {
+  "page": "tp-2006-06-treocentral-shootout",
+  "name": "headline",
+  "clip": [
+   78,
+   110,
+   900,
+   100
+  ],
+  "text": "Task Manager Shoot-Out for the 700W / By Tim Hillebrand",
+  "replaces": [
+   "tp-2006-06-treocentral-shootout--handyswitcher.png"
+  ],
+  "shows": "Headline: Task Manager Shoot-Out for the 700W (Tim Hillebrand, 2006-06-19)"
+ },
+ {
+  "page": "tp-2006-06-treocentral-shootout",
+  "name": "dinarsoft",
+  "clip": [
+   78,
+   1688,
+   900,
+   425
+  ],
+  "text": "Handy Switcher / HandyLauncher / HandyMenu sections",
+  "shows": "The HandySwitcher, HandyLauncher and HandyMenu sections of the shoot-out"
+ },
+ {
+  "page": "tp-2006-09-tucows-memmaid",
+  "name": "verdict",
+  "rx": "^MemMaid is simply packed",
+  "shows": "Verdict paragraph"
+ },
+ {
+  "page": "tp-2006-10-tucows-favorite",
+  "name": "headline",
+  "rx": "^(Favorite - MemMaid|Download MemMaid NOW)",
+  "union": true,
+  "replaces": [
+   "tp-2006-10-tucows-favorite--headline.png"
+  ],
+  "shows": "Favorite - MemMaid: a Dr. File Finder Favorite, version 1.72"
+ },
+ {
+  "page": "tp-2007-05-clintonfitch-memmaid",
+  "name": "headline",
+  "rx": "^DinarSoft MemMaid 1\\.73",
+  "shows": "Headline: DinarSoft MemMaid 1.73 (review by Judie Hughes)"
+ },
+ {
+  "page": "tp-2007-06-gadgetmix-handyswitcher3",
+  "name": "verdict",
+  "rx": "do I recommend it",
+  "replaces": [
+   "tp-2007-06-gadgetmix-handyswitcher3--headline.png"
+  ],
+  "shows": "Verdict: \"So, in the end, do I recommend it? YES, go get it!\""
+ },
+ {
+  "page": "tp-2007-07-mobileview-memmaid",
+  "name": "headline",
+  "replaces": [
+   "tp-2007-07-mobileview-memmaid--headline.png"
+  ],
+  "shows": "Headline: DinarSoft's MemMaid 2.0 Reviewed!",
+  "clip": [
+   10,
+   2563,
+   1260,
+   54
+  ],
+  "text": "DinarSoft's MemMaid 2.0 Reviewed!"
+ },
+ {
+  "page": "tp-2007-08-gadgeteer-taptext",
+  "name": "headline",
+  "rx": "^DinarSoft TapText - Windows Mobile Utility",
+  "replaces": [
+   "tp-2007-08-gadgeteer-taptext--headline.png"
+  ],
+  "shows": "Headline: DinarSoft TapText - Windows Mobile Utility"
+ },
+ {
+  "page": "tp-2007-08-gadgeteer-taptext",
+  "name": "verdict",
+  "clip": [
+   66,
+   8948,
+   857,
+   235
+  ],
+  "text": "Conclusion and Thoughts",
+  "shows": "Conclusion: \"I really cannot see any problems with DinarSoft's TapText\""
+ },
+ {
+  "page": "tp-2007-09-etenblog-memmaid",
+  "name": "verdict",
+  "rx": "^What I like about MemMaid",
+  "shows": "What the reviewer likes about MemMaid"
+ },
+ {
+  "page": "tp-2007-10-aximsite-memmaid2",
+  "name": "rating",
+  "rx": "^Rating: 5 out of 5",
+  "shows": "Rating: 5 out of 5"
+ },
+ {
+  "page": "tp-2007-gadgetmix-handymenu",
+  "name": "headline",
+  "rx": "^Dinarsoft's Handy menu is",
+  "shows": "Opening line of the HandyMenu review"
+ },
+ {
+  "page": "tp-2007-gadgetmix-handymenu",
+  "name": "verdict",
+  "rx": "^Easy to use\\s+Customisable",
+  "shows": "Pros: easy to use, customisable, user friendly, cheap, light on memory"
+ },
+ {
+  "page": "tp-2007-gadgetmix-handyswitcher",
+  "name": "verdict",
+  "rx": "must have on every Pocket PC",
+  "shows": "Verdict: \"functional and must have on every Pocket PC\""
+ },
+ {
+  "page": "tp-2009-01-windowscentral-memmaid",
+  "name": "rating",
+  "rx": "^Ratings \\(5 out of 5\\)",
+  "shows": "Ratings (5 out of 5) with pros and cons"
+ }
+]

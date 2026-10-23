@@ -1,0 +1,191 @@
+---
+// The secret question as a ping: send a request through slot 21h, with or without Koko standing in front of DOS,
+// and watch who answers. His three lines and the same idea in JavaScript light up as the request travels.
+import Window from '../../shell/Window.astro';
+import { hl } from '../../explain/hl';
+
+const ASM = [
+  ['mov  ax,0FF0Ch', 'the secret question'],
+  ['int  21h', 'ask through slot 21h'],
+  ['cmp  ax,0C0C1h', "Koko's answer?"],
+];
+const JS = [
+  ['const reply = await dos({ ax: 0xFF0C });', 'a request no real service has'],
+  ['if (reply.ax === 0xC0C1)', 'the handshake only Koko knows'],
+  ["  alarm('Koko is in memory');", ''],
+];
+const REQ = [
+  { id: 'ask', label: 'Ask the secret question', code: 'FF0C' },
+  { id: 'run', label: 'Run a program', code: '4B00' },
+  { id: 'print', label: 'Print a line', code: '0900' },
+];
+---
+
+<div class="kxp" data-ping>
+  <div class="kxp-ctl">
+    <button type="button" class="button k-btn kxp-sw" role="switch" aria-checked="true" data-koko>
+      <span class="kxp-sw-box" aria-hidden="true"></span> Koko in memory
+    </button>
+    <div class="kxp-req" role="group" aria-label="Send a request through slot 21h">
+      {REQ.map((r, i) => <button type="button" class:list={['button k-btn', { 'button--primary': i === 0 }]} data-req={r.id}><span class="hk" aria-hidden="true">{r.code}</span> {r.label}</button>)}
+    </div>
+  </div>
+
+  <Window title="MEMORY  who answers slot 21h" kind="panel" active class="kxp-win">
+    <svg class="dg kxp-svg kxp-wide" viewBox="0 0 640 300" role="img" aria-labelledby="kxp-t">
+      <title id="kxp-t">KVC sends a request through slot 21h. With Koko in memory the request reaches Koko first; Koko answers the secret question itself and passes every other request on to DOS.</title>
+      <path data-seg="a" class="wire" d="M130 150 H222" />
+      <path data-seg="b" class="wire kxp-koko-w" d="M392 140 C430 140 432 66 470 66" />
+      <path data-seg="c" class="wire kxp-clean-w" d="M392 160 C430 160 432 238 470 238" />
+      <path data-seg="d" class="wire dash kxp-koko-w" d="M550 94 V208" />
+      <rect class="box" x="10" y="122" width="120" height="56" /><text x="70" y="148" text-anchor="middle">KVC.EXE</text><text class="t-sm" x="70" y="166" text-anchor="middle">asks</text>
+      <rect class="box-bk" x="222" y="118" width="170" height="64" /><text class="t-yl" x="307" y="146" text-anchor="middle">slot 21h</text><text class="t-sm" x="307" y="166" text-anchor="middle">the door for all</text>
+      <g class="kxp-koko">
+        <rect class="box-ink" x="470" y="38" width="160" height="56" /><text class="t-bk t-lg" x="550" y="72" text-anchor="middle">Koko</text>
+      </g>
+      <rect class="box-dash kxp-gone" x="470" y="38" width="160" height="56" /><text class="t-sm kxp-gone" x="550" y="70" text-anchor="middle">nobody here</text>
+      <rect class="box" x="470" y="210" width="160" height="56" /><text x="550" y="236" text-anchor="middle">DOS</text><text class="t-sm" x="550" y="254" text-anchor="middle">the system</text>
+      <text class="t-sm kxp-koko-w" x="540" y="156" text-anchor="end">passes it on</text>
+      <g class="kxp-pk" data-pk opacity="0"><rect x="-30" y="-13" width="60" height="26" class="box-hi" /><text class="t-bk" x="0" y="5" text-anchor="middle" data-pk-t>FF0C</text></g>
+      <text class="t-yl" x="70" y="222" text-anchor="middle" data-reply></text>
+      <text class="t-sm" x="70" y="244" text-anchor="middle" data-reply-2></text>
+    </svg>
+    <svg class="dg kxp-svg kxp-narrow" viewBox="0 0 360 430" role="img" aria-labelledby="kxp-tn">
+      <title id="kxp-tn">KVC asks through slot 21h. Koko, when it is in memory, answers the secret question itself and passes other requests on to DOS.</title>
+      <path data-seg="a" class="wire" d="M180 62 V110" />
+      <path data-seg="b" class="wire kxp-koko-w" d="M140 174 C140 212 85 210 85 246" />
+      <path data-seg="c" class="wire kxp-clean-w" d="M220 174 C220 260 275 290 275 334" />
+      <path data-seg="d" class="wire dash kxp-koko-w" d="M160 274 C230 274 275 300 275 334" />
+      <rect class="box" x="105" y="8" width="150" height="54" /><text x="180" y="32" text-anchor="middle">KVC.EXE</text><text class="t-sm" x="180" y="50" text-anchor="middle">asks</text>
+      <rect class="box-bk" x="90" y="110" width="180" height="64" /><text class="t-yl" x="180" y="138" text-anchor="middle">slot 21h</text><text class="t-sm" x="180" y="158" text-anchor="middle">the door for all</text>
+      <g class="kxp-koko"><rect class="box-ink" x="10" y="246" width="150" height="56" /><text class="t-bk t-lg" x="85" y="280" text-anchor="middle">Koko</text></g>
+      <rect class="box-dash kxp-gone" x="10" y="246" width="150" height="56" /><text class="t-sm kxp-gone" x="85" y="278" text-anchor="middle">nobody here</text>
+      <rect class="box" x="200" y="336" width="150" height="56" /><text x="275" y="362" text-anchor="middle">DOS</text><text class="t-sm" x="275" y="380" text-anchor="middle">the system</text>
+      <text class="t-sm kxp-koko-w" x="230" y="262">passes it on</text>
+      <g class="kxp-pk" data-pk opacity="0"><rect x="-30" y="-13" width="60" height="26" class="box-hi" /><text class="t-bk" x="0" y="5" text-anchor="middle" data-pk-t>FF0C</text></g>
+      <text class="t-yl" x="10" y="346" data-reply></text>
+      <text class="t-sm" x="10" y="368" data-reply-2></text>
+    </svg>
+  </Window>
+
+  <p class="kxp-say" aria-live="polite" data-say>Koko is in memory. Send the secret question and see who answers.</p>
+
+  <div class="kxp-code">
+    <Window title="KVC.EXE  his three lines" kind="editor" class="kxp-cw">
+      <div class="kxp-lines">{ASM.map(([c, n], i) => <div class="kxp-ln" data-l={i}><code set:html={hl(c)} /><span>; {n}</span></div>)}</div>
+    </Window>
+    <Window title="The same idea in JavaScript" kind="editor" class="kxp-cw">
+      <div class="kxp-lines kxp-lines--js">{JS.map(([c, n], i) => <div class="kxp-ln" data-l={i}><code>{c}</code>{n && <span>// {n}</span>}</div>)}</div>
+    </Window>
+  </div>
+</div>
+
+<style>
+  .kxp { display: grid; gap: 22px; min-width: 0; }
+  .kxp-ctl { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
+  .kxp-req { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kxp-sw-box { width: 18px; height: 18px; box-shadow: inset 0 0 0 2px currentColor; display: inline-grid; place-items: center; }
+  .kxp-sw[aria-checked='true'] .kxp-sw-box::after { content: ''; width: 10px; height: 10px; background: currentColor; }
+  .kxp-narrow { display: none; }
+  @media (max-width: 640px) { .kxp-wide { display: none; } .kxp-narrow { display: block; max-width: 420px; margin-inline: auto; } }
+  .kxp-svg .kxp-koko, .kxp-svg .kxp-koko-w { transition: opacity 0.3s var(--quart); }
+  .kxp-svg .kxp-gone, .kxp-svg .kxp-clean-w { opacity: 0; transition: opacity 0.3s var(--quart); }
+  .kxp[data-clean] .kxp-svg :is(.kxp-koko, .kxp-koko-w) { opacity: 0; }
+  .kxp[data-clean] .kxp-svg :is(.kxp-gone, .kxp-clean-w) { opacity: 1; }
+  .kxp-svg .lit { stroke: var(--accent); stroke-width: 3; }
+  .kxp-say { min-height: 3.4em; max-width: 64ch; font-size: 1.0625rem; }
+  .kxp-code { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+  .kxp-lines { margin: 0; padding: 0; list-style: none; font: 500 clamp(12px, 0.25vw + 9.5px, 13.5px)/1.9 var(--font-code); }
+  .kxp-lines .kxp-ln { display: grid; grid-template-columns: minmax(15ch, auto) 1fr; gap: 1.5ch; padding: 0 8px; color: var(--ink); white-space: pre; transition: background-color 0.15s, color 0.15s; }
+  .kxp-lines--js .kxp-ln { grid-template-columns: 1fr; white-space: pre-wrap; }
+  .kxp-lines code { font: inherit; color: inherit; }
+  .kxp-lines :global(.op) { color: var(--accent); }
+  .kxp-lines :global(.num) { color: var(--accent-2); }
+  .kxp-lines span { color: var(--ink-2); white-space: pre-wrap; }
+  .kxp-lines .kxp-ln.on, .kxp-lines .kxp-ln.on span, .kxp-lines .kxp-ln.on :global(.op), .kxp-lines .kxp-ln.on :global(.num) { background: var(--accent-2); color: var(--surface); }
+  @media (max-width: 860px) { .kxp-code { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 640px) { .kxp-lines .kxp-ln { grid-template-columns: 1fr; white-space: pre-wrap; } .kxp-lines span { padding-left: 2ch; } }
+  @media (max-width: 520px) { .kxp-req, .kxp-req .k-btn, .kxp-sw { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .kxp-svg *, .kxp-lines .kxp-ln { transition: none !important; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
+
+  gsap.registerPlugin(MotionPathPlugin);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-ping]').forEach(root => {
+    const sw = root.querySelector<HTMLButtonElement>('[data-koko]')!;
+    // The wide or the narrow drawing, whichever is on screen
+    const svg = () => [...root.querySelectorAll<SVGSVGElement>('.kxp-svg')].find(x => x.getClientRects().length) ?? root.querySelector('.kxp-svg')!;
+    const pks = root.querySelectorAll<SVGGElement>('[data-pk]'), pkts = root.querySelectorAll('[data-pk-t]');
+    const replies = root.querySelectorAll('[data-reply]'), replies2 = root.querySelectorAll('[data-reply-2]');
+    const setText = (els: NodeListOf<Element>, t: string) => els.forEach(e => (e.textContent = t));
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const seg = (id: string) => svg().querySelector<SVGPathElement>(`[data-seg="${id}"]`)!;
+    const lines = (k: number, i: number[]) => root.querySelectorAll('.kxp-cw')[k].querySelectorAll('.kxp-ln').forEach((li, j) => li.classList.toggle('on', i.includes(j)));
+    let tl: gsap.core.Timeline | null = null;
+    const koko = () => sw.getAttribute('aria-checked') === 'true';
+
+    const TEXT = {
+      ask: {
+        koko: ['C0C1h', "Koko's handshake", '<b>C0C1h came back.</b> Only Koko gives that answer to that question, so KVC knows Koko is in memory. Koko answered by itself. The request never reached DOS.'],
+        clean: ['not C0C1h', 'nobody knows FF0Ch', 'DOS has no request called FF0Ch, so the answer is not C0C1h. <b>This PC is clean</b>, and KVC moves on to the files.'],
+      },
+      run: {
+        koko: ['done', 'program started', 'Koko let it through to DOS, the way it lets every other request through. But first it copied itself into the program that is starting. <b>That is how it spread.</b>'],
+        clean: ['done', 'program started', 'Straight to DOS, and the program starts. Nothing in between.'],
+      },
+      print: {
+        koko: ['done', 'line printed', 'Koko passed it on untouched. To every normal request, a PC with Koko looks like a clean one. <b>Only the secret question gives it away.</b>'],
+        clean: ['done', 'line printed', 'Straight to DOS. Nothing in between.'],
+      },
+    } as const;
+
+    function send(kind: keyof typeof TEXT) {
+      tl?.kill();
+      const k = koko(), t = TEXT[kind][k ? 'koko' : 'clean'];
+      const out = kind === 'ask' && k ? ['a', 'b'] : k ? ['a', 'b', 'd'] : ['a', 'c'];
+      const pk = svg().querySelector<SVGGElement>('[data-pk]')!;
+      setText(pkts, kind === 'ask' ? 'FF0C' : kind === 'run' ? '4B00' : '0900');
+      setText(replies, ''); setText(replies2, '');
+      gsap.set(pks, { opacity: 0 });
+      root.querySelectorAll('.lit').forEach(e => e.classList.remove('lit'));
+      lines(0, kind === 'ask' ? [0, 1] : []); lines(1, kind === 'ask' ? [0] : []);
+      const end = () => {
+        setText(replies, t[0]); setText(replies2, t[1]);
+        say.innerHTML = t[2];
+        if (kind === 'ask') { lines(0, [2]); lines(1, k ? [1, 2] : [1]); }
+      };
+      if (reduce()) {
+        out.forEach(s => root.querySelectorAll(`[data-seg="${s}"]`).forEach(e => e.classList.add('lit')));
+        return end();
+      }
+      say.textContent = 'The request travels through slot 21h.';
+      tl = gsap.timeline({ onComplete: end });
+      tl.set(pk, { opacity: 1 });
+      const go = (s: string, back = false) => tl!.call(() => seg(s).classList.add('lit')).to(pk, {
+        duration: 0.55, ease: 'power1.inOut',
+        motionPath: { path: seg(s), align: seg(s), alignOrigin: [0.5, 0.5], start: back ? 1 : 0, end: back ? 0 : 1 },
+      });
+      out.forEach(s => go(s));
+      tl.call(() => setText(pkts, kind === 'ask' ? (k ? 'C0C1' : '?') : 'OK'));
+      [...out].reverse().forEach(s => go(s, true));
+      tl.to(pk, { opacity: 0, duration: 0.2 });
+    }
+
+    sw.addEventListener('click', () => {
+      tl?.kill();
+      const on = !koko();
+      sw.setAttribute('aria-checked', String(on));
+      root.toggleAttribute('data-clean', !on);
+      gsap.set(pks, { opacity: 0 });
+      root.querySelectorAll('.lit').forEach(e => e.classList.remove('lit'));
+      setText(replies, ''); setText(replies2, '');
+      say.textContent = on ? 'Koko is back in memory, standing in front of DOS.' : 'A clean PC: slot 21h leads straight to DOS.';
+    });
+    root.querySelectorAll<HTMLButtonElement>('[data-req]').forEach(b => b.addEventListener('click', () => send(b.dataset.req as keyof typeof TEXT)));
+  });
+</script>

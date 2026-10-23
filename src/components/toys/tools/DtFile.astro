@@ -1,0 +1,130 @@
+---
+// Every Digi-Test file has the same frame: the group's copyright line, a Ctrl-Z, the data, and the file's own length
+// in the last 4 bytes. FIL0.GAT (the NAND gate) is all 60 bytes of it. TYPE a file and DOS stops at the Ctrl-Z;
+// load a cut copy and the length check refuses it (MAIN.EXE 1C5C:04E5).
+import Window from '../../shell/Window.astro';
+import { file } from './dt-data';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const gat = [...file('FIL0.GAT')];
+const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
+const part = (i: number) => (i < 0x2a ? 'txt' : i < 0x2d ? 'pad' : i === 0x2d ? 'eof' : i < 0x32 ? 'gap' : i < 0x38 ? 'gate' : 'len');
+const SAY: Record<string, string> = {
+  txt: 'The copyright line: “Copyright 1993 by KEMYAM (c) For Gate Save”. Every file he saves starts with his group’s name.',
+  pad: 'The end of the text and two spaces of padding.',
+  eof: '1Ah, Ctrl-Z: the DOS mark for “end of text”. TYPE stops here, so a curious user sees the copyright and nothing else.',
+  gap: '4 bytes the save steps over: the data always starts at the same place, 32h.',
+  gate: 'The gate: 2 inputs, 1 output, controlling value code 1 (a 0), inverts code 2 (yes). That is a NAND.',
+  len: 'The file’s own length, 60, in 4 bytes. Digi-Test checks it on every load.',
+};
+// A copy cut to 52 bytes: its last 4 bytes are now part of the gate, read as a length
+const cut = (gat[48] | (gat[49] << 8) | (gat[50] << 16)) + gat[51] * 2 ** 24;
+const TYPES = ['FIL0.GAT', 'FIL0.CIR', 'FIL0.IC', 'GROUP.CIR'].map(n => {
+  const d = file(n), z = d.indexOf(0x1a);
+  return { n, text: String.fromCharCode(...d.slice(0, z)).replace(/\0/g, ' ').trimEnd(), size: d.length };
+});
+---
+
+<div class="dtf" id={id} data-dtfile data-cut={cut} data-say={JSON.stringify(SAY)} data-types={JSON.stringify(TYPES)}>
+  <Window title="FIL0.GAT  60 bytes" kind="editor" active class="dtf-hex">
+    <div class="dtf-grid" role="group" aria-label="The 60 bytes of FIL0.GAT. Pick a byte to see what it is.">
+      {gat.map((b, i) => (
+        <button type="button" class="dtf-b" data-part={part(i)} data-i={i} aria-label={`Byte ${hex(i)}h: ${hex(b)}h`} tabindex={i === 0 ? 0 : -1}>
+          <b>{hex(b)}</b><i aria-hidden="true">{b >= 32 && b < 127 ? String.fromCharCode(b) : '·'}</i>
+        </button>
+      ))}
+    </div>
+    <p class="dtf-key" aria-hidden="true">
+      <span data-part="txt">copyright</span><span data-part="eof">Ctrl-Z</span><span data-part="gate">the gate</span><span data-part="len">length</span>
+    </p>
+    <p class="dtf-say" aria-live="polite" data-bsay>{SAY.gate}</p>
+  </Window>
+  <Window title={'C:\\DIGI_T'} kind="screen" class="dtf-dos">
+    <div class="dtf-cmds" hidden data-cmds>
+      {TYPES.map(t => <button type="button" class="dtf-c" data-type={t.n}>TYPE {t.n}</button>)}
+      <button type="button" class="dtf-c" data-load="ok">load FIL0.GAT</button>
+      <button type="button" class="dtf-c" data-load="cut">load a cut copy</button>
+    </div>
+    <pre class="dtf-out" aria-live="polite" data-out>C:\DIGI_T&gt;TYPE FIL0.GAT
+{TYPES[0].text}
+C:\DIGI_T&gt;<span class="dtf-cur">_</span></pre>
+  </Window>
+</div>
+
+<style is:global>
+  .dtf { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .dtf-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; }
+  .dtf-b { display: grid; justify-items: center; gap: 1px; min-height: 44px; padding: 4px 0 3px; font: inherit; color: var(--ink); background: var(--surface-2); border: 0; cursor: pointer; }
+  .dtf-b b { font: 600 13px/1.1 var(--font-code); }
+  .dtf-b i { font: 500 11px/1 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .dtf-b[data-part='eof'] { background: #aa0000; color: #fff; } .dtf-b[data-part='eof'] i { color: #fcc; }
+  .dtf-b[data-part='gate'] { background: var(--accent); color: var(--surface); } .dtf-b[data-part='gate'] i { color: var(--surface); }
+  .dtf-b[data-part='len'] { background: var(--accent-2); color: var(--surface); } .dtf-b[data-part='len'] i { color: var(--surface); }
+  .dtf-b[data-part='gap'], .dtf-b[data-part='pad'] { background: none; box-shadow: inset 0 0 0 1px var(--rule); color: var(--ink-2); }
+  .dtf-b.sel { outline: 3px solid var(--ink); outline-offset: -3px; }
+  .dtf-b:focus-visible { outline: 3px solid var(--focus); outline-offset: 1px; z-index: 1; }
+  .dtf-key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 12px 0 0 !important; font: 500 12px/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  .dtf-key span::before { content: ''; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; background: var(--surface-2); }
+  .dtf-key [data-part='eof']::before { background: #aa0000; } .dtf-key [data-part='gate']::before { background: var(--accent); } .dtf-key [data-part='len']::before { background: var(--accent-2); }
+  .dtf-say { margin: 10px 0 0 !important; min-height: 3.2em; font-size: 0.9375rem !important; }
+  .dtf-cmds { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .dtf-c { min-height: 44px; padding: 0 10px; font: 600 12px/1 var(--font-code); color: #000; background: #aaa; border: 0; box-shadow: inset -2px -2px 0 #555, inset 2px 2px 0 #fff; cursor: pointer; }
+  .dtf-c:active { box-shadow: inset 2px 2px 0 #555, inset -2px -2px 0 #fff; }
+  .dtf-c:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .dtf-out { min-height: 13em; margin: 0; padding: 12px; overflow-x: auto; white-space: pre-wrap; overflow-wrap: anywhere; font: 400 16px/1.25 var(--font-dos); color: #aaa; background: #000; }
+  .dtf-out .err { color: #ff5555; } .dtf-out .ok { color: #55ff55; }
+  .dtf-cur { animation: dtf-blink 1s steps(1) infinite; }
+  @keyframes dtf-blink { 50% { opacity: 0; } }
+  @media (max-width: 960px) { .dtf { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) { .dtf-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); } }
+  @media (prefers-reduced-motion: reduce) { .dtf-cur { animation: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement & { dtf?: boolean }>('[data-dtfile]').forEach(root => {
+    if (root.dtf) return;
+    root.dtf = true;
+    const SAY: Record<string, string> = JSON.parse(root.dataset.say!);
+    const TYPES: { n: string; text: string; size: number }[] = JSON.parse(root.dataset.types!);
+    const bs = [...root.querySelectorAll<HTMLButtonElement>('.dtf-b')], bsay = root.querySelector<HTMLElement>('[data-bsay]')!;
+    const out = root.querySelector<HTMLElement>('[data-out]')!;
+    const sel = (b: HTMLButtonElement) => {
+      bs.forEach(x => { x.classList.toggle('sel', x.dataset.part === b.dataset.part); x.tabIndex = x === b ? 0 : -1; });
+      bsay.textContent = `Byte ${(+b.dataset.i!).toString(16).toUpperCase()}h. ${SAY[b.dataset.part!]}`;
+    };
+    bs.forEach(b => { b.addEventListener('click', () => sel(b)); b.addEventListener('focus', () => sel(b)); });
+    root.querySelector('.dtf-grid')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key, i = bs.indexOf(document.activeElement as HTMLButtonElement);
+      const cols = getComputedStyle(root.querySelector('.dtf-grid')!).gridTemplateColumns.split(' ').length;
+      const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: cols, ArrowUp: -cols } as Record<string, number>;
+      if (i < 0 || !(k in d)) return;
+      e.preventDefault();
+      bs[Math.max(0, Math.min(bs.length - 1, i + d[k]))].focus();
+    });
+
+    // A tiny DOS prompt: TYPE stops at Ctrl-Z; the loader checks the length in the last 4 bytes
+    let tw: gsap.core.Tween | null = null;
+    const print = (cmd: string, body: string, cls = '') => {
+      tw?.kill();
+      const head = `C:\\DIGI_T>${cmd}\n`;
+      const done = () => { out.innerHTML = ''; out.append(head); const s = document.createElement('span'); s.className = cls; s.textContent = body; out.append(s, '\nC:\\DIGI_T>'); const c = document.createElement('span'); c.className = 'dtf-cur'; c.textContent = '_'; out.append(c); };
+      if (reduce()) return done();
+      const st = { n: 0 };
+      tw = gsap.to(st, { n: body.length, duration: Math.min(1.2, body.length * 0.018), ease: 'none', onUpdate: () => { out.textContent = head + body.slice(0, Math.round(st.n)); }, onComplete: done });
+    };
+    root.querySelectorAll<HTMLButtonElement>('[data-type]').forEach(b => b.addEventListener('click', () => {
+      const t = TYPES.find(x => x.n === b.dataset.type)!;
+      print(`TYPE ${t.n}`, `${t.text}\n\n(The file is ${t.size.toLocaleString('en-US')} bytes. TYPE stopped at the Ctrl-Z.)`);
+    }));
+    root.querySelectorAll<HTMLButtonElement>('[data-load]').forEach(b => b.addEventListener('click', () => {
+      const cut = b.dataset.load === 'cut';
+      print(cut ? 'load FIL0.GAT (cut to 52 bytes)' : 'load FIL0.GAT',
+        cut ? `The last 4 bytes say ${(+root.dataset.cut!).toLocaleString('en-US')}. The file is 52 bytes.\nThey do not match: Digi-Test refuses the file.` : 'The last 4 bytes say 60. The file is 60 bytes.\nThey match: the NAND gate loads.', cut ? 'err' : 'ok');
+    }));
+    root.querySelector<HTMLElement>('[data-cmds]')!.hidden = false;
+  });
+</script>

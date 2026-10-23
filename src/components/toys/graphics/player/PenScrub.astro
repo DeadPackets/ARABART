@@ -1,0 +1,78 @@
+---
+// TAHER.COM's name, drawn by his player. Scrub the pen through all 901 strokes, step, or run it.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { Player, SCRIPT } from './player.ts';
+import { memSync, png } from '../ssr.ts';
+import './player.css';
+
+const X0 = 136, Y0 = 102, CW = 330, CH = 96, N = 90;
+const p = new Player(memSync('TAHER_TAHER.COM'), SCRIPT.taher, 'taher');
+p.run();
+const crop = new Uint8Array(CW * CH);
+for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) crop[y * CW + x] = p.pix[(y + Y0) * 640 + x + X0];
+---
+
+<div class="gp gpn" data-gp-pen data-x0={X0} data-y0={Y0} data-cw={CW} data-ch={CH} data-n={N}>
+  <Window title={'C:\\TAHER\\TAHER.COM'} kind="screen" active>
+    <div class="gp-crt" style={`--gp-ar:${CW} / ${CH}`}>
+      <img src={png(crop, CW, CH)} width={CW} height={CH} alt="طاهر ابراهيم الصرفي, Taher Ibrahim El-Sarafy, in red and silver calligraphy on black." data-still />
+      <canvas hidden aria-hidden="true"></canvas>
+      <span class="gpn-pen" aria-hidden="true" hidden></span>
+    </div>
+    <p slot="status" class="gp-stat" data-stat>901 strokes, 2,109 bytes of script, one name.</p>
+  </Window>
+  <div class="gpn-ctl"><Scrubber n={N + 1} at={N} label="Strokes drawn" /></div>
+</div>
+
+<style is:global>
+  .gpn-ctl { margin-top: 18px; }
+  .gpn-pen { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid var(--vga-14); border-radius: 50%; box-shadow: 0 0 0 2px var(--vga-0); pointer-events: none; transition: left 0.08s linear, top 0.08s linear; }
+  @media (prefers-reduced-motion: reduce) { .gpn-pen { transition: none; } }
+</style>
+
+<script>
+  import { Player, SCRIPT, type Ev } from './player.ts';
+  import { Screen, reduce } from './screen.ts';
+  import { mem } from '../ega.ts';
+  import { scrubber } from '../../scrubber';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-pen]').forEach(async root => {
+    const b = await mem('TAHER_TAHER.COM');
+    const [X0, Y0, CW, CH, N] = ['x0', 'y0', 'cw', 'ch', 'n'].map(k => +root.dataset[k]!);
+    const canvas = root.querySelector('canvas')!, pen = root.querySelector<HTMLElement>('.gpn-pen')!;
+    const stat = root.querySelector<HTMLElement>('[data-stat]')!;
+    const scr = new Screen(canvas, CW, CH, X0, Y0);
+    const total = 901;
+    let p = new Player(b, SCRIPT.taher, 'taher'), last: Ev | null = null;
+    p.onPlot = (x, y, c) => scr.set(x, y, c);
+
+    const show = (i: number) => {
+      const k = Math.round((i * total) / N);
+      if (k < p.strokes) { scr.clear(); p = new Player(b, SCRIPT.taher, 'taher'); p.onPlot = (x, y, c) => scr.set(x, y, c); }
+      let e = null;
+      while (p.strokes < k && (e = p.step())) if (e.t === 'stroke') last = e;
+      scr.flush();
+      const done = k >= total;
+      pen.hidden = done;
+      pen.style.left = `${((p.col - X0 + 0.5) / CW) * 100}%`;
+      pen.style.top = `${((last ? last.row + last.len! : p.top) - Y0) / CH * 100}%`;
+      stat.textContent = done ? '901 strokes, 2,109 bytes of script, one name.' : `Stroke ${k.toLocaleString('en-US')} of 901 · column ${p.col} · byte ${(p.si - SCRIPT.taher).toLocaleString('en-US')}`;
+    };
+    canvas.hidden = false;
+    root.querySelector<HTMLElement>('[data-still]')!.hidden = true;
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, i => show(i), { speed: 0.035 });
+    show(N);
+    // Write the name once when it first comes into view, unless the visitor got there first
+    if (!reduce()) {
+      let touched = false;
+      for (const ev of ['pointerdown', 'keydown', 'focusin']) root.addEventListener(ev, () => (touched = true));
+      const io = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        if (!touched) { s.go(0, 'step'); s.play(); }
+      }, { threshold: 0.6 });
+      io.observe(canvas);
+    }
+  });
+</script>

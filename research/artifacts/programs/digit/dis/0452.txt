@@ -1,0 +1,462 @@
+0452:0000 81670cfffd     and word ptr [bx + 0xc], 0xfdff
+0452:0005 8b56fe         mov dx, word ptr [bp - 2]
+0452:0008 8b46fc         mov ax, word ptr [bp - 4]
+0452:000b 8be5           mov sp, bp
+0452:000d 5d             pop bp
+0452:000e cb             retf 
+0452:000f c8020000       enter 2, 0
+0452:0013 39265c16       cmp word ptr [0x165c], sp
+0452:0017 7705           ja 0x1e
+0452:0019 9aac290000     lcall 0, 0x29ac
+0452:001e eb17           jmp 0x37
+0452:0020 c45e06         les bx, ptr [bp + 6]
+0452:0023 268a07         mov al, byte ptr es:[bx]
+0452:0026 8846ff         mov byte ptr [bp - 1], al
+0452:0029 52             push dx
+0452:002a 50             push ax
+0452:002b 8a56ff         mov dl, byte ptr [bp - 1]
+0452:002e b405           mov ah, 5
+0452:0030 cd21           int 0x21
+0452:0032 58             pop ax
+0452:0033 5a             pop dx
+0452:0034 ff4606         inc word ptr [bp + 6]
+0452:0037 c45e06         les bx, ptr [bp + 6]
+0452:003a 26803f00       cmp byte ptr es:[bx], 0
+0452:003e 75e0           jne 0x20
+0452:0040 c9             leave 
+0452:0041 cb             retf 
+0452:0042 c8620000       enter 0x62, 0
+0452:0046 56             push si
+0452:0047 39265c16       cmp word ptr [0x165c], sp
+0452:004b 7705           ja 0x52
+0452:004d 9aac290000     lcall 0, 0x29ac
+0452:0052 8d46d4         lea ax, [bp - 0x2c]
+0452:0055 16             push ss
+0452:0056 50             push ax
+0452:0057 1e             push ds
+0452:0058 689200         push 0x92
+0452:005b b91300         mov cx, 0x13
+0452:005e 9a32290000     lcall 0, 0x2932
+0452:0063 8d46b4         lea ax, [bp - 0x4c]
+0452:0066 16             push ss
+0452:0067 50             push ax
+0452:0068 1e             push ds
+0452:0069 68a500         push 0xa5
+0452:006c b91f00         mov cx, 0x1f
+0452:006f 9a32290000     lcall 0, 0x2932
+0452:0074 8d469e         lea ax, [bp - 0x62]
+0452:0077 16             push ss
+0452:0078 50             push ax
+0452:0079 1e             push ds
+0452:007a 68c400         push 0xc4
+0452:007d b91600         mov cx, 0x16
+0452:0080 9a32290000     lcall 0, 0x2932
+0452:0085 8d46f8         lea ax, [bp - 8]
+0452:0088 16             push ss
+0452:0089 50             push ax
+0452:008a 1e             push ds
+0452:008b 68da00         push 0xda
+0452:008e b90700         mov cx, 7
+0452:0091 9a32290000     lcall 0, 0x2932
+0452:0096 8d46f0         lea ax, [bp - 0x10]
+0452:0099 16             push ss
+0452:009a 50             push ax
+0452:009b 1e             push ds
+0452:009c 68e100         push 0xe1
+0452:009f b90700         mov cx, 7
+0452:00a2 9a32290000     lcall 0, 0x2932
+0452:00a7 8d46ec         lea ax, [bp - 0x14]
+0452:00aa 16             push ss
+0452:00ab 50             push ax
+0452:00ac 1e             push ds
+0452:00ad 68e800         push 0xe8
+0452:00b0 b90300         mov cx, 3
+0452:00b3 9a32290000     lcall 0, 0x2932
+0452:00b8 8d46e8         lea ax, [bp - 0x18]
+0452:00bb 16             push ss
+0452:00bc 50             push ax
+0452:00bd 1e             push ds
+0452:00be 68eb00         push 0xeb
+0452:00c1 b90300         mov cx, 3
+0452:00c4 9a32290000     lcall 0, 0x2932
+0452:00c9 16             push ss
+0452:00ca 8d46e8         lea ax, [bp - 0x18]
+0452:00cd 50             push ax
+0452:00ce 0e             push cs
+0452:00cf e83dff         call 0xf
+0452:00d2 59             pop cx
+0452:00d3 59             pop cx
+0452:00d4 16             push ss
+0452:00d5 8d46e8         lea ax, [bp - 0x18]
+0452:00d8 50             push ax
+0452:00d9 0e             push cs
+0452:00da e832ff         call 0xf
+0452:00dd 59             pop cx
+0452:00de 59             pop cx
+0452:00df 16             push ss
+0452:00e0 8d46d4         lea ax, [bp - 0x2c]
+0452:00e3 50             push ax
+0452:00e4 0e             push cs
+0452:00e5 e827ff         call 0xf
+0452:00e8 59             pop cx
+0452:00e9 59             pop cx
+0452:00ea 16             push ss
+0452:00eb 8d46e8         lea ax, [bp - 0x18]
+0452:00ee 50             push ax
+0452:00ef 0e             push cs
+0452:00f0 e81cff         call 0xf
+0452:00f3 59             pop cx
+0452:00f4 59             pop cx
+0452:00f5 16             push ss
+0452:00f6 8d46b4         lea ax, [bp - 0x4c]
+0452:00f9 50             push ax
+0452:00fa 0e             push cs
+0452:00fb e811ff         call 0xf
+0452:00fe 59             pop cx
+0452:00ff 59             pop cx
+0452:0100 16             push ss
+0452:0101 8d46e8         lea ax, [bp - 0x18]
+0452:0104 50             push ax
+0452:0105 0e             push cs
+0452:0106 e806ff         call 0xf
+0452:0109 59             pop cx
+0452:010a 59             pop cx
+0452:010b 16             push ss
+0452:010c 8d46e8         lea ax, [bp - 0x18]
+0452:010f 50             push ax
+0452:0110 0e             push cs
+0452:0111 e8fbfe         call 0xf
+0452:0114 59             pop cx
+0452:0115 59             pop cx
+0452:0116 16             push ss
+0452:0117 8d469e         lea ax, [bp - 0x62]
+0452:011a 50             push ax
+0452:011b 0e             push cs
+0452:011c e8f0fe         call 0xf
+0452:011f 59             pop cx
+0452:0120 59             pop cx
+0452:0121 16             push ss
+0452:0122 8d46e8         lea ax, [bp - 0x18]
+0452:0125 50             push ax
+0452:0126 0e             push cs
+0452:0127 e8e5fe         call 0xf
+0452:012a 59             pop cx
+0452:012b 59             pop cx
+0452:012c 1e             push ds
+0452:012d 68f100         push 0xf1
+0452:0130 0e             push cs
+0452:0131 e8dbfe         call 0xf
+0452:0134 59             pop cx
+0452:0135 59             pop cx
+0452:0136 be0100         mov si, 1
+0452:0139 eb0b           jmp 0x146
+0452:013b 1e             push ds
+0452:013c 68f300         push 0xf3
+0452:013f 0e             push cs
+0452:0140 e8ccfe         call 0xf
+0452:0143 59             pop cx
+0452:0144 59             pop cx
+0452:0145 46             inc si
+0452:0146 8a4606         mov al, byte ptr [bp + 6]
+0452:0149 b400           mov ah, 0
+0452:014b 3bc6           cmp ax, si
+0452:014d 7dec           jge 0x13b
+0452:014f 1e             push ds
+0452:0150 68fa00         push 0xfa
+0452:0153 0e             push cs
+0452:0154 e8b8fe         call 0xf
+0452:0157 59             pop cx
+0452:0158 59             pop cx
+0452:0159 be0100         mov si, 1
+0452:015c eb0b           jmp 0x169
+0452:015e 1e             push ds
+0452:015f 68fc00         push 0xfc
+0452:0162 0e             push cs
+0452:0163 e8a9fe         call 0xf
+0452:0166 59             pop cx
+0452:0167 59             pop cx
+0452:0168 46             inc si
+0452:0169 8a4608         mov al, byte ptr [bp + 8]
+0452:016c b400           mov ah, 0
+0452:016e 3bc6           cmp ax, si
+0452:0170 7fec           jg 0x15e
+0452:0172 1e             push ds
+0452:0173 680301         push 0x103
+0452:0176 0e             push cs
+0452:0177 e895fe         call 0xf
+0452:017a 59             pop cx
+0452:017b 59             pop cx
+0452:017c 16             push ss
+0452:017d 8d46e8         lea ax, [bp - 0x18]
+0452:0180 50             push ax
+0452:0181 0e             push cs
+0452:0182 e88afe         call 0xf
+0452:0185 59             pop cx
+0452:0186 59             pop cx
+0452:0187 1e             push ds
+0452:0188 680a01         push 0x10a
+0452:018b 0e             push cs
+0452:018c e880fe         call 0xf
+0452:018f 59             pop cx
+0452:0190 59             pop cx
+0452:0191 be0100         mov si, 1
+0452:0194 eb35           jmp 0x1cb
+0452:0196 6a0a           push 0xa
+0452:0198 16             push ss
+0452:0199 8d46ec         lea ax, [bp - 0x14]
+0452:019c 50             push ax
+0452:019d 56             push si
+0452:019e 9ad1160000     lcall 0, 0x16d1
+0452:01a3 83c408         add sp, 8
+0452:01a6 83fe0a         cmp si, 0xa
+0452:01a9 7d08           jge 0x1b3
+0452:01ab 8a46ec         mov al, byte ptr [bp - 0x14]
+0452:01ae 8846fb         mov byte ptr [bp - 5], al
+0452:01b1 eb0c           jmp 0x1bf
+0452:01b3 8a46ec         mov al, byte ptr [bp - 0x14]
+0452:01b6 8846fb         mov byte ptr [bp - 5], al
+0452:01b9 8a46ed         mov al, byte ptr [bp - 0x13]
+0452:01bc 8846fc         mov byte ptr [bp - 4], al
+0452:01bf 16             push ss
+0452:01c0 8d46f8         lea ax, [bp - 8]
+0452:01c3 50             push ax
+0452:01c4 0e             push cs
+0452:01c5 e847fe         call 0xf
+0452:01c8 59             pop cx
+0452:01c9 59             pop cx
+0452:01ca 46             inc si
+0452:01cb 8a4606         mov al, byte ptr [bp + 6]
+0452:01ce b400           mov ah, 0
+0452:01d0 3bc6           cmp ax, si
+0452:01d2 7dc2           jge 0x196
+0452:01d4 1e             push ds
+0452:01d5 680c01         push 0x10c
+0452:01d8 0e             push cs
+0452:01d9 e833fe         call 0xf
+0452:01dc 59             pop cx
+0452:01dd 59             pop cx
+0452:01de be0100         mov si, 1
+0452:01e1 eb35           jmp 0x218
+0452:01e3 6a0a           push 0xa
+0452:01e5 16             push ss
+0452:01e6 8d46ec         lea ax, [bp - 0x14]
+0452:01e9 50             push ax
+0452:01ea 56             push si
+0452:01eb 9ad1160000     lcall 0, 0x16d1
+0452:01f0 83c408         add sp, 8
+0452:01f3 83fe0a         cmp si, 0xa
+0452:01f6 7d08           jge 0x200
+0452:01f8 8a46ec         mov al, byte ptr [bp - 0x14]
+0452:01fb 8846f3         mov byte ptr [bp - 0xd], al
+0452:01fe eb0c           jmp 0x20c
+0452:0200 8a46ec         mov al, byte ptr [bp - 0x14]
+0452:0203 8846f3         mov byte ptr [bp - 0xd], al
+0452:0206 8a46ed         mov al, byte ptr [bp - 0x13]
+0452:0209 8846f4         mov byte ptr [bp - 0xc], al
+0452:020c 16             push ss
+0452:020d 8d46f0         lea ax, [bp - 0x10]
+0452:0210 50             push ax
+0452:0211 0e             push cs
+0452:0212 e8fafd         call 0xf
+0452:0215 59             pop cx
+0452:0216 59             pop cx
+0452:0217 46             inc si
+0452:0218 8a4608         mov al, byte ptr [bp + 8]
+0452:021b b400           mov ah, 0
+0452:021d 3bc6           cmp ax, si
+0452:021f 7dc2           jge 0x1e3
+0452:0221 16             push ss
+0452:0222 8d46e8         lea ax, [bp - 0x18]
+0452:0225 50             push ax
+0452:0226 0e             push cs
+0452:0227 e8e5fd         call 0xf
+0452:022a 59             pop cx
+0452:022b 59             pop cx
+0452:022c 1e             push ds
+0452:022d 680e01         push 0x10e
+0452:0230 0e             push cs
+0452:0231 e8dbfd         call 0xf
+0452:0234 59             pop cx
+0452:0235 59             pop cx
+0452:0236 be0100         mov si, 1
+0452:0239 eb0b           jmp 0x246
+0452:023b 1e             push ds
+0452:023c 681001         push 0x110
+0452:023f 0e             push cs
+0452:0240 e8ccfd         call 0xf
+0452:0243 59             pop cx
+0452:0244 59             pop cx
+0452:0245 46             inc si
+0452:0246 8a4606         mov al, byte ptr [bp + 6]
+0452:0249 b400           mov ah, 0
+0452:024b 3bc6           cmp ax, si
+0452:024d 7dec           jge 0x23b
+0452:024f 1e             push ds
+0452:0250 681701         push 0x117
+0452:0253 0e             push cs
+0452:0254 e8b8fd         call 0xf
+0452:0257 59             pop cx
+0452:0258 59             pop cx
+0452:0259 be0100         mov si, 1
+0452:025c eb0b           jmp 0x269
+0452:025e 1e             push ds
+0452:025f 681901         push 0x119
+0452:0262 0e             push cs
+0452:0263 e8a9fd         call 0xf
+0452:0266 59             pop cx
+0452:0267 59             pop cx
+0452:0268 46             inc si
+0452:0269 8a4608         mov al, byte ptr [bp + 8]
+0452:026c b400           mov ah, 0
+0452:026e 3bc6           cmp ax, si
+0452:0270 7fec           jg 0x25e
+0452:0272 1e             push ds
+0452:0273 682001         push 0x120
+0452:0276 0e             push cs
+0452:0277 e895fd         call 0xf
+0452:027a 59             pop cx
+0452:027b 59             pop cx
+0452:027c 16             push ss
+0452:027d 8d46e8         lea ax, [bp - 0x18]
+0452:0280 50             push ax
+0452:0281 0e             push cs
+0452:0282 e88afd         call 0xf
+0452:0285 59             pop cx
+0452:0286 59             pop cx
+0452:0287 5e             pop si
+0452:0288 c9             leave 
+0452:0289 cb             retf 
+0452:028a c8040000       enter 4, 0
+0452:028e 56             push si
+0452:028f 39265c16       cmp word ptr [0x165c], sp
+0452:0293 7705           ja 0x29a
+0452:0295 9aac290000     lcall 0, 0x29ac
+0452:029a 8d46fc         lea ax, [bp - 4]
+0452:029d 16             push ss
+0452:029e 50             push ax
+0452:029f 1e             push ds
+0452:02a0 68ee00         push 0xee
+0452:02a3 b90300         mov cx, 3
+0452:02a6 9a32290000     lcall 0, 0x2932
+0452:02ab 1e             push ds
+0452:02ac 682701         push 0x127
+0452:02af 0e             push cs
+0452:02b0 e85cfd         call 0xf
+0452:02b3 59             pop cx
+0452:02b4 59             pop cx
+0452:02b5 be0100         mov si, 1
+0452:02b8 eb23           jmp 0x2dd
+0452:02ba c45e0a         les bx, ptr [bp + 0xa]
+0452:02bd 26803f01       cmp byte ptr es:[bx], 1
+0452:02c1 750c           jne 0x2cf
+0452:02c3 1e             push ds
+0452:02c4 682901         push 0x129
+0452:02c7 0e             push cs
+0452:02c8 e844fd         call 0xf
+0452:02cb 59             pop cx
+0452:02cc 59             pop cx
+0452:02cd eb0a           jmp 0x2d9
+0452:02cf 1e             push ds
+0452:02d0 683001         push 0x130
+0452:02d3 0e             push cs
+0452:02d4 e838fd         call 0xf
+0452:02d7 59             pop cx
+0452:02d8 59             pop cx
+0452:02d9 ff460a         inc word ptr [bp + 0xa]
+0452:02dc 46             inc si
+0452:02dd 8a4606         mov al, byte ptr [bp + 6]
+0452:02e0 b400           mov ah, 0
+0452:02e2 3bc6           cmp ax, si
+0452:02e4 7dd4           jge 0x2ba
+0452:02e6 1e             push ds
+0452:02e7 683701         push 0x137
+0452:02ea 0e             push cs
+0452:02eb e821fd         call 0xf
+0452:02ee 59             pop cx
+0452:02ef 59             pop cx
+0452:02f0 be0100         mov si, 1
+0452:02f3 eb23           jmp 0x318
+0452:02f5 c45e0a         les bx, ptr [bp + 0xa]
+0452:02f8 26803f01       cmp byte ptr es:[bx], 1
+0452:02fc 750c           jne 0x30a
+0452:02fe 1e             push ds
+0452:02ff 683901         push 0x139
+0452:0302 0e             push cs
+0452:0303 e809fd         call 0xf
+0452:0306 59             pop cx
+0452:0307 59             pop cx
+0452:0308 eb0a           jmp 0x314
+0452:030a 1e             push ds
+0452:030b 684001         push 0x140
+0452:030e 0e             push cs
+0452:030f e8fdfc         call 0xf
+0452:0312 59             pop cx
+0452:0313 59             pop cx
+0452:0314 ff460a         inc word ptr [bp + 0xa]
+0452:0317 46             inc si
+0452:0318 8a4608         mov al, byte ptr [bp + 8]
+0452:031b b400           mov ah, 0
+0452:031d 3bc6           cmp ax, si
+0452:031f 7dd4           jge 0x2f5
+0452:0321 16             push ss
+0452:0322 8d46fc         lea ax, [bp - 4]
+0452:0325 50             push ax
+0452:0326 0e             push cs
+0452:0327 e8e5fc         call 0xf
+0452:032a 59             pop cx
+0452:032b 59             pop cx
+0452:032c 5e             pop si
+0452:032d c9             leave 
+0452:032e cb             retf 
+0452:032f 55             push bp
+0452:0330 8bec           mov bp, sp
+0452:0332 56             push si
+0452:0333 39265c16       cmp word ptr [0x165c], sp
+0452:0337 7705           ja 0x33e
+0452:0339 9aac290000     lcall 0, 0x29ac
+0452:033e 1e             push ds
+0452:033f 684701         push 0x147
+0452:0342 0e             push cs
+0452:0343 e8c9fc         call 0xf
+0452:0346 59             pop cx
+0452:0347 59             pop cx
+0452:0348 be0100         mov si, 1
+0452:034b eb0b           jmp 0x358
+0452:034d 1e             push ds
+0452:034e 684901         push 0x149
+0452:0351 0e             push cs
+0452:0352 e8bafc         call 0xf
+0452:0355 59             pop cx
+0452:0356 59             pop cx
+0452:0357 46             inc si
+0452:0358 8a4606         mov al, byte ptr [bp + 6]
+0452:035b b400           mov ah, 0
+0452:035d 3bc6           cmp ax, si
+0452:035f 7dec           jge 0x34d
+0452:0361 1e             push ds
+0452:0362 685001         push 0x150
+0452:0365 0e             push cs
+0452:0366 e8a6fc         call 0xf
+0452:0369 59             pop cx
+0452:036a 59             pop cx
+0452:036b be0100         mov si, 1
+0452:036e eb0b           jmp 0x37b
+0452:0370 1e             push ds
+0452:0371 685201         push 0x152
+0452:0374 0e             push cs
+0452:0375 e897fc         call 0xf
+0452:0378 59             pop cx
+0452:0379 59             pop cx
+0452:037a 46             inc si
+0452:037b 8a4608         mov al, byte ptr [bp + 8]
+0452:037e b400           mov ah, 0
+0452:0380 3bc6           cmp ax, si
+0452:0382 7fec           jg 0x370
+0452:0384 1e             push ds
+0452:0385 685901         push 0x159
+0452:0388 0e             push cs
+0452:0389 e883fc         call 0xf
+0452:038c 59             pop cx
+0452:038d 59             pop cx
+0452:038e 5e             pop si
+0452:038f 5d             pop bp

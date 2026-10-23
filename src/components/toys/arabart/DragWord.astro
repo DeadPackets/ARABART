@@ -1,0 +1,270 @@
+---
+// Pull a letter out of a word and its neighbors re-shape at once; drop it anywhere and the word joins again.
+// Every glyph is drawn by his engine (font 3). Mouse, touch, and keys: arrows move a letter, Space pulls it out.
+// Event: 'word' { keys } on the root after every change.
+import Window from '../../shell/Window.astro';
+import Pix from './Pix.astro';
+import { translate, shape, draw, toUnicode, metrics, FORMS } from './core.ts';
+import { ssrBin } from './ssr.ts';
+
+interface Props { id?: string; keys?: string; presets?: [string, string][] }
+const { id = 'dragword', keys = '~guvfd', presets = [['~guvfd', 'العربي'], ['~gtk', 'الفن'], ['dhsv', 'ياسر'], ['fsl', 'بسم']] } = Astro.props;
+const FONT = 3;
+const bin = ssrBin();
+const { h } = metrics(bin, FONT);
+const codes = shape(translate(bin, keys));
+const letters = [...keys].map((k, i) => {
+  const img = draw(bin, [codes[i]], { font: FONT, color: 14 });
+  return { k, ar: toUnicode(k), code: codes[i], img, form: FORMS[codes[i] >> 6] };
+});
+const vars = (img: (typeof letters)[0]['img']) => `--adv:${img.advance};--gx:${img.advance - 1 - img.x};--gy:${h - 1 - img.y};--gw:${img.width}`;
+---
+
+<div class="dw" id={id} data-dragword data-keys={keys} data-font={FONT} data-h={h}>
+  <Window title="LETTERS  pull one out of the word" kind="screen" class="dw-win">
+    <div class="dw-stage" style={`--h:${h}`}>
+      <div class="dw-word" dir="rtl" data-word>
+        {letters.map(l => (
+          <button type="button" class="dw-l" data-k={l.k} data-code={l.code} style={vars(l.img)} aria-label={`${l.ar}, ${l.form}`}>
+            <span class="dw-g"><Pix img={l.img} scale={1} /></span>
+            <span class="dw-f" aria-hidden="true">{l.form}</span>
+          </button>
+        ))}
+      </div>
+      <span class="dw-caret" aria-hidden="true"></span>
+    </div>
+  </Window>
+  <div class="dw-bar">
+    <div class="dw-presets" role="group" aria-label="Words to try">
+      {presets.map(([k, ar]) => <button type="button" class="button k-btn" data-preset={k} aria-pressed={String(k === keys)}><span lang="ar">{ar}</span></button>)}
+    </div>
+    <p class="dw-say" aria-live="polite" data-say>Drag any letter out of the word, then drop it back anywhere. On a keyboard: Tab to a letter and use the arrows to move it, or Space to pull it out and Space to put it back.</p>
+  </div>
+</div>
+
+<style is:global>
+  .dw { --s: 4; display: grid; gap: 18px; }
+  .dw-stage { position: relative; display: grid; place-items: center; min-height: calc((var(--h) + 30) * var(--s) * 1px); padding: 18px 8px; overflow: hidden; touch-action: none; }
+  .dw-word { display: flex; justify-content: center; align-items: flex-start; }
+  .dw-l {
+    position: relative;
+    flex: none;
+    width: calc(var(--adv) * var(--s) * 1px);
+    height: calc(var(--h) * var(--s) * 1px + 42px);
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .dw-l.is-lift { z-index: 3; cursor: grabbing; }
+  .dw-g { position: absolute; inset: 0 0 42px 0; pointer-events: none; }
+  .dw-g svg { position: absolute; left: calc(var(--gx) * var(--s) * 1px); top: calc(var(--gy) * var(--s) * 1px); width: calc(var(--gw) * var(--s) * 1px); height: auto; }
+  .dw-f { position: absolute; left: 50%; bottom: 0; translate: -50% 0; font: 500 11px/1 var(--font-code); color: var(--vga-11); white-space: nowrap; direction: ltr; opacity: 0.85; pointer-events: none; }
+  .dw-l:nth-child(even of .dw-l) .dw-f { bottom: 16px; }
+  .dw-l:hover .dw-f, .dw-l:focus-visible .dw-f, .dw-l.is-lift .dw-f { color: var(--vga-14); opacity: 1; }
+  .dw-l:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 2px; }
+  .dw-caret { position: absolute; top: 14%; height: 62%; width: 4px; margin-left: -2px; background: var(--vga-11); opacity: 0; pointer-events: none; left: 0; }
+  .dw-bar { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px 24px; align-items: center; }
+  .dw-presets { display: flex; flex-wrap: wrap; gap: 10px; }
+  .dw-presets [lang='ar'] { font: 700 1.25rem/1 var(--font-ar); }
+  .dw-say { margin: 0; min-height: 3.2em; font-size: 1.0625rem; line-height: 1.55; color: var(--ink); text-wrap: pretty; }
+  .dw-say b { color: var(--accent); }
+  .dw-say [lang='ar'] { font-weight: 700; font-size: 1.2em; color: var(--accent); }
+  @media (max-width: 1023px) {
+    .dw { --s: 3; }
+    .dw-bar { grid-template-columns: 1fr; }
+    .dw-f { font-size: 10px; }
+    .dw-l:nth-child(n of .dw-l) .dw-f { bottom: 0; }
+    .dw-l:nth-child(3n + 2 of .dw-l) .dw-f { bottom: 14px; }
+    .dw-l:nth-child(3n of .dw-l) .dw-f { bottom: 28px; }
+  }
+  @media (max-width: 560px) { .dw { --s: 2; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, translate, shape, draw, toUnicode, svgMarkup, FORMS, type Bin } from './core.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const D = (d: number) => (reduce() ? 0 : d);
+  const A = (s: string) => `<span lang="ar">${s}</span>`;
+  type Slot = HTMLButtonElement & { _code?: number };
+
+  document.querySelectorAll<HTMLElement>('[data-dragword]').forEach(async root => {
+    const bin: Bin = await fonts();
+    const font = +root.dataset.font!, h = +root.dataset.h!;
+    const word = root.querySelector<HTMLElement>('[data-word]')!, stage = word.parentElement!;
+    const caret = root.querySelector<HTMLElement>('.dw-caret')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const slots = () => [...word.querySelectorAll<Slot>('.dw-l')];
+
+    function setGlyph(el: Slot, code: number, animate: boolean) {
+      if (el._code === code) return;
+      const img = draw(bin, [code], { font, color: 14 });
+      el.style.cssText = `--adv:${img.advance};--gx:${img.advance - 1 - img.x};--gy:${h - 1 - img.y};--gw:${img.width}`;
+      const g = el.querySelector<HTMLElement>('.dw-g')!, old = g.firstElementChild as SVGElement | null;
+      g.insertAdjacentHTML('beforeend', svgMarkup(img, 1, ''));
+      const nu = g.lastElementChild!;
+      if (old && animate && D(1)) {
+        gsap.to(old, { opacity: 0, scale: 0.92, duration: 0.35, ease: 'power2.out', onComplete: () => old.remove() });
+        gsap.fromTo(nu, { opacity: 0, scale: 1.12, transformOrigin: '50% 70%' }, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' });
+      } else old?.remove();
+      el._code = code;
+      const form = FORMS[code >> 6];
+      el.querySelector('.dw-f')!.textContent = form;
+      el.setAttribute('aria-label', `${toUnicode(el.dataset.k!)}, ${form}`);
+    }
+
+    // FLIP: measure, change, then slide everything from where it was
+    function flip(change: () => void, skip?: Element) {
+      const els = slots().filter(e => e !== skip);
+      const before = new Map(els.map(e => [e, e.getBoundingClientRect().left]));
+      change();
+      if (!D(1)) return;
+      for (const e of slots()) {
+        if (e === skip) continue;
+        const was = before.get(e);
+        if (was === undefined) continue;
+        const dx = was - e.getBoundingClientRect().left;
+        if (Math.abs(dx) > 0.5) gsap.fromTo(e, { x: dx }, { x: 0, duration: 0.55, ease: 'expo.out', overwrite: 'auto' });
+      }
+    }
+
+    const keysOf = (els: Slot[]) => els.map(e => e.dataset.k!).join('');
+    function reshape(els: Slot[], animate = true) {
+      const codes = shape(translate(bin, keysOf(els)));
+      els.forEach((e, i) => setGlyph(e, codes[i], animate));
+      return codes;
+    }
+
+    function why(els: Slot[], i: number) {
+      const table = translate(bin, keysOf(els)), codes = shape(table);
+      const L = A(toUnicode(els[i].dataset.k!)), f = codes[i] >> 6;
+      const prev = els[i - 1], next = els[i + 1];
+      const pa = prev && A(toUnicode(prev.dataset.k!)), na = next && A(toUnicode(next.dataset.k!));
+      const right = !prev ? 'nothing comes before it' : !(table[i - 1] & 0x80) ? `${pa} before it never reaches left` : '';
+      const left = !(table[i] & 0x80) ? 'it never reaches left' : !next ? 'nothing comes after it' : !(table[i + 1] & 0x40) ? `${na} after it never reaches back` : '';
+      if (f === 3) return `${L} is <b>medial</b>: it joins the letter on each side.`;
+      if (f === 2) return `${L} is <b>initial</b>: it joins ${na} after it, but ${right}.`;
+      if (f === 1) return `${L} is <b>final</b>: it joins ${pa} before it, and ${left}.`;
+      return `${L} is <b>isolated</b>: ${right || 'it never reaches right'}, and ${left}.`;
+    }
+    const emit = () => root.dispatchEvent(new CustomEvent('word', { bubbles: true, detail: { keys: keysOf(slots()) } }));
+
+    // Pointer: press, pull out past a threshold, drop between any two letters
+    let drag: { el: Slot; x0: number; y0: number; out: boolean; at: number } | null = null;
+    const others = (el?: Element) => slots().filter(e => e !== el);
+    // Right to left: the drop index is how many letters have their middle right of the pointer
+    const insertAt = (px: number, el: Element) => others(el).filter(e => { const r = e.getBoundingClientRect(); return r.left + r.width / 2 > px; }).length;
+    function lift(el: Slot) {
+      const r = el.getBoundingClientRect(), s = stage.getBoundingClientRect();
+      flip(() => {
+        el.classList.add('is-lift');
+        Object.assign(el.style, { position: 'absolute', left: `${r.left - s.left}px`, top: `${r.top - s.top}px` });
+        stage.append(el);
+        reshape(others(el));
+        setGlyph(el, translate(bin, el.dataset.k!)[0] & 0x3f, true);
+      }, el);
+      say.innerHTML = `${A(toUnicode(el.dataset.k!))} let go, so its neighbors re-shaped. On its own it is <b>isolated</b>.`;
+    }
+    function drop(el: Slot, at: number) {
+      gsap.set(caret, { opacity: 0 });
+      const rest = others(el), r0 = el.getBoundingClientRect();
+      flip(() => {
+        el.classList.remove('is-lift');
+        el.style.position = el.style.left = el.style.top = '';
+        gsap.set(el, { x: 0, y: 0, scale: 1 });
+        word.insertBefore(el, rest[at] ?? null);
+        reshape(slots());
+      }, el);
+      const r1 = el.getBoundingClientRect();
+      if (D(1)) gsap.fromTo(el, { x: r0.left - r1.left, y: r0.top - r1.top }, { x: 0, y: 0, duration: 0.55, ease: 'expo.out' });
+      const all = slots();
+      say.innerHTML = why(all, all.indexOf(el));
+      emit();
+    }
+
+    word.addEventListener('pointerdown', e => {
+      const el = (e.target as Element).closest<Slot>('.dw-l');
+      if (!el || e.button > 0) return;
+      e.preventDefault();
+      el.setPointerCapture(e.pointerId);
+      drag = { el, x0: e.clientX, y0: e.clientY, out: false, at: slots().indexOf(el) };
+      gsap.to(el, { scale: 1.05, duration: D(0.2), ease: 'power2.out' });
+    });
+    root.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+      if (!drag.out && Math.hypot(dx, dy) > 24) { drag.out = true; lift(drag.el); }
+      gsap.set(drag.el, { x: dx, y: dy });
+      if (drag.out) showCaret((drag.at = insertAt(e.clientX, drag.el)), drag.el);
+    });
+    function showCaret(at: number, el: Slot) {
+      const rest = others(el), s = stage.getBoundingClientRect();
+      const x = !rest.length ? s.width / 2 : at === 0 ? rest[0].getBoundingClientRect().right - s.left : rest[at - 1].getBoundingClientRect().left - s.left;
+      gsap.set(caret, { x, opacity: 1 });
+    }
+    const end = () => {
+      if (!drag) return;
+      const { el, out, at } = drag;
+      drag = null;
+      if (out) drop(el, at);
+      else { gsap.to(el, { x: 0, y: 0, scale: 1, duration: D(0.4), ease: 'expo.out' }); const all = slots(); say.innerHTML = why(all, all.indexOf(el)); }
+    };
+    root.addEventListener('pointerup', end);
+    root.addEventListener('pointercancel', end);
+
+    // Keys: arrows move the focused letter, Space or Enter pulls it out and puts it back
+    word.addEventListener('keydown', e => {
+      const el = (e.target as Element).closest<Slot>('.dw-l');
+      if (!el) return;
+      const all = slots(), i = all.indexOf(el);
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const j = Math.max(0, Math.min(all.length - 1, i + (e.key === 'ArrowLeft' ? 1 : -1))); // right to left
+        if (j === i) return;
+        flip(() => { word.insertBefore(el, j > i ? all[j].nextSibling : all[j]); reshape(slots()); });
+        el.focus();
+        const now = slots();
+        say.innerHTML = why(now, now.indexOf(el));
+        emit();
+      }
+    });
+    stage.addEventListener('keydown', e => {
+      const el = (e.target as Element).closest<Slot>('.dw-l');
+      if (el?.classList.contains('is-lift') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        // While pulled out, arrows choose where it goes back in (right to left)
+        e.preventDefault();
+        const at = Math.max(0, Math.min(others(el).length, +(el.dataset.at ?? 0) + (e.key === 'ArrowLeft' ? 1 : -1)));
+        el.dataset.at = String(at);
+        showCaret(at, el);
+        return;
+      }
+      if (!el || (e.key !== ' ' && e.key !== 'Enter' && e.key !== 'Escape')) return;
+      e.preventDefault();
+      if (el.classList.contains('is-lift')) { drop(el, +(el.dataset.at ?? 0)); el.focus(); }
+      else if (e.key !== 'Escape') {
+        el.dataset.at = String(slots().indexOf(el));
+        lift(el);
+        gsap.to(el, { y: -28, duration: D(0.4), ease: 'expo.out' });
+        el.focus();
+      }
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach(b => b.addEventListener('click', () => {
+      root.querySelectorAll('[data-preset]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      const ks = [...b.dataset.preset!];
+      flip(() => {
+        word.innerHTML = ks.map(k => `<button type="button" class="dw-l" data-k="${k.replace(/"/g, '&quot;')}"><span class="dw-g"></span><span class="dw-f" aria-hidden="true"></span></button>`).join('');
+        reshape(slots(), false);
+      });
+      if (D(1)) gsap.from(slots(), { opacity: 0, y: 18, duration: 0.5, stagger: 0.05, ease: 'expo.out' });
+      say.innerHTML = `${A(toUnicode(b.dataset.preset!))}: ${slots().map((e, i) => `${A(toUnicode(e.dataset.k!))} ${FORMS[(e as Slot)._code! >> 6]}`).join(', ')}.`;
+      emit();
+    }));
+
+    slots().forEach(e => ((e as Slot)._code = +e.dataset.code!));
+  });
+</script>

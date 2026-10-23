@@ -1,0 +1,396 @@
+{
+ "file": "KVC/KVC.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header, rebuilt by the museum unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 60,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "7 segment addresses that DOS patches with the real load address.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 60,
+   "end": 64,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Fills the header to a 16-byte boundary.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 64,
+   "end": 592,
+   "kind": "startup",
+   "label": "Borland C++ start-up code",
+   "note": "Sets up memory, the stack, argv and the environment, then calls main at 0525.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 592,
+   "end": 688,
+   "kind": "code",
+   "label": "C helpers",
+   "note": "Find first and find next in one function (AH = 4Eh + flag), set the DTA, compare names.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 688,
+   "end": 1381,
+   "kind": "code",
+   "label": "Folder scanner",
+   "note": "Walks every folder (unless /NS) and checks each COM and EXE file it finds.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 1381,
+   "end": 2016,
+   "kind": "code",
+   "label": "main",
+   "note": "Reads /NS, /NC and /H, runs the memory check, scans the disk and prints the totals.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 2016,
+   "end": 2086,
+   "kind": "code",
+   "label": "Reopen for writing",
+   "note": "Closes the file, unlocks it if it is read-only, and opens it again for writing, so protected programs get cleaned too.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 2086,
+   "end": 2231,
+   "kind": "code",
+   "label": "Memory check and freeze",
+   "note": "Asks INT 21h AX=FF0Ch; on the reply C0C1h it sounds a siren and points INT 21h back at DOS through INT 3.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-freeze"
+  },
+  {
+   "start": 2231,
+   "end": 2537,
+   "kind": "text",
+   "label": "Memory alarm messages",
+   "note": "\"Found --KoKo (1) virus-- active in RAM\", \"Virus Freezed\" and the advice to reboot from a clean disk, then a 1-byte flag.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-freeze"
+  },
+  {
+   "start": 2537,
+   "end": 2632,
+   "kind": "code",
+   "label": "Message printer",
+   "note": "Prints message n from two pointer tables, with the file name in between.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 2632,
+   "end": 2753,
+   "kind": "unused",
+   "label": "Zero bytes",
+   "note": "120 zero bytes and a $.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 2753,
+   "end": 2793,
+   "kind": "table",
+   "label": "Message pointer tables",
+   "note": "Two tables of 10 word pointers, at CS:0A81 (before the file name) and CS:0A95 (after it).",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 2793,
+   "end": 3383,
+   "kind": "text",
+   "label": "Scan messages",
+   "note": "\"File is infected by KoKo (1) virus\", \"Virus removed\", \"Strange signeture\", \"Scanning >>\", \"Cleaning >>\" and error texts.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 3383,
+   "end": 4053,
+   "kind": "code",
+   "label": "COM check and repair",
+   "note": "Checks bytes 5-25 and body+127h, writes back the 26 saved bytes and restores the date and time.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 4053,
+   "end": 4783,
+   "kind": "code",
+   "label": "EXE check and repair",
+   "note": "Checks SP = C0C1h and three body signatures, restores CS:IP and SS:SP, computes the clean size.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 4783,
+   "end": 4821,
+   "kind": "code",
+   "label": "Help routine",
+   "note": "Prints the three help pages (/H), waiting for a key after each.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 4821,
+   "end": 7967,
+   "kind": "text",
+   "label": "Help pages",
+   "note": "Version notes, credits (Yasser Mohamed Ali, Ebrahim El-Etr), the Koko description, and a contact page that this site does not reproduce.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 7967,
+   "end": 7990,
+   "kind": "code",
+   "label": "Press-any-key routine",
+   "note": "Prints the prompt, waits for a key, clears the line.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 7990,
+   "end": 8147,
+   "kind": "text",
+   "label": "Prompts",
+   "note": "\"< Press any key >\" and a blank line.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 8147,
+   "end": 14272,
+   "kind": "library",
+   "label": "Borland C++ runtime library",
+   "note": "printf, sprintf, chsize, file and memory functions that the compiler linked in.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 14272,
+   "end": 14430,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "The Borland copyright string, \"Divide error\" and start-up variables.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 14430,
+   "end": 15556,
+   "kind": "text",
+   "label": "Messages of the C part",
+   "note": "Path formats, \"Scanning >> %s\", the banner \"KEMYAM Virus Capture. (Ver 1.05)\", totals and usage.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 15556,
+   "end": 15569,
+   "kind": "text",
+   "label": "Spare string",
+   "note": "The text \"a:format.com\".",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 15569,
+   "end": 15711,
+   "kind": "data",
+   "label": "File buffers",
+   "note": "A 26-byte header buffer at DS:0511 and a 98-byte body buffer at DS:052F.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 15711,
+   "end": 15732,
+   "kind": "table",
+   "label": "Koko COM signature",
+   "note": "push ax / mov ax,100h / push ax / xor ax,ax / retf / 08 00 \"KoKo (1)\" 0A 0D $: 21 bytes, compared with file bytes 5-25.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 15732,
+   "end": 15745,
+   "kind": "unused",
+   "label": "Spaces",
+   "note": "13 spaces after the signature string.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 15745,
+   "end": 15765,
+   "kind": "table",
+   "label": "Koko EXE signature",
+   "note": "20 bytes of Koko's own EXE restore code, compared at entry + 5F0h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 15765,
+   "end": 15771,
+   "kind": "table",
+   "label": "Koko restore-code signature",
+   "note": "BF 00 01 BE 22 01 (mov di,100h / mov si,122h), compared at body + 127h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#kvc-clean"
+  },
+  {
+   "start": 15771,
+   "end": 16928,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "File table, buffers and other variables of the Borland runtime.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 2086,
+   "end": 2231,
+   "name": "find_koko_in_memory",
+   "note": "Detects Koko through its own reply, then cuts it off from DOS.",
+   "link": "#kvc-freeze",
+   "lines": [
+    {
+     "off": 2095,
+     "note": "Asks the question only Koko answers"
+    },
+    {
+     "off": 2100,
+     "note": "C0C1h means Koko is resident"
+    },
+    {
+     "off": 2123,
+     "note": "Prints the alarm through INT 3, past the virus"
+    },
+    {
+     "off": 2179,
+     "note": "AX=3503h through INT 3: read entry 3, the real DOS address"
+    },
+    {
+     "off": 2187,
+     "note": "AX=2521h through INT 3: point INT 21h back at DOS"
+    }
+   ]
+  },
+  {
+   "start": 3383,
+   "end": 4053,
+   "name": "check_and_clean_com",
+   "note": "Two signature checks, then the 26 saved bytes go back to the start of the file.",
+   "link": "#kvc-clean",
+   "lines": [
+    {
+     "off": 3535,
+     "note": "Bytes 5-25 must match Koko's stub and name"
+    },
+    {
+     "off": 3553,
+     "note": "Bytes 3-4 x 16 = body offset"
+    },
+    {
+     "off": 3666,
+     "note": "Body + 127h must be Koko's restore code"
+    },
+    {
+     "off": 3884,
+     "note": "Writes the 26 saved bytes at offset 0"
+    },
+    {
+     "off": 3913,
+     "note": "Puts the date and time back"
+    }
+   ]
+  },
+  {
+   "start": 4053,
+   "end": 4783,
+   "name": "check_and_clean_exe",
+   "note": "Finds Koko's mark in the EXE header and restores the original start-up fields.",
+   "link": "#kvc-clean",
+   "lines": [
+    {
+     "off": 4206,
+     "note": "SP = C0C1h is Koko's mark"
+    },
+    {
+     "off": 4310,
+     "note": "Entry must start EB 60 90 EA"
+    },
+    {
+     "off": 4379,
+     "note": "IP, SP, CS and SS come back from the virus body"
+    },
+    {
+     "off": 4564,
+     "note": "Clean size = entry - 100h"
+    },
+    {
+     "off": 4591,
+     "note": "Pages = size / 512, plus 1 for the last part"
+    }
+   ]
+  },
+  {
+   "start": 592,
+   "end": 638,
+   "name": "find_file",
+   "note": "One helper for both find first and find next.",
+   "link": "#kvc-clean",
+   "lines": [
+    {
+     "off": 598,
+     "note": "AH = 4Eh + flag: 4Eh first, 4Fh next"
+    }
+   ]
+  },
+  {
+   "start": 1381,
+   "end": 2016,
+   "name": "main",
+   "note": "Options, memory check, scan, totals.",
+   "link": "#kvc-clean"
+  }
+ ]
+}

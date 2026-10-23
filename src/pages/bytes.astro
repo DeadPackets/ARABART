@@ -1,0 +1,244 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Window from '../components/shell/Window.astro';
+import Term from '../components/explain/Term.astro';
+import Deep from '../components/explain/Deep.astro';
+import { programs } from '../data/programs';
+import { loadBytes } from '../scripts/bytes/data';
+import { MEM_RGB, rgb } from '../scripts/bytes/regions';
+
+const base = import.meta.env.BASE_URL;
+const { meta, files, anatomy } = loadBytes();
+const n = (v: number) => v.toLocaleString('en-US');
+const titles: Record<string, { title: string; year: string }> = {
+  'ARABART_ARABART.EXE': { title: 'ARABART 4.15, the Arabic engine', year: '1993' },
+  'SUN_ARAB-ART.EXE': { title: "ARAB-ART 7.15, The Brave Sun's own engine", year: '1993' },
+};
+for (const f of files) {
+  const p = programs.find(q => q.id === f.id);
+  if (p && !titles[f.key]) titles[f.key] = { title: p.title.replace(' - ', ': '), year: String(p.year) };
+}
+const data = JSON.stringify({ base, titles, anatomy }).replace(/</g, '\\u003c');
+const sw = (c: [number, number, number]) => `background:${rgb(c)}`;
+---
+
+<BaseLayout
+  title="Every Byte · Yasser Awad"
+  description={`All ${files.length} of Yasser Awad's program files, byte by byte: ${n(meta.totals.disk)} bytes on the disk, ${n(meta.totals.mem)} once unpacked. Zoom from the whole archive down to single instructions.`}
+  era="dos"
+  keys={[{ k: 'L', label: 'Layer' }, { k: 'Y', label: 'His code' }, { k: '+/-', label: 'Zoom' }, { k: 'Esc', label: 'Back out' }]}
+>
+  <div class="bx-page">
+    <header class="bx-head">
+      <h1>Every Byte</h1>
+      <p class="bx-intro">All {files.length} of his program files, one square for every <Term id="byte">byte</Term>. Zoom from the whole archive down to a single instruction he wrote.</p>
+    </header>
+
+    <Window title="HOW TO READ THE MAP" kind="help" class="bx-how" aria-labelledby="bx-how-h">
+      <h2 id="bx-how-h" class="sr-only">How to read the map</h2>
+      <ol>
+        <li><b>One square, one byte.</b> The {files.length} files hold {n(meta.totals.mem)} bytes. Each block is one file, so a bigger block is a bigger program.</li>
+        <li><b>Color says what it is.</b> <i style={sw(MEM_RGB.code)}></i>code, <i style={sw(MEM_RGB.text)}></i>text, <i style={sw(MEM_RGB.data)}></i>data, <i style={sw(MEM_RGB.library)}></i>Borland’s library, <i style={sw(MEM_RGB.header)}></i>the header DOS reads first.</li>
+        <li><b>Two layers.</b> <em>On disk</em> is each file as it shipped, packed by <Term id="diet">DIET</Term> into {n(meta.totals.disk)} bytes. <em>In memory</em> is the program after it unpacks itself: what the processor ran.</li>
+        <li><b>Zoom and tap.</b> Close up, the bytes show as <Term id="hex">hex</Term>, then as instructions. Tap any part to read what it is and who made it.</li>
+      </ol>
+    </Window>
+  </div>
+
+  <section class="bx bx-root" aria-label="Byte map of all files" data-layer="memory">
+    <script type="application/json" id="bx-data" set:html={data} />
+    <Window title={`EVERY.BYT  ${files.length} files`} kind="editor" active num="1" class="bx-win">
+      <div class="bx-tools">
+        <div class="bx-seg" role="group" aria-label="Layer">
+          <button type="button" class="button k-btn" data-set-layer="memory" aria-pressed="true"><span><span class="hk">I</span>n memory</span></button>
+          <button type="button" class="button k-btn" data-set-layer="disk" aria-pressed="false"><span>On <span class="hk">d</span>isk</span></button>
+        </div>
+        <label class="bx-onlyhis"><input type="checkbox" /> Only Yasser’s code</label>
+        <ol class="bx-crumbs" aria-label="Where you are"><li><button type="button" data-go="all" aria-current="page">All files</button></li></ol>
+      </div>
+      <div class="bx-body">
+        <div class="bx-map" tabindex="0" role="application" aria-roledescription="zoomable byte map" aria-label="Byte map. Drag or use the arrow keys to move, plus and minus to zoom, L to switch layers.">
+          <canvas class="bx-gl" aria-hidden="true"></canvas>
+          <canvas class="bx-ov" aria-hidden="true"></canvas>
+          <div class="bx-labels"></div>
+          <div class="bx-ctrl">
+            <div class="bx-scale" aria-hidden="true"><span></span><i></i></div>
+            <div class="bx-zoom">
+              <button type="button" class="bx-zin" aria-label="Zoom in">+</button>
+              <button type="button" class="bx-zout" aria-label="Zoom out">-</button>
+              <button type="button" class="bx-zfit" aria-label="Show all files">⌂</button>
+            </div>
+            <ol class="bx-ladder" aria-label="Zoom level">
+              <li><button type="button" data-go="all">All files</button></li>
+              <li><button type="button" data-go="file">File</button></li>
+              <li><button type="button" data-go="bytes">Bytes</button></li>
+              <li><button type="button" data-go="code">Code</button></li>
+            </ol>
+          </div>
+          <div class="bx-mini" aria-hidden="true"><canvas width="200" height="164"></canvas></div>
+          <p class="bx-nogl">This map draws with WebGL 2, which is switched off in this browser. The map on each <a href={`${base}/program/kvc-antivirus/#bytes`}>program’s page</a> works everywhere.</p>
+          <p class="bx-live" aria-live="polite"></p>
+        </div>
+        <Window title="DETAILS" kind="dialog" as="aside" class="bx-panel" aria-label="Details">
+          <div class="bx-p-head"><h2>All files</h2><p class="bx-lead">Loading the map…</p></div>
+          <div class="bx-p-byte"></div>
+          <div class="bx-p-body"></div>
+        </Window>
+      </div>
+    </Window>
+  </section>
+
+  <div class="bx-page bx-after">
+    <Deep title="For engineers: how this map was made">
+      <p><b>On disk</b> comes from the unpacker at work. Each packed file ran inside a CPU <Term id="emulator">emulator</Term> with its own DIET unpacker, and every byte it read was tagged by the instruction that read it. One instruction reads the control bits, one copies a stored byte (a <Term id="lz77">literal</Term>), one reads a <Term id="back-reference">copy instruction</Term>, and the bytes it runs are DIET’s own code.</p>
+      <p><b>In memory</b> is the unpacked program. Every file has a map of its parts written from its own bytes: the <Term id="mz-header">header</Term>, the list of <Term id="relocation">fix-ups</Term>, his code, Borland’s library, text, pictures, fonts and tables. At the Code level every instruction is decoded from the bytes, starting at the <Term id="entry-point">entry point</Term>.</p>
+      <p>Personal phone numbers and a P.O. box in KVC and SUN are blanked in both layers, including the packed bytes that would rebuild them.</p>
+    </Deep>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initExplorer } from '../scripts/bytes/explorer';
+  const root = document.querySelector<HTMLElement>('.bx')!;
+  initExplorer(root).catch(err => {
+    root.classList.add('is-failed');
+    console.error(err);
+  });
+</script>
+
+<style is:global>
+  .bx-page { width: 100%; max-width: 1360px; margin-inline: auto; padding-inline: var(--gut); }
+  .bx-head { padding-top: clamp(28px, 5vw, 64px); }
+  .bx-head h1 { font-size: clamp(3rem, 5vw + 1rem, 6rem); font-stretch: 72%; line-height: 0.9; color: var(--accent); }
+  .bx-intro { margin-top: 18px; max-width: 46ch; font-size: clamp(1.1875rem, 0.6vw + 1rem, 1.5rem); line-height: 1.5; font-weight: 500; color: var(--ink); }
+  .bx-how { margin: clamp(32px, 4vw, 48px) 0 clamp(40px, 5vw, 64px); }
+  .bx-how ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px 28px; margin: 0; padding: 0; list-style: none; counter-reset: how; }
+  .bx-how li { position: relative; padding-top: 34px; font-size: 0.9375rem; line-height: 1.55; color: var(--ink); counter-increment: how; }
+  .bx-how li::before { content: counter(how); position: absolute; top: 0; left: 0; width: 26px; height: 26px; display: grid; place-items: center; background: var(--vga-1); color: var(--vga-14); font: 400 16px/1 var(--font-dos); }
+  .bx-how b { display: block; font-weight: 800; }
+  .bx-how i { display: inline-block; width: 0.8em; height: 0.8em; margin: 0 4px 0 2px; vertical-align: -0.05em; outline: 1px solid var(--vga-0); }
+  .bx-how .term { color: var(--vga-1); }
+  @media (max-width: 1000px) { .bx-how ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .bx-how ol { grid-template-columns: 1fr; } .bx-how li { padding: 0 0 0 38px; } }
+
+  .bx-root { width: 100%; max-width: 1800px; margin-inline: auto; padding-inline: calc(var(--gut) - 8px); }
+  .bx-win { --bx-h: clamp(520px, calc(100svh - var(--mb) - var(--sl) - 150px), 920px); }
+  .bx-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 2px 0 14px; }
+  .bx-seg { display: flex; gap: 10px; }
+  .bx-seg .button { min-height: 44px; font-size: 0.9375rem; }
+  .bx-seg .hk { color: var(--vga-4); font-weight: 800; }
+  .bx-onlyhis { display: flex; align-items: center; gap: 8px; min-height: 44px; font: 600 0.9375rem var(--sans); color: var(--ink); cursor: pointer; }
+  .bx-onlyhis input { width: 20px; height: 20px; accent-color: var(--vga-14); }
+  .bx-onlyhis[hidden] { display: none; }
+  .bx-crumbs { display: flex; flex-wrap: wrap; margin: 0 0 0 auto; padding: 0; list-style: none; font: 400 16px/1 var(--font-dos); }
+  .bx-crumbs li + li::before { content: '\\'; color: var(--ink-2); padding: 0 4px; }
+  .bx-crumbs button { min-height: 44px; padding: 0 2px; background: none; border: 0; color: var(--accent-2); font: inherit; cursor: pointer; }
+  .bx-crumbs button[aria-current] { color: var(--ink); }
+
+  .bx-body { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 26vw, 400px); gap: 22px; align-items: start; }
+  .bx-map {
+    position: relative; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none;
+    height: var(--bx-h); background: var(--vga-1); box-shadow: inset 0 0 0 1px var(--rule); cursor: grab;
+  }
+  .bx-map.dragging { cursor: grabbing; }
+  .bx-map:focus-visible { outline: 3px solid var(--vga-14); outline-offset: 2px; }
+  .bx-map canvas.bx-gl, .bx-map canvas.bx-ov { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .bx-labels { position: absolute; inset: 0; pointer-events: none; }
+  .bx-tl {
+    position: absolute; left: 0; top: 0; display: none; align-items: baseline; gap: 6px; transform-origin: 0 0;
+    padding: 2px 6px; border: 0; background: rgb(0 0 120); color: var(--vga-14); white-space: nowrap; pointer-events: auto; cursor: pointer;
+    font: 700 11px/1.3 var(--mono);
+  }
+  .bx-tl.on { display: flex; }
+  .bx-tl .y { color: var(--dos-ink-2); font-weight: 400; }
+  .bx-tl.big { padding: 4px 8px; font: 800 22px/1.1 var(--sans); font-stretch: 82%; background: none; text-shadow: 0 2px 0 rgb(0 0 90); }
+  .bx-tl.big .y { font: 500 13px var(--mono); }
+  .bx-tl:focus-visible { outline: 2px solid var(--vga-14); }
+  .bx-callout { position: absolute; left: 0; top: 0; display: none; max-width: 300px; padding: 8px 10px; background: var(--vga-3); color: var(--vga-0); font: 500 0.8125rem/1.45 var(--sans); box-shadow: 5px 5px 0 var(--vga-0); }
+  .bx-callout.on { display: block; }
+  .bx-callout .ins { font: 700 0.75rem var(--mono); }
+  .bx-ctrl { position: absolute; left: 12px; bottom: 12px; max-width: calc(100% - 24px); display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .bx-zoom { display: flex; box-shadow: 4px 4px 0 var(--vga-0); }
+  .bx-zoom button, .bx-ladder button { min-width: 44px; min-height: 44px; border: 0; background: var(--vga-7); color: var(--vga-0); font: 700 1rem/1 var(--mono); cursor: pointer; }
+  .bx-zoom button + button { border-left: 1px solid rgb(0 0 0 / 0.3); }
+  .bx-ladder { display: flex; flex-wrap: wrap; margin: 0; padding: 0; list-style: none; box-shadow: 4px 4px 0 var(--vga-0); }
+  .bx-ladder button { padding: 0 10px; font: 400 16px/1 var(--font-dos); }
+  .bx-ladder button[aria-current] { background: var(--vga-14); }
+  :is(.bx-zoom, .bx-ladder) button:hover { background: var(--vga-10); }
+  :is(.bx-zoom, .bx-ladder) button:focus-visible { outline: 2px solid var(--vga-0); outline-offset: -4px; }
+  .bx-scale { display: grid; gap: 3px; font: 500 11px var(--mono); color: var(--dos-ink); pointer-events: none; }
+  .bx-scale i { height: 5px; border: 1.5px solid var(--dos-ink); border-top: 0; }
+  .bx-mini { position: absolute; right: 12px; bottom: 12px; width: 168px; border: 2px solid var(--vga-15); box-shadow: 5px 5px 0 var(--vga-0); cursor: crosshair; touch-action: none; }
+  .bx-mini canvas { display: block; width: 100%; height: auto; }
+  .bx-nogl, .bx-live { display: none; }
+  .bx.is-ready:not(.has-gl) .bx-nogl, .bx.is-failed .bx-nogl { display: block; position: absolute; inset: 40% 10% auto; color: var(--dos-ink); text-align: center; }
+  .bx-nogl a { color: var(--vga-11); }
+  .bx-live { display: block; position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+  /* The details panel: a Borland dialog whose body scrolls under a fixed title */
+  .bx-panel { height: var(--bx-h); }
+  .bx-panel > .win-body { min-height: 0; overflow-y: auto; padding-right: 6px; scrollbar-color: var(--vga-1) var(--vga-7); }
+  .bx-panel h2 { margin: 0; font: 800 1.625rem/1.1 var(--sans); font-stretch: 84%; color: var(--ink); text-wrap: balance; }
+  .bx-panel h3 { margin-top: 22px; font: 400 16px/1.2 var(--font-dos); color: var(--accent); }
+  .bx-panel p { margin-top: 10px; font-size: 0.9375rem; line-height: 1.5; color: var(--ink); }
+  .bx-panel a { color: var(--accent); font-weight: 700; text-underline-offset: 3px; }
+  .bx-panel :focus-visible { outline: 2px solid var(--vga-1); outline-offset: 2px; }
+  .bx-panel .bx-meta { font: 500 0.75rem/1.5 var(--mono); color: var(--ink-2); margin-top: 0 !important; margin-bottom: 6px; }
+  .bx-lead { font-weight: 600; }
+  .bx-kind { display: flex; align-items: center; gap: 8px; font: 600 0.8125rem var(--mono); }
+  .bx-kind i, .bx-legend i, .bx-regs i { flex: none; width: 14px; height: 14px; outline: 1.5px solid var(--vga-0); }
+  .bx-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-top: 14px; }
+  .bx-facts div { padding: 8px 10px; background: var(--surface-2); }
+  .bx-facts dt { font: 600 0.6875rem/1.3 var(--mono); text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+  .bx-facts dd { margin: 2px 0 0; font: 700 0.9375rem/1.3 var(--sans); }
+  .bx-explain { margin-top: 16px; padding: 12px 14px; background: var(--vga-1); color: var(--dos-ink); box-shadow: 5px 5px 0 var(--vga-0); }
+  .bx-panel .bx-explain p { margin-top: 0; font-size: 0.875rem; color: var(--dos-ink); }
+  .bx-explain p + p { margin-top: 8px; }
+  .bx-explain b { color: var(--vga-14); }
+  .bx-panel .bx-src { padding: 8px 10px; border: 1px solid var(--vga-0); background: var(--surface-2); font-size: 0.8125rem !important; }
+  .bx-src.is-auth { border-color: var(--vga-2); }
+  .bx-bar { display: flex; height: 16px; margin-top: 12px; outline: 1.5px solid var(--vga-0); }
+  .bx-bar i { min-width: 1px; }
+  .bx-legend, .bx-regs, .bx-files, .bx-rts { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 2px; }
+  .bx-legend li { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: start; padding: 5px 0; font-size: 0.8125rem; line-height: 1.4; }
+  .bx-legend i { margin-top: 2px; }
+  .bx-legend .n, .bx-regs .n, .bx-files .sz { font: 500 0.75rem var(--mono); color: var(--ink-2); }
+  .bx-regs button, .bx-rts button, .bx-lines button { display: grid; grid-template-columns: 14px 1fr auto; gap: 10px; align-items: center; width: 100%; min-height: 44px; padding: 4px 6px; border: 0; background: none; color: var(--ink); font: 500 0.875rem/1.3 var(--sans); text-align: left; cursor: pointer; }
+  :is(.bx-regs, .bx-rts, .bx-lines) button:hover { background: var(--vga-10); }
+  .bx-files a { display: grid; grid-template-columns: 3.2em 1fr auto; gap: 8px; align-items: baseline; min-height: 44px; padding: 6px; text-decoration: none; font-weight: 500 !important; color: var(--ink) !important; }
+  .bx-files .yr { font: 500 0.75rem var(--mono); }
+  .bx-files .t { font: 700 0.875rem/1.3 var(--mono); }
+  .bx-files small { display: block; font: 400 0.8125rem/1.3 var(--sans); }
+  .bx-files a:hover { background: var(--vga-10) !important; }
+  .bx-rts button { grid-template-columns: 1fr; gap: 2px; }
+  .bx-rts b { font: 700 0.8125rem var(--mono); }
+  .bx-rts small { font-size: 0.8125rem; }
+  .bx-lines { list-style: none; margin: 2px 0 8px 10px; padding: 0; border-left: 2px solid var(--vga-0); }
+  .bx-lines button { grid-template-columns: 4.6em 1fr; font-size: 0.8125rem; }
+  .bx-lines .o { font: 500 0.75rem var(--mono); }
+  .bx-panel .bx-note { font-size: 0.8125rem !important; color: var(--ink-2) !important; }
+  .bx-byte { display: flex; align-items: baseline; gap: 12px; margin-top: 18px; padding-top: 14px; border-top: 2px solid var(--vga-0); }
+  .bx-byte b { font: 700 1.75rem/1 var(--mono); }
+  .bx-byte span { font: 500 0.875rem var(--mono); }
+  .bx-panel .bx-ins { font: 700 0.875rem var(--mono) !important; padding: 6px 8px; background: var(--vga-1); color: var(--vga-14) !important; }
+  .bx-go { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; background: var(--vga-2); color: var(--vga-0) !important; box-shadow: 4px 4px 0 var(--vga-0); text-decoration: none; }
+  .bx-go:hover { background: var(--vga-14); }
+  .bx-more { margin-top: 22px; border-top: 2px solid var(--vga-0); padding-top: 10px; }
+  .bx-more summary { font: 700 0.875rem var(--sans); cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+  .bx-after { margin-top: 48px; }
+
+  @media (max-width: 860px) {
+    .bx-root { padding-inline: 8px; }
+    .bx-body { grid-template-columns: 1fr; }
+    .bx-map { height: min(64svh, 560px); }
+    .bx-panel { height: auto; }
+    .bx-panel > .win-body { overflow: visible; }
+    .bx-crumbs { margin-left: 0; width: 100%; }
+    .bx-mini { display: none; }
+    .bx-ctrl { left: 8px; bottom: 8px; max-width: calc(100% - 16px); gap: 8px; }
+    .bx-ladder button { padding: 0 8px; }
+  }
+  @media (max-width: 360px) {
+    .bx-ladder button { padding: 0 4px; }
+  }
+</style>

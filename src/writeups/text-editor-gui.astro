@@ -1,0 +1,261 @@
+---
+// EDIT.EXE ("EDIT-TEST Ver 1.00"): a text editor built inside Digi-Test's own windows, menus and dialogs.
+// Facts: research/programs.md section 5, research/artifacts/programs/editors/ (NOTES.txt, excerpts.txt, edit_02d1.asm),
+// and the unpacked binary research/artifacts/programs/unpacked/EDIT_EDIT.EXE.
+import '../components/toys/tools/tools.css';
+import Term from '../components/explain/Term.astro';
+import Steps from '../components/explain/Steps.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import CodeStepper from '../components/toys/CodeStepper.astro';
+import EgReuse from '../components/toys/tools/EgReuse.astro';
+import EgChain from '../components/toys/tools/EgChain.astro';
+import EgType from '../components/toys/tools/EgType.astro';
+
+// The key loop, segment 0473 (new in EDIT), and the same in C
+const ASM = [
+  { off: '0257', code: 'call far 0B23:000C', note: 'read a key' },
+  { off: '025F', code: 'mov  es:[bx],ax', note: 'keep it in the event' },
+  { off: '0269', code: 'cmp  ax,2D00h', note: 'Alt+X?' },
+  { off: '026C', code: 'je   0270', note: 'then stop' },
+  { off: '0294', code: 'les  bx,[bp+6]', note: 'the application' },
+  { off: '0297', code: 'les  bx,es:[bx+2Ah]', note: 'its window in front' },
+  { off: '029B', code: 'mov  bx,es:[bx+28h]', note: 'that window’s method table' },
+  { off: '029F', code: 'call far [bx+8]', note: 'slot 2: handle the key' },
+  { off: '02DB', code: 'jmp  0257', note: 'next key' },
+];
+const C = [
+  { code: 'for (;;) {' },
+  { code: '  ev.key = readKey();' },
+  { code: '  if (ev.key == ALT_X) break;' },
+  { code: '  Window far *w = app->front;' },
+  { code: '  w->handleKey(&ev);', note: 'virtual' },
+  { code: '}' },
+];
+const key = { name: 'AX', value: '1E61h', means: 'the key: scan code 1Eh, letter a' };
+const trace = (ed: boolean) => {
+  const tbl = ed ? '00ADh' : '05EEh', who = ed ? 'his editor' : 'a plain Digi-Test window';
+  return [
+    { a: 0, c: 1, v: 1, say: 'Wait for a key, with Digi-Test’s own key reader. You press <b>a</b>, and its code, <code>1E61h</code>, comes back.', regs: [{ ...key, changed: true }] },
+    { a: 1, c: 1, v: 1, say: 'Keep it in the event record: the same job as the event object a browser hands to your listener.', regs: [key] },
+    { a: 2, c: 2, v: 1, say: 'Alt+X would end the program. This is an a, so carry on.', regs: [key] },
+    { a: 4, c: 3, v: 2, say: 'Fetch the application object. There is one, and it knows every window.', regs: [key] },
+    { a: 5, c: 3, v: 3, say: `Its field at <code>2Ah</code> points to the window in front: right now, ${who}.`, regs: [key] },
+    { a: 6, c: 4, v: 4, say: `That window’s field at <code>28h</code> holds the address of its class’s method table: <b>${tbl}</b>. Its constructor put it there.`, regs: [key, { name: 'BX', value: tbl, means: 'the method table', changed: true }] },
+    { a: 7, c: 4, v: 5, say: ed ? 'Call the address in slot 2, 8 bytes into the table: <b>02D1:040D</b>, his key handler. The loop never names the class. The table decides.' : 'Call the address in slot 2: <b>0473:046F</b>, Digi-Test’s own key handler. Same loop, same instructions, other code.', regs: [key, { name: 'BX', value: tbl, means: 'the method table' }] },
+    { a: 8, c: 5, v: 5, say: 'Back to the top for the next key.', regs: [key, { name: 'BX', value: tbl, means: 'the method table' }] },
+  ];
+};
+const editor = trace(true), plain = trace(false);
+---
+
+<section id="eg-reuse">
+  <h2>Built from his own parts</h2>
+  <p class="lead">For a job interview he needed a text editor, fast. So he opened his graduation project, Digi-Test, kept its windows, menus and dialogs, and added one new thing: a text editor class.</p>
+  <p>
+    It is what a developer does today when a new app starts from the component library of the last one. In EDIT.EXE you
+    can count it: <strong>89 of its 124 functions</strong> are the same as functions in Digi-Test, instruction for
+    instruction. Step through to watch each part arrive, or pick any block to read it.
+  </p>
+  <EgReuse />
+  <p>
+    The copy came whole, the way you would vendor a package into a project. Digi-Test’s circuit menus still sit inside
+    EDIT.EXE, and so do the names of the five KEMYAM students who built it, his own last. Of all his text in the program,
+    only three lines are new: the title <code>EDIT-TEST Ver 1.00</code>, the prompt for a file name, and the first file
+    name, <code>NONAME.TXT</code>.
+  </p>
+  <Deep title="For engineers: how the functions were matched">
+    <p>
+      Both programs were cut into functions at their entry code, and every function was turned into its list of
+      instruction types, ignoring the addresses that change from one build to the next. That is
+      <Term id="opcode-match">opcode matching</Term>. Two lists that are equal mean the same source code. 124 of EDIT’s
+      functions are long enough to compare (12 instructions or more); 89 match a Digi-Test function exactly, 12,674 of
+      17,393 instructions. Segment 02D1, his TextEditor class, matches nothing: it is all new.
+    </p>
+    <Listing
+      title="EDIT.EXE, his text in the data segment"
+      lines={[
+        { off: '0264', code: '"NODE CTRL N "', note: 'Digi-Test: place a circuit node' },
+        { off: '0288', code: '"VCC CTRL V "', note: 'Digi-Test: place a power pin' },
+        { off: '02B4', code: '" DETECT FAULT "', note: 'Digi-Test: test a real circuit' },
+        { off: '02EB', code: '" TRUTH TABLE "' },
+        { off: '03BA', code: '"     Yasser Mohamed   "', note: 'the last of the five KEMYAM names' },
+        { off: '009C', code: '"NONAME.TXT"', note: 'new for EDIT', hi: true },
+        { off: '0313', code: '"      Name To Save/Load  "', note: 'new for EDIT', hi: true },
+        { off: '0401', code: '"About This Program   << EDIT-TEST  Ver 1.00 >>"', note: 'new for EDIT', hi: true },
+      ]}
+      foot="Offsets are inside the data segment."
+    />
+  </Deep>
+</section>
+
+<section id="eg-class">
+  <h2>One new class</h2>
+  <p>
+    The new part is a <Term id="cpp-class">C++ class</Term>, TextEditor: 22 functions in one block of memory, 6,688 bytes.
+    One object of it takes 80 bytes. The first 42 are exactly a Digi-Test window: where it sits, how big it is, and which
+    table of methods it uses. The other 38 are his: the cursor’s line and column, the tab width, insert or overwrite, room
+    for 500 lines, and the file name. In today’s words, <code>class TextEditor extends Window</code>, written in Borland
+    C++ in 1993. Step through the code that runs when the editor is made with <code>new</code>:
+  </p>
+  <Steps
+    title="new TextEditor(...), his constructor"
+    steps={[
+      '<code>new</code> asks the <b>heap</b> for 80 bytes: one empty TextEditor object.',
+      'First, Digi-Test’s own window constructor runs, unchanged (<code>0B2D:0004</code>). It fills in the window part and writes its method table, <code>05EEh</code>, at <code>28h</code>.',
+      'Then his constructor writes his own table, <code>00ADh</code>, over it. From now on the object answers as an editor. Slots 3 and 4 point to the same code as before: inherited.',
+      'His own fields: line 0, column 0, a tab of 8 spaces, insert mode, room for 500 lines.',
+      'A second block, 2,000 bytes: the line table, 500 slots of 4 bytes each. Its address goes in the field at <code>24h</code>.',
+      'A loop clears all 500 slots to zero: no lines yet.',
+      'Line 0 gets its own 255-byte block, all zeros, and the file name starts as <code>NONAME.TXT</code>. The editor is ready.',
+    ]}
+  >
+    <svg class="dg" viewBox="0 0 890 360" role="img" aria-labelledby="eg-ctor-t">
+      <title id="eg-ctor-t">An 80-byte TextEditor object. Its first 42 bytes are a Digi-Test window whose field at 28h first points to Digi-Test’s method table 05EEh, then to his table 00ADh. Its other 38 bytes hold his fields and the name NONAME.TXT. Its field at 24h points to a 2,000-byte table of 500 line slots; slot 0 points to a 255-byte line.</title>
+      <text x="10" y="24" class="t-cy">TextEditor object, 80 bytes</text>
+      <rect class="box" x="10" y="36" width="290" height="134" />
+      <rect class="box" x="10" y="180" width="290" height="166" />
+      <g data-s="2+"><text x="22" y="58">Digi-Test window, 42 bytes</text><text class="t-sm" x="22" y="160">00h to 07h: where it sits, its size</text></g>
+      <g data-s="5+"><rect class="box-hi" x="18" y="70" width="274" height="28" /><text class="t-bk" x="30" y="89">24h  lines →</text></g>
+      <rect class="box-hi" x="18" y="106" width="274" height="28" data-s="2+" />
+      <text class="t-bk" x="30" y="125" data-s="2+">28h  table 05EEh</text>
+      <text class="t-bk" x="194" y="125" data-s="3+">→ 00ADh</text>
+      <g data-s="4+">
+        <text x="22" y="202">His fields, 38 bytes</text>
+        <text x="30" y="228">36h line 0, 38h column 0</text>
+        <text x="30" y="252">3Ah tab = 8 spaces</text>
+        <text x="30" y="276">42h insert mode</text>
+        <text x="30" y="300">4Ah room for 500 lines</text>
+      </g>
+      <text x="30" y="330" data-s="7">4Ch name = "NONAME.TXT"</text>
+
+      <g data-s="2+">
+        <text x="340" y="24" class="t-cy">Digi-Test’s table 05EEh</text>
+        {['0B2D:07F2 draw', '0473:047F', '0473:046F key', '02D1:1A02', '02D1:1A12'].map((t, i) => <><rect class="box" x="340" y={36 + i * 24} width="220" height="24" /><text x="350" y={53 + i * 24}>{i}  {t}</text></>)}
+      </g>
+      <path class="wire-hi arrow" data-s="2" d="M292 120 C318 120 314 60 334 60" />
+      <rect x="334" y="30" width="232" height="132" fill="var(--surface)" opacity="0.6" data-s="3+" />
+      <g data-s="3+">
+        <text x="340" y="204" class="t-cy">His table 00ADh</text>
+        {['02D1:03B9 draw', '02D1:0C3E', '02D1:040D key', '02D1:1A02 same', '02D1:1A12 same'].map((t, i) => <><rect class:list={[i < 3 ? 'box-hi' : 'box']} x="340" y={216 + i * 24} width="220" height="24" /><text class:list={[{ 't-bk': i < 3 }]} x="350" y={233 + i * 24}>{i}  {t}</text></>)}
+        <path class="wire-hi arrow" d="M292 120 C326 120 312 240 334 240" />
+      </g>
+
+      <g data-s="5+">
+        <text x="610" y="24" class="t-cy">Line table, 2,000 bytes</text>
+        {['[0]', '[1]', '[2]', '…', '[499]'].map((t, i) => <><rect class="box" x="610" y={36 + i * 24} width="270" height="24" /><text x="620" y={53 + i * 24}>{t}</text></>)}
+        <path class="wire-hi arrow" d="M292 84 H318 V9 H590 V48 H604" />
+      </g>
+      <g data-s="6+">{[1, 2, 4].map(i => <text x="690" y={53 + i * 24}>0000:0000</text>)}</g>
+      <text x="690" y="53" data-s="6">0000:0000</text>
+      <g data-s="7">
+        <rect class="box-hi" x="610" y="36" width="270" height="24" /><text class="t-bk" x="620" y="53">[0]</text><text class="t-bk" x="786" y="53">line 0 ↓</text>
+        <text x="610" y="204" class="t-cy">Line 0, 255 bytes</text>
+        <rect class="box-ink" x="610" y="216" width="270" height="28" /><text class="t-bk" x="620" y="235">00 00 00 … 00</text>
+        <path class="wire-hi arrow" d="M826 60 V210" />
+      </g>
+    </svg>
+    <svg slot="narrow" class="dg" viewBox="0 0 360 720" role="img" aria-labelledby="eg-ctor-tn">
+      <title id="eg-ctor-tn">The 80-byte TextEditor object: a 42-byte Digi-Test window part with its method table at 28h, then his 38 bytes of fields, a 500-slot line table, line 0 and the file name.</title>
+      <text x="6" y="20" class="t-cy">TextEditor object, 80 bytes</text>
+      <rect class="box" x="6" y="30" width="348" height="130" />
+      <rect class="box" x="6" y="166" width="348" height="140" />
+      <g data-s="2+"><text x="16" y="52">Digi-Test window, 42 bytes</text><text class="t-sm" x="16" y="150">00h to 07h: where it sits, its size</text></g>
+      <g data-s="5+"><rect class="box-hi" x="14" y="62" width="332" height="28" /><text class="t-bk" x="24" y="81">24h  lines ↓</text></g>
+      <rect class="box-hi" x="14" y="98" width="332" height="28" data-s="2+" />
+      <text class="t-bk" x="24" y="117" data-s="2+">28h  table 05EEh</text>
+      <text class="t-bk" x="190" y="117" data-s="3+">→ 00ADh</text>
+      <g data-s="4+">
+        <text x="16" y="188">His fields, 38 bytes</text>
+        <text x="24" y="214">36h line 0, 38h column 0</text>
+        <text x="24" y="238">3Ah tab = 8 spaces</text>
+        <text x="24" y="262">42h insert mode, 4Ah 500 lines</text>
+      </g>
+      <text x="24" y="292" data-s="7">4Ch name = "NONAME.TXT"</text>
+      <g data-s="3+">
+        <text x="6" y="338" class="t-cy">His table 00ADh</text>
+        {['02D1:03B9 draw', '02D1:0C3E', '02D1:040D key', '02D1:1A02 same', '02D1:1A12 same'].map((t, i) => <><rect class:list={[i < 3 ? 'box-hi' : 'box']} x="6" y={348 + i * 24} width="348" height="24" /><text class:list={[{ 't-bk': i < 3 }]} x="16" y={365 + i * 24}>{i}  {t}</text></>)}
+      </g>
+      <g data-s="5+">
+        <text x="6" y="500" class="t-cy">Line table, 2,000 bytes</text>
+        {['[0]', '[1]', '…', '[499]'].map((t, i) => <><rect class="box" x="6" y={510 + i * 24} width="348" height="24" /><text x="16" y={527 + i * 24}>{t}</text></>)}
+      </g>
+      <g data-s="6+">{[1, 3].map(i => <text x="90" y={527 + i * 24}>0000:0000</text>)}</g>
+      <text x="90" y="527" data-s="6">0000:0000</text>
+      <g data-s="7">
+        <rect class="box-hi" x="6" y="510" width="348" height="24" /><text class="t-bk" x="16" y="527">[0]</text><text class="t-bk" x="210" y="527">line 0 ↓</text>
+        <text x="6" y="652" class="t-cy">Line 0, 255 bytes</text>
+        <rect class="box-ink" x="6" y="662" width="348" height="30" /><text class="t-bk" x="16" y="682">00 00 00 … 00</text>
+      </g>
+    </svg>
+  </Steps>
+  <ThenNow
+    title="The same ideas today"
+    rows={[
+      { then: 'A TextEditor class built on Digi-Test’s window class', now: '<code>class TextEditor extends Window</code> in TypeScript', why: 'The child gets everything the parent has and replaces only what it needs.' },
+      { then: 'One hidden field: the address of the class’s method table', now: 'The prototype link behind every JavaScript object', why: 'One hidden pointer per object says where its methods live.' },
+    ]}
+  />
+</section>
+
+<section id="eg-virtual">
+  <h2>How a key finds the editor</h2>
+  <p class="lead">Digi-Test’s key loop was written before the editor existed. It still hands every key to his new code, with three instructions and a table.</p>
+  <CodeStepper id="eg-loop" title="EDIT.EXE  the key loop" cTitle="The same in C++" asm={ASM} c={C} steps={editor}>
+    <EgChain slot="visual" editor={editor} plain={plain} />
+  </CodeStepper>
+  <p>
+    This is the heart of object-oriented code, and it is why his reuse worked. The loop only knows “the window in front”
+    and asks it to handle the key. The window’s <Term id="vtable">method table</Term> decides which code runs. Put a plain
+    Digi-Test window in front, above, and the same three instructions land in Digi-Test’s handler instead. A browser does
+    the same today when it hands a click to whatever element you clicked. So does a UI framework when it calls your
+    component’s handler. The <Term id="event-loop">event loop</Term> stays the same, and each kind of window brings its own
+    behavior.
+  </p>
+</section>
+
+<section id="eg-insert">
+  <h2>Type into his line</h2>
+  <p class="lead">Every line of text has its own block of 255 bytes. Type below, and his insert routine runs on every key.</p>
+  <EgType />
+  <div class="eg-cols">
+    <p>
+      The editor keeps a table of 500 line slots, 2,000 bytes in all. A line gets its block only when you first type on
+      it, so an empty file costs almost nothing. Insert is the in-place version of <code>s.slice(0, i) + key + s.slice(i)</code>
+      in JavaScript. His <code>movmem</code> slides the rest of the line to the right inside its own block, and the key
+      drops into the gap. No other line is ever touched.
+    </p>
+    <p>
+      Press <b>Past the end</b>, then type. EDIT lets the cursor stand anywhere on the line and fills the gap with spaces
+      when a key arrives, a feature editors still call virtual space. Switch to <b>Overwrite</b> and a key replaces the
+      byte under the cursor, while a Tab still opens 8 fresh spaces.
+    </p>
+  </div>
+  <Deep title="For engineers: the insert routine">
+    <Listing
+      title="EDIT.EXE 02D1:0D16, TextEditor insert"
+      lines={[
+        { off: '0D16', code: 'cmp  byte ptr [bp+0Ah],9', note: 'is the key a Tab?' },
+        { off: '0D1F', code: 'mov  si,es:[bx+3Ah]', note: 'yes: width = the tab width, 8' },
+        { off: '0D23', code: 'mov  byte ptr [bp+0Ah],20h', note: 'and write spaces' },
+        { off: '0D29', code: 'mov  si,1', note: 'a letter: width 1' },
+        { off: '0D2F', code: 'mov  ax,es:[bx+38h]', note: 'the cursor column' },
+        { off: '0D36', code: 'cmp  ax,0FFh', note: 'column + width - 1 inside the 255 bytes?' },
+        { off: '0D68', code: 'cmp  es:[bx+38h],di', note: 'cursor past the end of the text?' },
+        { off: '0D83', code: 'call far 0000:1D22', note: 'memset(line + len, 20h, col - len): fill the gap', hi: true },
+        { off: '0D8E', code: 'cmp  word ptr es:[bx+42h],0', note: 'insert mode?' },
+        { off: '0DC3', code: 'call far 0000:1D41', note: 'movmem(line + col, line + col + n, 255 - col)', hi: true },
+        { off: '0DE0', code: 'call far 0000:1D22', note: 'memset(line + col, ch, n): the key', hi: true },
+      ]}
+      foot="1D22h and 1D41h are memset and movmem in Borland’s library. The arguments go on the stack before each call; the notes show them in C."
+    />
+  </Deep>
+</section>
+
+<style>
+  .eg-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 48px); margin-top: 28px; }
+  .eg-cols p { margin: 0 !important; }
+  @media (max-width: 760px) { .eg-cols { grid-template-columns: minmax(0, 1fr); } }
+</style>
+

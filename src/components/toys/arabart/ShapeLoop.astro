@@ -1,0 +1,165 @@
+---
+// His joining pass in the CodeStepper, with a linked view of the text in memory: each byte, its two hand bits, and
+// the shape it draws, plus the word as his engine draws it from those bytes at that moment.
+// It runs on الفن by default, on a preset, or on the word built in the drag toy above (its 'word' event).
+import Window from '../../shell/Window.astro';
+import CodeStepper from '../CodeStepper.astro';
+import { ASM, C, trace } from './loop.ts';
+import { translate, toUnicode, draw, svgMarkup, FORMS, hex, bits8, isStyle } from './core.ts';
+import { ssrBin } from './ssr.ts';
+
+interface Props { id?: string; keys?: string }
+const { id = 'shapeloop', keys = '~gtk' } = Astro.props;
+const bin = ssrBin();
+const codes = translate(bin, keys);
+const steps = trace(codes, [...keys].map(k => toUnicode(k)));
+const last = steps[steps.length - 1];
+const tile = (c: number, end: boolean) => ({
+  hex: hex(c), bits: bits8(c), form: end ? 'end' : isStyle(c) ? 'style' : c === 3 ? 'space' : FORMS[c >> 6],
+  svg: end || isStyle(c) || c === 3 ? '' : svgMarkup(draw(bin, [c], { font: 3, color: 14 }), 1, ''),
+});
+const word = draw(bin, last.mem.slice(0, -1), { font: 3, color: 14, mode: '3d', shadow: 4 });
+const PRESETS: [string, string][] = [['~gtk', 'الفن'], ['dhsv', 'ياسر'], ['~guvfd', 'العربي'], ['~gt@k', 'الفن, @ bold']];
+---
+
+<CodeStepper id={id} title="ARABART.EXE  his joining pass" asm={ASM} c={C} steps={steps}>
+  <div slot="visual" class="sl" data-shapeloop data-for={id}>
+    <Window title="MEMORY  the text, one byte per key" kind="panel" num="4" class="sl-mem-win">
+      <div class="sl-words" role="group" aria-label="Run the loop on">
+        {PRESETS.map(([k, ar]) => <button type="button" class="button k-btn" data-keys={k} aria-pressed={String(k === keys)}><span lang="ar">{ar}</span></button>)}
+        <button type="button" class="button k-btn" data-mine hidden>Your word from above</button>
+      </div>
+      <ol class="sl-mem" data-mem>
+        {last.mem.map((c, i) => {
+          const t = tile(c, i === last.mem.length - 1);
+          return (
+            <li class="sl-t" data-i={i}>
+              <span class="sl-i">{i + 1}</span>
+              <span class="sl-g" set:html={t.svg} />
+              <span class="sl-hex">{t.hex}</span>
+              <span class="sl-bits" aria-hidden="true">{[...t.bits].map((b, j) => <i class:list={{ h: j < 2 }}>{b}</i>)}</span>
+              <span class="sl-f">{t.form}</span>
+            </li>
+          );
+        })}
+      </ol>
+      <div class="sl-ptrs" aria-hidden="true"><span class="sl-p" data-p="di">DI this</span><span class="sl-p" data-p="si">SI next</span></div>
+    </Window>
+    <Window title="VGA" kind="screen" class="sl-vga-win">
+      <div class="sl-vga" data-vga set:html={svgMarkup(word, 1, '')} />
+      <p class="sr-only" data-said lang="ar">{toUnicode(keys)}</p>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .sl { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .sl-words { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+  .sl-words [lang='ar'] { font: 700 1.125rem/1 var(--font-ar); }
+  .sl-mem { position: relative; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .sl-t { display: grid; justify-items: center; gap: 4px; min-width: 76px; padding: 8px 6px 6px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow 0.2s var(--quart); }
+  .sl-t.is-di { box-shadow: inset 0 0 0 2px var(--accent); }
+  .sl-t.is-si { box-shadow: inset 0 0 0 2px var(--accent-2); }
+  .sl-i { font: 500 10px/1 var(--font-code); color: var(--ink-2); }
+  .sl-g { display: grid; place-items: end center; height: 54px; }
+  .sl-g svg { width: auto; height: 51px; }
+  .sl-hex { font: 700 15px/1 var(--font-code); color: var(--accent); }
+  .sl-bits { display: flex; gap: 1px; font: 600 11px/1 var(--font-code); }
+  .sl-bits i { font-style: normal; width: 8px; text-align: center; color: var(--ink-2); }
+  .sl-bits i.h { color: var(--surface); background: var(--accent-2); }
+  .sl-bits i.h.z { color: var(--accent-2); background: none; box-shadow: inset 0 0 0 1px var(--accent-2); }
+  .sl-f { font: 600 11px/1 var(--font-code); color: var(--ink); }
+  .sl-ptrs { position: relative; height: 26px; margin-top: 6px; }
+  .sl-p { position: absolute; left: 0; top: 0; padding: 3px 6px; font: 700 11px/1.2 var(--font-code); color: var(--surface); background: var(--accent); white-space: nowrap; opacity: 0; }
+  .sl-p[data-p='si'] { background: var(--accent-2); top: 0; }
+  .sl-p::before { content: '▲ '; }
+  .sl-vga { display: grid; place-items: center; min-height: 200px; height: 100%; padding: 16px; background: var(--vga-0); }
+  .sl-vga svg { width: 100%; max-width: 420px; height: auto; }
+  @media (max-width: 1023px) { .sl { grid-template-columns: minmax(0, 1fr); } .sl-vga { min-height: 150px; } }
+  @media (max-width: 560px) { .sl-t { min-width: 64px; } .sl-g { height: 40px; } .sl-g svg { height: 38px; } }
+  @media (prefers-reduced-motion: reduce) { .sl-t { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, translate, toUnicode, draw, svgMarkup, FORMS, hex, bits8, isStyle } from './core.ts';
+  import { trace, type Step } from './loop.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-shapeloop]').forEach(async vis => {
+    const bin = await fonts();
+    const root = document.getElementById(vis.dataset.for!) as HTMLElement & { stepper?: { load(s: Step[], at?: number): void } };
+    const mem = vis.querySelector<HTMLElement>('[data-mem]')!, vga = vis.querySelector<HTMLElement>('[data-vga]')!;
+    const said = vis.querySelector<HTMLElement>('[data-said]')!;
+    const ptr = { di: vis.querySelector<HTMLElement>('[data-p="di"]')!, si: vis.querySelector<HTMLElement>('[data-p="si"]')! };
+    let shown: number[] = [], wordKey = '';
+
+    const tileHTML = (i: number) => `<li class="sl-t" data-i="${i}"><span class="sl-i">${i + 1}</span><span class="sl-g"></span><span class="sl-hex"></span><span class="sl-bits" aria-hidden="true">${'<i></i>'.repeat(8)}</span><span class="sl-f"></span></li>`;
+    function paintTile(li: HTMLElement, c: number, end: boolean, animate: boolean) {
+      const g = li.querySelector<HTMLElement>('.sl-g')!;
+      const blank = end || isStyle(c) || c === 3;
+      g.innerHTML = blank ? '' : svgMarkup(draw(bin, [c], { font: 3, color: 14 }), 1, '');
+      li.querySelector('.sl-hex')!.textContent = hex(c);
+      const bs = [...li.querySelectorAll<HTMLElement>('.sl-bits i')], b = bits8(c);
+      bs.forEach((x, j) => {
+        const changed = x.textContent !== '' && x.textContent !== b[j];
+        x.textContent = b[j];
+        x.className = j < 2 ? (b[j] === '1' ? 'h' : 'h z') : '';
+        if (changed && animate && !reduce()) gsap.fromTo(x, { rotationX: -180 }, { rotationX: 0, duration: 0.45, ease: 'expo.out' });
+      });
+      li.querySelector('.sl-f')!.textContent = end ? 'end' : isStyle(c) ? 'style' : c === 3 ? 'space' : FORMS[c >> 6];
+      if (animate && !blank && !reduce()) gsap.fromTo(g.firstElementChild, { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 0.5, ease: 'expo.out' });
+    }
+    function render(m: number[], animate: boolean) {
+      if (mem.children.length !== m.length) { mem.innerHTML = m.map((_, i) => tileHTML(i)).join(''); shown = []; }
+      const lis = [...mem.children] as HTMLElement[];
+      m.forEach((c, i) => { if (shown[i] !== c) paintTile(lis[i], c, i === m.length - 1, animate && shown[i] !== undefined); });
+      const key = m.join();
+      if (key !== wordKey) {
+        vga.innerHTML = svgMarkup(draw(bin, m.slice(0, -1), { font: 3, color: 14, mode: '3d', shadow: 4 }), 1, '');
+        if (animate && !reduce()) gsap.fromTo(vga.firstElementChild, { opacity: 0.4 }, { opacity: 1, duration: 0.4 });
+        wordKey = key;
+      }
+      shown = [...m];
+    }
+    function point(di: number, si: number, how: string) {
+      const lis = [...mem.children] as HTMLElement[];
+      lis.forEach((li, i) => { li.classList.toggle('is-di', i === di); li.classList.toggle('is-si', i === si && si !== di); });
+      const base = mem.getBoundingClientRect();
+      for (const [k, i] of [['di', di], ['si', si]] as const) {
+        const li = lis[i];
+        if (!li || (k === 'si' && si === di)) { gsap.to(ptr[k], { opacity: 0, duration: 0.15 }); continue; }
+        const r = li.getBoundingClientRect();
+        gsap.to(ptr[k], { x: r.left - base.left, y: r.bottom - base.bottom, opacity: 1, duration: how === 'jump' || reduce() ? 0 : 0.3, ease: 'power3.out' });
+      }
+    }
+
+    root.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail as { step: Step; how: string };
+      render(step.mem, how !== 'jump');
+      point(step.di, step.si, how);
+    });
+
+    const load = (keys: string) => {
+      const codes = translate(bin, keys);
+      said.textContent = toUnicode(keys);
+      shown = [];
+      root.stepper!.load(trace(codes, [...keys].map(k => toUnicode(k))), 0);
+    };
+    const btns = [...vis.querySelectorAll<HTMLButtonElement>('[data-keys], [data-mine]')];
+    const press = (b: HTMLButtonElement) => btns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    vis.querySelectorAll<HTMLButtonElement>('[data-keys]').forEach(b => b.addEventListener('click', () => { press(b); load(b.dataset.keys!); }));
+    const mine = vis.querySelector<HTMLButtonElement>('[data-mine]')!;
+    document.addEventListener('word', e => {
+      const keys = (e as CustomEvent).detail.keys as string;
+      mine.hidden = false;
+      mine.dataset.word = keys;
+      mine.innerHTML = `Your word: <span lang="ar">${toUnicode(keys)}</span>`;
+    });
+    mine.addEventListener('click', () => { press(mine); load(mine.dataset.word!); });
+
+    shown = (JSON.parse(root.querySelector('[data-trace]')!.textContent!) as Step[]).at(-1)!.mem;
+    point(-1, -1, 'jump');
+  });
+</script>

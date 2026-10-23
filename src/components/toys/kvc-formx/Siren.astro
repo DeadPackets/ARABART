@@ -1,0 +1,182 @@
+---
+// KVC's alarm: his two tones from his own code (src/lib/kvc/siren.ts), the speaker wave they make, and the timer
+// chip's divisor to drag. Without JS the wave and the 20 tones are drawn in full.
+import Window from '../../shell/Window.astro';
+import { PIT_HZ, DIVISORS, TONES, TONE_MS } from '../../../lib/kvc/siren';
+
+const W = 600, H = 120, MS = 10; // the wave window: 10 ms
+// A square wave of f Hz across the window, as one SVG path
+const wave = (hz: number) => {
+  const per = (W * 1000) / (hz * MS), half = per / 2;
+  let d = `M0 ${H - 20}`, x = 0, up = false;
+  while (x < W) {
+    const nx = Math.min(W, x + half);
+    d += ` H${nx.toFixed(1)}`;
+    if (nx < W) { up = !up; d += ` V${up ? 20 : H - 20}`; }
+    x = nx;
+  }
+  return d;
+};
+const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
+---
+
+<div class="kxs" data-siren data-w={W} data-h={H} data-ms={MS} data-pit={PIT_HZ} data-tone-ms={TONE_MS} data-tones={TONES}>
+  <div class="kxs-top">
+    <button type="button" class="button button--primary kxs-play" data-play><span aria-hidden="true">►</span> <span data-play-l>Hear the alarm</span></button>
+    <div class="kxs-speed" role="radiogroup" aria-label="Speed">
+      <button type="button" class="button k-btn" role="radio" aria-checked="true" data-slow="1">As on his PC, 1.3 s</button>
+      <button type="button" class="button k-btn" role="radio" aria-checked="false" data-slow="8" tabindex="-1">8 times slower</button>
+    </div>
+  </div>
+
+  <Window title="PC SPEAKER  10 ms of the wave KVC sends" kind="screen" active class="kxs-scope">
+    <svg class="kxs-svg" viewBox={`0 0 ${W} ${H + 26}`} role="img" aria-labelledby="kxs-wt">
+      <title id="kxs-wt">The PC speaker's square wave: the speaker cone is pushed out, then pulled in, 1,193 times a second for the high tone and 746 times for the low one.</title>
+      <defs><clipPath id="kxs-clip"><rect width={W} height={H} /></clipPath></defs>
+      <line class="kxs-axis" x1="0" x2={W} y1={H / 2} y2={H / 2} />
+      <g clip-path="url(#kxs-clip)"><path class="kxs-wave" d={wave(PIT_HZ / DIVISORS[0])} data-wave /></g>
+      <text class="kxs-lab" x="0" y={H + 20}>0 ms</text>
+      <text class="kxs-lab" x={W} y={H + 20} text-anchor="end">10 ms</text>
+      <text class="kxs-hz" x={W / 2} y={H + 20} text-anchor="middle" data-hz>{fmt(PIT_HZ / DIVISORS[0])} Hz</text>
+    </svg>
+    <div class="kxs-tones" role="list" aria-label="The 20 tones, high and low in turn">
+      {Array.from({ length: TONES }, (_, i) => <div role="listitem" class:list={['kxs-t', i % 2 ? 'lo' : 'hi']} data-i={i}><span class="kxs-bar"></span><span class="kxs-n">{i + 1}</span></div>)}
+    </div>
+    <p class="kxs-read" aria-live="polite" data-read>20 tones, high then low, with no gap: {fmt(PIT_HZ / DIVISORS[0])} Hz and {fmt(PIT_HZ / DIVISORS[1])} Hz, {Math.round(TONE_MS)} ms each.</p>
+  </Window>
+
+  <Window title="TIMER CHIP  one number sets the pitch" kind="dialog" class="kxs-pit">
+    <p class="kxs-eq"><span>{PIT_HZ.toLocaleString('en-US')} ticks a second</span> <b>÷</b> <output data-div>1,000</output> <b>=</b> <output class="kxs-eq-hz" data-div-hz>{fmt(PIT_HZ / 1000)} Hz</output></p>
+    <input type="range" min="200" max="4000" step="10" value="1000" aria-label="Divisor: how many ticks make one wave" data-range />
+    <div class="kxs-his">
+      <span>His two:</span>
+      {DIVISORS.map(d => <button type="button" class="button k-btn" data-set={d}>{d.toLocaleString('en-US')}</button>)}
+      <button type="button" class="button button--primary k-btn" data-tone><span aria-hidden="true">►</span> Hear this pitch</button>
+    </div>
+  </Window>
+</div>
+
+<style>
+  .kxs { display: grid; gap: 26px; min-width: 0; }
+  .kxs-top { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
+  .kxs-play { min-height: 56px; padding: 0 26px; font-size: 1.125rem; }
+  .kxs-speed { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kxs-svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .kxs-axis { stroke: var(--vga-8); stroke-dasharray: 3 5; }
+  .kxs-wave { fill: none; stroke: var(--vga-10); stroke-width: 3; }
+  .kxs.is-playing .kxs-wave { filter: drop-shadow(0 0 6px color-mix(in oklch, var(--vga-10) 70%, transparent)); }
+  .kxs-lab { font: 400 16px var(--font-dos); fill: var(--vga-7); }
+  .kxs-hz { font: 400 16px var(--font-dos); fill: var(--vga-14); }
+  .kxs-tones { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; margin: 18px 0 0; padding: 0; list-style: none; }
+  .kxs-t { display: grid; gap: 4px; justify-items: center; }
+  .kxs-bar { width: 100%; height: 34px; background: var(--vga-8); transform-origin: bottom; }
+  .kxs-t.lo .kxs-bar { height: 21px; margin-top: 13px; }
+  .kxs-t.on .kxs-bar { background: var(--vga-10); }
+  .kxs-t.done .kxs-bar { background: var(--vga-2); }
+  .kxs-n { font: 400 11px/1 var(--font-code); color: var(--vga-7); }
+  .kxs-read { margin-top: 14px; min-height: 3em; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); }
+  .kxs-pit :global(.win-body) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 28px; align-items: center; }
+  .kxs-his { grid-column: 1 / -1; }
+  .kxs-eq { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: baseline; font: 600 1rem/1.4 var(--font-code); color: var(--ink); }
+  .kxs-eq b { color: var(--accent); }
+  .kxs-eq output { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .kxs-eq-hz { font-size: 1.5rem; }
+  .kxs-pit input[type='range'] { width: 100%; height: 44px; margin: 18px 0 12px; accent-color: var(--vga-1); }
+  .kxs-his { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font: 600 0.9375rem var(--font-code); color: var(--ink); }
+  @media (max-width: 760px) { .kxs-pit :global(.win-body) { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) {
+    .kxs-tones { grid-template-columns: repeat(10, minmax(0, 1fr)); row-gap: 8px; }
+    .kxs-speed, .kxs-speed .k-btn, .kxs-play { width: 100%; }
+  }
+</style>
+
+<script>
+  import { createSiren } from '../../../lib/kvc/siren';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
+
+  document.querySelectorAll<HTMLElement>('[data-siren]').forEach(root => {
+    const W = +root.dataset.w!, H = +root.dataset.h!, MS = +root.dataset.ms!, PIT = +root.dataset.pit!;
+    const TONE_MS = +root.dataset.toneMs!, N = +root.dataset.tones!;
+    const sirens = { 1: createSiren(), 8: createSiren({ toneMs: TONE_MS * 8 }) } as Record<string, ReturnType<typeof createSiren>>;
+    const path = root.querySelector<SVGPathElement>('[data-wave]')!, hzT = root.querySelector('[data-hz]')!;
+    const cells = [...root.querySelectorAll<HTMLElement>('.kxs-t')], read = root.querySelector<HTMLElement>('[data-read]')!;
+    const play = root.querySelector<HTMLButtonElement>('[data-play]')!, playL = root.querySelector('[data-play-l]')!;
+    const speeds = [...root.querySelectorAll<HTMLButtonElement>('[data-slow]')];
+    const range = root.querySelector<HTMLInputElement>('[data-range]')!;
+    const divOut = root.querySelector('[data-div]')!, divHz = root.querySelector('[data-div-hz]')!;
+    let slow = '1', raf = 0, t0 = 0, hz = 0;
+
+    // A square wave of f Hz over 10 ms, drawn twice as wide so it can slide left by any phase
+    function draw(f: number, phase = 0) {
+      const per = (W * 1000) / (f * MS), half = per / 2;
+      let x = -((phase % 1) * per), up = false, d = `M${x.toFixed(1)} ${H - 20}`;
+      while (x < W) { x += half; up = !up; d += ` H${x.toFixed(1)} V${up ? 20 : H - 20}`; }
+      path.setAttribute('d', d);
+      if (f !== hz) { hz = f; hzT.textContent = `${fmt(f)} Hz`; }
+    }
+    const mark = (k: number) => cells.forEach((c, i) => { c.classList.toggle('on', i === k); c.classList.toggle('done', i < k); });
+
+    function stopAnim(msg?: string) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+      root.classList.remove('is-playing');
+      playL.textContent = 'Hear the alarm';
+      mark(-1);
+      draw(PIT / +range.value);
+      if (msg) read.textContent = msg;
+    }
+
+    function tick() {
+      const ms = TONE_MS * +slow, el = performance.now() - t0, k = Math.floor(el / ms);
+      if (k >= N) return stopAnim('Done: 20 tones in ' + (N * ms / 1000).toFixed(2) + ' s. On his PC the speaker then switches off, and KVC goes after Koko.');
+      const div = k % 2 ? 1600 : 1000, f = PIT / div;
+      // The wave slides by its real phase, slowed so the eye can follow it
+      draw(f, reduce() ? 0 : (el / 1000) * f / (60 * +slow));
+      if (!cells[k].classList.contains('on')) {
+        mark(k);
+        read.textContent = `Tone ${k + 1} of 20: ${k % 2 ? 'low' : 'high'}, ${fmt(f)} Hz. The timer chip divides its clock by ${div.toLocaleString('en-US')}.`;
+      }
+      raf = requestAnimationFrame(tick);
+    }
+
+    play.addEventListener('click', () => {
+      if (raf) { Object.values(sirens).forEach(s => s.stop()); return stopAnim('Stopped.'); }
+      Object.values(sirens).forEach(s => s.stop());
+      sirens[slow].play().catch(() => {});
+      t0 = performance.now();
+      root.classList.add('is-playing');
+      playL.textContent = 'Stop';
+      raf = requestAnimationFrame(tick);
+    });
+
+    const pick = (b: HTMLButtonElement) => {
+      speeds.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+      slow = b.dataset.slow!;
+    };
+    speeds.forEach(b => b.addEventListener('click', () => pick(b)));
+    root.querySelector('[role=radiogroup]')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key;
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(k)) return;
+      e.preventDefault();
+      const b = speeds[(speeds.findIndex(x => x.dataset.slow === slow) + 1) % 2];
+      pick(b); b.focus();
+    });
+
+    // The divisor: the timer chip's clock divided by it is the pitch
+    const setDiv = (d: number) => {
+      range.value = String(d);
+      divOut.textContent = d.toLocaleString('en-US');
+      divHz.textContent = `${fmt(PIT / d)} Hz`;
+      if (!raf) { draw(PIT / d); read.textContent = `${fmt(PIT / d)} Hz: the cone moves out and back ${fmt(PIT / d)} times a second.${d === 1000 || d === 1600 ? ' One of his two tones.' : ''}`; }
+    };
+    range.addEventListener('input', () => setDiv(+range.value));
+    root.querySelectorAll<HTMLButtonElement>('[data-set]').forEach(b => b.addEventListener('click', () => setDiv(+b.dataset.set!)));
+    root.querySelector<HTMLButtonElement>('[data-tone]')!.addEventListener('click', () => {
+      if (raf) { Object.values(sirens).forEach(s => s.stop()); stopAnim(); }
+      setDiv(+range.value);
+      sirens[1].tone(+range.value).catch(() => {});
+    });
+  });
+</script>

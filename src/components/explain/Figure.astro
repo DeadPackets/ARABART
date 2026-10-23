@@ -1,0 +1,19 @@
+---
+import Window from '../shell/Window.astro';
+import '../../styles/explain.css';
+
+interface Props { title?: string; caption?: string }
+const { title = '', caption } = Astro.props;
+const narrow = Astro.slots.has('narrow');
+const cap = !!caption || Astro.slots.has('caption');
+---
+
+<figure class="k-fig fig">
+  <Window title={title} kind="editor">
+    <div class:list={['fig-body', { 'has-narrow': narrow }]}>
+      <div class="fig-wide"><slot /></div>
+      {narrow && <div class="fig-narrow"><slot name="narrow" /></div>}
+    </div>
+  </Window>
+  {cap && <figcaption><slot name="caption">{caption}</slot></figcaption>}
+</figure>

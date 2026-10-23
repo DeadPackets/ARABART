@@ -1,0 +1,96 @@
+---
+// Why his printing core ran on its own thread: press Print and keep typing. Switch to "same thread" and the editor
+// freezes until the last page is out, the way a program without threads did.
+import Window from '../../shell/Window.astro';
+
+const PAGES = 4, LINES = 7;
+---
+
+<div class="pr" data-print data-pages={PAGES}>
+  <Window title="LETTER.DOC" kind="editor" active class="pr-win">
+    <div class="pr-grid">
+      <div class="pr-left">
+        <fieldset class="pr-mode">
+          <legend>Print</legend>
+          <label><input type="radio" name="pr-mode" value="own" checked /> On its own thread, his way</label>
+          <label><input type="radio" name="pr-mode" value="same" /> On the same thread as typing</label>
+        </fieldset>
+        <label class="sr-only" for="pr-text">Type here while it prints</label>
+        <textarea id="pr-text" rows="4" dir="auto" data-text placeholder="Type here while it prints..."></textarea>
+        <div class="pr-act">
+          <button type="button" class="button button--primary k-btn" data-go disabled>Print 4 pages</button>
+          <span class="pr-bar" aria-hidden="true"><i data-bar></i></span>
+        </div>
+        <p class="pr-say" aria-live="polite" data-say>Press Print, then try to type.</p>
+      </div>
+      <div class="pr-paper" aria-hidden="true">
+        {Array.from({ length: LINES }, (_, i) => <i style={`--w:${[92, 78, 88, 60, 95, 70, 40][i]}%`}></i>)}
+        <span class="pr-pg" data-pg>page 1</span>
+      </div>
+    </div>
+  </Window>
+</div>
+
+<style>
+  .pr-grid { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 20px; align-items: start; }
+  .pr-mode { border: 0; padding: 0; margin: 0 0 10px; display: grid; gap: 2px; color-scheme: light; }
+  .pr-mode legend { font: 700 0.9375rem/1.4 var(--font-ui); }
+  .pr-mode label { display: flex; align-items: center; gap: 8px; min-height: 44px; font: 400 0.9375rem/1.3 var(--font-ui); cursor: pointer; }
+  .pr-mode input { width: 18px; height: 18px; accent-color: var(--w-navy); }
+  textarea { width: 100%; padding: 8px; font: 400 1rem/1.5 var(--sans); color: var(--w-black); background: var(--w-white); border: 1px solid var(--w-black); resize: vertical; color-scheme: light; }
+  textarea[readonly] { background: oklch(0.93 0 0); cursor: wait; }
+  .pr-act { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+  .pr-bar { flex: 1; height: 22px; border: 1px solid var(--w-black); background: var(--w-white); }
+  .pr-bar i { display: block; height: 100%; width: 0; background: var(--w-navy); }
+  .pr-say { margin-top: 10px; min-height: 3em; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink); }
+  .pr-say b { color: var(--hot); }
+  .pr-paper { position: relative; display: grid; align-content: start; justify-items: end; gap: 9px; aspect-ratio: 3 / 4; padding: 16px 12px; background: var(--w-white); border: 1px solid var(--w-black); box-shadow: 4px 4px 0 oklch(0 0 0 / 0.35); }
+  .pr-paper i { display: block; width: var(--w); height: 6px; background: var(--w-black); transform-origin: right; }
+  .pr-pg { position: absolute; left: 0; right: 0; bottom: 6px; text-align: center; font: 600 11px/1 var(--font-code); color: oklch(0.45 0 0); }
+  .pr.busy .pr-win { cursor: wait; }
+  @media (max-width: 520px) { .pr-grid { grid-template-columns: minmax(0, 1fr); } .pr-paper { width: 150px; justify-self: center; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-print]').forEach(root => {
+    const go = root.querySelector<HTMLButtonElement>('[data-go]')!, text = root.querySelector<HTMLTextAreaElement>('[data-text]')!;
+    const bar = root.querySelector<HTMLElement>('[data-bar]')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const paper = root.querySelector<HTMLElement>('.pr-paper')!, pg = root.querySelector<HTMLElement>('[data-pg]')!;
+    const lines = [...paper.querySelectorAll<HTMLElement>('i')];
+    const title = root.querySelector<HTMLElement>('.win-title')!;
+    const PAGES = +root.dataset.pages!;
+    let tl: gsap.core.Timeline | null = null;
+
+    const done = () => {
+      root.classList.remove('busy');
+      text.readOnly = false;
+      title.textContent = 'LETTER.DOC';
+      go.disabled = false;
+      say.innerHTML = `${PAGES} pages printed. ` + (root.querySelector<HTMLInputElement>('input[value="same"]')!.checked ? 'Only now can you type again.' : 'And you never stopped typing.');
+    };
+    go.addEventListener('click', () => {
+      tl?.kill();
+      const same = root.querySelector<HTMLInputElement>('input[value="same"]')!.checked;
+      go.disabled = true;
+      root.classList.toggle('busy', same);
+      text.readOnly = same;
+      title.textContent = same ? 'LETTER.DOC (Not Responding)' : 'LETTER.DOC, printing';
+      say.innerHTML = same ? '<b>The editor is frozen.</b> Printing and typing share one thread, so your keys wait until the last page is out.' : 'Printing in the background. <b>Keep typing:</b> the printer has its own thread.';
+      if (!same) text.focus();
+      const per = 1;
+      tl = gsap.timeline({ onComplete: done });
+      gsap.set(bar, { width: 0 });
+      for (let p = 0; p < PAGES; p++) {
+        tl.call(() => { pg.textContent = `page ${p + 1}`; }).set(lines, { scaleX: 0 });
+        if (reduce()) tl.set(lines, { scaleX: 1 }, `+=${per}`).set(bar, { width: `${((p + 1) / PAGES) * 100}%` });
+        else tl.to(lines, { scaleX: 1, duration: per / lines.length, stagger: per / lines.length, ease: 'none' })
+          .to(bar, { width: `${((p + 1) / PAGES) * 100}%`, duration: per, ease: 'none' }, '<');
+      }
+    });
+    go.disabled = false;
+  });
+</script>

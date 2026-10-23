@@ -1,0 +1,147 @@
+---
+// Three of HandyMenu's cases side by side: Soft Reset, Hard Reset and Power Off (HandyMenu.exe 3.7, 0x152B4 to 0x15378).
+// Pick one and step it; the Pocket PC beside the code does what the code says.
+import CodeStepper from '../CodeStepper.astro';
+import Window from '../../shell/Window.astro';
+import tray from './icon-101-16.png';
+import { powerSteps } from './hm.ts';
+
+const steps = powerSteps('soft');
+const ASM = [
+  { off: '152B4', label: 'soft', code: 'ldr  r0,=0101003Ch', note: 'IOCTL_HAL_REBOOT' },
+  { off: '152CC', code: 'bl   KernelIoControl', note: 'ask the hardware to restart' },
+  { off: '152D8', label: 'hard', code: 'mov  r1,#2', note: 'title: his string 2' },
+  { off: '152EC', code: 'mov  r1,#45', note: 'the warning: string 45' },
+  { off: '15304', code: 'bl   MessageBoxW', note: 'Yes or No' },
+  { off: '15308', code: 'cmp  r0,#6', note: '6 = Yes' },
+  { off: '1530C', code: 'bne  1579C', note: 'No: nothing happens' },
+  { off: '15318', code: 'ldr  pc,[SetCleanRebootFlag]', note: 'next start: factory fresh' },
+  { off: '1531C', code: 'ldr  r0,=0101003Ch', note: 'IOCTL_HAL_REBOOT' },
+  { off: '15340', code: 'bl   KernelIoControl', note: 'restart' },
+  { off: '1534C', label: 'off', code: 'mov  r0,#223', note: 'VK_OFF, the power key' },
+  { off: '1535C', code: 'bl   keybd_event', note: 'press it' },
+  { off: '15364', code: 'mov  r2,#2', note: 'KEYEVENTF_KEYUP' },
+  { off: '15370', code: 'bl   keybd_event', note: 'let it go' },
+];
+const C = [
+  { code: 'case SOFT_RESET:' },
+  { code: '  KernelIoControl(IOCTL_HAL_REBOOT,' },
+  { code: '                  0, 0, 0, 0, 0);' },
+  { code: 'case HARD_RESET:' },
+  { code: '  if (MessageBox(0, text(45), text(2),' },
+  { code: '        0x24) == IDYES) {', note: 'Yes and No buttons' },
+  { code: '    SetCleanRebootFlag();', note: 'wipe on the way up' },
+  { code: '    KernelIoControl(IOCTL_HAL_REBOOT,' },
+  { code: '                    0, 0, 0, 0, 0);' },
+  { code: '  } break;' },
+  { code: 'case POWER_OFF:' },
+  { code: '  keybd_event(VK_OFF, 0, 0, 0);', note: 'key down' },
+  { code: '  keybd_event(VK_OFF,0,KEYEVENTF_KEYUP,0);' },
+];
+---
+
+<div class="hm-pw" data-hm-power>
+  <div class="hm-pw-ctl" role="group" aria-label="Pick a case" hidden data-ctl>
+    <button type="button" class="button k-btn" aria-pressed="true" data-case="soft">Soft Reset</button>
+    <button type="button" class="button k-btn" aria-pressed="false" data-case="hard">Hard Reset</button>
+    <button type="button" class="button k-btn" aria-pressed="false" data-case="off">Power Off</button>
+  </div>
+  <CodeStepper id="hm-power-code" title="HandyMenu.exe  three cases" asm={ASM} c={C} steps={steps} speed={0.9}>
+    <div slot="visual" class="hm-pw-vis">
+      <Window title="Start" kind="device" num="9:41" class="hm-dev2" aria-label="The Pocket PC the code is running on">
+        <div class="ppc hm-scr" data-screen="today" data-scr>
+          <div class="hm-s hm-s-today">
+            <p class="hm-t-date">Thursday, October 22, 2026</p>
+            <p class="hm-t-row"><b>No upcoming appointments</b></p>
+            <p class="hm-t-row">0 unread messages</p>
+            <div class="hm-tray"><span></span><img src={tray.src} alt="" width="16" height="16" /></div>
+          </div>
+          <div class="hm-s hm-s-ask" role="alertdialog" aria-label="Hard Reset">
+            <div class="hm-mb">
+              <p class="hm-mb-t">Hard Reset</p>
+              <p class="hm-mb-q"><span class="hm-mb-i" aria-hidden="true">?</span>HardReset will make you lose all the data stored on your PocketPC, are you sure you want to HardReset ?</p>
+              <p class="hm-mb-b"><button type="button" data-ans="yes">Yes</button><button type="button" data-ans="no">No</button></p>
+            </div>
+          </div>
+          <div class="hm-s hm-s-boot"><p>Windows Mobile</p><i></i></div>
+          <div class="hm-s hm-s-fresh"><p>Welcome</p><small>A brand-new start: no programs, no settings, no data.</small></div>
+          <div class="hm-s hm-s-off"><button type="button" data-wake>Screen off. Tap to wake.</button></div>
+        </div>
+        <p slot="status" class="hm-soft"><span>Calendar</span><span>Contacts</span></p>
+      </Window>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hm-pw { display: grid; gap: 16px; margin-block: 32px; }
+  .hm-pw-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+  .hm-dev2 > .win-body { padding: 0 !important; overflow: hidden !important; }
+  .hm-pw-vis { display: grid; justify-items: center; padding: 12px 0; }
+  .hm-scr { --p: calc(100cqw / 240); position: relative; height: 100%; overflow: hidden; background: #000; }
+  .hm-s { position: absolute; inset: 0; display: none; font-size: calc(var(--p) * 11); }
+  .hm-scr[data-screen='today'] .hm-s-today, .hm-scr[data-screen='ask'] :is(.hm-s-today, .hm-s-ask), .hm-scr[data-screen='boot'] .hm-s-boot,
+  .hm-scr[data-screen='fresh'] .hm-s-fresh, .hm-scr[data-screen='off'] .hm-s-off { display: block; }
+  .hm-s-today { padding: calc(var(--p) * 8); background: linear-gradient(#fff, #e9f0fb); }
+  .hm-s-today p { margin: 0 0 calc(var(--p) * 9) !important; font-size: inherit !important; line-height: 1.25 !important; color: #000 !important; max-width: none !important; }
+  .hm-s-today .hm-tray { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: flex-end; align-items: center; height: calc(var(--p) * 22); padding: 0 calc(var(--p) * 6); background: linear-gradient(#f4f6fb, #d8dfee); border-top: 1px solid #9aa9c8; }
+  .hm-s-today .hm-tray img { width: calc(var(--p) * 16); height: calc(var(--p) * 16); image-rendering: pixelated; }
+  .hm-s-ask { background: rgb(0 0 0 / 0.25); }
+  .hm-mb { position: absolute; left: calc(var(--p) * 10); right: calc(var(--p) * 10); top: calc(var(--p) * 50); background: #fff; border: 1px solid #000; box-shadow: 3px 3px 0 rgb(0 0 0 / 0.4); }
+  .hm-mb p { margin: 0 !important; max-width: none !important; font-size: calc(var(--p) * 11) !important; line-height: 1.3 !important; color: #000 !important; }
+  .hm-mb-t { padding: calc(var(--p) * 4) calc(var(--p) * 6); color: #fff !important; font-weight: 700; background: linear-gradient(#3d6fd1, #1f4ba8); }
+  .hm-mb-q { display: flex; gap: calc(var(--p) * 6); padding: calc(var(--p) * 8); }
+  .hm-mb-i { flex: none; display: grid; place-items: center; width: calc(var(--p) * 20); height: calc(var(--p) * 20); border-radius: 50%; color: #fff; font-weight: 700; background: #1f4ba8; }
+  .hm-mb-b { display: flex; justify-content: center; gap: calc(var(--p) * 10); padding: 0 calc(var(--p) * 8) calc(var(--p) * 8); }
+  .hm-mb-b button { min-width: calc(var(--p) * 56); min-height: calc(var(--p) * 22); font: inherit; font-size: calc(var(--p) * 11); background: linear-gradient(#fff, #e3e3e3); border: 1px solid #555; cursor: pointer; }
+  .hm-mb-b button:focus-visible, .hm-s-off button:focus-visible { outline: 2px solid #316ac5; outline-offset: 2px; }
+  .hm-s-boot { display: none; background: #000; color: #fff; text-align: center; }
+  .hm-scr[data-screen='boot'] .hm-s-boot { display: grid; place-content: center; gap: calc(var(--p) * 12); }
+  .hm-s-boot p { margin: 0 !important; font: 700 calc(var(--p) * 18)/1 Tahoma, sans-serif !important; color: #fff !important; }
+  .hm-s-boot i { justify-self: center; width: calc(var(--p) * 80); height: calc(var(--p) * 6); background: linear-gradient(90deg, #3d95ff 0 30%, #333 0); }
+  .hm-scr[data-screen='fresh'] .hm-s-fresh { display: grid; place-content: center; gap: calc(var(--p) * 8); padding: calc(var(--p) * 16); text-align: center; background: linear-gradient(#2d62c9, #0a3a96); }
+  .hm-s-fresh p { margin: 0 !important; font: 700 calc(var(--p) * 20)/1 Tahoma, sans-serif !important; color: #fff !important; }
+  .hm-s-fresh small { font-size: calc(var(--p) * 11); color: #dbe5f5; }
+  .hm-s-off { background: #000; }
+  .hm-s-off button { width: 100%; height: 100%; font: calc(var(--p) * 11) Tahoma, sans-serif; color: #444; background: #000; border: 0; cursor: pointer; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { powerSteps, reduce, type PowerCase, type PwStep } from './hm.ts';
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-power]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void; go(i: number): void } }>('[data-stepper]')!;
+    const scr = root.querySelector<HTMLElement>('[data-scr]')!, btns = [...root.querySelectorAll<HTMLButtonElement>('[data-case]')];
+    const show = (state: string) => {
+      if (scr.dataset.screen === state) return;
+      scr.dataset.screen = state;
+      if (!reduce()) gsap.fromTo(scr.children, { opacity: 0.2 }, { opacity: 1, duration: 0.35 });
+    };
+    cs.addEventListener('stepper', e => show(((e as CustomEvent).detail.step as PwStep).dev));
+    let chain: gsap.core.Tween | null = null;
+    const pick = (c: PowerCase, answer?: 'yes' | 'no') => {
+      chain?.kill();
+      btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.case === c)));
+      const st = powerSteps(c, answer);
+      cs.stepper?.load(st, 0);
+    };
+    btns.forEach(b => b.addEventListener('click', () => pick(b.dataset.case as PowerCase)));
+    // The message box answers for real: Yes and No each reload the trace from that point and play it out
+    root.querySelectorAll<HTMLButtonElement>('[data-ans]').forEach(b => b.addEventListener('click', () => {
+      const st = powerSteps('hard', b.dataset.ans as 'yes' | 'no');
+      chain?.kill();
+      cs.stepper?.load(st, reduce() ? st.length - 1 : 3);
+      let k = 3;
+      const next = () => { cs.stepper?.go(++k); chain = k < st.length - 1 ? gsap.delayedCall(0.9, next) : null; };
+      if (!reduce()) chain = gsap.delayedCall(0.9, next);
+    }));
+    root.querySelector('[data-wake]')!.addEventListener('click', () => show('today'));
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    show('today');
+    const st0 = cs as unknown as { stepper?: { i: number; go(i: number): void } };
+    st0.stepper?.go(st0.stepper.i);
+  });
+</script>

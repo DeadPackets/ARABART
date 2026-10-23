@@ -1,0 +1,95 @@
+---
+// His Mecca rule (visible() in HijriPlugin.dll): a new moon born before 6:00 in Mecca is old enough to be seen that
+// evening, so the month starts the next day; born later, it is seen one evening later. Drag the birth time to try it.
+// Inside a CodeStepper it follows the steps (detail.step.show = how much of the picture to show, 0 to 5).
+interface Props { id: string; minutes: number; dates: [string, string, string]; label?: string }
+const { id, minutes, dates, label = 'When is the new moon born? (Mecca time)' } = Astro.props;
+const X0 = 20, W = 200; // one day per 200 px
+const x = (min: number) => X0 + (min / 1440) * W;
+const late = minutes > 360;
+const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+---
+
+<div class="hdt-mr" id={id} data-mr data-min={minutes} data-dates={JSON.stringify(dates)} data-show="5">
+  <div class="hdt-mr-scroll" tabindex="0" role="region" aria-label="Three days in Mecca">
+  <svg class="dg" viewBox="0 0 640 216" role="img" aria-labelledby={`${id}-t`}>
+    <title id={`${id}-t`}>Three days in Mecca. The new moon is born at {hhmm(minutes)} on {dates[0]}. Born {late ? 'after' : 'before'} 6:00, so the crescent is first seen on the evening of {late ? dates[1] : dates[0]} and the month starts on {late ? dates[2] : dates[1]}.</title>
+    {[0, 1, 2].map(d => (
+      <g>
+        <rect x={X0 + d * W} y="28" width={W / 4} height="92" class="hdt-mr-night" />
+        <rect x={X0 + d * W + (W * 3) / 4} y="28" width={W / 4} height="92" class="hdt-mr-night" />
+        <rect x={X0 + d * W} y="28" width={W} height="92" class="hdt-mr-day" />
+        <text class="t-sm" x={X0 + d * W + W / 4} y="136" text-anchor="middle">6:00</text>
+        <text class="t-sm" x={X0 + d * W + (W * 3) / 4} y="136" text-anchor="middle">18:00</text>
+        <text class="t-bk" x={X0 + d * W + W / 2} y="158" text-anchor="middle">{dates[d]}</text>
+      </g>
+    ))}
+    <g data-part="rule"><path class="wire-hi dash" d={`M${X0 + W / 4} 28 V120`} /></g>
+    <g data-part="moon" data-moon transform={`translate(${x(minutes)} 0)`}>
+      <path class="wire-hi" d="M0 28 V120" />
+      <circle cx="0" cy="56" r="9" class="hdt-mr-moon" />
+      <text class="t-sm" x="0" y="18" text-anchor="middle" data-born>born {hhmm(minutes)}</text>
+    </g>
+    <g data-part="seen" data-seen transform={`translate(${X0 + (late ? 1 : 0) * W + (W * 3) / 4 + 22} 0)`}>
+      <path class="hdt-mr-cres" d="M-6 98 a14 14 0 1 0 12 -22 a11 11 0 1 1 -12 22z" />
+      <text class="t-sm" x="0" y="112" text-anchor="middle">seen</text>
+    </g>
+    <g data-part="day1" data-day1 transform={`translate(${X0 + (late ? 2 : 1) * W} 0)`}>
+      <rect class="box-hi" x="4" y="170" width={W - 8} height="40" />
+      <text class="t-bk t-lg" x={W / 2} y="197" text-anchor="middle">Day 1</text>
+    </g>
+  </svg>
+  </div>
+  <label class="hdt-mr-ctl">
+    <span>{label}</span>
+    <input type="range" min="0" max="1439" step="1" value={minutes} data-range aria-valuetext={hhmm(minutes)} />
+    <output data-out>{hhmm(minutes)}: {late ? 'after 6:00, so the month starts two days later' : 'before 6:00, so the month starts the next day'}</output>
+  </label>
+</div>
+
+<style>
+  .hdt-mr { display: grid; gap: 12px; min-width: 0; }
+  .hdt-mr-scroll { overflow-x: auto; }
+  .hdt-mr-scroll svg { min-width: 560px; }
+  .hdt-mr :global(.hdt-mr-day) { fill: transparent; stroke: var(--accent-2); stroke-width: 1.5; }
+  .hdt-mr :global(.hdt-mr-night) { fill: color-mix(in oklch, var(--ink) 16%, transparent); }
+  .hdt-mr :global(.hdt-mr-moon) { fill: var(--ink); stroke: var(--accent); stroke-width: 3; }
+  .hdt-mr :global(.hdt-mr-cres) { fill: var(--accent); }
+  .hdt-mr [data-part] { transition: opacity 0.25s, transform 0.3s; }
+  .hdt-mr[data-show='0'] [data-part='rule'], .hdt-mr[data-show='0'] [data-part='seen'], .hdt-mr[data-show='0'] [data-part='day1'],
+  .hdt-mr[data-show='1'] [data-part='rule'], .hdt-mr[data-show='1'] [data-part='seen'], .hdt-mr[data-show='1'] [data-part='day1'],
+  .hdt-mr[data-show='2'] [data-part='rule'], .hdt-mr[data-show='2'] [data-part='seen'], .hdt-mr[data-show='2'] [data-part='day1'],
+  .hdt-mr[data-show='3'] [data-part='seen'], .hdt-mr[data-show='3'] [data-part='day1'],
+  .hdt-mr[data-show='4'] [data-part='day1'] { opacity: 0; }
+  .hdt-mr-ctl { display: grid; grid-template-columns: auto minmax(120px, 1fr); gap: 6px 14px; align-items: center; font-weight: 600; }
+  .hdt-mr-ctl input { width: 100%; min-height: 44px; accent-color: var(--accent); }
+  .hdt-mr-ctl output { grid-column: 1 / -1; font-weight: 500; color: var(--ink-2); }
+  @media (max-width: 640px) { .hdt-mr-ctl { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .hdt-mr [data-part] { transition: none; } }
+</style>
+
+<script>
+  const hhmm = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+  for (const root of document.querySelectorAll<HTMLElement>('[data-mr]')) {
+    const range = root.querySelector<HTMLInputElement>('[data-range]')!, out = root.querySelector('[data-out]')!;
+    const moon = root.querySelector('[data-moon]')!, seen = root.querySelector('[data-seen]')!, day1 = root.querySelector('[data-day1]')!;
+    const born = root.querySelector('[data-born]')!, title = root.querySelector('title')!;
+    const dates = JSON.parse(root.dataset.dates!) as string[];
+    const set = (min: number) => {
+      const late = min > 360;
+      moon.setAttribute('transform', `translate(${20 + (min / 1440) * 200} 0)`);
+      seen.setAttribute('transform', `translate(${20 + (late ? 1 : 0) * 200 + 172} 0)`);
+      day1.setAttribute('transform', `translate(${20 + (late ? 2 : 1) * 200} 0)`);
+      born.textContent = `born ${hhmm(min)}`;
+      range.value = String(min); range.setAttribute('aria-valuetext', hhmm(min));
+      out.textContent = `${hhmm(min)}: ${late ? 'after 6:00, so the month starts two days later' : 'before 6:00, so the month starts the next day'}`;
+      title.textContent = `The new moon is born at ${hhmm(min)} on ${dates[0]}, so the month starts on ${late ? dates[2] : dates[1]}.`;
+    };
+    range.addEventListener('input', () => { root.dataset.show = '5'; set(+range.value); });
+    root.closest('[data-stepper]')?.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { show?: number };
+      root.dataset.show = String(s.show ?? 5);
+      set(+root.dataset.min!);
+    });
+  }
+</script>

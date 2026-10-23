@@ -1,0 +1,84 @@
+---
+// His sign-off (NAMES.COM 06D5): two lines in text mode, then a bright spark that walks along them, one letter per
+// screen refresh. Each letter on a text screen is two bytes, the letter and its color; the spark only changes the color.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import './rle.css';
+
+const L0 = '    YASSER DOT DESIGN.    ', L1 = '<c>1993 YASSER MOHAMED ALI';
+const C0 = 21, COLS = 34; // the screen from column 21 to 54; both lines start at column 25
+const row = (s: string) => [...Array(COLS)].map((_, i) => s[i + C0 - 25] ?? ' ');
+const ROWS = [row(L0), row(L1)];
+// The walk: 25 letters on row 0 from column 25, then 26 on row 1 (his loop counts, 19h and 1Ah)
+const WALK = [...[...Array(25)].map((_, j) => [0, 25 + j]), ...[...Array(26)].map((_, j) => [1, 25 + j])];
+---
+
+<div class="ky-sp" data-kysp data-walk={JSON.stringify(WALK)} data-c0={C0}>
+  <Window title="TEXT MODE   80 x 25" kind="screen" class="g-win">
+    <div class="ky-sp-scr" role="img" aria-label="YASSER DOT DESIGN. and, under it, <c>1993 YASSER MOHAMED ALI, in light gray on black.">
+      {ROWS.map((r, y) => (
+        <div class="ky-sp-row" aria-hidden="true">{r.map((ch, i) => <span data-at={`${y},${i + C0}`}>{ch}</span>)}</div>
+      ))}
+      <div class="ky-sp-row" aria-hidden="true"><span class="ky-sp-cur">_</span></div>
+    </div>
+  </Window>
+  <div class="ky-sp-mem" aria-live="polite">
+    <span class="ky-sp-cell"><i>B800:<b data-a0>0032</b></i><b data-ch>20</b><span>the letter</span></span>
+    <span class="ky-sp-cell ky-sp-cell--c"><i>B800:<b data-a1>0033</b></i><b data-co>0F</b><span>its color</span></span>
+    <p class="g-note" data-what>Each letter on a text screen is two bytes. The spark writes 0F, bright white, into the color byte, waits one screen refresh, and puts the old 07 back.</p>
+  </div>
+  <Scrubber n={WALK.length} at={WALK.length - 1} label="The spark, letter by letter" />
+</div>
+
+<style>
+  .ky-sp { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px 24px; align-items: start; }
+  .ky-sp > :global(.k-scrub) { grid-column: 1 / -1; }
+  .ky-sp-scr { display: grid; justify-content: center; padding: 18px 0; overflow: hidden; }
+  .ky-sp-row { display: flex; height: 16px; font: 400 16px/16px var(--font-dos); color: var(--vga-7); white-space: pre; }
+  .ky-sp-row span { width: 9px; text-align: center; cursor: pointer; }
+  .ky-sp-row span.hot { color: var(--vga-15); text-shadow: 0 0 6px oklch(1 0 0 / 0.8); }
+  .ky-sp-cur { animation: ky-blink 1s steps(1) infinite; cursor: default !important; }
+  @keyframes ky-blink { 50% { opacity: 0; } }
+  .ky-sp-mem { display: grid; grid-template-columns: auto auto 1fr; gap: 12px; align-items: start; }
+  .ky-sp-mem .g-note { grid-column: 1 / -1; }
+  .ky-sp-cell { display: grid; justify-items: center; gap: 4px; min-width: 96px; padding: 10px 8px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .ky-sp-cell i { font: 500 11px/1 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .ky-sp-cell i b { color: inherit; font-weight: 500; }
+  .ky-sp-cell > b { font: 700 28px/1 var(--font-code); color: var(--ink); }
+  .ky-sp-cell--c > b { color: var(--accent); }
+  .ky-sp-cell > span { font: 500 12px/1 var(--font-code); color: var(--accent-2); }
+  @media (min-width: 1100px) { .ky-sp-row { height: 32px; font-size: 32px; line-height: 32px; } .ky-sp-row span { width: 18px; } }
+  @media (max-width: 860px) { .ky-sp { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .ky-sp-cur { animation: none; } }
+</style>
+
+<script>
+  import { scrubber, type How } from '../../scrubber.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-kysp]').forEach(root => {
+    const walk: [number, number][] = JSON.parse(root.dataset.walk!);
+    const cell = (y: number, x: number) => root.querySelector<HTMLElement>(`[data-at="${y},${x}"]`);
+    const q = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const hex = (n: number) => n.toString(16).toUpperCase().padStart(4, '0');
+    let lit: HTMLElement | null = null;
+    const show = (i: number, how: How) => {
+      lit?.classList.remove('hot');
+      const [y, x] = walk[i], c = cell(y, x)!;
+      // At the end of a run the spark has passed: every color is back to 07
+      const done = i === walk.length - 1 && how === 'play';
+      if (!done) { c.classList.add('hot'); lit = c; }
+      const a = y * 160 + x * 2, ch = c.textContent!.charCodeAt(0);
+      q('[data-a0]').textContent = hex(a); q('[data-a1]').textContent = hex(a + 1);
+      q('[data-ch]').textContent = ch.toString(16).toUpperCase().padStart(2, '0');
+      q('[data-co]').textContent = done ? '07' : '0F';
+      q('[data-what]').textContent = `${ch === 32 ? 'A space' : `The letter ${c.textContent}`}, row ${y}, column ${x}: its color byte is ${done ? 'back to 07, light gray' : '0F, bright white, for one screen refresh, then back to 07'}.`;
+    };
+    // One letter per screen refresh, as he wrote it
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 1 / 70 });
+    root.querySelector('.ky-sp-scr')!.addEventListener('click', e => {
+      const at = (e.target as HTMLElement).closest<HTMLElement>('[data-at]')?.dataset.at;
+      const k = at ? walk.findIndex(([y, x]) => `${y},${x}` === at) : -1;
+      if (k >= 0) { scrub.pause(); scrub.go(k, 'step'); }
+    });
+  });
+</script>

@@ -1,0 +1,88 @@
+---
+// PESM.EXE (1991). Facts: research/programs.md, research/arabart.md, the unpacked PESM.EXE (main 0000-00FA, engine
+// entry 0284, strings 00FC-0283 and 05C8-0600). Drawn with his engine, PESM's screen comes out pixel for pixel.
+import PesmWalk from '../components/toys/arabart-family/PesmWalk.astro';
+import PesmTwin from '../components/toys/arabart-family/PesmTwin.astro';
+import KeyLine from '../components/toys/arabart-family/KeyLine.astro';
+import { BASMALA } from '../components/toys/arabart-family/pesm.ts';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import '../components/toys/arabart-family/writeup.css';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="walk">
+  <h2>Sixteen lines, counting to fifteen</h2>
+  <p class="lead">PESM writes the Basmala, <span lang="ar">بسم الله الرحمن الرحيم</span>, sixteen times. Every line switches on a new mix of bold, underline, italic and double size, until it has drawn them all.</p>
+  <p>This is the first appearance of his Arabic engine, in 1991. Press <b>Run</b> and watch it work through every style, one call at a time.</p>
+  <div class="af-toy"><PesmWalk id="pesm-walk" /></div>
+  <div class="af-cols">
+    <p>Watch the four switches. PESM never sets a style outright. In front of each line it puts only the style keys that need to flip: <code>@</code> for bold, <code>#</code> for underline, <code>!</code> for italic. The switches carry over from one line to the next, so the prefixes count in binary: 0, 1, 2, 3, all the way to 15.</p>
+    <p>Line 9 starts the second column with <code>*$</code>: every switch off, then double size on. That is 8, binary 1000, and the count runs on to 1111. Sixteen lines, every combination of four styles, and not one line repeated. A complete test card, in a few bytes of text.</p>
+  </div>
+</section>
+
+<section id="engine">
+  <h2>The engine inside, byte for byte</h2>
+  <p class="lead">PESM carries its own copy of his Arabic engine. Its joining code and its letter shapes are the very bytes ARABART 4.15 carries two years later.</p>
+  <p>Pick a block and compare the two files live. Two years on, he had no reason to touch the code that gives every letter its shape.</p>
+  <div class="af-toy"><PesmTwin id="pesm-twin" /></div>
+  <div class="af-cols">
+    <p>ARABART runs as a service in memory. Programs reach it through the PC’s built-in video service, <Term id="int-10h">INT 10h</Term>, the way a web page calls a browser API. PESM keeps the engine inside its own file and calls it directly, with the very same arguments: the color, x, y and the text. Today we call that <Term id="static-linking">static linking</Term>: one file, nothing to install first.</p>
+    <p>So the same code serves both ways. For a quick demo, link it in. For many programs on one PC, load it once and let all of them call it. ARABART is the second way.</p>
+  </div>
+  <ThenNow
+    title="One engine, two ways to ship it"
+    rows={[
+      { then: 'PESM carries the engine inside its own file', now: 'A statically linked binary, the way Go builds by default', why: 'One file that runs anywhere, with nothing to install.' },
+      { then: 'ARABART loads once and serves every program', now: 'A shared library, or a local background service', why: 'One copy in memory for every program that needs it.' },
+      { then: 'The same inputs for <code>call 0284h</code> and <code>int 10h</code>', now: 'One API with two backends', why: 'Code written for one works with the other.' },
+      { then: 'Sixteen lines, every mix of styles', now: 'A visual test page, like a Storybook story for every variant', why: 'Draw every combination once, and see them all at a glance.' },
+    ]}
+  />
+  <Deep title="For engineers: the entry PESM calls">
+    <Listing
+      title="PESM.EXE · the engine entry (image offset 0284h)"
+      lines={[
+        { off: '0284', code: 'mov  cs:[05B9h],ds / mov cs:[05BBh],dx', note: 'where the text is' },
+        { off: '028E', code: 'mov  cs:[05C7h],al', note: 'the color' },
+        { off: '0292', code: 'mov  cs:[05BFh],bx / mov cs:[05BDh],cx', note: 'y and x' },
+        { off: '02A7', code: 'mov  dl,[di] / cmp dl,0 / je 02BDh', note: 'each key, up to the zero' },
+        { off: '02B3', code: 'mov  al,cs:[si+09FBh]', note: 'key to glyph code: his table', hi: true },
+        { off: '02B8', code: 'mov  [di],al / inc di', note: 'stored in place' },
+        { off: '02C5', code: 'dec di / inc di / mov dl,[di] / cmp dl,0C8h', note: 'the shaping pass: 136 bytes, the same as ARABART 0238h', hi: true },
+      ]}
+      foot="Image offsets in the unpacked PESM.EXE; the file adds a 30h-byte header. Main is sixteen copies of five instructions, at 0007h to 00F6h."
+    />
+    <p>PESM fills the registers exactly as a program fills them for ARABART: AH = 36h, AL the color, CX the x, BX the y, DS:DX the text. Pixels go straight into VGA memory, mode 12h, 640 by 480, through the <Term id="graphics-controller">VGA Graphics Controller</Term>: <Term id="set-reset">Set/Reset</Term> holds the color and the <Term id="bit-mask">Bit Mask</Term> picks the pixels, exactly as in ARABART. One difference shows how the engine grew: in PESM the style switches carry over from call to call, which is what lets the sixteen lines count. ARABART 4.15 clears them at the start of every call, so each string carries its own styles. <a href={`${base}/bytes/?f=PESM_PESM.EXE&layer=memory&at=2b4`}>See the engine in Every Byte</a>.</p>
+  </Deep>
+</section>
+
+<section id="keys">
+  <h2>The Basmala, in 22 keys</h2>
+  <p class="lead">The whole sentence is <code>{BASMALA}</code>: 22 keys on an English keyboard, pressed as if it had Arabic key caps. Two more lines wait in PESM’s data, in the same code.</p>
+  <p>One is his own name. The other names a computer center, Al-Nour. Pick a line, then pick any key to see what it becomes.</p>
+  <div class="af-toy">
+    <KeyLine
+      id="pesm-keys"
+      font={1}
+      color={15}
+      scale={3}
+      title="PESM.EXE  its strings, one key per byte"
+      lines={[
+        { label: 'The Basmala', keys: BASMALA, note: 'بسم الله الرحمن الرحيم, “In the name of God, the Most Gracious, the Most Merciful”.' },
+        { label: 'His name', keys: 'dh#s#v @lpl]@ ugd>', note: 'His name, ياسر محمد علي. A <code>#</code> pair underlines the س of Yasser, and an <code>@</code> pair makes محمد bold.' },
+        { label: 'Al-Nour Computer Center', keys: 'lv;. #$hgk,v$#  gg;,lfd,jv @!#', note: 'مركز النور للكومبيوتر, Al-Nour Computer Center. <code>#$</code> makes النور, Al-Nour, underlined and twice as tall.' },
+      ]}
+    />
+  </div>
+  <p class="af-after">Every key here is the <Term id="key-encoding">Arabic-keyboard encoding</Term>: <kbd>f</kbd> is <span lang="ar">ب</span>, <kbd>s</kbd> is <span lang="ar">س</span>, <kbd>l</kbd> is <span lang="ar">م</span>. His markup lives inside the text, style keys and all, the same way it does in ARABART. <a href={`${base}/arabart/`}>Type your own on ARABART</a>.</p>
+</section>
+
+<style>
+  .af-after { margin-top: 28px; }
+</style>
+

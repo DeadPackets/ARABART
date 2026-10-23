@@ -1,88 +1,326 @@
 ---
-import CrtBezel from './CrtBezel.astro';
+// His program, running in js-dos inside a DOS screen window. On a touch screen it waits for a tap, then shows the keys the
+// program needs (read from its controls) and a button that opens the phone's own keyboard for letters and digits.
+import Window from './shell/Window.astro';
+import type { ProgramControl } from '../data/programs';
 
 interface Props {
   bundleUrl: string;
-  programId: string;
+  name: string;
+  title: string;
+  image: string;
+  alt: string;
+  bundleBytes?: number | null;
+  controls?: ProgramControl[];
+  /** A command the program wants typed at the DOS prompt; gets a one-tap key */
+  line?: string;
 }
 
-const { bundleUrl, programId } = Astro.props;
+const { bundleUrl, name, title, image, alt, bundleBytes, controls = [], line } = Astro.props;
+const kb = bundleBytes ? `${Math.round(bundleBytes / 1024)} KB` : '';
+
+// js-dos key codes follow GLFW: letters and digits are ASCII, Esc 256, Enter 257, arrows 262 to 265, F1 is 290
+const ORDER = ['Esc', 'F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'Ins', 'Del', 'Alt+X', 'Space', '←', '↑', '↓', '→', 'Enter'];
+const CODE: Record<string, number[]> = { Esc: [256], Enter: [257], Ins: [260], Del: [261], '→': [262], '←': [263], '↓': [264], '↑': [265], Space: [32] };
+const want = new Set(['Esc', 'Enter']);
+for (const { key } of controls) {
+  const k = key.toUpperCase();
+  if (/ANY KEY|SPACE/.test(k)) want.add('Space');
+  if (/ARROW/.test(k)) ['←', '↑', '↓', '→'].forEach(a => want.add(a));
+  if (/\bUP\b|\bDOWN\b/.test(k)) ['↑', '↓'].forEach(a => want.add(a));
+  if (/\bINS/.test(k)) want.add('Ins');
+  if (/\bDEL/.test(k)) want.add('Del');
+  for (const m of k.matchAll(/\bF(\d{1,2})\b/g)) want.add(`F${m[1]}`);
+  for (const m of k.matchAll(/ALT\s*\+\s*([A-Z])/g)) want.add(`Alt+${m[1]}`);
+}
+const code = (k: string) => CODE[k] ?? (k.startsWith('Alt+') ? [342, k.charCodeAt(4)] : [289 + Number(k.slice(1))]);
+const label: Record<string, string> = { '←': 'Left', '↑': 'Up', '↓': 'Down', '→': 'Right', Ins: 'Insert', Del: 'Delete' };
+const keys = [...want].sort((a, b) => (ORDER.indexOf(a) + 1 || 99) - (ORDER.indexOf(b) + 1 || 99)).map(k => ({ k, codes: code(k).join(' '), label: label[k] }));
 ---
 
-<div class="dos-player-wrap">
-  <CrtBezel>
-    <div
-      class="dos-container"
-      id={`dos-${programId}`}
-      data-bundle-url={bundleUrl}
-    ></div>
-  </CrtBezel>
+<div class="player" data-player data-bundle={bundleUrl} data-name={name}>
+  <Window kind="screen" title={title} active as="figure" class="player-win">
+    <div class="screen" data-screen tabindex="0" role="application" aria-label={`${name}. Press Enter to type into the program.`} aria-describedby="player-hint">
+      <img class="screen-img" src={image} alt={alt} width="962" height="600" fetchpriority="high" />
+      <div class="emu" data-emu></div>
+      <div class="standby" data-standby>
+        <button type="button" class="button button--primary start" data-start hidden>Tap to start {name}</button>
+        <p class="status" role="status" data-status>Loading {name}{kb && `, ${kb}`}</p>
+        <button type="button" class="button button--primary" data-retry hidden>Try again</button>
+      </div>
+    </div>
 
-  <div class="dos-controls">
-    <button class="btn btn-sm" id={`reset-${programId}`}>
-      <span aria-hidden="true">&gt;</span> RESET CACHE
-    </button>
-    <button class="btn btn-sm" onclick="window.location.reload()">
-      <span aria-hidden="true">&gt;</span> RUN AGAIN
-    </button>
-  </div>
+    <div class="keys" role="group" aria-label={`Keys for ${name}`} data-keys>
+      {line && <button type="button" class="key key--line" data-line={line} disabled>Type {line}</button>}
+      {keys.map(({ k, codes, label }) => (
+        <button type="button" class:list={['key', { 'key--wide': k.length > 3 }]} data-codes={codes} aria-label={label} disabled>{k}</button>
+      ))}
+      <label class="key key--kb">
+        <span aria-hidden="true">ABC</span>
+        <input type="text" class="kb-in" data-kb aria-label="Type letters and digits into the program" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="enter" disabled />
+      </label>
+    </div>
+
+    <div slot="status" class="player-bar">
+      <p class="player-hint" id="player-hint" role="status" data-hint>Click the screen to type into the program.</p>
+      <button type="button" class="button" data-fullscreen disabled>Full screen</button>
+      <button type="button" class="button" data-restart disabled>Restart</button>
+    </div>
+  </Window>
 </div>
 
 <style>
-  .dos-player-wrap {
-    margin: 0 auto;
-    max-width: 960px;
+  /* The whole window, its buttons included, fits between the top bar and the key bar */
+  .player { width: min(100%, calc((100svh - var(--mb) - var(--sl) - 168px) * 962 / 600 + 24px)); margin-inline: auto; }
+  .player-win { margin: 0 14px 12px 0; }
+  .screen { position: relative; aspect-ratio: 962 / 600; overflow: hidden; background: var(--vga-0); }
+  .screen-img, .emu { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .screen-img { object-fit: cover; image-rendering: pixelated; }
+  .emu { z-index: 2; opacity: 0; pointer-events: none; transition: opacity 0.3s var(--expo); }
+  .emu.is-on { opacity: 1; pointer-events: auto; }
+
+  .standby {
+    position: absolute; inset: 0; z-index: 3;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 14px; padding: 5%;
+    background: linear-gradient(to top, oklch(0 0 0 / 0.8), transparent 50%);
+  }
+  [data-state='idle'] .standby { justify-content: center; background: oklch(0 0 0 / 0.45); }
+  [data-state='idle'] .status { display: none; }
+  .start { min-height: 56px; padding-inline: 1.5rem; font-size: 1.0625rem; }
+  .status {
+    padding: 4px 14px; font: 400 16px/1.5 var(--font-dos); color: var(--vga-0); background: var(--vga-7);
+    box-shadow: 5px 5px 0 var(--vga-0); text-align: center;
+  }
+  .status::after { content: '_'; animation: blink 1.06s steps(1) infinite; }
+  [data-state='error'] .status { color: var(--vga-15); background: var(--vga-4); }
+  [data-state='error'] .status::after { display: none; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .screen:fullscreen { aspect-ratio: auto; }
+  .screen:fullscreen .screen-img { object-fit: contain; }
+
+  .player-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
+  /* its own line: the hint grows when the program starts, and the buttons must not jump */
+  .player-hint { flex: 1 1 100%; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); }
+  [data-kbd='on'] .player-hint { color: var(--vga-14); }
+  .screen:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 3px; }
+  [data-kbd='on'] .screen { outline: 3px double var(--vga-14); outline-offset: 3px; }
+  .player-bar .button { min-height: 44px; }
+
+  /* On-screen keys: his keyboard's keycaps, gray with a hard shadow, for touch screens */
+  .keys { display: none; flex-wrap: wrap; gap: 10px 10px; margin-top: 14px; }
+  .key {
+    position: relative; display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0 10px;
+    font: 400 16px/1 var(--font-dos); color: var(--vga-0); background: var(--vga-7); border: 0; box-shadow: 3px 3px 0 var(--vga-8);
+    cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  }
+  .key:active, .key.is-down { translate: 2px 2px; box-shadow: 1px 1px 0 var(--vga-8); background: var(--vga-14); }
+  .key--line { background: var(--vga-2); }
+  .key--kb { background: var(--vga-11); }
+  .key--kb:focus-within { background: var(--vga-14); outline: 2px solid var(--vga-15); outline-offset: 2px; }
+  .kb-in { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; border: 0; cursor: pointer; }
+  .key:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 2px; }
+  [data-player]:not([data-state='running']) .keys { opacity: 0.55; pointer-events: none; }
+  @media (pointer: coarse), (max-width: 760px) {
+    .keys { display: flex; }
+    .player-hint { display: none; }
+    [data-kbd='on'] .player-hint { display: block; }
   }
 
-  .dos-container {
-    width: 100%;
-    aspect-ratio: 16 / 10;
-  }
-
-  .dos-controls {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-top: 2.5rem;
-    flex-wrap: wrap;
+  @media (max-width: 640px) {
+    .player-win { margin-right: 8px; }
+    .player-bar .button { flex: 1; }
   }
 </style>
 
-<script is:inline define:vars={{ programId, bundleUrl }}>
-  (function() {
-    function initPlayer() {
-      var el = document.getElementById('dos-' + programId);
-      if (!el) return;
-      if (typeof Dos === 'undefined') {
-        setTimeout(initPlayer, 200);
-        return;
+<script>
+  type CI = {
+    simulateKeyPress: (...codes: number[]) => void;
+    events(): { onFrame(fn: (rgb: Uint8Array | null, rgba: Uint8Array | null) => void): void };
+  };
+  const w = window as unknown as { Dos?: (el: HTMLElement, opts: Record<string, unknown>) => unknown };
+
+  const root = document.querySelector<HTMLElement>('[data-player]')!;
+  const $ = <T extends HTMLElement = HTMLElement>(s: string) => root.querySelector<T>(s)!;
+  const screen = $('[data-screen]'), emu = $('[data-emu]'), standby = $('[data-standby]'), status = $('[data-status]');
+  const start = $<HTMLButtonElement>('[data-start]'), retry = $<HTMLButtonElement>('[data-retry]');
+  const fullscreen = $<HTMLButtonElement>('[data-fullscreen]'), restart = $<HTMLButtonElement>('[data-restart]');
+  const kb = $<HTMLInputElement>('[data-kb]');
+  const pathPrefix = document.querySelector<HTMLMetaElement>('meta[name="jsdos-path"]')!.content;
+  const touch = matchMedia('(pointer: coarse), (max-width: 760px)').matches;
+
+  function fail(message: string) {
+    root.dataset.state = 'error';
+    status.textContent = message;
+    retry.hidden = false;
+  }
+
+  async function waitForDos(ms: number) {
+    const t0 = performance.now();
+    while (typeof w.Dos !== 'function') {
+      if (performance.now() - t0 > ms) throw new Error('The emulator script did not load. Check your connection.');
+      await new Promise(r => setTimeout(r, 100));
+    }
+  }
+
+  // DOS boots to a black screen first; keep the screenshot up until the program draws something
+  function firstFrame(ci: CI, cap: number) {
+    return new Promise<void>(resolve => {
+      let done = false;
+      const finish = () => { if (!done) { done = true; resolve(); } };
+      setTimeout(finish, cap);
+      let litSince = 0;
+      ci.events().onFrame((rgb, rgba) => {
+        const px = rgb ?? rgba;
+        if (done || !px) return;
+        // A blinking cursor lights ~10 samples, a program screen hundreds; the ARABART
+        // loader banner is bright but cleared at once, so the screen must stay lit
+        let lit = 0;
+        for (let i = 0; i < px.length && lit <= 60; i += 97) if (px[i] > 24) lit++;
+        if (lit <= 60) litSince = 0;
+        else if (!litSince) litSince = performance.now();
+        else if (performance.now() - litSince > 700) finish();
+      });
+    });
+  }
+
+  let ci: CI | null = null;
+  async function ready(c: CI) {
+    status.textContent = `Starting ${root.dataset.name}`;
+    await firstFrame(c, 12000);
+    ci = c;
+    root.dataset.state = 'running';
+    root.dataset.kbd = 'off';
+    if (!touch) hint.textContent = 'Keyboard: on the page. Click the screen, or press Enter on it, to type into the program.';
+    standby.hidden = true;
+    emu.classList.add('is-on');
+    // the on-screen keys stay disabled (and dimmed) until there is a program to type into
+    root.querySelectorAll<HTMLButtonElement | HTMLInputElement>('.keys :is(button, input)').forEach(k => (k.disabled = false));
+    fullscreen.disabled = false;
+    restart.disabled = false;
+    root.dispatchEvent(new CustomEvent('dos:ready', { detail: { ci: c, emu }, bubbles: true }));
+  }
+
+  /* ---------- the keyboard belongs to the page until the visitor gives it to the program ----------
+     js-dos listens for keys on window and cancels every one (Tab, Enter, Space). Its key listeners are held here instead of
+     on window, and get keys only while the player owns the keyboard. Then no page shortcut sees them, as in a real PC. */
+  const held: Record<string, (EventListener | EventListenerObject)[]> = { keydown: [], keyup: [], keypress: [] };
+  const fromJsDos = () => /\/js-dos\.js/.test(new Error().stack ?? '');
+  const add = window.addEventListener.bind(window), remove = window.removeEventListener.bind(window);
+  window.addEventListener = ((type: string, fn: EventListener, opts?: boolean | AddEventListenerOptions) =>
+    held[type] && fn && fromJsDos() ? void held[type].push(fn) : add(type, fn, opts)) as typeof window.addEventListener;
+  window.removeEventListener = ((type: string, fn: EventListener, opts?: boolean | EventListenerOptions) => {
+    const i = held[type]?.indexOf(fn) ?? -1;
+    if (i >= 0) held[type].splice(i, 1); else remove(type, fn, opts);
+  }) as typeof window.removeEventListener;
+
+  const hint = $('[data-hint]');
+  let owned = false, lastEsc = 0;
+  const down = new Set<string>();
+  function own(on: boolean) {
+    if (on && root.dataset.state !== 'running') return;
+    if (owned === on) return;
+    owned = on;
+    root.dataset.kbd = on ? 'on' : 'off';
+    hint.textContent = on ? 'Keyboard: in the program. Esc twice or Ctrl+F2 to leave.' : 'Keyboard: on the page. Click the screen, or press Enter on it, to type into the program.';
+    if (!on && document.activeElement !== screen && root.contains(document.activeElement)) screen.focus();
+  }
+  for (const type of ['keydown', 'keypress', 'keyup']) {
+    add(type, e => {
+      const k = e as KeyboardEvent;
+      // a key pressed in the program still gets its release there, even after the visitor leaves
+      if (!owned && !(type === 'keyup' && down.delete(k.code))) return;
+      if (type === 'keydown') {
+        const twice = k.key === 'Escape' && k.timeStamp - lastEsc < 600;
+        if (k.key === 'Escape') lastEsc = k.timeStamp;
+        if (twice || (k.key === 'F2' && k.ctrlKey)) { own(false); k.preventDefault(); k.stopImmediatePropagation(); return; }
+        down.add(k.code);
       }
-      Dos(el, {
-        url: bundleUrl,
+      if (type === 'keyup' && owned) down.delete(k.code);
+      for (const fn of held[type]) typeof fn === 'function' ? fn.call(window, k) : fn.handleEvent(k);
+      k.stopImmediatePropagation();
+    }, true);
+  }
+  screen.addEventListener('pointerdown', () => own(true), true);
+  screen.addEventListener('keydown', e => {
+    if (!owned && e.key === 'Enter' && e.target === screen) { e.preventDefault(); e.stopPropagation(); own(true); }
+  });
+  // clicking or focusing anything else on the page hands the keyboard back
+  document.addEventListener('pointerdown', e => { if (!root.contains(e.target as Node)) own(false); }, true);
+  document.addEventListener('focusin', e => { if (!root.contains(e.target as Node)) own(false); });
+
+  // js-dos (about 115 KB) loads only when a program starts, so a phone that never taps never downloads it
+  function loadJsDos() {
+    const dir = pathPrefix.replace(/emulators\/$/, '');
+    document.head.append(Object.assign(document.createElement('style'), { textContent: `@import url("${dir}js-dos.css") layer(jsdos);` }));
+    document.head.append(Object.assign(document.createElement('script'), { src: `${dir}js-dos.js` }));
+  }
+  async function run() {
+    root.dataset.state = 'loading';
+    start.hidden = true;
+    try {
+      if (typeof w.Dos !== 'function') loadJsDos();
+      await waitForDos(15000);
+      const timeout = setTimeout(() => fail('The emulator did not start. Try again.'), 45000);
+      w.Dos!(emu, {
+        url: root.dataset.bundle,
+        pathPrefix,
         autoStart: true,
-        noSocialLinks: true,
+        noCloud: true,
+        thinSidebar: true,
+        theme: 'dark',
+        imageRendering: 'pixelated',
+        onEvent(event: string, c: CI) {
+          if (event === 'ci-ready') {
+            clearTimeout(timeout);
+            ready(c);
+          }
+        },
       });
+    } catch (e) {
+      fail((e as Error).message);
     }
+  }
 
-    // Reset cache button
-    var resetBtn = document.getElementById('reset-' + programId);
-    if (resetBtn) {
-      resetBtn.addEventListener('click', function() {
-        if (window.indexedDB && window.indexedDB.databases) {
-          window.indexedDB.databases().then(function(dbs) {
-            dbs.forEach(function(db) {
-              window.indexedDB.deleteDatabase(db.name);
-            });
-            alert('Cache cleared. Refresh to reload.');
-          });
-        }
-      });
-    }
+  /* ---------- on-screen keys: one queue, so fast taps arrive in order ---------- */
+  // A US keyboard: the same index in SH is that key with Shift held
+  const US = "`1234567890-=qwertyuiop[]\\asdfghjkl;'zxcvbnm,./";
+  const SH = '~!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:"ZXCVBNM<>?';
+  const charCodes = (ch: string): number[] | null => {
+    if (ch === ' ') return [32];
+    const i = US.indexOf(ch), j = SH.indexOf(ch), base = US[i < 0 ? j : i];
+    if (!base) return null;
+    const c = base.toUpperCase().charCodeAt(0);
+    return i < 0 ? [340, c] : [c];
+  };
+  let queue = Promise.resolve();
+  const press = (codes: number[]) => {
+    queue = queue.then(() => { ci?.simulateKeyPress(...codes); return new Promise(r => setTimeout(r, 50)); });
+  };
+  root.querySelectorAll<HTMLButtonElement>('[data-codes]').forEach(b =>
+    b.addEventListener('click', () => press(b.dataset.codes!.split(' ').map(Number))),
+  );
+  root.querySelectorAll<HTMLButtonElement>('[data-line]').forEach(b =>
+    b.addEventListener('click', () => { for (const ch of b.dataset.line!) { const c = charCodes(ch); if (c) press(c); } press([257]); }),
+  );
+  // The phone's own keyboard: every character typed goes to DOS, and the field stays empty
+  kb.addEventListener('input', () => {
+    for (const ch of kb.value) { const c = charCodes(ch); if (c) press(c); }
+    kb.value = '';
+  });
+  const SPECIAL: Record<string, number> = { Backspace: 259, Enter: 257, Escape: 256, Tab: 258, ArrowLeft: 263, ArrowUp: 265, ArrowDown: 264, ArrowRight: 262 };
+  kb.addEventListener('keydown', e => {
+    const c = SPECIAL[e.key];
+    if (c) { e.preventDefault(); press([c]); }
+  });
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initPlayer);
-    } else {
-      initPlayer();
-    }
-  })();
+  retry.addEventListener('click', () => location.reload());
+  restart.addEventListener('click', () => location.reload());
+  fullscreen.addEventListener('click', () => screen.requestFullscreen?.());
+  start.addEventListener('click', run);
+
+  // A phone waits for a tap, so a shared link does not spend data on an emulator nobody asked for; with reduced motion
+  // nothing moves until the visitor asks
+  if (touch || matchMedia('(prefers-reduced-motion: reduce)').matches) { root.dataset.state = 'idle'; start.hidden = false; }
+  else run();
 </script>

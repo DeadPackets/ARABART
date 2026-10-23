@@ -1,0 +1,95 @@
+---
+// The key machine: 120 numbers shuffled by a word, then one letter per character of the Pocket PC Code (rc4.ts).
+// Type a code to get its key. Inside a CodeStepper it follows step.k (letter) and step.sub (fill, ksa, i, j, swap, t, c, done).
+import { trace } from './rc4.ts';
+interface Props { id: string; pass: string; code: string; label?: string; editable?: boolean }
+const { id, pass, code, label = 'Pocket PC Code', editable = true } = Astro.props;
+const tr = trace(code, pass);
+const COLS = 12, CW = 44, CH = 30;
+const grp = (k: string) => k.match(/.{1,4}/g)!.join(' - ');
+const key = grp(tr.key), shown = grp(code);
+---
+
+<div class="hdt-km" id={id} data-km data-pass={pass} data-code={code}>
+  {editable && (
+    <label class="hdt-km-in"><span>{label}</span>
+      <input type="text" value={shown} maxlength="25" spellcheck="false" autocomplete="off" data-in aria-describedby={`${id}-k`} />
+    </label>
+  )}
+  {!editable && <p class="hdt-km-ro">{label}: <b>{code}</b></p>}
+  <svg class="dg hdt-km-svg" viewBox={`0 0 ${COLS * CW} ${10 * CH + 96}`} role="img" aria-labelledby={`${id}-t`}>
+    <title id={`${id}-t`}>The 120 numbers after the shuffle keyed by “{pass}”, and the 16 letters of the key: {tr.key}.</title>
+    {tr.states[tr.states.length - 1].map((v, n) => (
+      <g data-cell={n} transform={`translate(${(n % COLS) * CW} ${Math.floor(n / COLS) * CH})`}>
+        <rect x="1" y="1" width={CW - 2} height={CH - 2} class="box" />
+        <text x={CW / 2} y={CH / 2 + 5} text-anchor="middle">{v}</text>
+      </g>
+    ))}
+    <text class="t-cy" x="0" y={10 * CH + 24} data-cap>KEY</text>
+    {[...tr.key].map((c, n) => (
+      <g data-out={n} transform={`translate(${n * 33} ${10 * CH + 34})`}>
+        <rect x="1" y="1" width="30" height="36" class="box-ink" />
+        <text class="t-lg hdt-km-letter" x="16" y="27" text-anchor="middle">{c}</text>
+      </g>
+    ))}
+  </svg>
+  <p class="hdt-km-key" id={`${id}-k`} aria-live="polite" data-key>Key: <b>{key}</b></p>
+</div>
+
+<style>
+  .hdt-km { display: grid; gap: 14px; min-width: 0; }
+  .hdt-km-in { display: grid; gap: 6px; font-weight: 600; max-width: 420px; }
+  .hdt-km-in input { min-height: 44px; padding: 0 12px; font: 600 1.05rem var(--font-code); letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+  .hdt-km-svg :global(g) { transition: opacity 0.2s; }
+  .hdt-km-svg :global(.is-i rect) { fill: var(--accent); stroke: var(--accent); }
+  .hdt-km-svg :global(.is-i text), .hdt-km-svg :global(.is-t text) { fill: var(--black); font-weight: 700; }
+  .hdt-km-svg :global(.is-j rect) { fill: var(--accent-2); stroke: var(--accent-2); }
+  .hdt-km-svg :global(.is-j text) { fill: var(--surface); font-weight: 700; }
+  .hdt-km-svg :global(.is-t rect) { fill: var(--accent); stroke: var(--ink); stroke-width: 3; }
+  .hdt-km-svg :global(.is-off) { opacity: 0.12; }
+  .hdt-km-svg :global(.hdt-km-letter) { fill: var(--surface); }
+  .hdt-km-ro { margin: 0; font-weight: 600; }
+  .hdt-km-ro b { font-family: var(--font-code); letter-spacing: 0.04em; }
+  .hdt-km-key { margin: 0; font-size: 1.05rem; }
+  .hdt-km-key b { font-family: var(--font-code); letter-spacing: 0.06em; }
+  @media (prefers-reduced-motion: reduce) { .hdt-km-svg :global(g) { transition: none; } }
+</style>
+
+<script>
+  import { trace } from './rc4.ts';
+  for (const root of document.querySelectorAll<HTMLElement>('[data-km]')) {
+    const pass = root.dataset.pass!;
+    let code = root.dataset.code!, tr = trace(code, pass);
+    const cells = [...root.querySelectorAll<SVGGElement>('[data-cell]')], outs = [...root.querySelectorAll<SVGGElement>('[data-out]')];
+    const keyEl = root.querySelector('[data-key]')!, input = root.querySelector<HTMLInputElement>('[data-in]');
+    const paint = (table: number[], mark: Record<string, number | undefined> = {}, shown = outs.length) => {
+      cells.forEach((g, n) => {
+        g.querySelector('text')!.textContent = String(table[n]);
+        g.classList.toggle('is-i', n === mark.i); g.classList.toggle('is-j', n === mark.j); g.classList.toggle('is-t', n === mark.t);
+      });
+      outs.forEach((g, n) => { g.classList.toggle('is-off', n >= shown); g.querySelector('text')!.textContent = tr.letters[n]?.out ?? ''; });
+      keyEl.innerHTML = `Key: <b>${tr.key.match(/.{1,4}/g)!.join(' - ')}</b>`;
+    };
+    const show = (k: number, sub: string) => {
+      if (sub === 'fill') return paint(Array.from({ length: 120 }, (_, n) => n), {}, 0);
+      if (sub === 'ksa') return paint(tr.start, {}, 0);
+      if (sub === 'done' || k >= tr.letters.length) return paint(tr.states[tr.states.length - 1]);
+      const L = tr.letters[k];
+      if (sub === 'i') return paint(tr.states[k], { i: L.i }, k);
+      if (sub === 'j') return paint(tr.states[k], { i: L.i, j: L.j }, k);
+      if (sub === 'swap') return paint(tr.states[k + 1], { i: L.i, j: L.j }, k);
+      if (sub === 't') return paint(tr.states[k + 1], { t: L.ti }, k);
+      return paint(tr.states[k + 1], { t: L.ti }, k + 1);
+    };
+    input?.addEventListener('input', () => {
+      const c = input.value.toUpperCase().replace(/[^0-9A-Z]/g, '').slice(0, 16);
+      if (c.length !== 16) { keyEl.textContent = `Type all 16 characters (${c.length} so far).`; return; }
+      code = c; tr = trace(code, pass); show(16, 'done');
+    });
+    root.closest('[data-stepper]')?.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { k?: number; sub?: string };
+      if (code !== root.dataset.code) { code = root.dataset.code!; tr = trace(code, pass); if (input) input.value = code.match(/.{1,4}/g)!.join(' - '); }
+      show(s.k ?? 16, s.sub ?? 'done');
+    });
+  }
+</script>

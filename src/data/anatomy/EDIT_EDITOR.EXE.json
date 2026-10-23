@@ -1,0 +1,327 @@
+{
+ "file": "EDIT/EDITOR.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header: 432 relocations, initial stack at 08AB:0080. Rebuilt by the museum unpacker after removing DIET.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 1760,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "432 far addresses that DOS adjusts for the load segment, 4 bytes each.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 1760,
+   "end": 2295,
+   "kind": "startup",
+   "label": "Borland C++ start-up (c0)",
+   "note": "Sets up segments and the stack, clears the zero-filled data, takes over the divide-error interrupt, calls main.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 2295,
+   "end": 9806,
+   "kind": "library",
+   "label": "Borland C++ runtime library",
+   "note": "C library code: bioskey, new and delete, fopen, fgetc, fputc, memmove, strlen and more (7,511 bytes).",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#ed-build"
+  },
+  {
+   "start": 9806,
+   "end": 11524,
+   "kind": "code",
+   "label": "WINGRAPH.CPP",
+   "note": "His screen code: palette, title bar, menu bar, the File menu with its save-under, the status bar. 1,718 bytes from 159 source lines.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#ed-screen"
+  },
+  {
+   "start": 11524,
+   "end": 11917,
+   "kind": "code",
+   "label": "EDITOR.CPP",
+   "note": "main: starts graphics, reads keys with bioskey and dispatches them through a 22-entry key table. 393 bytes from 119 lines.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#ed-keys"
+  },
+  {
+   "start": 11917,
+   "end": 16515,
+   "kind": "code",
+   "label": "FUNCTION.CPP",
+   "note": "The editor: insert, Enter, Delete, Backspace, cursor, redraw, load, save and the file dialog. 4,598 bytes from 560 lines.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#ed-buffer"
+  },
+  {
+   "start": 16515,
+   "end": 16528,
+   "kind": "unused",
+   "label": "Alignment padding",
+   "note": "Zero bytes the linker adds so the next segment starts on a 16-byte boundary.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 16528,
+   "end": 32000,
+   "kind": "library",
+   "label": "BGI graphics library",
+   "note": "Borland Graphics Interface: initgraph, bar, line, rectangle, outtextxy, getimage, putimage and more (15,472 bytes). The card driver loads from EGAVGA.BGI.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#ed-screen"
+  },
+  {
+   "start": 32000,
+   "end": 32146,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "Borland copyright string and runtime variables.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 32146,
+   "end": 32454,
+   "kind": "text",
+   "label": "His strings and flags",
+   "note": "Menu items, status-bar help lines, TEST-EDITOR, INS ON/OFF, dialog texts; the insert flag (015Eh) and the line count (015Fh).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#ed-screen"
+  },
+  {
+   "start": 32454,
+   "end": 34674,
+   "kind": "data",
+   "label": "Runtime and BGI data",
+   "note": "Stack limit, file table, graphics driver names and BGI error messages.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 34674,
+   "end": 37078,
+   "kind": "table",
+   "label": "Line table",
+   "note": "601 far pointers, one per line of text. Zero in the file; filled while the editor runs.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#ed-buffer"
+  },
+  {
+   "start": 37078,
+   "end": 37098,
+   "kind": "data",
+   "label": "Cursor and screen variables",
+   "note": "Screen column (13DAh), row, column in the line, current line, line height 12 and character width 8.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#ed-buffer"
+  },
+  {
+   "start": 37098,
+   "end": 37264,
+   "kind": "data",
+   "label": "Runtime zero-filled data",
+   "note": "Work space for the runtime library, cleared at start-up.",
+   "by": "borland",
+   "evidence": "inferred"
+  },
+  {
+   "start": 37264,
+   "end": 37392,
+   "kind": "stack",
+   "label": "Initial stack",
+   "note": "128 bytes at 08AB:0080, from the header.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 9806,
+   "end": 9930,
+   "name": "set_palette",
+   "note": "Reads the palette, then sets 5 entries: red, white, light gray, dark gray and blue.",
+   "link": "#ed-screen",
+   "lines": [
+    {
+     "off": 9826,
+     "note": "getpalette"
+    },
+    {
+     "off": 9844,
+     "note": "Color 12 becomes pure red (63,0,0): the cursor color"
+    }
+   ]
+  },
+  {
+   "start": 9930,
+   "end": 10372,
+   "name": "draw_screen",
+   "note": "Clears the screen to white and draws the title bar, menu bar and status bar.",
+   "link": "#ed-screen",
+   "lines": []
+  },
+  {
+   "start": 10425,
+   "end": 11524,
+   "name": "file_menu",
+   "note": "The File drop-down: saves the screen behind it, lists 4 items and writes each help line in the status bar at y 462.",
+   "link": "#ed-screen",
+   "lines": [
+    {
+     "off": 10780,
+     "note": "outtextxy at y 462: the help line"
+    }
+   ]
+  },
+  {
+   "start": 11524,
+   "end": 11917,
+   "name": "main",
+   "note": "Reads a key with bioskey(0), then jumps through a 22-entry table at 0262:0135.",
+   "link": "#ed-keys",
+   "lines": []
+  },
+  {
+   "start": 11968,
+   "end": 11998,
+   "name": "exit_editor",
+   "note": "Frees every line, closes graphics, then ends the program with INT 21h AH=4Ch.",
+   "link": "#ed-keys",
+   "lines": [
+    {
+     "off": 11992,
+     "note": "DOS function 4Ch: end the program"
+    }
+   ]
+  },
+  {
+   "start": 12367,
+   "end": 12566,
+   "name": "toggle_cursor",
+   "note": "Draws 3 thin rectangles in XOR mode with color 3; called again to erase.",
+   "link": "#ed-cursor",
+   "lines": [
+    {
+     "off": 12383,
+     "note": "setwritemode(1): XOR"
+    },
+    {
+     "off": 12558,
+     "note": "setwritemode(0): normal again"
+    }
+   ]
+  },
+  {
+   "start": 12750,
+   "end": 13016,
+   "name": "insert_char",
+   "note": "Opens a gap in the 204-byte line with memmove, then stores the character.",
+   "link": "#ed-buffer",
+   "lines": [
+    {
+     "off": 12789,
+     "note": "Line full (204) in insert mode: ignore"
+    },
+    {
+     "off": 12876,
+     "note": "memmove(line+col+1, line+col, 204-col)"
+    },
+    {
+     "off": 12942,
+     "note": "Store the character"
+    }
+   ]
+  },
+  {
+   "start": 13016,
+   "end": 13196,
+   "name": "redraw_lines",
+   "note": "Clears a band of the text area and draws each line again with outtextxy.",
+   "link": "#ed-screen",
+   "lines": []
+  },
+  {
+   "start": 13196,
+   "end": 13550,
+   "name": "new_line",
+   "note": "Enter: moves the later line pointers down, makes a new 204-byte line and moves the text after the cursor into it.",
+   "link": "#ed-buffer",
+   "lines": [
+    {
+     "off": 13402,
+     "note": "memmove: the text after the cursor moves to the new line"
+    }
+   ]
+  },
+  {
+   "start": 14317,
+   "end": 14671,
+   "name": "load_file",
+   "note": "Reads the file a byte at a time; Tab becomes 6 spaces and long lines wrap at 201.",
+   "link": "#ed-buffer",
+   "lines": [
+    {
+     "off": 14478,
+     "note": "fgetc"
+    },
+    {
+     "off": 14586,
+     "note": "End-of-file test"
+    }
+   ]
+  },
+  {
+   "start": 14671,
+   "end": 14822,
+   "name": "save_file",
+   "note": "Asks for a name, opens it in text mode and writes every character with fputc.",
+   "link": "#ed-buffer",
+   "lines": []
+  },
+  {
+   "start": 14822,
+   "end": 15389,
+   "name": "file_dialog",
+   "note": "Asks for a file name of up to 13 characters in a box that saves the screen behind it.",
+   "link": "#ed-screen",
+   "lines": []
+  },
+  {
+   "start": 15809,
+   "end": 16173,
+   "name": "delete_char",
+   "note": "Delete: at the end of a line it joins the next line; otherwise it shifts the rest of the line left.",
+   "link": "#ed-buffer",
+   "lines": [
+    {
+     "off": 15847,
+     "note": "si = strlen(line)"
+    },
+    {
+     "off": 16142,
+     "note": "memmove(line+col, line+col+1, ...): close the gap"
+    }
+   ]
+  }
+ ]
+}

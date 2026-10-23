@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="962" height="600" viewBox="0 0 962 600">
+  <rect width="962" height="600" fill="#000"/>
+  <g font-family="'Courier New', Courier, monospace" font-size="24" fill="#aaaaaa">
+    <text x="28" y="52">Welcome to ARABART!</text>
+    <text x="28" y="86">Yasser Awad's DOS programs from the 1990s.</text>
+    <text x="28" y="120">Each directory contains a project with a README.TXT.</text>
+    <text x="28" y="154">Type DIR to list all directories.</text>
+    <text x="28" y="222">C:\&gt;</text>
+    <rect x="96" y="204" width="14" height="22" fill="#aaaaaa"/>
+  </g>
+</svg>

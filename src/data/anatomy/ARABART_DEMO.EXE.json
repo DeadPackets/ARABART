@@ -1,0 +1,225 @@
+{
+ "file": "ARABART/DEMO.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 28,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "The DOS EXE header, rebuilt by the museum's unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured",
+   "link": "#binding"
+  },
+  {
+   "start": 28,
+   "end": 32,
+   "kind": "unused",
+   "label": "Header gap",
+   "note": "Four zero bytes before the relocation table.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 768,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "184 addresses that DOS patches with the real load segment when the program starts.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#binding"
+  },
+  {
+   "start": 768,
+   "end": 9067,
+   "kind": "library",
+   "label": "Borland C++ startup and runtime",
+   "note": "Start-up code, getch, the structure-copy helper and the stack check.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#binding"
+  },
+  {
+   "start": 9067,
+   "end": 9315,
+   "kind": "code",
+   "label": "ARABART binding",
+   "note": "Five small C functions that save the registers and call INT 10h with AH = 36h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#binding"
+  },
+  {
+   "start": 9315,
+   "end": 9750,
+   "kind": "code",
+   "label": "main()",
+   "note": "Draws four screens: fonts 1 to 3, fonts 3 and 4 with kashida, then both in italic.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#screens"
+  },
+  {
+   "start": 9750,
+   "end": 9760,
+   "kind": "unused",
+   "label": "Padding",
+   "note": "Zeros up to the next 16-byte segment.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 9760,
+   "end": 25232,
+   "kind": "library",
+   "label": "Borland graphics library (BGI)",
+   "note": "initgraph, cleardevice, closegraph and the code that loads EGAVGA.BGI.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#binding"
+  },
+  {
+   "start": 25232,
+   "end": 25378,
+   "kind": "data",
+   "label": "Borland data",
+   "note": "The \"Borland C++ - Copyright 1991\" string and runtime variables.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 25378,
+   "end": 25512,
+   "kind": "text",
+   "label": "His strings",
+   "note": "The three Arabic strings in keyboard encoding, then the two error lines.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#string"
+  },
+  {
+   "start": 25512,
+   "end": 27856,
+   "kind": "data",
+   "label": "Borland data",
+   "note": "Graphics library tables, the driver name EGAVGA and its error texts.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 27856,
+   "end": 28000,
+   "kind": "unused",
+   "label": "Uninitialized variables",
+   "note": "Zeros in the file; variables that start at 0 (BSS).",
+   "by": "borland",
+   "evidence": "inferred"
+  },
+  {
+   "start": 28000,
+   "end": 28128,
+   "kind": "stack",
+   "label": "Stack",
+   "note": "128 bytes, from SS:SP 06A6:0080 in the header.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 9067,
+   "end": 9099,
+   "name": "ar_color",
+   "note": "AX = 3601h, CX = color.",
+   "link": "#binding",
+   "lines": [
+    {
+     "off": 9085,
+     "note": "mov ax,3601h"
+    }
+   ]
+  },
+  {
+   "start": 9099,
+   "end": 9131,
+   "name": "ar_font",
+   "note": "AX = 3603h, CX = font.",
+   "link": "#binding",
+   "lines": [
+    {
+     "off": 9117,
+     "note": "mov ax,3603h"
+    }
+   ]
+  },
+  {
+   "start": 9131,
+   "end": 9174,
+   "name": "ar_width",
+   "note": "AX = 3605h, returns CX.",
+   "link": "#binding",
+   "lines": [
+    {
+     "off": 9154,
+     "note": "mov ax,3605h"
+    }
+   ]
+  },
+  {
+   "start": 9174,
+   "end": 9260,
+   "name": "ar_height",
+   "note": "AX = 3604h, then doubles for every $.",
+   "link": "#binding",
+   "lines": [
+    {
+     "off": 9219,
+     "note": "Doubles the height once for every $ in the string"
+    }
+   ]
+  },
+  {
+   "start": 9260,
+   "end": 9315,
+   "name": "ar_text",
+   "note": "Adds the height to y, then AX = 3607h.",
+   "link": "#binding",
+   "lines": [
+    {
+     "off": 9303,
+     "note": "mov ax,3607h / int 10h"
+    }
+   ]
+  },
+  {
+   "start": 9315,
+   "end": 9750,
+   "name": "main",
+   "note": "The four test screens.",
+   "link": "#screens",
+   "lines": [
+    {
+     "off": 9385,
+     "note": "Third string: the underline runs three keys on"
+    },
+    {
+     "off": 9481,
+     "note": "x = 630"
+    },
+    {
+     "off": 9508,
+     "note": "Colors 4 to 15"
+    },
+    {
+     "off": 9560,
+     "note": "Next column to the left"
+    },
+    {
+     "off": 9683,
+     "note": "Pass 2: patch 3 bytes for italic"
+    }
+   ]
+  }
+ ]
+}

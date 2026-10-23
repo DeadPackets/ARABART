@@ -1,0 +1,671 @@
+0a35 enter 0x40, 0
+0a39 push si
+0a3a push di
+0a3b cmp word ptr [0x2f14], sp
+0a3f ja 0xa46
+0a41 lcall 0, 0x2dd9
+0a46 mov si, 0xf
+0a49 mov di, 0xb4
+0a4c lcall 0xde6, 0xefd
+0a51 lcall 0x4da, 0x23b
+0a56 push 0x32
+0a58 push 0
+0a5a lcall 0x4da, 0x6c7
+0a5f pop cx
+0a60 pop cx
+0a61 push 0
+0a63 push 1
+0a65 lcall 0xde6, 0x1230
+0a6a pop cx
+0a6b pop cx
+0a6c push 0x113
+0a6f push 0x12c
+0a72 push 0x52
+0a74 push 0x1e
+0a76 lcall 0xde6, 0x1c88
+0a7b add sp, 8
+0a7e push 2
+0a80 push 0x113
+0a83 push 0x12c
+0a86 push 0x52
+0a88 push 0x1e
+0a8a lcall 0x4da, 0x610
+0a8f add sp, 0xa
+0a92 wait 
+0a93 fld dword ptr [0x1991]
+0a97 wait 
+0a98 fstp qword ptr [bp - 8]
+0a9b wait 
+0a9c fldz 
+0a9e wait 
+0a9f fstp qword ptr [bp - 0x10]
+0aa2 wait 
+0aa3 fld qword ptr [bp - 8]
+0aa6 wait 
+0aa7 fmul dword ptr [0x1995]
+0aab wait 
+0aac fstp qword ptr [bp - 0x18]
+0aaf wait 
+0ab0 fldz 
+0ab2 wait 
+0ab3 fstp qword ptr [bp - 0x20]
+0ab6 wait 
+0ab7 fld qword ptr [bp - 8]
+0aba wait 
+0abb fmul qword ptr [0x1999]
+0abf wait 
+0ac0 fstp qword ptr [bp - 0x28]
+0ac3 wait 
+0ac4 fld qword ptr [bp - 8]
+0ac7 wait 
+0ac8 fdiv dword ptr [0x19a1]
+0acc wait 
+0acd fstp qword ptr [bp - 8]
+0ad0 push 0xe
+0ad2 wait 
+0ad3 nop 
+0ad4 lcall 0xde6, 0x1db2
+0ad9 pop cx
+0ada push 0xe
+0adc push 1
+0ade lcall 0xde6, 0x1230
+0ae3 pop cx
+0ae4 pop cx
+0ae5 push 7
+0ae7 push 7
+0ae9 push di
+0aea mov ax, si
+0aec add ax, 0x96
+0aef push ax
+0af0 lcall 0xde6, 0x1d1c
+0af5 add sp, 8
+0af8 push 0
+0afa lcall 0xde6, 0x1db2
+0aff pop cx
+0b00 push 0x14
+0b02 push 0x14
+0b04 push 0
+0b06 push 0
+0b08 lcall 0xde6, 0x1517
+0b0d add sp, 8
+0b10 mov word ptr [bp - 0x3a], ax
+0b13 push word ptr [bp - 0x3a]
+0b16 lcall 0, 0x2a86
+0b1b pop cx
+0b1c mov word ptr [bp - 0x2a], dx
+0b1f mov word ptr [bp - 0x2c], ax
+0b22 push word ptr [bp - 0x3a]
+0b25 lcall 0, 0x2a86
+0b2a pop cx
+0b2b mov word ptr [bp - 0x36], dx
+0b2e mov word ptr [bp - 0x38], ax
+0b31 push word ptr [bp - 0x3a]
+0b34 lcall 0, 0x2a86
+0b39 pop cx
+0b3a mov word ptr [bp - 0x2e], dx
+0b3d mov word ptr [bp - 0x30], ax
+0b40 push word ptr [bp - 0x3a]
+0b43 lcall 0, 0x2a86
+0b48 pop cx
+0b49 mov word ptr [bp - 0x32], dx
+0b4c mov word ptr [bp - 0x34], ax
+0b4f push 9
+0b51 push 1
+0b53 lcall 0xde6, 0x1230
+0b58 pop cx
+0b59 pop cx
+0b5a push 9
+0b5c lcall 0xde6, 0x1db2
+0b61 pop cx
+0b62 push 4
+0b64 push 4
+0b66 push di
+0b67 mov ax, si
+0b69 add ax, 0xc8
+0b6c push ax
+0b6d lcall 0xde6, 0x1d1c
+0b72 add sp, 8
+0b75 push 2
+0b77 lcall 0xde6, 0x1db2
+0b7c pop cx
+0b7d mov ax, di
+0b7f inc ax
+0b80 push ax
+0b81 mov ax, si
+0b83 add ax, 0xcb
+0b86 push ax
+0b87 mov ax, di
+0b89 inc ax
+0b8a push ax
+0b8b mov ax, si
+0b8d add ax, 0xc8
+0b90 push ax
+0b91 lcall 0xde6, 0x1c25
+0b96 add sp, 8
+0b99 mov ax, di
+0b9b inc ax
+0b9c inc ax
+0b9d push ax
+0b9e mov ax, si
+0ba0 add ax, 0xca
+0ba3 push ax
+0ba4 mov ax, di
+0ba6 inc ax
+0ba7 inc ax
+0ba8 push ax
+0ba9 mov ax, si
+0bab add ax, 0xc7
+0bae push ax
+0baf lcall 0xde6, 0x1c25
+0bb4 add sp, 8
+0bb7 push di
+0bb8 mov ax, si
+0bba add ax, 0xca
+0bbd push ax
+0bbe push di
+0bbf mov ax, si
+0bc1 add ax, 0xc7
+0bc4 push ax
+0bc5 lcall 0xde6, 0x1c25
+0bca add sp, 8
+0bcd mov ax, di
+0bcf add ax, 3
+0bd2 push ax
+0bd3 mov ax, si
+0bd5 add ax, 0xc9
+0bd8 push ax
+0bd9 mov ax, di
+0bdb add ax, 3
+0bde push ax
+0bdf mov ax, si
+0be1 add ax, 0xc7
+0be4 push ax
+0be5 lcall 0xde6, 0x1c25
+0bea add sp, 8
+0bed push di
+0bee mov ax, si
+0bf0 add ax, 0xc7
+0bf3 push ax
+0bf4 push di
+0bf5 mov ax, si
+0bf7 add ax, 0xc4
+0bfa push ax
+0bfb lcall 0xde6, 0x1c25
+0c00 add sp, 8
+0c03 mov ax, di
+0c05 add ax, 0xfffe
+0c08 push ax
+0c09 mov ax, si
+0c0b add ax, 0xc5
+0c0e push ax
+0c0f mov ax, di
+0c11 dec ax
+0c12 push ax
+0c13 mov ax, si
+0c15 add ax, 0xc4
+0c18 push ax
+0c19 lcall 0xde6, 0x1c25
+0c1e add sp, 8
+0c21 mov ax, di
+0c23 add ax, 0xfffd
+0c26 push ax
+0c27 mov ax, si
+0c29 add ax, 0xc6
+0c2c push ax
+0c2d mov ax, di
+0c2f add ax, 0xfffe
+0c32 push ax
+0c33 mov ax, si
+0c35 add ax, 0xc4
+0c38 push ax
+0c39 lcall 0xde6, 0x1c25
+0c3e add sp, 8
+0c41 push word ptr [bp - 0x32]
+0c44 push word ptr [bp - 0x34]
+0c47 mov ax, di
+0c49 add ax, 6
+0c4c push ax
+0c4d mov ax, si
+0c4f add ax, 0xce
+0c52 push ax
+0c53 mov ax, di
+0c55 add ax, 0xfffa
+0c58 push ax
+0c59 mov ax, si
+0c5b add ax, 0xc2
+0c5e push ax
+0c5f lcall 0xde6, 0x20bc
+0c64 add sp, 0xc
+0c67 push 1
+0c69 push word ptr [bp - 0x32]
+0c6c push word ptr [bp - 0x34]
+0c6f mov ax, di
+0c71 add ax, 0xfffa
+0c74 push ax
+0c75 mov ax, si
+0c77 add ax, 0xc2
+0c7a push ax
+0c7b lcall 0xde6, 0x1548
+0c80 add sp, 0xa
+0c83 push 4
+0c85 lcall 0xde6, 0x1db2
+0c8a pop cx
+0c8b push 4
+0c8d push 1
+0c8f lcall 0xde6, 0x1230
+0c94 pop cx
+0c95 pop cx
+0c96 push 2
+0c98 push 2
+0c9a push di
+0c9b mov ax, si
+0c9d add ax, 0xb4
+0ca0 push ax
+0ca1 lcall 0xde6, 0x1d1c
+0ca6 add sp, 8
+0ca9 push word ptr [bp - 0x2a]
+0cac push word ptr [bp - 0x2c]
+0caf mov ax, di
+0cb1 add ax, 6
+0cb4 push ax
+0cb5 mov ax, si
+0cb7 add ax, 0xb7
+0cba push ax
+0cbb mov ax, di
+0cbd add ax, 0xfffa
+0cc0 push ax
+0cc1 mov ax, si
+0cc3 add ax, 0xb1
+0cc6 push ax
+0cc7 lcall 0xde6, 0x20bc
+0ccc add sp, 0xc
+0ccf push 1
+0cd1 push word ptr [bp - 0x2a]
+0cd4 push word ptr [bp - 0x2c]
+0cd7 mov ax, di
+0cd9 add ax, 0xfffa
+0cdc push ax
+0cdd mov ax, si
+0cdf add ax, 0xb1
+0ce2 push ax
+0ce3 lcall 0xde6, 0x1548
+0ce8 add sp, 0xa
+0ceb push 6
+0ced lcall 0xde6, 0x1db2
+0cf2 pop cx
+0cf3 push 6
+0cf5 push 1
+0cf7 lcall 0xde6, 0x1230
+0cfc pop cx
+0cfd pop cx
+0cfe push 4
+0d00 push 4
+0d02 push di
+0d03 mov ax, si
+0d05 add ax, 0xb4
+0d08 push ax
+0d09 lcall 0xde6, 0x1d1c
+0d0e add sp, 8
+0d11 push word ptr [bp - 0x2e]
+0d14 push word ptr [bp - 0x30]
+0d17 mov ax, di
+0d19 add ax, 6
+0d1c push ax
+0d1d mov ax, si
+0d1f add ax, 0xb9
+0d22 push ax
+0d23 mov ax, di
+0d25 add ax, 0xfffa
+0d28 push ax
+0d29 mov ax, si
+0d2b add ax, 0xaf
+0d2e push ax
+0d2f lcall 0xde6, 0x20bc
+0d34 add sp, 0xc
+0d37 push 1
+0d39 push word ptr [bp - 0x2e]
+0d3c push word ptr [bp - 0x30]
+0d3f mov ax, di
+0d41 add ax, 0xfffa
+0d44 push ax
+0d45 mov ax, si
+0d47 add ax, 0xaf
+0d4a push ax
+0d4b lcall 0xde6, 0x1548
+0d50 add sp, 0xa
+0d53 push 9
+0d55 lcall 0xde6, 0x1db2
+0d5a pop cx
+0d5b push 9
+0d5d push 1
+0d5f lcall 0xde6, 0x1230
+0d64 pop cx
+0d65 pop cx
+0d66 push 2
+0d68 push 2
+0d6a push di
+0d6b mov ax, si
+0d6d add ax, 0xb4
+0d70 push ax
+0d71 lcall 0xde6, 0x1d1c
+0d76 add sp, 8
+0d79 push word ptr [bp - 0x36]
+0d7c push word ptr [bp - 0x38]
+0d7f mov ax, di
+0d81 add ax, 6
+0d84 push ax
+0d85 mov ax, si
+0d87 add ax, 0xb9
+0d8a push ax
+0d8b mov ax, di
+0d8d add ax, 0xfffa
+0d90 push ax
+0d91 mov ax, si
+0d93 add ax, 0xaf
+0d96 push ax
+0d97 lcall 0xde6, 0x20bc
+0d9c add sp, 0xc
+0d9f push 1
+0da1 push word ptr [bp - 0x36]
+0da4 push word ptr [bp - 0x38]
+0da7 mov ax, di
+0da9 add ax, 0xfffa
+0dac push ax
+0dad mov ax, si
+0daf add ax, 0xaf
+0db2 push ax
+0db3 lcall 0xde6, 0x1548
+0db8 add sp, 0xa
+0dbb mov word ptr [bp - 0x3c], 0
+0dc0 jmp 0x1124
+0dc3 push 1
+0dc5 lcall 0, 0x1eaa
+0dca pop cx
+0dcb or ax, ax
+0dcd je 0xdd7
+0dcf push 0
+0dd1 lcall 0, 0x1eaa
+0dd6 pop cx
+0dd7 mov ax, word ptr [bp - 0x3c]
+0dda or ax, ax
+0ddc je 0xdea
+0dde cmp ax, 1
+0de1 je 0xdf0
+0de3 cmp ax, 2
+0de6 je 0xdf6
+0de8 jmp 0xdfc
+0dea push cs
+0deb call 0x5e6
+0dee jmp 0xdfc
+0df0 push cs
+0df1 call 0x73c
+0df4 jmp 0xdfc
+0df6 push cs
+0df7 call 0x8b3
+0dfa jmp 0xdfc
+0dfc mov word ptr [bp - 0x40], 0
+0e01 jmp 0x1118
+0e04 push 1
+0e06 lcall 0, 0x1eaa
+0e0b pop cx
+0e0c mov word ptr [bp - 0x40], ax
+0e0f cmp word ptr [bp - 0x40], 0x3b00
+0e14 jne 0xe20
+0e16 lcall 0x2de, 5
+0e1b mov word ptr [bp - 0x40], 0
+0e20 cmp word ptr [bp - 0x40], 0x2d00
+0e25 jne 0xe2c
+0e27 lcall 0x4da, 0x13f3
+0e2c cmp word ptr [bp - 0x40], 0x11b
+0e31 jne 0xe6a
+0e33 push word ptr [bp - 0x2a]
+0e36 push word ptr [bp - 0x2c]
+0e39 lcall 0, 0x29a0
+0e3e pop cx
+0e3f pop cx
+0e40 push word ptr [bp - 0x2e]
+0e43 push word ptr [bp - 0x30]
+0e46 lcall 0, 0x29a0
+0e4b pop cx
+0e4c pop cx
+0e4d push word ptr [bp - 0x32]
+0e50 push word ptr [bp - 0x34]
+0e53 lcall 0, 0x29a0
+0e58 pop cx
+0e59 pop cx
+0e5a push word ptr [bp - 0x36]
+0e5d push word ptr [bp - 0x38]
+0e60 lcall 0, 0x29a0
+0e65 pop cx
+0e66 pop cx
+0e67 jmp 0x1161
+0e6a push 0
+0e6c push word ptr [bp - 0x36]
+0e6f push word ptr [bp - 0x38]
+0e72 wait 
+0e73 fld qword ptr [bp - 0x28]
+0e76 add sp, -8
+0e79 wait 
+0e7a fstp qword ptr [bp - 0x52]
+0e7d wait 
+0e7e nop 
+0e7f lcall 0, 0xc43
+0e84 add sp, 8
+0e87 wait 
+0e88 fmul dword ptr [0x19a5]
+0e8c mov ax, di
+0e8e add ax, 0xfffb
+0e91 mov word ptr [bp - 0x3e], ax
+0e94 wait 
+0e95 fild word ptr [bp - 0x3e]
+0e98 wait 
+0e99 faddp st(1)
+0e9b lcall 0, 0xe7b
+0ea0 push ax
+0ea1 wait 
+0ea2 fld qword ptr [bp - 0x28]
+0ea5 add sp, -8
+0ea8 wait 
+0ea9 fstp qword ptr [bp - 0x54]
+0eac wait 
+0ead nop 
+0eae lcall 0, 0x46f
+0eb3 add sp, 8
+0eb6 wait 
+0eb7 fmul dword ptr [0x19a9]
+0ebb mov ax, si
+0ebd add ax, 0x91
+0ec0 mov word ptr [bp - 0x3e], ax
+0ec3 wait 
+0ec4 fild word ptr [bp - 0x3e]
+0ec7 wait 
+0ec8 faddp st(1)
+0eca lcall 0, 0xe7b
+0ecf push ax
+0ed0 lcall 0xde6, 0x1548
+0ed5 add sp, 0xa
+0ed8 push 0
+0eda push word ptr [bp - 0x32]
+0edd push word ptr [bp - 0x34]
+0ee0 wait 
+0ee1 fld qword ptr [bp - 0x20]
+0ee4 add sp, -8
+0ee7 wait 
+0ee8 fstp qword ptr [bp - 0x52]
+0eeb wait 
+0eec nop 
+0eed lcall 0, 0xc43
+0ef2 add sp, 8
+0ef5 wait 
+0ef6 fmul dword ptr [0x19ad]
+0efa mov ax, di
+0efc add ax, 0xfffb
+0eff mov word ptr [bp - 0x3e], ax
+0f02 wait 
+0f03 fild word ptr [bp - 0x3e]
+0f06 wait 
+0f07 faddp st(1)
+0f09 lcall 0, 0xe7b
+0f0e push ax
+0f0f wait 
+0f10 fld qword ptr [bp - 0x20]
+0f13 add sp, -8
+0f16 wait 
+0f17 fstp qword ptr [bp - 0x54]
+0f1a wait 
+0f1b nop 
+0f1c lcall 0, 0x46f
+0f21 add sp, 8
+0f24 wait 
+0f25 fmul dword ptr [0x19b1]
+0f29 mov ax, si
+0f2b add ax, 0x91
+0f2e mov word ptr [bp - 0x3e], ax
+0f31 wait 
+0f32 fild word ptr [bp - 0x3e]
+0f35 wait 
+0f36 faddp st(1)
+0f38 lcall 0, 0xe7b
+0f3d push ax
+0f3e lcall 0xde6, 0x1548
+0f43 add sp, 0xa
+0f46 push 0
+0f48 push word ptr [bp - 0x2e]
+0f4b push word ptr [bp - 0x30]
+0f4e wait 
+0f4f fld qword ptr [bp - 0x18]
+0f52 add sp, -8
+0f55 wait 
+0f56 fstp qword ptr [bp - 0x52]
+0f59 wait 
+0f5a nop 
+0f5b lcall 0, 0xc43
+0f60 add sp, 8
+0f63 wait 
+0f64 fmul dword ptr [0x19b5]
+0f68 mov ax, di
+0f6a add ax, 0xfffb
+0f6d mov word ptr [bp - 0x3e], ax
+0f70 wait 
+0f71 fild word ptr [bp - 0x3e]
+0f74 wait 
+0f75 faddp st(1)
+0f77 lcall 0, 0xe7b
+0f7c push ax
+0f7d wait 
+0f7e fld qword ptr [bp - 0x18]
+0f81 add sp, -8
+0f84 wait 
+0f85 fstp qword ptr [bp - 0x54]
+0f88 wait 
+0f89 nop 
+0f8a lcall 0, 0x46f
+0f8f add sp, 8
+0f92 wait 
+0f93 fmul dword ptr [0x19b5]
+0f97 mov ax, si
+0f99 add ax, 0x91
+0f9c mov word ptr [bp - 0x3e], ax
+0f9f wait 
+0fa0 fild word ptr [bp - 0x3e]
+0fa3 wait 
+0fa4 faddp st(1)
+0fa6 lcall 0, 0xe7b
+0fab push ax
+0fac lcall 0xde6, 0x1548
+0fb1 add sp, 0xa
+0fb4 push 0
+0fb6 push word ptr [bp - 0x2a]
+0fb9 push word ptr [bp - 0x2c]
+0fbc wait 
+0fbd fld qword ptr [bp - 0x10]
+0fc0 add sp, -8
+0fc3 wait 
+0fc4 fstp qword ptr [bp - 0x52]
+0fc7 wait 
+0fc8 nop 
+0fc9 lcall 0, 0xc43
+0fce add sp, 8
+0fd1 wait 
+0fd2 fmul dword ptr [0x19b9]
+0fd6 mov ax, di
+0fd8 add ax, 0xfffb
+0fdb mov word ptr [bp - 0x3e], ax
+0fde wait 
+0fdf fild word ptr [bp - 0x3e]
+0fe2 wait 
+0fe3 faddp st(1)
+0fe5 lcall 0, 0xe7b
+0fea push ax
+0feb wait 
+0fec fld qword ptr [bp - 0x10]
+0fef add sp, -8
+0ff2 wait 
+0ff3 fstp qword ptr [bp - 0x54]
+0ff6 wait 
+0ff7 nop 
+0ff8 lcall 0, 0x46f
+0ffd add sp, 8
+1000 wait 
+1001 fmul dword ptr [0x19b9]
+1005 mov ax, si
+1007 add ax, 0x93
+100a mov word ptr [bp - 0x3e], ax
+100d wait 
+100e fild word ptr [bp - 0x3e]
+1011 wait 
+1012 faddp st(1)
+1014 lcall 0, 0xe7b
+1019 push ax
+101a lcall 0xde6, 0x1548
+101f add sp, 0xa
+1022 wait 
+1023 fld qword ptr [bp - 8]
+1026 wait 
+1027 fdiv dword ptr [0x19a9]
+102b wait 
+102c fsubr qword ptr [bp - 0x10]
+102f wait 
+1030 fstp qword ptr [bp - 0x10]
+1033 wait 
+1034 fld qword ptr [bp - 0x10]
+1037 wait 
+1038 fldz 
+103a wait 
+103b fcompp 
+103d wait 
+103e fnstsw word ptr [bp - 0x3e]
+1041 wait 
+1042 nop 
+1043 mov ax, word ptr [bp - 0x3e]
+1046 sahf 
+1047 jb 0x1058
+1049 wait 
+104a fld qword ptr [bp - 8]
+104d wait 
+104e fmul dword ptr [0x19bd]
+1052 wait 
+1053 fstp qword ptr [bp - 0x10]
+1056 wait 
+1057 nop 
+1058 wait 
+1059 fld qword ptr [bp - 8]
+105c wait 
+105d fdiv dword ptr [0x19a9]
+1061 wait 
+1062 fdiv dword ptr [0x19c1]
+1066 wait 
+1067 fmul dword ptr [0x19c5]
+106b wait 
+106c fsubr qword ptr [bp - 0x18]
+106f wait 
+1070 fstp qword ptr [bp - 0x18]
+1073 wait 
+1074 fld qword ptr [bp - 0x18]
+1077 wait 
+1078 fldz 
+107a wait 
+107b fcompp 
+107d wait 
+107e db
+107f db

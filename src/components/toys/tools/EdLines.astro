@@ -1,0 +1,174 @@
+---
+// One pointer per line: EDITOR.EXE keeps a table of 601 far pointers at DS:0A72, and every line is its own 204-byte
+// block from new. Type, and press Enter: a new block is made for the text after the cursor, and only the 4-byte
+// pointers below it move down. 1C2A:0004 and 1C38:0004 are what his editor got in one run; each new block is 0Eh paragraphs on.
+import Window from '../../shell/Window.astro';
+import { Screen, cursorOps } from './EdBgi';
+import { fontB64, fontBytes, png } from './EdPng';
+
+interface Props { id?: string }
+const { id = 'edlines' } = Astro.props;
+const LINES = ['Hello, World!', 'This is a text editor!'];
+const X = 6, Y = 65, W = 232, H = 104;
+const s = new Screen(fontBytes());
+s.run(['pal', 12, 63, 0, 0]); s.run(['fill', 15]); s.run(['bar', 0, 0, 639, 479]); s.run(['view', 10, 70]); s.run(['color', 0]);
+LINES.forEach((l, r) => s.run(['text', 0, r * 12, l]));
+for (const op of cursorOps(1, 22)) s.run(op);
+const img = png(s, X, Y, W, H);
+const addr = (k: number) => `${(0x1c2a + 0x0e * k).toString(16).toUpperCase()}:0004`;
+---
+
+<div class="ed-ln" id={id} data-edlines data-font={fontB64()} data-lines={JSON.stringify(LINES)}>
+  <div class="ed-ln-top">
+    <Window title="TEST-EDITOR" kind="screen" class="ed-ln-win">
+      <div class="ed-ln-stage">
+        <img class="ed-ln-img" src={img} width={W} height={H} alt="His editor with two lines: Hello, World! and This is a text editor!, with the red cursor at the end of the second line." data-img />
+        <canvas class="ed-ln-cv" width={W} height={H} data-cv hidden></canvas>
+        <label class="ed-ln-cap"><span class="sr-only">Type into his editor. Enter makes a new line, arrow keys move the cursor.</span>
+          <input class="ed-ln-in" data-in type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="enter" hidden /></label>
+      </div>
+    </Window>
+    <div class="ed-ln-ctl" data-ctl hidden>
+      <button type="button" class="button button--primary k-btn" data-k="enter">Enter</button>
+      <button type="button" class="button k-btn" data-k="up" aria-label="Cursor up">▲</button>
+      <button type="button" class="button k-btn" data-k="down" aria-label="Cursor down">▼</button>
+      <button type="button" class="button k-btn" data-k="left" aria-label="Cursor left">◄</button>
+      <button type="button" class="button k-btn" data-k="right" aria-label="Cursor right">►</button>
+      <button type="button" class="button k-btn" data-k="reset">Reset</button>
+    </div>
+  </div>
+  <div class="ed-ln-mem">
+    <Window title="LINE TABLE  601 pointers" kind="panel" class="ed-ln-tbl">
+      <ol class="ed-ln-slots" data-slots>
+        {LINES.map((_, k) => <li class:list={{ cur: k === 1 }}><span>[{k}]</span><code>{addr(k)}</code></li>)}
+        <li class="ed-ln-empty"><span>[2]</span><code>0000:0000</code></li>
+        <li class="ed-ln-empty"><span>…</span><code></code></li>
+        <li class="ed-ln-empty"><span>[600]</span><code>0000:0000</code></li>
+      </ol>
+    </Window>
+    <Window title="The heap" kind="editor" class="ed-ln-heap">
+      <ol class="ed-ln-blocks" data-blocks>
+        {LINES.map((l, k) => <li class:list={{ cur: k === 1 }}><code>{addr(k)}</code><span class="ed-ln-txt">{l}</span><small>{l.length} of 204</small></li>)}
+      </ol>
+    </Window>
+  </div>
+  <p class="ed-ln-say" aria-live="polite" data-say>Two lines, two blocks, two pointers. Put the cursor in the middle of a line and press <b>Enter</b>.</p>
+</div>
+
+<style is:global>
+  .ed-ln { display: grid; gap: 18px; }
+  .ed-ln-top { display: grid; gap: 12px; max-width: 800px; }
+  .ed-ln-stage { position: relative; aspect-ratio: 232 / 104; }
+  .ed-ln-img, .ed-ln-cv { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .ed-ln-cap { position: absolute; inset: 0; }
+  .ed-ln-in { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; cursor: text; }
+  .ed-ln-stage:focus-within { outline: 3px solid var(--vga-14); outline-offset: 3px; }
+  .ed-ln-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+  .ed-ln-ctl .k-btn { min-height: 44px; }
+  .ed-ln-mem { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 22px; align-items: start; }
+  .ed-ln ol.ed-ln-slots, .ed-ln ol.ed-ln-blocks, .writeup .ed-ln ol.ed-ln-slots, .writeup .ed-ln ol.ed-ln-blocks { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
+  .ed-ln-slots li, .ed-ln-blocks li { display: grid; align-items: baseline; gap: 1ch; padding: 4px 8px; max-width: none !important; font: 500 13px/1.5 var(--font-code) !important; color: var(--ink); background: var(--surface-2); }
+  .ed-ln-slots li::marker, .ed-ln-blocks li::marker { content: none; }
+  .ed-ln-slots li { grid-template-columns: 6ch 1fr; }
+  .ed-ln-slots span { color: var(--ink-2); }
+  .ed-ln-slots code, .ed-ln-blocks code { font: inherit; color: var(--accent); }
+  .ed-ln-empty code { color: var(--ink-2) !important; }
+  .ed-ln-blocks li { grid-template-columns: 10ch minmax(0, 1fr) auto; }
+  .ed-ln-txt { overflow: hidden; text-overflow: ellipsis; white-space: pre; }
+  .ed-ln-blocks small { font-size: 11px; color: var(--ink-2); }
+  .ed-ln-slots li.cur, .ed-ln-blocks li.cur { box-shadow: inset 0 0 0 2px var(--accent); }
+  .ed-ln-slots li.moved { background: color-mix(in oklch, var(--accent-2) 30%, var(--surface-2)); }
+  .ed-ln-blocks li.fresh, .ed-ln-slots li.fresh { background: color-mix(in oklch, var(--accent) 30%, var(--surface-2)); }
+  .ed-ln-say { margin: 0 !important; min-height: 3.2em; font-size: 1.0625rem; }
+  .ed-ln-say b { color: var(--accent); }
+  @media (max-width: 760px) { .ed-ln-mem { grid-template-columns: minmax(0, 1fr); } .ed-ln-blocks li { grid-template-columns: 10ch minmax(0, 1fr); } .ed-ln-blocks small { grid-column: 2; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { Screen, cursorOps, fontFrom } from './EdBgi';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = (t: string) => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+  const X = 6, Y = 65, W = 232, H = 104, ROWS = 8, COLS = 27, LINE = 204;
+  const hx = (k: number) => `${(0x1c2a + 0x0e * k).toString(16).toUpperCase()}:0004`;
+
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-edlines]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const font = fontFrom(root.dataset.font!), start: string[] = JSON.parse(root.dataset.lines!);
+    const cv = root.querySelector<HTMLCanvasElement>('[data-cv]')!, ctx = cv.getContext('2d')!;
+    const input = root.querySelector<HTMLInputElement>('[data-in]')!;
+    const slotsEl = root.querySelector<HTMLOListElement>('[data-slots]')!, blocksEl = root.querySelector<HTMLOListElement>('[data-blocks]')!;
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    // lines in order, each with the number of the block it lives in (blocks never move)
+    let lines: { b: number; t: string }[] = [], next = 0, r = 0, c = 0;
+    const reset = () => { lines = start.map((t, k) => ({ b: k, t })); next = start.length; r = lines.length - 1; c = lines[r].t.length; };
+    reset();
+
+    function draw() {
+      const s = new Screen(font);
+      s.run(['pal', 12, 63, 0, 0]); s.run(['fill', 15]); s.run(['bar', 0, 0, 639, 479]); s.run(['view', 10, 70]); s.run(['color', 0]);
+      lines.forEach((l, k) => s.run(['text', 0, k * 12, l.t.slice(0, COLS + 1)]));
+      for (const op of cursorOps(r, Math.min(c, COLS))) s.run(op);
+      ctx.putImageData(new ImageData(s.rgba(X, Y, W, H), W, H), 0, 0);
+    }
+    function lists(fresh = -1, movedFrom = Infinity) {
+      slotsEl.innerHTML = lines.map((l, k) => `<li class="${k === r ? 'cur' : ''}${k === fresh ? ' fresh' : ''}${k > fresh && k >= movedFrom ? ' moved' : ''}" data-k="${k}"><span>[${k}]</span><code>${hx(l.b)}</code></li>`).join('') +
+        `<li class="ed-ln-empty"><span>[${lines.length}]</span><code>0000:0000</code></li><li class="ed-ln-empty"><span>…</span><code></code></li><li class="ed-ln-empty"><span>[600]</span><code>0000:0000</code></li>`;
+      const byBlock = [...lines].sort((a, b) => a.b - b.b);
+      blocksEl.innerHTML = byBlock.map(l => `<li class="${l === lines[r] ? 'cur' : ''}${lines.indexOf(l) === fresh ? ' fresh' : ''}"><code>${hx(l.b)}</code><span class="ed-ln-txt">${esc(l.t) || ' '}</span><small>${l.t.length} of ${LINE}</small></li>`).join('');
+    }
+    const render = (fresh = -1, movedFrom = Infinity) => { draw(); lists(fresh, movedFrom); };
+
+    function enter() {
+      if (lines.length >= ROWS) { say.innerHTML = 'That is enough lines for this picture. His table has room for 601.'; return; }
+      const cur = lines[r], tail = cur.t.slice(c);
+      cur.t = cur.t.slice(0, c);
+      lines.splice(r + 1, 0, { b: next++, t: tail });
+      const moved = lines.length - (r + 2);
+      r++; c = 0;
+      render(r, r + 1);
+      if (!reduce()) {
+        const h = (slotsEl.firstElementChild as HTMLElement).offsetHeight + 3;
+        gsap.fromTo([...slotsEl.querySelectorAll('li.moved')], { y: -h }, { y: 0, duration: 0.45, ease: 'power3.out' });
+        gsap.fromTo([...root.querySelectorAll('li.fresh')], { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: 'back.out(2)' });
+      }
+      say.innerHTML = `Enter: <code>new char[204]</code> gives a fresh block at <b>${hx(lines[r].b)}</b>, and the text after the cursor moves into it. ` +
+        (moved ? `The ${moved} pointer${moved > 1 ? 's' : ''} below slid down one slot: ${moved * 4} bytes moved, and not one letter of the other lines.` : 'Nothing below it, so no pointer had to move.');
+    }
+    function type(ch: string) {
+      const l = lines[r];
+      if (l.t.length >= LINE - 1) return;
+      if (c > l.t.length) l.t = l.t.padEnd(c, ' ');
+      l.t = l.t.slice(0, c) + ch + l.t.slice(c);
+      c++;
+      render();
+      say.innerHTML = `Typed into line ${r}: only its own block changed, at <b>${hx(l.b)}</b>. The table did not move.`;
+    }
+    function act(k: string) {
+      if (k === 'enter') return enter();
+      if (k === 'up') r = Math.max(0, r - 1); else if (k === 'down') r = Math.min(lines.length - 1, r + 1);
+      else if (k === 'left') c = Math.max(0, c - 1); else if (k === 'right') c = Math.min(COLS, c + 1);
+      else if (k === 'home') c = 0; else if (k === 'end') c = lines[r].t.length;
+      else if (k === 'back') { if (c > 0 && c <= lines[r].t.length) { const l = lines[r]; l.t = l.t.slice(0, c - 1) + l.t.slice(c); } c = Math.max(0, c - 1); }
+      else if (k === 'reset') { reset(); say.innerHTML = 'Two lines, two blocks, two pointers.'; }
+      render();
+    }
+    root.querySelectorAll<HTMLButtonElement>('[data-ctl] [data-k]').forEach(b => b.addEventListener('click', () => { act(b.dataset.k!); if (matchMedia('(pointer: fine)').matches) input.focus(); }));
+    input.addEventListener('keydown', e => {
+      const m: Record<string, string> = { Enter: 'enter', ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', Home: 'home', End: 'end', Backspace: 'back' };
+      if (m[e.key]) { e.preventDefault(); act(m[e.key]); }
+    });
+    input.addEventListener('beforeinput', e => {
+      e.preventDefault();
+      if (e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph') return enter();
+      if (e.inputType === 'deleteContentBackward') return act('back');
+      for (const ch of e.data ?? '') if (ch >= ' ' && ch <= '~') type(ch);
+    });
+    root.querySelector<HTMLImageElement>('[data-img]')!.hidden = true;
+    cv.hidden = false; input.hidden = false;
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    render();
+  });
+</script>

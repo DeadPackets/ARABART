@@ -1,0 +1,98 @@
+---
+// The four builds that survive, measured from the files: how big, how much code, how many screens, how many system
+// functions, and which logo and tab icons they carry. Step from 1.5a to 2.3.
+import Window from '../../shell/Window.astro';
+import { VERSIONS } from './data';
+import tabs1 from './img/tabs-1.png';
+import tabs2 from './img/tabs.png';
+import logo1 from './img/logo-1.png';
+import logo2 from './img/logo-2.png';
+
+const B = VERSIONS.filter(v => 'bytes' in v) as unknown as { v: string; date: string; notes: string[]; bytes: number; code: number; dialogs: number; imports: number; logo: number }[];
+const last = B[B.length - 1];
+const ROWS = [
+  { k: 'bytes', label: 'MemMaid.exe', unit: 'bytes' },
+  { k: 'code', label: 'ARM code', unit: 'bytes' },
+  { k: 'dialogs', label: 'Screens', unit: 'layouts' },
+  { k: 'imports', label: 'System functions', unit: 'used' },
+] as const;
+const n = (x: number) => x.toLocaleString('en-US');
+---
+
+<div class="mvr" data-mm-versions>
+  <div class="mvr-pick" role="group" aria-label="Pick a build">
+    {B.map((b, i) => <button type="button" class="button k-btn" data-b={i} aria-pressed={String(i === B.length - 1)}>{b.v}<small>{b.date}</small></button>)}
+  </div>
+  <Window title={`MemMaid ${last.v}`} kind="dialog" active class="mvr-win" data-title>
+    <div class="mvr-look">
+      <img data-logo src={logo2.src} width="150" height="32" alt="The DinarSoft logo, from 2007" />
+      <img data-tabs src={tabs2.src} width="276" height="36" alt="MemMaid 2’s six tab icons" class="mvr-tabs" />
+    </div>
+    <dl class="mvr-bars">
+      {ROWS.map(r => (
+        <div>
+          <dt>{r.label}</dt>
+          <dd><span class="mvr-bar" aria-hidden="true"><i data-bar={r.k} style="--w:1"></i></span><b data-n={r.k}>{n(last[r.k])}</b> <small>{r.unit}</small></dd>
+        </div>
+      ))}
+    </dl>
+    <ul class="mvr-notes" data-notes>{last.notes.map(t => <li>{t}</li>)}</ul>
+  </Window>
+  <script type="application/json" data-vs set:html={JSON.stringify({ B, img: { tabs1: tabs1.src, tabs2: tabs2.src, logo1: logo1.src, logo2: logo2.src } })} />
+</div>
+
+<style is:global>
+  .mvr-pick { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+  .mvr-pick button { display: grid; gap: 2px; justify-items: center; min-height: 52px; text-align: center; }
+  .mvr-pick small { font-size: 0.75rem; font-weight: 500; opacity: 0.8; }
+  .mvr-look { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 8px 10px; border-radius: 3px; background: #fff; }
+  .mvr-look img { display: block; height: auto; max-width: 100%; image-rendering: auto; }
+  .mvr-bars { display: grid; gap: 10px; margin: 16px 0 0; }
+  .mvr-bars > div { display: grid; grid-template-columns: 9em minmax(0, 1fr); align-items: center; gap: 10px; }
+  .mvr-bars dt { font-size: 0.875rem; color: var(--ink-2); }
+  .mvr-bars dd { display: grid; grid-template-columns: minmax(0, 1fr) 6.5em 3.5em; align-items: center; gap: 8px; margin: 0; }
+  .mvr-bar i { display: block; width: calc(var(--w) * 100%); height: 14px; border-radius: 1px; background: var(--accent); }
+  .mvr-bars b { font: 700 0.875rem var(--font-code); color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+  .mvr-bars small { font-size: 0.75rem; color: var(--ink-2); }
+  .mvr-notes { margin: 16px 0 0; padding-left: 1.2em; font-size: 0.9375rem; line-height: 1.5; color: var(--ink); }
+  @media (max-width: 560px) {
+    .mvr-pick { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .mvr-bars > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  type Bd = { v: string; date: string; notes: string[]; bytes: number; code: number; dialogs: number; imports: number; logo: number };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-mm-versions]').forEach(root => {
+    const { B, img } = JSON.parse(root.querySelector('[data-vs]')!.textContent!) as { B: Bd[]; img: Record<string, string> };
+    const top = B[B.length - 1];
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-b]')];
+    const logo = root.querySelector<HTMLImageElement>('[data-logo]')!, tabs = root.querySelector<HTMLImageElement>('[data-tabs]')!;
+    const title = root.querySelector('[data-title] .win-title');
+    const pick = (i: number) => {
+      const b = B[i], d = reduce() ? 0 : 0.6;
+      btns.forEach((x, n) => x.setAttribute('aria-pressed', String(n === i)));
+      if (title) title.textContent = `MemMaid ${b.v}`;
+      for (const k of ['bytes', 'code', 'dialogs', 'imports'] as const) {
+        const bar = root.querySelector<HTMLElement>(`[data-bar="${k}"]`)!, num = root.querySelector<HTMLElement>(`[data-n="${k}"]`)!;
+        gsap.to(bar, { '--w': b[k] / top[k], duration: d, ease: 'power3.out' });
+        const o = { v: +num.textContent!.replace(/,/g, '') };
+        gsap.to(o, { v: b[k], duration: d, ease: 'power3.out', onUpdate: () => (num.textContent = Math.round(o.v).toLocaleString('en-US')) });
+      }
+      logo.src = b.logo === 1 ? img.logo1 : img.logo2;
+      logo.width = b.logo === 1 ? 116 : 150; logo.height = b.logo === 1 ? 53 : 32;
+      logo.alt = b.logo === 1 ? 'The old DINAR logo, with its globe' : 'The DinarSoft logo, from 2007';
+      const v2 = b.v.startsWith('2');
+      tabs.src = v2 ? img.tabs2 : img.tabs1;
+      tabs.width = v2 ? 276 : 192; tabs.height = v2 ? 36 : 25;
+      tabs.alt = v2 ? 'MemMaid 2’s six tab icons' : 'MemMaid 1’s six small tab icons';
+      const ul = root.querySelector('[data-notes]')!;
+      ul.replaceChildren(...b.notes.map(t => { const li = document.createElement('li'); li.textContent = t; return li; }));
+      if (d) gsap.fromTo([logo, tabs], { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08 });
+    };
+    btns.forEach((x, i) => x.addEventListener('click', () => pick(i)));
+  });
+</script>

@@ -1,0 +1,23 @@
+/* Shared by the four ARABART family writeups. The writeup type rules (.writeup ol, li, p in explain.css) also reach the
+   lists inside the shared toys; these put the toys' own layout back. */
+.writeup .k-tw .k-tw-strip { display: flex; gap: 0; margin: 0; padding: 4px 2px 10px; list-style: none; }
+.writeup .k-tw .k-tw-strip > li { max-width: none; font-size: inherit; line-height: inherit; }
+.writeup .k-tw p.k-tw-stored { max-width: none; font: 500 0.8125rem/1.5 var(--font-code); color: var(--ink-2); }
+.writeup .k-tw p.k-tw-sun { font: 500 0.875rem/1.5 var(--sans); }
+.writeup .k-cs ol.k-code { display: block; margin: 0; padding: 0; list-style: none; }
+.writeup .k-cs .k-code > li { max-width: none; font: inherit; }
+.writeup .k-cs .k-code > li.exec { color: var(--surface); }
+.writeup .k-cs p.k-cs-say { max-width: none; font: 500 1rem/1.55 var(--sans); }
+
+.writeup .sb .sb-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.writeup .sb .sb-list > li { max-width: none; }
+
+/* Page furniture */
+.writeup .af-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 48px); margin-top: 28px; }
+.writeup .af-cols > p { margin: 0; }
+.writeup .af-tip { margin-top: 16px; font-size: 0.9375rem; color: var(--ink-2); }
+.writeup .af-toy { margin-top: 32px; }
+.writeup p [lang='ar'], .writeup li [lang='ar'] { font-family: var(--font-ar); font-weight: 700; }
+.writeup p [lang='ar'], .writeup li [lang='ar'] { font-size: 1.15em; color: var(--accent); }
+.writeup .af-big { font: 800 clamp(3.5rem, 6vw + 1rem, 6rem)/0.9 var(--font-display); font-stretch: 75%; color: var(--accent); }
+@media (max-width: 760px) { .writeup .af-cols { grid-template-columns: minmax(0, 1fr); } }

@@ -1,47 +1,18 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import TimelineEntry from '../components/TimelineEntry.astro';
-import { programs, getYears, getProgramsByYear } from '../data/programs';
-
-const years = getYears();
+// The timeline became the home collection (programs are listed oldest first there)
+const to = `${import.meta.env.BASE_URL}/#programs`;
 ---
 
-<BaseLayout
-  title="Timeline - DOSArchive"
-  description="A chronological view of Yasser Awad's DOS programs from 1991 to 1993."
->
-  <div class="container">
-    <section class="timeline-header">
-      <h1 class="glow">Timeline</h1>
-      <p class="timeline-subtitle">
-        Three years of DOS programming in Egypt &mdash; from Assembly libraries to award-winning software.
-      </p>
-    </section>
-
-    <div class="timeline">
-      {years.map(year => (
-        <TimelineEntry year={year} programs={getProgramsByYear(year)} />
-      ))}
-    </div>
-  </div>
-</BaseLayout>
-
-<style>
-  .timeline-header {
-    margin-bottom: 3rem;
-  }
-
-  .timeline-header h1 {
-    margin-bottom: 0.5rem;
-  }
-
-  .timeline-subtitle {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-    max-width: 520px;
-  }
-
-  .timeline {
-    padding-bottom: 2rem;
-  }
-</style>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="refresh" content={`0; url=${to}`} />
+  <link rel="canonical" href={to} />
+  <link rel="icon" href={`${import.meta.env.BASE_URL}/favicon.ico`} />
+  <title>Moved to the collection · Yasser Awad</title>
+</head>
+<body>
+  <p>The timeline is now the <a href={to}>collection on the home page</a>.</p>
+</body>
+</html>

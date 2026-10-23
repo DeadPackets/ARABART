@@ -1,0 +1,178 @@
+---
+// MemMaid, by Yasser Awad (DinarSoft, 2003 to 2008). Facts: MemMaid 1.5a, 1.72, 1.73 and 2.3 from the archived
+// installers (research/dinarsoft/re/memmaid/NOTES.md), DinarSoft's revision history and screenshots. Every toy is
+// built from MemMaid's own resources and traced from its own ARM code.
+import MmDevice from '../components/toys/ds-memmaid/MmDevice.astro';
+import MmParts from '../components/toys/ds-memmaid/MmParts.astro';
+import MmReclaim from '../components/toys/ds-memmaid/MmReclaim.astro';
+import MmInject from '../components/toys/ds-memmaid/MmInject.astro';
+import MmCleaner from '../components/toys/ds-memmaid/MmCleaner.astro';
+import MmStartup from '../components/toys/ds-memmaid/MmStartup.astro';
+import MmLoader from '../components/toys/ds-memmaid/MmLoader.astro';
+import MmSplit from '../components/toys/ds-memmaid/MmSplit.astro';
+import MmTrial from '../components/toys/ds-memmaid/MmTrial.astro';
+import MmKey from '../components/toys/ds-memmaid/MmKey.astro';
+import MmVersions from '../components/toys/ds-memmaid/MmVersions.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Term from '../components/explain/Term.astro';
+import { APIS } from '../components/toys/ds-memmaid/data';
+---
+
+<section id="mm-tap" class="mm">
+  <h2>MemMaid, rebuilt from its own files</h2>
+  <p class="lead">This is MemMaid 2.3 on a Pocket PC. Tap the six icons along the bottom, open Jump To and Tools, and run a scan.</p>
+  <p>Nothing here is a screenshot. The tab icons and the toolbar come out of MemMaid’s own picture file, and the menus out of its own menu definitions. Every label comes from its <Term id="mm-string-table">string table</Term> of 709 strings. The lists match DinarSoft’s own 2007 screenshots, and the scan sizes are a sample.</p>
+  <MmDevice />
+  <p>Open <b>Tools › Settings</b> and change the language. MemMaid 2.3 speaks eight: English, German, French, Italian, Czech, Slovak, Russian and Simplified Chinese. Each language is a small DLL that holds the same 709 strings, translated. When MemMaid needs a word, it asks the language DLL first and falls back to English, so a missing translation never leaves a blank button. Then open <b>Tools › About › Register</b> and type the key from <a href="#unlock">Unlock the full version</a>.</p>
+  <Deep title="For engineers: one word, in any of eight languages">
+    <Listing
+      title="MemMaid.exe 2.3  6A2E4, string number r5"
+      lines={[
+        { off: '6A2EC', code: 'mov  r3,#0x200 / orr r3,r3,#0xC5', note: '709 strings' },
+        { off: '6A2F4', code: 'cmp  r5,r3', note: 'past the end?' },
+        { off: '6A2F8', code: 'movge r0,#0', note: 'yes: no string' },
+        { off: '6A304', code: 'ldr  r3,[r4,#0x18]', note: 'the language DLL’s GetString', hi: true },
+        { off: '6A308', code: 'cmp  r3,#0', note: 'is a language loaded?' },
+        { off: '6A318', code: 'ldr  pc,[r4,#0x18]', note: 'ask it for string r5', hi: true },
+        { off: '6A31C', code: 'cmp  r0,#0', note: 'did it have one?' },
+        { off: '6A324', code: 'ldr  r3,[r4,#0x10]', note: 'no: the English table' },
+        { off: '6A328', code: 'ldr  r0,[r3,r5,lsl #2]', note: 'English string r5', hi: true },
+        { off: '6A32C', code: 'pop  {r4,r5,pc}', note: 'return it' },
+      ]}
+      foot="MemMaid loads the language DLL once, at start, and finds its GetString function by name (6A7A0). Each mm_xxx.dll fills its table of 709 pointers when it loads. In JavaScript: return lang?.(n) || en[n]."
+    />
+  </Deep>
+</section>
+
+<section id="mm-parts" class="mm">
+  <h2>Fourteen files, one app</h2>
+  <p class="lead">MemMaid 2.3 arrives as one CAB installer. Open it, and out come 14 files: the app, its pictures, seven languages, its help and two small helpers.</p>
+  <p>The app itself, MemMaid.exe, is 629,760 bytes, smaller than one photo on a phone today. Inside are about 98,700 ARM instructions and 41 screen layouts. Yasser wrote it in C++ and built it with Visual Studio 2005. Tap any file to see what it does.</p>
+  <MmParts />
+  <p>Every part has one job. The pictures for sharp VGA screens sit in their own DLL of 245,248 bytes. MemMaid loads it only on a VGA screen, so a small screen never pays for big pictures. Each language is its own file, and the English-only installer of the same build simply leaves them out. The launcher, 12,800 bytes, finds MemMaid wherever you installed it, in main memory or on a card.</p>
+  <p>To do its work, MemMaid calls 348 system functions. Many have a twin on the phone in your pocket, and a few are now kept for the system alone.</p>
+  <ThenNow
+    title="What Windows Mobile gave him, and what an app calls today"
+    era="2003 to 2008"
+    rows={APIS.map(a => ({ then: `<code>${a.then}</code>`, now: a.now, why: a.job }))}
+  />
+</section>
+
+<section id="mm-reclaim" class="mm">
+  <h2>Reclaim RAM: one message to every app</h2>
+  <p class="lead">On a Pocket PC, memory was the thing you ran out of. Version 1.72, in July 2006, added a button that wins some back without closing a thing.</p>
+  <p>Programs keep things they can rebuild later: pictures, caches, windows you cannot see. Windows Mobile had a polite way to ask for them back, a message named <Term id="mm-wm-hibernate">WM_HIBERNATE</Term>, the ancestor of the low-memory warning an iPhone or Android app gets today. The system sent it when <Term id="mm-ram">main memory</Term> ran low. MemMaid sends it now, to every window on the device, and measures what comes back. Step through his code, or press Run.</p>
+  <MmReclaim />
+  <p>Look at the order: measure, ask, wait one second, measure again. The second is for the apps. A message only lands in an app’s mailbox, and the app answers when its turn comes. The report is plain arithmetic, after minus before: “MemMaid has reclaimed 0.19 MB”. The numbers here are a sample run, with the programs from DinarSoft’s own screenshot.</p>
+  <p>The first box goes the other way: it closes every program, except two. MemMaid keeps itself running, and ActiveSync’s repllog.exe, so a sync with your PC is never cut off.</p>
+</section>
+
+<section id="mm-inject" class="mm">
+  <h2>A helper inside every app</h2>
+  <p class="lead">The third box, Compact, goes further. It tidies each app’s memory from the inside.</p>
+  <p>Each app on Windows CE runs as its own <Term id="mm-process">process</Term>, walled off from the rest. Its <Term id="heap">heap</Term>, the memory it hands out to itself, fills with holes as it runs. Only code inside the app can tidy it. So MemMaid sends code inside.</p>
+  <p>It takes on the system’s own <Term id="mm-kmode">full privileges</Term> and gives itself rights over every process. Then it asks the system, through one of its <Term id="mm-callback4">private calls</Term>, to act as if the app itself were calling. The app loads MemMaid’s helper, MemMaidSetup.dll, runs its tidy-up function, PerformInst, and unloads it. PerformInst does two things. It lets go of shared components the app no longer uses, and it <Term id="mm-heap-compact">compacts</Term> the app’s working memory, so empty pages go back to the system. Then the helper leaves, and the app carries on, lighter. Step through it.</p>
+  <MmInject />
+  <p>MemMaid does this for every process on the device, one after another. Its own process gets the short path: it calls PerformInst directly. On the phone in your pocket, no app may reach inside another. Only the system can. On Windows Mobile a program that knew the system this well could, and MemMaid used that power to help every app on the device.</p>
+</section>
+
+<section id="mm-clean" class="mm">
+  <h2>Where the junk lives</h2>
+  <p class="lead">MemMaid 2.3 has 29 cleaners. Each one knows a place where a Pocket PC collects things nobody needs.</p>
+  <p>Two work in memory, most work on files, three in the <Term id="mm-registry">registry</Term>, and three in the <Term id="mm-notify-queue">notification queue</Term>, the system’s list of programs to wake later. Pick one to see where it looks and what it removes.</p>
+  <MmCleaner />
+  <p>Look how often it asks first. MemMaid never assumes where a folder is. Pocket Internet Explorer’s cache lives wherever the device maker put it, so MemMaid reads the real place from the registry. Opera keeps its settings in its own file, Opera.ini, so MemMaid reads that. AvantGo moved its files between versions, so MemMaid checks the version before it touches one. A dead shortcut goes only after MemMaid has read its target and found the program gone. That care is what makes one tap on Clean safe.</p>
+  <Deep title="For engineers: reading an .ini file on a system that cannot">
+    <Listing
+      title="MemMaid.exe 2.3  the Opera cache cleaner"
+      lines={[
+        { off: '22FC8', code: 'ldr  r1,=L"\\Application Data\\Opera\\Opera.ini"', note: 'Opera’s own settings' },
+        { off: '21960', code: 'ldr  r3,=L"Cache Directory4"', note: 'the key' },
+        { off: '21964', code: 'ldr  r2,=L"[User Prefs]"', note: 'the section' },
+        { off: '2198C', code: 'bl   ReadIni', note: 'his own reader, at 2A688', hi: true },
+        { off: '2A6CC', code: 'bl   CreateFileW', note: 'open the file' },
+        { off: '2A8A4', code: 'bl   ReadFile', note: 'read it' },
+        { off: '2A8DC', code: 'bl   MultiByteToWideChar', note: 'into Unicode' },
+        { off: '2A794', code: 'cmp  r3,#0x5B', note: 'a line that starts with [ ?', hi: true },
+        { off: '2A7A8', code: 'bl   _wcsnicmp', note: 'is it [User Prefs]?' },
+        { off: '2A7F8', code: 'cmp  r3,#0x3D', note: 'the = after the key', hi: true },
+      ]}
+      foot="Desktop Windows reads .ini files with GetPrivateProfileString. Windows CE leaves it out, so MemMaid carries its own: read the file, turn it into Unicode, find the section, then the key. Python’s configparser does the same job today."
+    />
+  </Deep>
+</section>
+
+<section id="mm-startup" class="mm">
+  <h2>Startup, in your order</h2>
+  <p class="lead">Everything in the <Term id="mm-startup-folder">StartUp folder</Term> runs when the Pocket PC starts. Windows Mobile gave you no way to choose the order. MemMaid did, from version 1.3.</p>
+  <p>Each item is a <Term id="mm-lnk">shortcut file</Term>, one line of text. A folder has no setting for order, so MemMaid writes the files again, one at a time, in the order you choose. Meanwhile it keeps them safe in a folder of its own, <code>\Windows\MEMMAID.TEMP</code>. Move an item, press Save, and watch.</p>
+  <MmStartup />
+  <p>Now switch one off. A simpler program would delete the shortcut. MemMaid keeps the real one in <code>StartUp.Disabled</code> and leaves a stand-in in its place: a shortcut to its own launcher with the word <code>-noop</code>. The launcher sees <code>-noop</code> and ends at once. The item keeps its place in your order, and switching it back on is one copy.</p>
+  <Deep title="For engineers: the stand-in shortcut">
+    <Listing
+      title="MemMaid.exe 2.3  4EB40, switch a startup item off"
+      lines={[
+        { off: '4EB7C', code: 'bl   SHGetSpecialFolderPath', note: 'where StartUp is (7)' },
+        { off: '4EB98', code: 'ldr  r1,=L".Disabled\\"', note: 'the folder beside it' },
+        { off: '4EBA8', code: 'bl   CreateDir', note: 'make it, at 62050' },
+        { off: '4EBD0', code: 'bl   CopyFileW', note: 'keep the real shortcut there', hi: true },
+        { off: '4EC04', code: 'bl   CreateFileW', note: 'open the one in StartUp' },
+        { off: '4EC34', code: 'ldr  r0,=36#"\\Windows\\MemMaidLauncher.exe" -noop', note: 'the stand-in' },
+        { off: '4EC50', code: 'bl   WriteFile', note: 'write it over the old one', hi: true },
+        { off: '4EC58', code: 'bl   SetEndOfFile', note: 'cut off the rest' },
+        { off: '4EC24', code: 'bl   DeleteFileW', note: 'cannot open it? delete it' },
+      ]}
+      foot={'36 is the length of the command after the # sign. In MemMaidLauncher.exe, the first test at 11028 is wcsstr(cmdline, L"-noop"): found, return 0.'}
+    />
+  </Deep>
+</section>
+
+<section id="mm-room" class="mm">
+  <h2>More room for programs</h2>
+  <p class="lead">Two tools on the Tweaks tab give programs more memory to run in. One moves code out of memory. The other moves the line between files and programs.</p>
+  <h3>The DLL Optimizer</h3>
+  <p>Installed programs kept their <Term id="mm-dll">DLLs</Term> in main memory, in <code>\Windows</code>. Version 1.4, in November 2004, added the DLL Optimizer: it moves them to a memory card, into a folder named <code>DLL Store</code>. A moved DLL must still be found. So MemMaid adds the new folder to the places the <Term id="mm-loader">loader</Term> searches, like adding a folder to <code>PATH</code>. The list lives in the registry as one <Term id="mm-multi-sz">multi-string value</Term> named <code>SystemPath</code>. Then MemMaid restarts the device with a <Term id="mm-soft-reset">soft reset</Term>. Step through the edit.</p>
+  <MmLoader />
+  <p>Every step is careful. It looks for its folder in the list first, so a second run never adds it twice. It writes the list back with a fresh zero at the end, and flushes the registry to storage before the restart.</p>
+  <h3>Memory for files, memory for programs</h3>
+  <p>On Windows Mobile 2003, one RAM chip held both your files and your running programs, and the system drew the line between them by itself. MemMaid’s Information screen puts that line on a <Term id="mm-trackbar">slider</Term>, counted in pages of 4,096 bytes. It marks the band where the line may go: never below the files you have, never above the memory programs leave free. Let go, and MemMaid calls <code>SetSystemMemoryDivision</code>. One second later it reads the line back and puts the slider where the system put the line.</p>
+  <MmSplit />
+  <p>MemMaid looks that function up by name while it runs, the way a web page checks for a feature before it uses it. So the same program starts on every version of Windows Mobile. From version 5, files moved to flash memory, and the line was gone.</p>
+  <ThenNow
+    era="2003 to 2008"
+    rows={[
+      { then: '<code>HKLM\\Loader  SystemPath</code>', now: '<code>PATH</code>, and <code>LD_LIBRARY_PATH</code> on Linux', why: 'A list of folders to search, in order.' },
+      { then: 'REG_MULTI_SZ, each string ending in a zero', now: 'A JSON array of strings', why: 'Many strings in one value.' },
+      { then: '<code>KernelIoControl(IOCTL_HAL_REBOOT)</code>', now: 'Restart to apply an update', why: 'New settings take effect at the next start.' },
+      { then: '<code>GetProcAddress("SetSystemMemoryDivision")</code>', now: '<code>if ("share" in navigator)</code>', why: 'Use a feature only where it exists.' },
+    ]}
+  />
+</section>
+
+<section id="mm-key" class="mm">
+  <h2>Fifteen days, and a key</h2>
+  <p class="lead">MemMaid was <Term id="shareware">shareware</Term>: free for 15 days, then a key, at $14.99 in 2006 and $19.99 in 2008. In 2026, Yasser Awad released it as freeware.</p>
+  <p>The install date is written once, by the installer’s helper, MemMaidSetup.dll. It hides in <code>HKEY_CLASSES_ROOT</code>, among the file types, under a key named <code>TapHelp</code>. Fourteen bytes hold the date. The year, the month and the day are each written twice, in two different ways, with every second byte raised by one, and a <Term id="checksum">checksum</Term> closes the record. MemMaid reads them at every start. Both copies must agree and the checksum must match, or the trial is over. Set the dates, then tap any byte.</p>
+  <MmTrial />
+  <p>His day count needs no calendar: (year × 12 + month) × 31 + day. Every month counts as 31 days, so the count only grows. Older versions keep the same record under other names: <code>Windows.2</code> and <code>OSDB</code> in 1.72 and 1.73, <code>AppHelper</code> and <code>Platform</code> in 1.5a.</p>
+  <h3>The key</h3>
+  <p>A key is made from two things. One is your Pocket PC’s code, which MemMaid builds from the <Term id="mm-device-id">device ID</Term> and shows on its License Key screen. The other is a word: <code>MemMaid2</code>. His key function shuffles 120 numbers using the word, then steps through them once per character, turning each character of the code into a key letter. The letter O never appears in a key: the code skips it. Pick a preset or type your own, then step through it.</p>
+  <MmKey />
+  <p>MemMaid also accepts keys made from a few words built into the program, in place of the device code. One is his own name, <code>YASSERMOHAMEDALI</code>. Three more come from names in his family, and <code>GIVEAWAYVERSION1</code> served magazine give-aways. The key made from his name opens every copy of MemMaid 2.3, on any device. Versions 1.5a to 1.73 mix with the word <code>MemMaid</code>, so they have a key of their own, also made from his name. Both keys are in <a href="#unlock">Unlock the full version</a>.</p>
+  <p>Every key on this page passed MemMaid’s own check routine. Its real ARM code, from versions 1.5a, 1.72, 1.73 and 2.3, ran in an emulator. It accepted all 40 right keys: for seven devices, for a device with no ID, the give-away key and the key from his name. And it turned away all 196 near misses: one letter off, random, empty, or made for another device or version.</p>
+</section>
+
+<section id="mm-grow" class="mm">
+  <h2>Five years of growth</h2>
+  <p class="lead">Four builds of MemMaid survive, from March 2006 to June 2008. Side by side, they show how it grew.</p>
+  <MmVersions />
+  <p>From 1.5a to 2.3 the program almost doubled, from 327,680 bytes to 629,760. The code grew from 181,432 bytes to 394,752, the screens from 20 to 41, and the system functions it calls from 249 to 348. The 1.x builds were linked with Microsoft’s linker 6.20, and 2.3 with linker 8.0, from Visual Studio 2005.</p>
+  <p>The old builds also keep something the web archive never captured. Inside 1.5a and 1.72, as bitmap 108, is the first DinarSoft logo: the word DINAR under a globe. Version 1.73 swapped it for the new one, and its changelog says so: “New logo used in the about screen.”</p>
+</section>
+
+<style>
+  .mm :global(.k-code) { display: block; }
+  .mm h3 { margin-top: 40px; font: 700 clamp(1.25rem, 0.8vw + 1rem, 1.625rem)/1.2 var(--font-display); color: var(--ink); }
+</style>

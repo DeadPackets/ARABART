@@ -1,0 +1,119 @@
+UNWRAP.COM (all of it; runs first, then START.BAT deletes it)
+0100  be 4b 01             mov si, 0x14b
+0103  80 3c 00             cmp byte ptr [si], 0
+0106  74 3e                je 0x146
+0108  8b d6                mov dx, si
+010A  b8 02 3d             mov ax, 0x3d02
+010D  cd 21                int 0x21
+010F  72 2e                jb 0x13f
+0111  93                   xchg bx, ax
+0112  b4 3f                mov ah, 0x3f
+0114  b9 00 10             mov cx, 0x1000
+0117  ba 60 01             mov dx, 0x160
+011A  cd 21                int 0x21
+011C  91                   xchg cx, ax
+011D  51                   push cx
+011E  bf 60 01             mov di, 0x160
+0121  b0 a5                mov al, 0xa5
+0123  30 05                xor byte ptr [di], al
+0125  47                   inc di
+0126  04 4d                add al, 0x4d
+0128  e2 f9                loop 0x123
+012A  b8 00 42             mov ax, 0x4200
+012D  31 c9                xor cx, cx
+012F  31 d2                xor dx, dx
+0131  cd 21                int 0x21
+0133  59                   pop cx
+0134  b4 40                mov ah, 0x40
+0136  ba 60 01             mov dx, 0x160
+0139  cd 21                int 0x21
+013B  b4 3e                mov ah, 0x3e
+013D  cd 21                int 0x21
+013F  ac                   lodsb al, byte ptr [si]
+0140  84 c0                test al, al
+0142  75 fb                jne 0x13f
+0144  eb bd                jmp 0x103
+0146  b8 00 4c             mov ax, 0x4c00
+0149  cd 21                int 0x21
+
+DOUBLE.COM (all of it)
+0100  eb 12                jmp 0x114
+0102  00 00                add byte ptr [bx + si], al
+0104  00 00                add byte ptr [bx + si], al
+0106  3d 0c ff             cmp ax, 0xff0c
+0109  75 04                jne 0x10f
+010B  b8 c1 c0             mov ax, 0xc0c1
+010E  cf                   iret 
+010F  2e ff 2e 02 01       ljmp cs:[0x102]
+0114  b8 21 35             mov ax, 0x3521
+0117  cd 21                int 0x21
+0119  89 1e 02 01          mov word ptr [0x102], bx
+011D  8c 06 04 01          mov word ptr [0x104], es
+0121  1e                   push ds
+0122  c5 16 02 01          lds dx, ptr [0x102]
+0126  b8 03 25             mov ax, 0x2503
+0129  cd 21                int 0x21
+012B  1f                   pop ds
+012C  ba 06 01             mov dx, 0x106
+012F  b8 21 25             mov ax, 0x2521
+0132  cd 21                int 0x21
+0134  ba 43 01             mov dx, 0x143
+0137  b4 09                mov ah, 9
+0139  cd 21                int 0x21
+013B  ba 12 00             mov dx, 0x12
+013E  b8 00 31             mov ax, 0x3100
+0141  cd 21                int 0x21
+
+HELLO.COM entry stub, unscrambled (bytes 0-12; 13-25 are data)
+0100  8c c8                mov ax, cs
+0102  05 04 00             add ax, 4
+0105  50                   push ax
+0106  b8 00 01             mov ax, 0x100
+0109  50                   push ax
+010A  33 c0                xor ax, ax
+010C  cb                   retf 
+
+Body entry, body+0 (runs at 0100h)
+0100  eb 60                jmp 0x162
+0102  90                   nop 
+
+Body code, body+62h
+0162  0e                   push cs
+0163  1f                   pop ds
+0164  ba 99 01             mov dx, 0x199
+0167  b4 09                mov ah, 9
+0169  cd 21                int 0x21
+016B  80 3e 08 01 00       cmp byte ptr [0x108], 0
+0170  75 03                jne 0x175
+0172  e9 b2 00             jmp 0x227
+0175  8c c0                mov ax, es
+0177  05 10 00             add ax, 0x10
+017A  8b d8                mov bx, ax
+017C  03 1e 4f 01          add bx, word ptr [0x14f]
+0180  03 06 4d 01          add ax, word ptr [0x14d]
+0184  8b 0e 53 01          mov cx, word ptr [0x153]
+0188  8b 16 51 01          mov dx, word ptr [0x151]
+018C  fa                   cli 
+018D  8e d3                mov ss, bx
+018F  8b e1                mov sp, cx
+0191  fb                   sti 
+0192  06                   push es
+0193  1f                   pop ds
+0194  50                   push ax
+0195  52                   push dx
+0196  33 c0                xor ax, ax
+0198  cb                   retf 
+
+Body COM return, body+127h
+0227  bf 00 01             mov di, 0x100
+022A  be 22 01             mov si, 0x122
+022D  b9 1a 00             mov cx, 0x1a
+0230  fc                   cld 
+0231  f3 a4                rep movsb byte ptr es:[di], byte ptr [si]
+0233  06                   push es
+0234  1f                   pop ds
+0235  06                   push es
+0236  b8 00 01             mov ax, 0x100
+0239  50                   push ax
+023A  33 c0                xor ax, ax
+023C  cb                   retf 

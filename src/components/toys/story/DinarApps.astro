@@ -1,0 +1,160 @@
+---
+// DinarSoft in Visual Studio 2005: the six projects in Solution Explorer, each app's own screen on the device, its
+// facts in Properties, and the magazine's award grid. Images are DinarSoft's own files (research/dinarsoft/site).
+// Awards: research/career.md 1.3, from the magazine's own nominee, finalist and winner lists.
+import Window from '../../shell/Window.astro';
+import mmI from '../../../assets/dinarsoft/press/MemMaid_100.png';
+import hsI from '../../../assets/dinarsoft/press/HandySwitcher_100.png';
+import hmI from '../../../assets/dinarsoft/press/HandyMenu_100.png';
+import hlI from '../../../assets/dinarsoft/press/HandyLauncher_100.png';
+import ttI from '../../../assets/dinarsoft/press/TapText_100.png';
+import hdI from '../../../assets/dinarsoft/press/HijriDate_100.png';
+import mmS from '../../../assets/dinarsoft/mm2-1.gif';
+import hsS from '../../../assets/dinarsoft/HS3-6.gif';
+import hmS from '../../../assets/dinarsoft/hmcolors.gif';
+import hlS from '../../../assets/dinarsoft/hlauncherscreen.gif';
+import ttS from '../../../assets/dinarsoft/taptextscreen.gif';
+import hdS from '../../../assets/dinarsoft/hijriscreen.gif';
+
+const APPS = [
+  { id: 'memmaid', name: 'MemMaid', icon: mmI, shot: mmS, slogan: 'The Best Maid for PocketPCs', does: 'Cleans the phone: frees memory, clears temporary files, and manages the programs and services that start with it. From 2.0, a registry editor too.', first: '1.0, June 2003', last: '2.3, June 2008', awards: 'Finalist four years running, 2005 to 2008', quote: '“The Swiss Army Knife of PPC utilities.” eMobie, 2004', alt: 'MemMaid 2 on a Windows Mobile phone: the Quick Cleaner list, with Clean and Scan buttons.' },
+  { id: 'handyswitcher', name: 'HandySwitcher', icon: hsI, shot: hsS, slogan: 'The Ultimate Task Manager', does: 'A task switcher with an X button that really closes programs, plus Close All, hardware keys and skins.', first: '1.0, September 2003', last: '3.1, April 2008', awards: 'Best Task Manager, 2007 and 2008', quote: '“A simple-yet-powerful application.” GadgetMix, 2007', alt: 'HandySwitcher 3: a red menu of running programs, each with a close button, then Close All and Minimize All.' },
+  { id: 'handymenu', name: 'HandyMenu', icon: hmI, shot: hmS, slogan: 'Powerful System Access', does: 'A menu in the corner of the screen: soft reset, power off, brightness, memory, the Today screen and running programs. In five languages.', first: '1.0, July 2003', last: '3.6, March 2006', awards: 'Finalist, System and Registry, 2008', quote: '“A steal at $5.99!” Pocket PC Thoughts, 2004', alt: 'HandyMenu open over the Today screen: Soft Reset, Power Off, Brightness, Memory and more.' },
+  { id: 'handylauncher', name: 'HandyLauncher', icon: hlI, shot: hlS, slogan: 'The Seamless Launcher', does: 'Opens programs and documents from the corner of the screen, each one in the screen direction you choose.', first: '1.0, August 2003', last: '3.4, March 2006', awards: 'Nominee, 2007 and 2008', quote: '', alt: 'HandyLauncher open over the Today screen: My Documents, Pocket Excel, Pocket Word, Calculator and more.' },
+  { id: 'taptext', name: 'TapText', icon: ttI, shot: ttS, slogan: 'More Text, Less Taps.', does: 'Saved phrases and date stamps, typed into any program in two taps.', first: '1.0, March 2005', last: '1.3, February 2006', awards: 'Best Misc. Utility, 2007; finalist, 2008', quote: '“TapText is quickly becoming a utility that I can’t live without.” Pocket PC Thoughts, 2006', alt: 'The TapText start screen: a pen over a page, and the words Tap more with only a tap.' },
+  { id: 'hijridate', name: 'HijriDate', icon: hdI, shot: hdS, slogan: 'What is Today', does: 'The Hijri and the Gregorian date on the Today screen, in Arabic or English, calculated for Mecca.', first: '1.0, June 2003', last: '1.5', awards: '', quote: '', alt: 'The Today screen of a Windows Mobile phone in September 2006, with the Hijri date in Arabic: Ramadan 1427.' },
+];
+const YEARS = [2003, 2004, 2005, 2006, 2007, 2008];
+const GRID: Record<string, string[]> = {
+  memmaid: ['', 'N', 'F', 'F', 'F', 'F'],
+  handyswitcher: ['', 'N', 'N', 'N', 'W', 'W'],
+  handymenu: ['N', 'N', 'N', 'N', 'N', 'F'],
+  handylauncher: ['', '', '', '', 'N', 'N'],
+  taptext: ['', '', 'N', 'N', 'W', 'F'],
+};
+const WORD: Record<string, string> = { W: 'Winner', F: 'Finalist', N: 'Nominee' };
+---
+
+<div class="dsa" data-dinar>
+  <div class="dsa-ide">
+    <Window title="Solution Explorer" kind="panel" active class="dsa-sol">
+      <p class="dsa-root">Solution ‘DinarSoft’ (6 projects)</p>
+      <div class="dsa-list" role="tablist" aria-label="DinarSoft apps" aria-orientation="vertical">
+        {APPS.map((a, i) => (
+          <button type="button" role="tab" id={`dsa-t-${a.id}`} aria-controls="dsa-dev" aria-selected={String(i === 0)} tabindex={i === 0 ? 0 : -1} data-app={a.id}>
+            <img src={a.icon.src} width="28" height="28" alt="" decoding="async" />{a.name}
+          </button>
+        ))}
+      </div>
+    </Window>
+    <div class="dsa-dev" id="dsa-dev" role="tabpanel" aria-labelledby={`dsa-t-${APPS[0].id}`} data-dev>
+      <div class="dsa-bezel">
+        {APPS.map((a, i) => <img class="dsa-shot" src={a.shot.src} width="240" height="320" alt={a.alt} data-shot={a.id} hidden={i !== 0} loading={i ? 'lazy' : 'eager'} decoding="async" />)}
+      </div>
+    </div>
+    <Window title="Properties" kind="panel" class="dsa-props">
+      {APPS.map((a, i) => (
+        <dl class="dsa-dl" data-props={a.id} hidden={i !== 0}>
+          <div><dt>Name</dt><dd><b>{a.name}</b></dd></div>
+          <div><dt>Slogan</dt><dd>{a.slogan}</dd></div>
+          <div><dt>Does</dt><dd>{a.does}</dd></div>
+          <div><dt>First</dt><dd>{a.first}</dd></div>
+          <div><dt>Latest</dt><dd>{a.last}</dd></div>
+          {a.awards && <div><dt>Awards</dt><dd>{a.awards}</dd></div>}
+          {a.quote && <div><dt>Review</dt><dd>{a.quote}</dd></div>}
+        </dl>
+      ))}
+    </Window>
+  </div>
+
+  <Window title="Best Software Awards" kind="editor" active class="dsa-aw">
+    <div class="dsa-scroll">
+      <table class="dsa-grid">
+        <caption>Pocket PC Magazine, later Smartphone &amp; Pocket PC: Best Software Awards, from the magazine’s own lists</caption>
+        <thead><tr><th scope="col"><span class="sr-only">App</span></th>{YEARS.map(y => <th scope="col"><span class="dsa-y">{y}</span><span class="dsa-ys" aria-hidden="true">’{String(y).slice(2)}</span></th>)}</tr></thead>
+        <tbody>
+          {Object.entries(GRID).map(([id, row]) => (
+            <tr data-row={id} class:list={{ on: id === 'memmaid' }}>
+              <th scope="row">{APPS.find(a => a.id === id)!.name}</th>
+              {row.map(v => <td>{v && <span class:list={['dsa-c', v]}><span class="dsa-cw">{WORD[v]}</span></span>}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="dsa-tot"><b>22</b> nominations <span>·</span> <b>3</b> wins <span>·</span> <b>6</b> more finalist places</p>
+  </Window>
+</div>
+
+<style>
+  .dsa { display: grid; gap: 24px; }
+  .dsa-ide { display: grid; grid-template-columns: minmax(200px, 0.8fr) auto minmax(260px, 1.1fr); gap: 24px; align-items: start; }
+  .dsa-root { font-size: 0.9375rem; font-weight: 600; padding: 2px 4px 6px; color: var(--ink); }
+  .dsa-list { display: grid; padding-left: 10px; }
+  .dsa-list button { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 8px; font: 400 1rem/1 var(--sans); color: var(--ink); background: none; border: 1px solid transparent; cursor: pointer; text-align: left; }
+  .dsa-list button img { width: 28px; height: 28px; }
+  .dsa-list button:hover { background: #e8eef9; }
+  .dsa-list button[aria-selected='true'] { background: var(--xp-sel); color: var(--w-white); }
+  .dsa-list button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -3px; }
+  .dsa-dev { display: grid; justify-items: center; }
+  .dsa-bezel { position: relative; padding: 34px 16px 56px; border-radius: 28px; background: linear-gradient(160deg, oklch(0.42 0.012 260), oklch(0.22 0.01 260) 55%, oklch(0.3 0.01 260)); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.25), inset 0 -2px 6px oklch(0 0 0 / 0.5), 0 24px 48px oklch(0 0 0 / 0.3); }
+  .dsa-bezel::after { content: ''; position: absolute; left: 50%; bottom: 16px; width: 54px; height: 24px; translate: -50% 0; border-radius: 12px; background: linear-gradient(oklch(0.32 0.01 260), oklch(0.18 0.01 260)); }
+  .dsa-shot { display: block; width: 240px; height: 320px; image-rendering: pixelated; }
+  .dsa-shot:not([hidden]) { animation: dsa-in 0.3s var(--expo); }
+  @keyframes dsa-in { from { opacity: 0; } }
+  .dsa-dl { display: grid; margin: 0; font-size: 0.9375rem; }
+  .dsa-dl div { display: grid; grid-template-columns: 5.5em minmax(0, 1fr); border-bottom: 1px solid var(--rule); }
+  .dsa-dl dt { padding: 6px 8px; background: var(--xp-beige); color: oklch(0.3 0 0); }
+  .dsa-dl dd { margin: 0; padding: 6px 8px; line-height: 1.45; color: var(--ink); }
+  .dsa-scroll { overflow-x: auto; }
+  .dsa-grid { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+  .dsa-grid caption { text-align: left; padding-bottom: 10px; font: 600 0.875rem/1.4 var(--sans); color: var(--ink-2); }
+  .dsa-grid th { padding: 6px 8px; font: 600 0.8125rem/1.3 var(--font-code); color: var(--ink-2); text-align: left; }
+  .dsa-grid tbody th { font: 600 0.9375rem/1.3 var(--sans); color: var(--ink); white-space: nowrap; }
+  .dsa-grid td { padding: 4px; min-width: 64px; }
+  .dsa-grid tr { transition: background-color 0.2s; }
+  .dsa-grid tr.on { background: #e8eef9; }
+  .dsa-c { display: grid; place-items: center; height: 30px; font: 600 0.75rem/1 var(--sans); border-radius: 3px; }
+  .dsa-c.W { background: #cf2f2f; color: var(--w-white); }
+  .dsa-c.F { background: #f3b6b6; color: #5a0f0f; }
+  .dsa-c.N { background: #ebe8dc; color: oklch(0.35 0 0); box-shadow: inset 0 0 0 1px #c9c4b0; }
+  .dsa-ys { display: none; }
+  .dsa-tot { margin-top: 12px; font: 500 0.9375rem/1.4 var(--sans); color: var(--ink-2); }
+  .dsa-tot b { font-size: 1.375rem; color: #cf2f2f; }
+  .dsa-tot span { margin: 0 6px; }
+  @media (max-width: 1100px) { .dsa-ide { grid-template-columns: minmax(0, 1fr) auto; } .dsa-props { grid-column: 1 / -1; } }
+  @media (max-width: 680px) {
+    .dsa-ide { grid-template-columns: minmax(0, 1fr); }
+    .dsa-dev { order: -1; }
+    .dsa-list { grid-template-columns: 1fr 1fr; padding-left: 0; }
+    .dsa-c { font-size: 0; }
+    .dsa-c.W::after { content: 'W'; font-size: 0.75rem; } .dsa-c.F::after { content: 'F'; font-size: 0.75rem; } .dsa-c.N::after { content: 'N'; font-size: 0.75rem; }
+    .dsa-grid td { min-width: 0; padding: 2px; }
+    .dsa-grid th { padding: 4px 2px; }
+    .dsa-grid tbody th { font-size: 0.8125rem; }
+    .dsa-y { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .dsa-ys { display: inline; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dinar]').forEach(root => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const dev = root.querySelector<HTMLElement>('[data-dev]')!;
+    const go = (i: number, focus = false) => {
+      const id = tabs[i].dataset.app!;
+      tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+      root.querySelectorAll<HTMLElement>('[data-shot]').forEach(el => (el.hidden = el.dataset.shot !== id));
+      root.querySelectorAll<HTMLElement>('[data-props]').forEach(el => (el.hidden = el.dataset.props !== id));
+      root.querySelectorAll<HTMLElement>('[data-row]').forEach(el => el.classList.toggle('on', el.dataset.row === id));
+      dev.setAttribute('aria-labelledby', tabs[i].id);
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => go(i));
+      t.addEventListener('keydown', e => {
+        const d = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+        if (d) { e.preventDefault(); go((i + d + tabs.length) % tabs.length, true); }
+      });
+    });
+  });
+</script>

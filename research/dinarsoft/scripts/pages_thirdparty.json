@@ -1,0 +1,783 @@
+[
+ {
+  "id": "tp-2003-ppcmag-nominations",
+  "ts": "20031121173312",
+  "url": "http://www.pocketpcmag.com/Awards/category.asp?catid=45",
+  "owner": "third party (Pocket PC Magazine)",
+  "shows": "Best Software Awards 2003 nominations, Utilities: HandyMenu nominated (Today-screen Plug-in)",
+  "crops": [
+   {
+    "name": "handymenu",
+    "rx": "HandyMenu",
+    "up": 1
+   }
+  ],
+  "privacy": "Full page lists other developers' contact emails; DinarSoft entries show [company address on a free provider, redacted] (company address on a free provider)"
+ },
+ {
+  "id": "tp-2004-04-pocketpclife-handymenu",
+  "ts": "20040525130844",
+  "url": "http://www.pocketpclife.co.uk/featureddetails.asp?article=508",
+  "owner": "third party (Pocket PC Life)",
+  "shows": "HandyMenu V.2.0 review by Tim Hillebrand, 5 of 5 stars",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "HandyMenu V\\.?\\s?2"
+   }
+  ],
+  "privacy": "Shows [company address on a free provider, redacted] in the review"
+ },
+ {
+  "id": "tp-2004-04-pocketpclife-handyswitcher",
+  "ts": "20040926050629",
+  "url": "http://www.pocketpclife.co.uk/featureddetails.asp?article=509",
+  "owner": "third party (Pocket PC Life)",
+  "shows": "Handy Switcher V 2.0 review by Tim Hillebrand, 4 of 5 stars",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Handy\\s?Switcher V"
+   }
+  ],
+  "privacy": "Shows [company address on a free provider, redacted] in the review"
+ },
+ {
+  "id": "tp-2004-07-geekzone-memmaid",
+  "ts": "20040804041154",
+  "url": "http://www.geekzone.co.nz/content.asp?contentid=2977",
+  "owner": "third party (Geekzone)",
+  "shows": "MemMaid for Pocket PC review by M Freitas",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid for Pocket PC review"
+   }
+  ]
+ },
+ {
+  "id": "tp-2004-07-geekzone-handymenu",
+  "ts": "20040803112847",
+  "url": "http://www.geekzone.co.nz/content.asp?contentid=3052",
+  "owner": "third party (Geekzone)",
+  "shows": "HandyMenu review by M Freitas",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "HandyMenu review"
+   }
+  ]
+ },
+ {
+  "id": "tp-2004-07-pocketpcdubai-memmaid",
+  "ts": "20040806143825",
+  "url": "http://www.pocketpcdubai.com/DinarSoft/memmaid_review.html",
+  "owner": "third party (Pocket PC Dubai)",
+  "shows": "MemMaid 1.2 review by Mabini",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2004-ppcmag-nominations",
+  "ts": "20040810215241",
+  "url": "http://www.pocketpcmag.com/awards/category_2004.asp?catid=45",
+  "owner": "third party (Pocket PC Magazine)",
+  "shows": "Best Software Awards 2004 nominations, Utilities: MemMaid, HandyMenu, HandySwitcher",
+  "crops": [
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   },
+   {
+    "name": "handymenu",
+    "rx": "HandyMenu",
+    "up": 1
+   },
+   {
+    "name": "handyswitcher",
+    "rx": "Handy\\s?Switcher",
+    "up": 1
+   }
+  ],
+  "privacy": "Full page lists other developers' contact emails; DinarSoft entries show [company address on a free provider, redacted]"
+ },
+ {
+  "id": "tp-2004-09-ppcthoughts-handymenu",
+  "ts": "20050309212034",
+  "url": "http://www.pocketpcthoughts.com/forums/viewtopic.php?t=31227",
+  "owner": "third party (Pocket PC Thoughts)",
+  "shows": "All Tapped Out? DinarSoft's HandyMenu v2.5 Reviewed, by Doug Raeburn",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "All Tapped Out"
+   }
+  ]
+ },
+ {
+  "id": "tp-2004-09-emobie-memmaid",
+  "ts": "20041221174606",
+  "url": "http://www.emobie.com/featureddetails.asp?article=589",
+  "owner": "third party (eMobie)",
+  "shows": "Dinar Soft's MemMaid Reviewed, by Russ Terrell, 5 of 5 stars",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid Reviewed"
+   }
+  ]
+ },
+ {
+  "id": "tp-2004-11-pocketpcreviews-memmaid",
+  "ts": "20041109070117",
+  "url": "http://www.pocketpcreviews.net/reviews/112004/memmaid.htm",
+  "owner": "third party (PocketPC Reviews)",
+  "shows": "MemMaid 1.3 from DinarSoft review",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid 1\\.3"
+   }
+  ]
+ },
+ {
+  "id": "tp-2005-01-pocketnow-memmaid",
+  "ts": "20050207042826",
+  "url": "http://www.pocketnow.com/index.php?a=portal_detail&t=reviews&id=547",
+  "owner": "third party (Pocketnow)",
+  "shows": "Dinarsoft's MemMaid v1.4 review by Tim Adams",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid v1\\.4"
+   }
+  ]
+ },
+ {
+  "id": "tp-2005-03-aximsite-taptext",
+  "ts": "20050307020422",
+  "url": "http://www.aximsite.com/articles/link.php?id=228",
+  "owner": "third party (AximSite)",
+  "shows": "Tap Text staff review by Jim McGowan, 4 of 5 stars",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Tap\\s?Text"
+   }
+  ]
+ },
+ {
+  "id": "tp-2005-04-ppcthoughts-taptext",
+  "ts": "20050430072152",
+  "url": "http://www.pocketpcthoughts.com/forums/viewtopic.php?t=38753",
+  "owner": "third party (Pocket PC Thoughts)",
+  "shows": "DinarSoft TapText 1.0: Repetitive Text Entry is Less Repetitive, by John Walkosak",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Repetitive Text Entry"
+   }
+  ]
+ },
+ {
+  "id": "tp-2005-06-pda247-memmaid",
+  "ts": "20060406134223",
+  "url": "http://www.clieuk.co.uk/memmaid.shtml",
+  "owner": "third party (PDA247)",
+  "shows": "MemMaid review by Neil Brown",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2005-ppcmag-nominations",
+  "ts": "20051105095814",
+  "url": "http://pocketpcmag.com/awards/category_2005.asp?catid=45",
+  "owner": "third party (Pocket PC Magazine)",
+  "shows": "Best Software Awards 2005 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+  "crops": [
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   },
+   {
+    "name": "taptext",
+    "rx": "TapText",
+    "up": 1
+   },
+   {
+    "name": "handymenu",
+    "rx": "HandyMenu",
+    "up": 1
+   },
+   {
+    "name": "handyswitcher",
+    "rx": "Handy\\s?Switcher",
+    "up": 1
+   }
+  ],
+  "privacy": "Full page lists other developers' contact emails; DinarSoft entries show [company address on a free provider, redacted]"
+ },
+ {
+  "id": "tp-2005-smartphonemag-winners",
+  "ts": "20110716095947",
+  "url": "http://www.smartphonemag.com/awards/winners_ppc_2005.html",
+  "owner": "third party (Smartphone & Pocket PC magazine)",
+  "shows": "Best Software Awards 2005 winners and finalists: MemMaid finalist, Utilities: Maintenance",
+  "crops": [
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-03-pdablast-handyswitcher",
+  "ts": "20060418020419",
+  "url": "http://treo.pdablast.com/articles/2006/3/2006327-HandySwitcher-Task-Management-for.html",
+  "owner": "third party (pdaBlast)",
+  "shows": "HandySwitcher Task Management for Your Pocket PC, staff review",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "HandySwitcher Task Management"
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-07-jamm-memmaid",
+  "ts": "20061101030035",
+  "url": "http://justanothermobilemonday.com/Wordpress/2006/07/30/review-short-take-on-memmaid-172/",
+  "owner": "third party (Just Another Mobile Monday)",
+  "shows": "Review - Short Take on MemMaid 1.72, by PatrickJ",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Short Take on MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-08-ppcthoughts-taptext",
+  "ts": "20061118233130",
+  "url": "http://www.pocketpcthoughts.com/forums/viewtopic.php?t=49767",
+  "owner": "third party (Pocket PC Thoughts)",
+  "shows": "Speed Up Text Entry With TapText, by Brad Adrian",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Speed Up Text Entry"
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-ppcmag-nominations",
+  "ts": "20060901003358",
+  "url": "http://www.pocketpcmag.com/awards/category_2006.asp?catid=45",
+  "owner": "third party (Pocket PC Magazine)",
+  "shows": "Best Software Awards 2006 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+  "crops": [
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   },
+   {
+    "name": "taptext",
+    "rx": "TapText",
+    "up": 1
+   },
+   {
+    "name": "handymenu",
+    "rx": "HandyMenu",
+    "up": 1
+   },
+   {
+    "name": "handyswitcher",
+    "rx": "Handy\\s?Switcher",
+    "up": 1
+   }
+  ],
+  "privacy": "Full page lists other developers' contact emails; DinarSoft entries show support@dinarsoft.com (business)"
+ },
+ {
+  "id": "tp-2006-09-tucows-memmaid",
+  "ts": "20060917031341",
+  "url": "http://www.tucows.com/article/1127",
+  "owner": "third party (Tucows)",
+  "shows": "Shareware Spotlight: MemMaid, by Michael E. Callahan (Dr. File Finder)",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-smartphonemag-winners",
+  "ts": "20111005155856",
+  "url": "http://www.smartphonemag.com/awards/winners_ppc_2006.html",
+  "owner": "third party (Smartphone & Pocket PC magazine)",
+  "shows": "Best Software Awards 2006 winners, finalists and nominees: MemMaid finalist, Maintenance",
+  "crops": [
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-10-tucows-favorite",
+  "ts": "20071212153437",
+  "url": "http://www.tucows.com/article/1128",
+  "owner": "third party (Tucows)",
+  "shows": "Favorite - MemMaid (Dr. File Finder Favorites)",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-01-pocketland-es-memmaid",
+  "ts": "20080204015352",
+  "url": "http://pocketland.es/showstory.php?id=335&index=1",
+  "owner": "third party (Pocketland.es)",
+  "shows": "El orden que debe reinar (MemMaid review, Spanish)",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "orden que debe reinar"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-01-pocketland-net-memmaid",
+  "ts": "20120301210538",
+  "url": "http://www.pocketland.net/showstory.php?id=329&index=1",
+  "owner": "third party (Pocketland.net)",
+  "shows": "MemMaid Cleans House (MemMaid review, English)",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-01-technologyatplay-memmaid",
+  "ts": "20070128232324",
+  "url": "http://www.technologyatplay.com/main/tap/reviews/memmaid/review-memmaid.asp",
+  "owner": "third party (Technology at Play)",
+  "shows": "MemMaid by Dinarsoft review",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid by Dinarsoft"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-06-gadgetmix-handyswitcher3",
+  "ts": "20070627171617",
+  "url": "http://www.gadgetmix.com/reviews/hswitcher3/handyswitcher3.htm",
+  "owner": "third party (GadgetMix)",
+  "shows": "Dinarsoft HandySwitcher 3 Reviewed!",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "HandySwitcher 3"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-05-clintonfitch-memmaid",
+  "ts": "20070519052643",
+  "url": "http://www.clintonfitch.com/reviews/dinarsoft/memmaid/default.asp",
+  "owner": "third party (ClintonFitch.com)",
+  "shows": "Review of DinarSoft's MemMaid by Judie Hughes",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Review of DinarSoft"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-07-mobileview-memmaid",
+  "ts": "20071013202109",
+  "url": "http://mobile-view.org/index.php?option=com_content&task=view&id=63&Itemid=1",
+  "owner": "third party (Mobile-View)",
+  "shows": "DinarSoft's MemMaid 2.0 Reviewed! by Allistair Lee, 10/10",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid 2\\.0 Reviewed"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-08-gadgeteer-taptext",
+  "ts": "20070911045854",
+  "url": "http://the-gadgeteer.com/review/dinarsoft_taptext_windows_mobile_utility",
+  "owner": "third party (The Gadgeteer)",
+  "shows": "DinarSoft TapText - Windows Mobile Utility, by Kent Lanum",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "DinarSoft TapText"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-09-etenblog-memmaid",
+  "ts": "20071203204158",
+  "url": "http://www.etenblog.com/2007/09/12/spring-cleaning-with-dinarsofts-memmaid/",
+  "owner": "third party (Eten Blog dot Com)",
+  "shows": "Spring Cleaning With DinarSoft's MemMaid, by Tariq Bamadhaj",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Spring Cleaning With"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-10-aximsite-memmaid2",
+  "ts": "20071012112936",
+  "url": "http://www.aximsite.com/boards/vbarticles.php?do=article&articleid=423",
+  "owner": "third party (AximSite)",
+  "shows": "MemMaid 2.0 review by Bryan Eley, 5 out of 5",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid 2\\.0"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-ppcmag-nominations",
+  "ts": "20070901005121",
+  "url": "http://www.pocketpcmag.com/awards_2007/category.asp?catid=45",
+  "owner": "third party (Pocket PC Magazine)",
+  "shows": "Best Software Awards 2007 nominations, Utilities: MemMaid, TapText, HandySwitcher, HandyMenu, HandyLauncher",
+  "crops": [
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   },
+   {
+    "name": "taptext",
+    "rx": "TapText",
+    "up": 1
+   },
+   {
+    "name": "handyswitcher",
+    "rx": "Handy\\s?Switcher",
+    "up": 1
+   },
+   {
+    "name": "handymenu",
+    "rx": "HandyMenu",
+    "up": 1
+   },
+   {
+    "name": "handylauncher",
+    "rx": "HandyLauncher",
+    "up": 1
+   }
+  ],
+  "privacy": "Full page lists other developers' contact emails; DinarSoft entries show support@dinarsoft.com (business)"
+ },
+ {
+  "id": "tp-2007-smartphonemag-winners",
+  "ts": "20111009044045",
+  "url": "http://www.smartphonemag.com/awards/winners_ppc_2007.html",
+  "owner": "third party (Smartphone & Pocket PC magazine)",
+  "shows": "Best Software Awards 2007: TapText and HandySwitcher winners, MemMaid finalist",
+  "crops": [
+   {
+    "name": "taptext",
+    "rx": "TapText",
+    "up": 1
+   },
+   {
+    "name": "handyswitcher",
+    "rx": "Handy\\s?Switcher",
+    "up": 1
+   },
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-12-etenblog-taptext",
+  "ts": "20071213193925",
+  "url": "http://www.etenblog.com/2007/12/12/dinarsoft-taptext/",
+  "owner": "third party (Eten Blog dot Com)",
+  "shows": "TapText Data With Ease, by Tariq Bamadhaj",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "TapText Data With Ease"
+   }
+  ]
+ },
+ {
+  "id": "tp-2008-smartphonemag-winners-p2",
+  "ts": "20111103115143",
+  "url": "http://www.smartphonemag.com/cms/awards/2008/winners_ppc_apps/page2",
+  "owner": "third party (Smartphone & Pocket PC magazine)",
+  "shows": "Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+  "crops": [
+   {
+    "name": "handyswitcher",
+    "rx": "Handy\\s?Switcher",
+    "up": 1
+   },
+   {
+    "name": "memmaid",
+    "rx": "MemMaid",
+    "up": 1
+   },
+   {
+    "name": "taptext",
+    "rx": "TapText",
+    "up": 1
+   },
+   {
+    "name": "handymenu",
+    "rx": "HandyMenu",
+    "up": 1
+   },
+   {
+    "name": "handylauncher",
+    "rx": "HandyLauncher",
+    "up": 1
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-gadgetmix-handymenu",
+  "ts": "20070922203027",
+  "url": "http://gadgetmix.com/reviews/handymenu/hmenu.htm",
+  "owner": "third party (GadgetMix)",
+  "shows": "HandyMenu Reviewed!",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "HandyMenu"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-gadgetmix-handyswitcher",
+  "ts": "20071006205357",
+  "url": "http://gadgetmix.com/reviews/handyswitcher/hswitcher.htm",
+  "owner": "third party (GadgetMix)",
+  "shows": "Dinarysoft HandySwitcher Reviewed!",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "HandySwitcher"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-gadgetmix-memmaid",
+  "ts": "20080105104156",
+  "url": "http://gadgetmix.com/reviews/memmaid/memmaid.htm",
+  "owner": "third party (GadgetMix)",
+  "shows": "Dinarsoft Memmaid Reviewed!",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-mypdacafe-memmaid",
+  "ts": "20071013163100",
+  "url": "http://mypdacafe.com/articles.php?id=163",
+  "owner": "third party (MyPDACafe)",
+  "shows": "MyPDACafe article on MemMaid",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-09-jamm-memmaid2-vs-sktools",
+  "ts": "20090814140049",
+  "url": "http://justanothermobilemonday.com:80/Wordpress/2007/09/03/review-memmaid-20-andvs-sktools-319/",
+  "owner": "third party (Just Another Mobile Monday)",
+  "shows": "Review: MemMaid 2.0 and/vs SKTools 3.19",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid 2\\.0"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-pocketland-de-memmaid",
+  "ts": "20080204015428",
+  "url": "http://www.pocketland.de/showstory.php?st_id=328",
+  "owner": "third party (Pocketland.de)",
+  "shows": "MemMaid review, German",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-pocketland-fr-memmaid",
+  "ts": "20070713074846",
+  "url": "http://pocketlandfrance.com/showstory.php?id=330",
+  "owner": "third party (Pocketland France)",
+  "shows": "MemMaid review, French",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-pocketland-it-memmaid",
+  "ts": "20080206034739",
+  "url": "http://pocketland.it/showstory.php?id=330",
+  "owner": "third party (Pocketland.it)",
+  "shows": "MemMaid review, Italian",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-2007-11-ppcthoughts-news",
+  "ts": "20071114001732",
+  "url": "http://www.pocketpcthoughts.com/index.php?action=expand,52574",
+  "owner": "third party (Pocket PC Thoughts)",
+  "shows": "Pocket PC Thoughts news item linked from DinarSoft's press page",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "DinarSoft|HandySwitcher|MemMaid|TapText"
+   }
+  ]
+ },
+ {
+  "id": "tp-2006-06-treocentral-shootout",
+  "ts": "20060703010455",
+  "url": "http://treocentral.com/content/Stories/839-2.htm",
+  "owner": "third party (TreoCentral)",
+  "shows": "Task Manager Shoot-Out for the 700W, page 2 (Tim Hillebrand)",
+  "crops": [
+   {
+    "name": "handyswitcher",
+    "rx": "HandySwitcher"
+   }
+  ]
+ },
+ {
+  "id": "tp-2009-01-windowscentral-memmaid",
+  "ts": "20241104112136",
+  "url": "https://www.windowscentral.com/review-memmaid-memory-management-utility",
+  "owner": "third party (Windows Central)",
+  "shows": "Review: MemMaid Memory Management Utility (2009-01-03), Wayback copy from 2024",
+  "crops": [
+   {
+    "name": "headline",
+    "rx": "Review: MemMaid"
+   }
+  ]
+ },
+ {
+  "id": "tp-chip-2006-06",
+  "ts": null,
+  "url": "file:///Users/deadpackets/workspace/DOSArchive/research/dinarsoft/chip/render/2006-06__memmaid.html",
+  "owner": "third party (CHIP magazine, Russia)",
+  "shows": "CHIP DVD 06/2006 (Russia) cover-disc page: MemMaid 1.6; rendered from the disc file, OS badge icons omitted",
+  "source": "https://archive.org/details/chip-dvd-ru-2006-06 (file data/data_htm/special/memmaid.htm inside the ISO)",
+  "crops": [
+   {
+    "name": "entry",
+    "rx": "Internet:",
+    "up": 3,
+    "maxh": 900
+   }
+  ]
+ },
+ {
+  "id": "tp-chip-2007-05",
+  "ts": null,
+  "url": "file:///Users/deadpackets/workspace/DOSArchive/research/dinarsoft/chip/render/2007-05__handy.html",
+  "owner": "third party (CHIP magazine, Russia)",
+  "shows": "CHIP DVD 05/2007 (Russia) cover-disc page: HandySwitcher 2.7; rendered from the disc file, OS badge icons omitted",
+  "source": "https://archive.org/details/chip-dvd-ru-2007-05 (file data/data_htm/pda/handy.htm inside the ISO)",
+  "crops": [
+   {
+    "name": "entry",
+    "rx": "Internet:",
+    "up": 3,
+    "maxh": 900
+   }
+  ]
+ },
+ {
+  "id": "tp-chip-2008-06",
+  "ts": null,
+  "url": "file:///Users/deadpackets/workspace/DOSArchive/research/dinarsoft/chip/render/2008-06__HandySwitcher.html",
+  "owner": "third party (CHIP magazine, Russia)",
+  "shows": "CHIP DVD 06/2008 (Russia) cover-disc page: HandySwitcher 3.1 (same page on the CHIP CD 06/2008); rendered from the disc file, OS badge icons omitted",
+  "source": "https://archive.org/details/chip-dvd-ru-2008-06 (file data/data_htm/pda/HandySwitcher.htm inside the ISO)",
+  "crops": [
+   {
+    "name": "entry",
+    "rx": "Internet:",
+    "up": 3,
+    "maxh": 900
+   }
+  ]
+ },
+ {
+  "id": "tp-chip-2008-09",
+  "ts": null,
+  "url": "file:///Users/deadpackets/workspace/DOSArchive/research/dinarsoft/chip/render/2008-09__DinarSoftMemMaid.html",
+  "owner": "third party (CHIP magazine, Russia)",
+  "shows": "CHIP DVD 09/2008 (Russia) cover-disc page: MemMaid 2.3; rendered from the disc file, OS badge icons omitted",
+  "source": "https://archive.org/details/chip-dvd-ru-2008-09 (file data/data_htm/pda/DinarSoftMemMaid.htm inside the ISO)",
+  "crops": [
+   {
+    "name": "entry",
+    "rx": "Internet:",
+    "up": 3,
+    "maxh": 900
+   }
+  ]
+ }
+]

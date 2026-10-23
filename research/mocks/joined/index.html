@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<title>Yasser Awad</title>
+<meta name="description" content="The archive and analysis of Yasser Awad's software, 1991 to 1993.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Martian+Mono:wdth,wght@75..112.5,400..600&family=Reem+Kufi:wght@400..700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="menubar">
+  <a class="mb-home" href="#top" aria-label="Yasser Awad, top of page"><span aria-hidden="true">≡</span><b>Yasser Awad</b></a>
+  <nav aria-label="Sections">
+    <a href="#collection" accesskey="c"><span class="hk">C</span>ollection</a>
+    <a href="#arabart" accesskey="a"><span class="hk">A</span>RABART</a>
+    <a href="#career" accesskey="r">Ca<span class="hk">r</span>eer</a>
+    <a href="#glossary" accesskey="g"><span class="hk">G</span>lossary</a>
+  </nav>
+  <span class="mb-years">1991 to 1993</span>
+</header>
+
+<main id="main">
+<section class="hero" id="top" aria-labelledby="h1" data-keys="Drag:Pull a letter|Esc:Rejoin|F1:Glossary">
+  <div class="hero-slot" aria-hidden="true"></div>
+  <div class="hero-name">
+    <h1 id="h1" class="split">Yasser Awad</h1>
+    <p>The archive and analysis of his software, 1991 to 1993.</p>
+  </div>
+  <div class="hero-note">
+    <p><span lang="ar" dir="rtl" class="ar-inline">الفن العربي</span> means “Arabic art”. It is the name of ARABART, the library Yasser wrote in 1991 so DOS graphics screens could write Arabic. Every letter takes one of four shapes, chosen by the letters beside it.</p>
+    <p class="hint">Pull a letter out of the word. Its neighbors change shape.</p>
+    <button class="rm-step" type="button" hidden>Show ع final</button>
+  </div>
+  <div class="word" role="group" aria-label="الفن العربي, Arabic for Arabic art, as ten letters you can pull apart">
+    <p class="word-static" lang="ar" dir="rtl">الفن العربي</p>
+    <svg class="jsvg" aria-hidden="true"></svg>
+  </div>
+</section>
+
+<section class="collection" id="collection" aria-labelledby="col-h" data-keys="Point:See inside|Enter:Details|F1:Glossary">
+  <div class="sec-head">
+    <h2 id="col-h" class="split">Fifteen programs</h2>
+    <p>Port Said, 1991 to 1993: <strong>282,675 bytes</strong> of executable code in all. Point at a name to see the program through its letters. Select it for details.</p>
+  </div>
+  <ol class="specimen" aria-label="Programs, oldest first"></ol>
+</section>
+
+<section class="exhibit" id="arabart" aria-labelledby="ex-h" data-keys="Pull:Open a joint|Tap:Term|F1:Glossary">
+  <div class="ex-top">
+    <div class="ex-title">
+      <h2 id="ex-h" class="split">ARABART</h2>
+      <p class="ex-ar" lang="ar" dir="rtl">الفن العربي</p>
+      <dl class="ex-facts">
+        <div><dt>Written in</dt><dd><button class="term" type="button" data-term="asm">Assembly</button></dd></div>
+        <div><dt>Years</dt><dd>1991 to 1993</dd></div>
+        <div><dt>Runs as</dt><dd>a <button class="term" type="button" data-term="tsr">TSR</button>, resident in memory</dd></div>
+        <div><dt>File</dt><dd>ARABART.EXE, 11,183 bytes, packed</dd></div>
+        <div><dt>Signed</dt><dd><code>Copyright (c)1993 YASSER</code></dd></div>
+      </dl>
+    </div>
+    <figure class="ex-shot">
+      <img src="../../images/arabart-demo.png" width="962" height="600" alt="ARABART Demo screen: the words الفن العربي repeated in sixteen DOS colors and three sizes, each line on its own colored rule.">
+      <figcaption>ARABART Demo, 1991. The library writes its own name.</figcaption>
+    </figure>
+  </div>
+
+  <div class="joints">
+    <div class="joint" data-open="true">
+      <h3><button class="joint-btn" type="button" aria-expanded="true" aria-controls="d0"><span class="knob" aria-hidden="true"></span><span class="jl">Glance</span><span class="jh">One sentence</span></button></h3>
+      <div class="joint-body" id="d0"><div class="jb">
+        <p class="glance">ARABART let DOS programs write Arabic on graphics screens, giving each letter the right shape for its place in a word.</p>
+      </div></div>
+    </div>
+    <div class="joint" data-open="true">
+      <h3><button class="joint-btn" type="button" aria-expanded="true" aria-controls="d1"><span class="knob" aria-hidden="true"></span><span class="jl">Story</span><span class="jh">Four sentences</span></button></h3>
+      <div class="joint-body" id="d1"><div class="jb">
+        <p>Yasser wrote ARABART in <button class="term" type="button" data-term="asm">Assembly</button> in 1991 and kept improving it until 1993. It loads once and stays in memory as a <button class="term" type="button" data-term="tsr">TSR</button>, so his other programs can call it to draw Arabic in different fonts, colors and styles. Its core trick is <button class="term" type="button" data-term="shaping">auto-shaping</button>: it looks at each letter's neighbors and picks the isolated, initial, medial or final form, the same choice the word at the top of this page makes when you pull it apart. The Demo, the Editor, the Commercial and the Basmallah all draw their Arabic through it.</p>
+      </div></div>
+    </div>
+    <div class="joint" data-open="true">
+      <h3><button class="joint-btn" type="button" aria-expanded="true" aria-controls="d2"><span class="knob" aria-hidden="true"></span><span class="jl">Code</span><span class="jh">For engineers</span></button></h3>
+      <div class="joint-body" id="d2"><div class="jb">
+        <p>ARABART.EXE is an <button class="term" type="button" data-term="exe">EXE file</button> squeezed by an <button class="term" type="button" data-term="packer">executable packer</button>. Its first instructions draw nothing. They move the packed body upward in memory one <button class="term" type="button" data-term="para">paragraph</button> at a time, then jump into the unpacker that rebuilds the real program.</p>
+        <figure class="codewin">
+          <figcaption><span>ARABART.EXE</span></figcaption>
+          <div class="code" role="table" aria-label="ARABART.EXE entry code, annotated">
+            <div class="ln" role="row"><span class="off" role="cell">00003</span><code role="cell">cld</code><span class="cm" role="cell">; string copies run forward</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00004</span><code role="cell">push es</code><span class="cm" role="cell">; remember the segments DOS gave us</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00005</span><code role="cell">push ds</code><span class="cm" role="cell"></span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00007</span><code role="cell">mov  ax, cs</code><span class="cm" role="cell">; where our own code was loaded</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">0000D</span><code role="cell">mov  dx, 02C3h</code><span class="cm" role="cell">; size of the packed body, in 16-byte paragraphs</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">0001F</span><code role="cell">mov  cx, 8</code><span class="cm" role="cell">; 8 words = one 16-byte paragraph</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00022</span><code role="cell">rep  movsw</code><span class="cm" role="cell">; copy one paragraph upward in memory</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00024</span><code role="cell">dec  bx / dec ax / dec dx</code><span class="cm" role="cell">; step back one paragraph</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00027</span><code role="cell">jns  00017</code><span class="cm" role="cell">; repeat until the whole body has moved</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00033</span><code role="cell">mov  dl, 10h</code><span class="cm" role="cell">; 16-bit buffer for the decompressor's bit reader</span></div>
+            <div class="ln" role="row"><span class="off" role="cell">00035</span><code role="cell">jmp  far 0759:04D6</code><span class="cm" role="cell">; jump into the unpacker, which rebuilds the real program</span></div>
+          </div>
+          <p class="code-foot">Offsets are positions in the load image.</p>
+        </figure>
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="career" id="career" aria-labelledby="ca-h" data-keys="Scroll:Draw the line|F1:Glossary">
+  <div class="sec-head">
+    <h2 id="ca-h" class="split">After 1993</h2>
+    <p>The DOS years were the first joint. The line runs on through Arabic software in Cairo and network software in Ottawa, and it is not finished.</p>
+  </div>
+  <div class="arc">
+    <svg class="arc-line" aria-hidden="true"><path class="arc-done"/><path class="arc-open"/></svg>
+    <span class="cursor" aria-hidden="true"></span>
+    <p class="arc-key" aria-hidden="true">Each upright stroke is as tall as the years spent there.</p>
+    <ol class="eras">
+      <li class="era">
+        <span class="node" aria-hidden="true"></span>
+        <p class="when">1991 to 1993</p>
+        <h3>Port Said</h3>
+        <p class="role">The DOS years</p>
+        <p>Fifteen programs, 282,675 bytes, written with a few books and trial and error, and no internet.</p>
+        <a class="era-link" href="#collection">See the collection</a>
+      </li>
+      <li class="era">
+        <span class="node" aria-hidden="true"></span>
+        <p class="when">Jun 1993 to Sep 1996</p>
+        <h3>Sakhr Software</h3>
+        <p class="role">Project Leader, Cairo</p>
+        <p>Key contributor to Sakhr's ArabicOffice applications.</p>
+        <ul>
+          <li>A multi-threaded printing core, shared by several products</li>
+          <li>The bilingual, multi-font text displayer in the Ustaz word processor</li>
+          <li>Common Arabic APIs for Arabic and non-Arabic Windows</li>
+          <li>The first multimedia installer framework, adopted by almost every department</li>
+        </ul>
+      </li>
+      <li class="era">
+        <span class="node" aria-hidden="true"></span>
+        <p class="when">Oct 1996 to Nov 2006</p>
+        <h3>Alcatel-Lucent</h3>
+        <p class="role">Senior Designer and team leader, OSS interfaces, Ottawa</p>
+        <p>Architect of the 5620 CORBA product.</p>
+        <ul>
+          <li>Regular member of the company's ITU conference team for JIDM</li>
+          <li>Designed jidmTester, a script-based tester adopted by Alcatel labs</li>
+          <li>A custom CORBA EventChannel, measured at twice the standard one's speed</li>
+          <li>Named on US patent publications <span class="pat">US 2007/0130192</span> and <span class="pat">US 2006/0288020</span></li>
+        </ul>
+      </li>
+      <li class="era era-open">
+        <span class="node" aria-hidden="true"></span>
+        <p class="when">Later</p>
+        <h3>Dinarsoft</h3>
+        <p class="role">Founder</p>
+        <p>Research in progress. This joint stays open until the records are verified.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="glossary" id="glossary" aria-labelledby="gl-h" data-keys="F1:Glossary|Esc:Close a term">
+  <div class="help">
+    <div class="help-head">
+      <h2 id="gl-h" class="split">Glossary</h2>
+      <p>Fifteen terms in plain English. Press F1 from anywhere on the page to come back here.</p>
+    </div>
+    <dl class="gl">
+      <div><dt id="g-tsr">TSR</dt><dd>Terminate and Stay Resident. A DOS program that ends but leaves part of itself in memory, so other programs can call it later.</dd></div>
+      <div><dt id="g-asm">Assembly</dt><dd>A language that maps almost one to one onto the processor's own instructions. Programs come out small and fast, but every step is written by hand.</dd></div>
+      <div><dt id="g-vga">VGA</dt><dd>Video Graphics Array, the IBM PC graphics standard from 1987. It gave DOS programs up to 640 by 480 pixels in 16 colors, or 320 by 200 in 256.</dd></div>
+      <div><dt id="g-bgi">BGI</dt><dd>Borland Graphics Interface, the graphics library that came with Turbo C and Borland C++. It draws lines, shapes and text on DOS screens.</dd></div>
+      <div><dt id="g-int">Interrupt</dt><dd>A signal that makes the processor pause, run a short routine, then carry on. DOS programs also ask the system for services through software interrupts.</dd></div>
+      <div><dt id="g-com">COM file</dt><dd>The simplest DOS program format: raw code and data, loaded as they are into a single 64 KB segment.</dd></div>
+      <div><dt id="g-exe">EXE file</dt><dd>The DOS program format with a header that tells DOS how to load and relocate the program, so it can grow past 64 KB.</dd></div>
+      <div><dt id="g-packer">Executable packer</dt><dd>A tool that compresses a program and puts a small unpacker in front. When the program starts, the unpacker rebuilds the original code in memory.</dd></div>
+      <div><dt id="g-shaping">Auto-shaping</dt><dd>Choosing each Arabic letter's form (isolated, initial, medial or final) from the letters beside it, automatically, as text is written.</dd></div>
+      <div><dt id="g-lig">Ligature</dt><dd>Two or more letters drawn as one shape. In Arabic, lam followed by alif becomes <span lang="ar">لا</span>.</dd></div>
+      <div><dt id="g-bcd">BCD</dt><dd>Binary-coded decimal. Each decimal digit gets its own 4 bits, which makes exact decimal arithmetic possible without a math co-processor.</dd></div>
+      <div><dt id="g-borland">Borland C++ / Turbo C</dt><dd>Borland's C and C++ compilers for DOS, each with a full-screen blue editor. Text inside Yasser's programs shows he built them with these tools.</dd></div>
+      <div><dt id="g-dosbox">DOSBox / js-dos</dt><dd>DOSBox emulates an old PC running DOS. js-dos runs DOSBox inside a web browser, which is how this archive plays the programs.</dd></div>
+      <div><dt id="g-byte">Byte</dt><dd>Eight bits: enough to store one character. All of ARABART.EXE is 11,183 bytes.</dd></div>
+      <div><dt id="g-para">Paragraph</dt><dd>In real-mode x86, a block of 16 bytes. Segment addresses count in paragraphs, so loaders and packers measure memory in them.</dd></div>
+    </dl>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <p class="foot-ar" lang="ar" dir="rtl" aria-hidden="true">الفن العربي</p>
+  <p>Built by Youssef Awad for his father.</p>
+</footer>
+
+<div class="statusline">
+  <span class="sl-keys" id="slkeys"></span>
+  <span class="sl-msg" id="slmsg" aria-live="polite"></span>
+  <button class="sl-rejoin" id="rejoin" type="button" hidden>Rejoin letters</button>
+</div>
+
+<div id="gpop" popover></div>
+
+<script src="../../data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/SplitText.min.js" defer></script>
+<script src="main.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+---
+import Window from '../shell/Window.astro';
+import { hl } from './hl';
+import '../../styles/explain.css';
+
+interface Line { off?: string; code: string; note?: string; hi?: boolean }
+interface Props { title: string; lines: Line[]; foot?: string; lang?: 'asm' | 'c' }
+const { title, lines, foot, lang = 'asm' } = Astro.props;
+const mark = lang === 'c' ? '//' : ';';
+---
+
+<figure class="k-fig listing">
+  <Window title={title} kind="editor">
+    <div class="code" tabindex="0" role="region" aria-label={`${title} listing`}>
+      {lines.map(l => (
+        <div class:list={['ln', { hi: l.hi }]}>
+          <span class="off">{l.off}</span>
+          <code set:html={hl(l.code, lang)} />
+          {l.note && <span class="cm">{mark} {l.note}</span>}
+        </div>
+      ))}
+    </div>
+  </Window>
+  {foot && <figcaption class="code-foot">{foot}</figcaption>}
+</figure>

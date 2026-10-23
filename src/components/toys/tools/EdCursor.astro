@@ -1,0 +1,150 @@
+---
+// His red cursor, live: three 2-pixel rectangles drawn in XOR mode with color 3 (FUNCTION.CPP 027A:01CF). Every move
+// draws it once where it was, which erases it, and once where it goes. Draw it once more by hand and it vanishes.
+import Window from '../../shell/Window.astro';
+import { Screen, cursorOps } from './EdBgi';
+import { fontB64, fontBytes, png } from './EdPng';
+
+interface Props { id?: string }
+const { id = 'edcursor' } = Astro.props;
+const LINES = ['Hello, World!', 'This is a text editor!', 'TEST-EDITOR, 1993'];
+const R = 1, C = 2;
+const s = new Screen(fontBytes());
+s.run(['pal', 12, 63, 0, 0]); s.run(['fill', 15]); s.run(['bar', 0, 0, 639, 479]); s.run(['view', 10, 70]); s.run(['color', 0]);
+LINES.forEach((l, r) => s.run(['text', 0, r * 12, l]));
+for (const op of cursorOps(R, C)) s.run(op);
+// The crop: 25 columns and 3 rows of his text area
+const X = 6, Y = 65, W = 208, H = 44;
+const img = png(s, X, Y, W, H);
+---
+
+<div class="ed-cu" id={id} data-edcursor data-font={fontB64()} data-lines={JSON.stringify(LINES)} data-r={R} data-c={C}>
+  <Window title="TEST-EDITOR, zoomed" kind="screen" class="ed-cu-win">
+    <div class="ed-cu-stage" data-stage>
+      <img class="ed-cu-img" src={img} width={W} height={H} alt="Three lines of his text in black on white, with the red cursor block on the second line, where the letter under it shows in cyan." data-img />
+      <canvas class="ed-cu-cv" width={W} height={H} data-cv tabindex="0" role="img" aria-label="His text area. Arrow keys move the cursor; click a letter to put the cursor there." hidden></canvas>
+    </div>
+  </Window>
+  <div class="ed-cu-side">
+    <div class="ed-cu-ctl" data-ctl hidden>
+      <button type="button" class="button k-btn" data-k="left" aria-label="Cursor left">◄</button>
+      <button type="button" class="button k-btn" data-k="right" aria-label="Cursor right">►</button>
+      <button type="button" class="button k-btn" data-k="up" aria-label="Cursor up">▲</button>
+      <button type="button" class="button k-btn" data-k="down" aria-label="Cursor down">▼</button>
+      <button type="button" class="button button--primary k-btn" data-k="xor">Draw it once more</button>
+      <button type="button" class="button k-btn" data-k="pal" aria-pressed="true">His red</button>
+    </div>
+    <div class="ed-cu-math" aria-label="The XOR arithmetic">
+      <table>
+        <caption>On the white paper</caption>
+        <tr><th>pixel</th><td><code>1111</code></td><td>15</td><td><i style="background:#fff"></i></td></tr>
+        <tr><th>XOR</th><td><code>0011</code></td><td>3</td><td></td></tr>
+        <tr class="eq"><th>=</th><td><code>1100</code></td><td>12</td><td><i data-red style="background:#f00"></i></td></tr>
+      </table>
+      <table>
+        <caption>On a black letter</caption>
+        <tr><th>pixel</th><td><code>0000</code></td><td>0</td><td><i style="background:#000"></i></td></tr>
+        <tr><th>XOR</th><td><code>0011</code></td><td>3</td><td></td></tr>
+        <tr class="eq"><th>=</th><td><code>0011</code></td><td>3</td><td><i style="background:#0aa"></i></td></tr>
+      </table>
+    </div>
+    <p class="ed-cu-say" aria-live="polite" data-say>The cursor sits on the <b>i</b> of “This”. Move it, or press <b>Draw it once more</b>.</p>
+  </div>
+</div>
+
+<style is:global>
+  .ed-cu { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .ed-cu-stage { position: relative; aspect-ratio: 208 / 44; }
+  .ed-cu-img, .ed-cu-cv { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .ed-cu-cv { cursor: text; touch-action: manipulation; }
+  .ed-cu-cv:focus-visible { outline: 3px solid var(--vga-14); outline-offset: 3px; }
+  .ed-cu-side { display: grid; gap: 16px; min-width: 0; }
+  .ed-cu-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+  .ed-cu-ctl .k-btn { min-height: 44px; }
+  .ed-cu-math { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .ed-cu-math table { border-collapse: collapse; font: 500 0.9375rem/1.4 var(--font-code); }
+  .ed-cu-math caption { padding-bottom: 6px; text-align: left; font: 600 0.875rem/1.3 var(--sans); color: var(--accent-2); }
+  .ed-cu-math th { padding: 2px 10px 2px 0; text-align: left; font-weight: 500; color: var(--ink-2); }
+  .ed-cu-math td { padding: 2px 10px 2px 0; color: var(--ink); }
+  .ed-cu-math code { font: inherit; color: inherit; letter-spacing: 0.08em; }
+  .ed-cu-math .eq td, .ed-cu-math .eq th { border-top: 2px solid var(--accent-2); color: var(--accent); font-weight: 700; }
+  .ed-cu-math i { display: inline-block; width: 22px; height: 16px; vertical-align: -3px; box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.4); }
+  .ed-cu-say { margin: 0 !important; min-height: 4.8em; font-size: 1rem !important; line-height: 1.55 !important; }
+  .ed-cu-say b { color: var(--accent); }
+  @media (max-width: 1100px) { .ed-cu { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 420px) { .ed-cu-math { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { Screen, cursorOps, fontFrom } from './EdBgi';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const X = 6, Y = 65, W = 208, H = 44;
+
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-edcursor]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const lines: string[] = JSON.parse(root.dataset.lines!);
+    const s = new Screen(fontFrom(root.dataset.font!));
+    const cv = root.querySelector<HTMLCanvasElement>('[data-cv]')!, ctx = cv.getContext('2d')!;
+    const say = root.querySelector<HTMLElement>('[data-say]')!, red = root.querySelector<HTMLElement>('[data-red]')!;
+    const palBtn = root.querySelector<HTMLButtonElement>('[data-k="pal"]')!;
+    let r = +root.dataset.r!, c = +root.dataset.c!, shown = true, his = true, busy: gsap.core.Tween | null = null;
+
+    s.run(['pal', 12, 63, 0, 0]); s.run(['fill', 15]); s.run(['bar', 0, 0, 639, 479]); s.run(['view', 10, 70]); s.run(['color', 0]);
+    lines.forEach((l, k) => s.run(['text', 0, k * 12, l]));
+    const xor = (row: number, col: number) => { for (const op of cursorOps(row, col)) s.run(op); };
+    xor(r, c);
+    const paint = () => ctx.putImageData(new ImageData(s.rgba(X, Y, W, H), W, H), 0, 0);
+    const ch = (row: number, col: number) => lines[row][col] ?? ' ';
+    const where = (row: number, col: number) => (ch(row, col) === ' ' ? `column ${col} of line ${row + 1}, on white paper` : `the <b>${ch(row, col)}</b> in line ${row + 1}`);
+
+    function move(row: number, col: number) {
+      row = Math.max(0, Math.min(2, row)); col = Math.max(0, Math.min(24, col));
+      if (row === r && col === c) return;
+      busy?.kill();
+      if (shown) xor(r, c); // draw it again where it was: gone
+      paint();
+      const from = [r, c];
+      r = row; c = col;
+      const finish = () => { xor(r, c); shown = true; paint(); };
+      if (reduce()) finish(); else busy = gsap.delayedCall(0.18, finish);
+      say.innerHTML = `Drawn again at line ${from[0] + 1}, column ${from[1]}: those pixels are back exactly as they were. Drawn once at ${where(r, c)}: there it is.`;
+    }
+    function again() {
+      busy?.kill();
+      xor(r, c); shown = !shown; paint();
+      say.innerHTML = shown ? 'Drawn a third time: back again. Odd number of draws, visible; even number, gone.' : 'Drawn twice in the same place: gone. Every pixel is back to the paper or the letter it was. Nothing was saved, nothing had to be redrawn.';
+    }
+    function palette() {
+      his = !his;
+      s.run(['pal', 12, ...(his ? [63, 0, 0] : [63, 21, 21])] as ['pal', number, number, number, number]);
+      palBtn.setAttribute('aria-pressed', String(his));
+      palBtn.textContent = his ? 'His red' : 'Standard color 12';
+      red.style.background = his ? '#f00' : '#f55';
+      say.innerHTML = his ? 'His palette makes color 12 pure red, so the cursor is a strong red block.' : 'Without his palette change, color 12 is the standard light red: a softer, pinker cursor.';
+      paint();
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-ctl] [data-k]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.k!;
+      if (k === 'left') move(r, c - 1); else if (k === 'right') move(r, c + 1);
+      else if (k === 'up') move(r - 1, c); else if (k === 'down') move(r + 1, c);
+      else if (k === 'xor') again(); else if (k === 'pal') palette();
+    }));
+    cv.addEventListener('keydown', e => {
+      const m: Record<string, [number, number]> = { ArrowLeft: [0, -1], ArrowRight: [0, 1], ArrowUp: [-1, 0], ArrowDown: [1, 0] };
+      if (m[e.key]) { e.preventDefault(); move(r + m[e.key][0], c + m[e.key][1]); }
+      else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); again(); }
+    });
+    cv.addEventListener('pointerdown', e => {
+      const b = cv.getBoundingClientRect(), px = ((e.clientX - b.left) / b.width) * W, py = ((e.clientY - b.top) / b.height) * H;
+      move(Math.floor((py - (70 - Y) + 3) / 12), Math.floor((px - (10 - X)) / 8));
+    });
+    root.querySelector<HTMLImageElement>('[data-img]')!.hidden = true;
+    cv.hidden = false;
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    paint();
+  });
+</script>

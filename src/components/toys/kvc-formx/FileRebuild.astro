@@ -1,0 +1,290 @@
+---
+// How KVC rebuilt an infected file, step by step, on the real bytes of the demo's two marked programs.
+// Every byte shown is from programs/KVC_LIVE (unscrambled) and the clean originals in research/artifacts/koko/clean.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+
+const hx = (s: string) => s.split(' ');
+// HELLO.COM: the first 64 bytes as Koko left them, and the 61 clean bytes
+const COM_IN = hx('8C C8 05 04 00 50 B8 00 01 50 33 C0 CB 08 00 4B 6F 4B 6F 20 28 31 29 0A 0D 24 4C 4C 4F 2E 43 4F 4D 2C 20 61 20 63 6C 65 61 6E 20 6C 69 74 74 6C 65 20 70 72 6F 67 72 61 6D 2E 0D 0A 24 00 00 00');
+const COM_OUT = hx('B4 09 BA 0C 01 CD 21 B8 00 4C CD 21 48 65 6C 6C 6F 21 20 49 20 61 6D 20 48 45 4C 4C 4F 2E 43 4F 4D 2C 20 61 20 63 6C 65 61 6E 20 6C 69 74 74 6C 65 20 70 72 6F 67 72 61 6D 2E 0D 0A 24');
+const SAVED = COM_OUT.slice(0, 26);
+const region = (i: number) => (i < 26 ? 'kk' : i < 61 ? 'pg' : 'pad');
+
+const COM_STEPS = [
+  { say: 'HELLO.COM as Koko left it: <b>1,844 bytes</b>. It was 61. Koko wrote 26 bytes of its own over the start and added its body, 1,780 bytes, to the end.', cells: [], rows: [] },
+  { say: '<b>Mark 1.</b> KVC reads the first 26 bytes and compares bytes 5 to 25 with its own copy of Koko’s start: a jump into the body, then Koko’s name, <code>KoKo (1)</code>. All 21 match.', cells: range(5, 26), rows: ['kvc'] },
+  { say: 'Bytes 3 and 4 say where the body starts, counted in blocks of 16 bytes: <b>4 blocks, so byte 64.</b>', cells: [3, 4], rows: [], strip: 'body' },
+  { say: '<b>Mark 2.</b> 295 bytes into the body, KVC expects Koko’s own code for putting a program back together. It is there, so this is Koko for sure. A file with only one mark is left untouched: KVC repairs only what it fully recognizes.', cells: [], rows: ['b127'] },
+  { say: 'Koko kept the 26 bytes it covered, 34 bytes into its body. <b>KVC writes them back over the start.</b>', cells: range(0, 26), rows: ['b22'], fly: true },
+  { say: 'Koko also kept the original size, 61 bytes, 24 bytes into its body. <b>KVC cuts the file there.</b> Koko’s 1,783 bytes are gone.', cells: range(61, 64), rows: ['b18'], cut: true },
+  { say: 'Last, the file’s date and time go back as they were. <b>HELLO.COM is the same 61 bytes it was before Koko, byte for byte.</b> Run it in the demo above: it says hello and nothing else.', cells: [], rows: [], done: true },
+];
+const EXE_STEPS = [
+  { say: 'GREET.EXE as Koko left it: <b>2,132 bytes</b>. It was 96. Its header, the part that tells DOS how to start the program, now starts it inside Koko’s body.', f: [] as string[] },
+  { say: '<b>Mark 1.</b> The header’s starting stack value reads <code>C0C1h</code>: the same number Koko gives as its answer in memory.', f: ['sp'] },
+  { say: 'KVC follows the header to where the program starts, byte 352. <b>Mark 2:</b> Koko’s first instructions, <code>EB 60 90 EA</code>.', f: ['cs', 'entry'] },
+  { say: '<b>Marks 3 and 4:</b> two more pieces of Koko’s code, deep in its body. Both match, so this is Koko for sure.', f: ['deep'] },
+  { say: 'Koko kept the four start values it replaced, 77 bytes past its start. <b>KVC writes them back into the header:</b> the program starts at its own first byte again, with its own stack.', f: ['sp', 'cs'], fix: true },
+  { say: 'The original file ended 256 bytes before Koko’s start, at byte 96. <b>KVC cuts it there</b> and writes the new size into the header.', f: ['size'], fix: true, cut: true },
+  { say: '<b>GREET.EXE is the same 96 bytes it was before Koko, byte for byte.</b>', f: [], fix: true, cut: true, done: true },
+];
+function range(a: number, b: number) { return Array.from({ length: b - a }, (_, i) => a + i); }
+const FIELDS = [
+  { id: 'size', at: 'bytes 2 to 5', what: 'file size', bad: '2,132', good: '96' },
+  { id: 'sp', at: 'bytes 14 to 17', what: 'where the stack starts', bad: '0004:C0C1', good: '0000:0200' },
+  { id: 'cs', at: 'bytes 20 to 23', what: 'where the program starts', bad: '0004:0100', good: '0000:0000' },
+];
+const json = (x: unknown) => JSON.stringify(x).replace(/</g, '\\u003c');
+---
+
+<div class="kxr" data-rebuild>
+  <div class="kxr-tabs" role="tablist" aria-label="Pick a file">
+    <button type="button" role="tab" class="button k-btn" id="kxr-tc" aria-controls="kxr-com" aria-selected="true">HELLO.COM</button>
+    <button type="button" role="tab" class="button k-btn" id="kxr-te" aria-controls="kxr-exe" aria-selected="false" tabindex="-1">GREET.EXE</button>
+  </div>
+
+  <div class="kxr-mode" id="kxr-com" role="tabpanel" aria-labelledby="kxr-tc" data-mode="com">
+    <script type="application/json" data-kxr-steps set:html={json(COM_STEPS)} />
+    <Window title="HELLO.COM  a COM program" kind="editor" active>
+      <p class="kxr-size"><b data-size data-from="1844" data-to="61">1,844</b> bytes <span>· clean, it was 61</span></p>
+      <div class="kxr-strip" aria-hidden="true">
+        <span class="kxr-seg kk" style="flex-grow:5"><b>Koko’s start</b> <i>26</i></span>
+        <span class="kxr-seg pg" style="flex-grow:6"><b>program</b> <i>35</i></span>
+        <span class="kxr-seg pad" style="flex-grow:1.4"><i>3</i></span>
+        <span class="kxr-seg body" style="flex-grow:42" data-body>Koko’s body <i>1,780</i></span>
+      </div>
+      <div class="kxr-scale" aria-hidden="true"><span style="width:3.5%"></span><span>to scale: Koko is 97% of the file</span></div>
+      <div class="kxr-cols">
+        <div>
+          <h4 class="kxr-h">The first 64 bytes</h4>
+          <div class="kxr-grid" data-grid role="group" aria-label="The first 64 bytes of HELLO.COM">
+            {COM_IN.map((b, i) => <span class={region(i)} data-i={i} data-in={b} data-out={COM_OUT[i] ?? ''}>{b}</span>)}
+          </div>
+          <p class="kxr-key"><span class="kk">Koko’s</span> <span class="pg">the program’s</span> <span class="pad">filler</span></p>
+        </div>
+        <div class="kxr-body">
+          <h4 class="kxr-h">What KVC reads</h4>
+          <div class="kxr-row" data-row="kvc"><span class="kxr-at">KVC’s own copy</span><span class="kxr-v">50 B8 00 01 50 33 C0 CB 08 00 <q>KoKo (1)</q> 0A 0D 24</span></div>
+          <div class="kxr-row" data-row="b18"><span class="kxr-at">body + 24</span><span class="kxr-v">3D 00 <em>= 61, the original size</em></span></div>
+          <div class="kxr-row" data-row="b22"><span class="kxr-at">body + 34</span><span class="kxr-v kxr-saved">{SAVED.map(b => <i>{b}</i>)} <em>the 26 bytes Koko covered</em></span></div>
+          <div class="kxr-row" data-row="b127"><span class="kxr-at">body + 295</span><span class="kxr-v">BF 00 01 BE 22 01 <em>Koko’s own repair code</em></span></div>
+        </div>
+      </div>
+      <div class="kxr-ctl"><Scrubber n={COM_STEPS.length} label="Step through the repair of HELLO.COM" /></div>
+      <div class="kxr-say" aria-live="polite">{COM_STEPS.map((s, i) => <div class="kxr-sl" data-i={i} data-k={i + 1}><span set:html={s.say} /></div>)}</div>
+    </Window>
+  </div>
+
+  <div class="kxr-mode" id="kxr-exe" role="tabpanel" aria-labelledby="kxr-te" data-mode="exe">
+    <script type="application/json" data-kxr-steps set:html={json(EXE_STEPS)} />
+    <Window title="GREET.EXE  an EXE program" kind="editor" active>
+      <p class="kxr-size"><b data-size data-from="2132" data-to="96">2,132</b> bytes <span>· clean, it was 96</span></p>
+      <div class="kxr-strip" aria-hidden="true">
+        <span class="kxr-seg hd" style="flex-grow:5"><b>header</b> <i>32</i></span>
+        <span class="kxr-seg pg" style="flex-grow:7"><b>program</b> <i>64</i></span>
+        <span class="kxr-seg pad" style="flex-grow:12"><b>gap</b> <i>256</i></span>
+        <span class="kxr-seg body" style="flex-grow:40" data-body>Koko’s body <i>1,780</i></span>
+      </div>
+      <div class="kxr-scale" aria-hidden="true"><span style="width:4.5%"></span><span>to scale: Koko is 95% of the file</span></div>
+      <table class="kxr-fields">
+        <caption class="kxr-h">The header fields KVC reads and repairs</caption>
+        <thead><tr><th scope="col">Field</th><th scope="col">Means</th><th scope="col">Value</th></tr></thead>
+        <tbody>
+          {FIELDS.map(f => <tr data-f={f.id}><td>{f.at}</td><td>{f.what}</td><td><b data-v data-bad={f.bad} data-good={f.good}>{f.bad}</b></td></tr>)}
+          <tr data-f="entry"><td>byte 352</td><td>the first instructions that run</td><td><b>EB 60 90 EA</b></td></tr>
+          <tr data-f="deep"><td>Koko’s body</td><td>two pieces of Koko’s code</td><td><b>20 + 20 bytes</b></td></tr>
+        </tbody>
+      </table>
+      <div class="kxr-ctl"><Scrubber n={EXE_STEPS.length} label="Step through the repair of GREET.EXE" /></div>
+      <div class="kxr-say" aria-live="polite">{EXE_STEPS.map((s, i) => <div class="kxr-sl" data-i={i} data-k={i + 1}><span set:html={s.say} /></div>)}</div>
+    </Window>
+  </div>
+</div>
+
+<style>
+  .kxr { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; min-width: 0; }
+  .kxr-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kxr-tabs [role='tab'] { font-family: var(--font-code); }
+  .kxr.is-live .kxr-mode[hidden] { display: none; }
+  .kxr-mode + .kxr-mode { margin-top: 24px; }
+  .kxr.is-live .kxr-mode + .kxr-mode { margin-top: 0; }
+  .kxr-size { margin: 0 0 12px; font: 500 1rem/1.3 var(--font-code); color: var(--ink-2); }
+  .kxr-size b { font-size: 1.75rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .kxr-strip { display: flex; height: 44px; gap: 2px; overflow: hidden; }
+  .kxr-seg { flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 6px; overflow: hidden; white-space: nowrap; font: 600 12px/1 var(--font-code); }
+  .kxr-seg i { font-style: normal; opacity: 0.75; }
+  .kxr-seg b { font-weight: inherit; }
+  .kxr-seg.kk, .kxr-grid .kk { background: var(--vga-12); color: var(--vga-0); }
+  .kxr-seg.hd { background: var(--vga-7); color: var(--vga-0); }
+  .kxr-seg.pg, .kxr-grid .pg { background: var(--vga-11); color: var(--vga-0); }
+  .kxr-seg.pad, .kxr-grid .pad { background: var(--surface-2); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .kxr-seg.body { background: repeating-linear-gradient(-45deg, var(--vga-4) 0 8px, var(--vga-12) 8px 16px); color: var(--vga-15); text-shadow: 0 1px 0 var(--vga-0), 1px 0 0 var(--vga-0); }
+  .kxr-scale { position: relative; height: 18px; margin-top: 6px; background: var(--vga-4); }
+  .kxr-scale span:first-child { position: absolute; inset: 0 auto 0 0; background: var(--vga-11); }
+  .kxr-scale span:last-child { position: absolute; right: 6px; top: 0; font: 600 11px/18px var(--font-code); color: var(--vga-15); }
+  .kxr-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px 28px; margin-top: 22px; }
+  .kxr-h { margin: 0 0 10px; font: 700 0.8125rem/1.4 var(--font-code); color: var(--accent-2); text-align: left; }
+  .kxr-grid { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; margin: 0; padding: 0; list-style: none; }
+  .kxr-grid > span { display: grid; place-items: center; aspect-ratio: 1 / 1.05; min-width: 0; font: 600 clamp(9px, 1.05vw, 12px)/1 var(--font-code); transition: background-color 0.25s, color 0.25s, opacity 0.3s; }
+  .kxr-grid > span.hl { outline: 2px solid var(--accent); outline-offset: -2px; position: relative; z-index: 1; }
+  .kxr-grid > span.cut { opacity: 0.12; }
+  .kxr-grid > span.ok { background: var(--vga-10); color: var(--vga-0); }
+  .kxr-key { display: flex; gap: 14px; margin-top: 8px; font: 600 11px/1 var(--font-code); }
+  .kxr-key span { padding: 4px 6px; }
+  .kxr-body { display: grid; align-content: start; gap: 8px; }
+  .kxr-row { display: grid; grid-template-columns: 10ch minmax(0, 1fr); gap: 10px; padding: 8px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow 0.2s; }
+  .kxr-row.hl { box-shadow: inset 0 0 0 2px var(--accent); }
+  .kxr-at { font: 700 12px/1.5 var(--font-code); color: var(--accent-2); }
+  .kxr-v { font: 600 12px/1.5 var(--font-code); color: var(--ink); overflow-wrap: anywhere; }
+  .kxr-v q { quotes: '"' '"'; color: var(--accent); }
+  .kxr-v em { display: block; font: 400 0.8125rem/1.4 var(--sans); color: var(--ink-2); }
+  .kxr-saved i { font-style: normal; margin-right: 0.6ch; display: inline-block; }
+  .kxr-fields { width: 100%; margin-top: 22px; border-collapse: collapse; font: 500 0.875rem/1.4 var(--font-code); }
+  .kxr-fields th { text-align: left; padding: 6px 10px 6px 0; color: var(--accent-2); border-bottom: 2px solid var(--accent-2); font-size: 0.75rem; }
+  .kxr-fields td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--rule); color: var(--ink); }
+  .kxr-fields td:nth-child(2) { font-family: var(--sans); color: var(--ink-2); }
+  .kxr-fields b { color: var(--accent); white-space: nowrap; }
+  .kxr-fields tr.hl td { background: color-mix(in oklch, var(--accent-2) 22%, transparent); }
+  .kxr-fields b.good { color: var(--vga-10); }
+  .kxr-ctl { margin-top: 22px; }
+  .kxr-say { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .kxr-say .kxr-sl { display: grid; grid-template-columns: 4.5ch 1fr; gap: 10px; padding: 6px 8px; font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+  .kxr-say .kxr-sl::before { content: attr(data-k); font: 600 0.8125rem/1.8 var(--font-code); color: var(--accent-2); }
+  .kxr-say :global(b) { color: var(--ink); }
+  .kxr-say :global(code) { font: 500 0.875em var(--font-code); color: var(--accent); }
+  .kxr.is-live .kxr-say .kxr-sl:not(.now) { display: none; }
+  .kxr.is-live .kxr-say .kxr-sl { font-size: 1rem; color: var(--ink); min-height: 4.6em; }
+  .kxr.is-live .kxr-say .kxr-sl::before { content: attr(data-k) '/' attr(data-n); }
+  :global(.kxr-fly) { position: fixed; z-index: 50; display: grid; place-items: center; font: 600 12px/1 var(--font-code); background: var(--vga-11); color: var(--vga-0); pointer-events: none; }
+  @media (max-width: 860px) { .kxr-cols { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) {
+    .kxr-seg { font-size: 10px; padding: 0 3px; }
+    .kxr-seg.pad i { display: none; }
+    .kxr-seg:not(.body) b { display: none; }
+    .kxr-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    .kxr-grid > span { font-size: 12px; }
+    .kxr-fields { font-size: 0.8125rem; }
+    .kxr-fields td:nth-child(2) { display: none; }
+    .kxr-fields th:nth-child(2) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .kxr-grid > span, .kxr-row { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type ComStep = { say: string; cells: number[]; rows: string[]; strip?: string; fly?: boolean; cut?: boolean; done?: boolean };
+  type ExeStep = { say: string; f: string[]; fix?: boolean; cut?: boolean; done?: boolean };
+
+  document.querySelectorAll<HTMLElement>('[data-rebuild]').forEach(root => {
+    const panes = [...root.querySelectorAll<HTMLElement>('.kxr-mode')];
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+
+    function sizeTo(el: HTMLElement, cut: boolean, animate: boolean) {
+      const to = +(cut ? el.dataset.to! : el.dataset.from!), now = +el.textContent!.replace(/,/g, '');
+      if (!animate || now === to) { el.textContent = to.toLocaleString('en-US'); return; }
+      const o = { v: now };
+      gsap.to(o, { v: to, duration: 0.8, ease: 'power2.inOut', onUpdate: () => (el.textContent = Math.round(o.v).toLocaleString('en-US')) });
+    }
+    function cutBody(pane: HTMLElement, cut: boolean, animate: boolean) {
+      pane.querySelectorAll<HTMLElement>('.kxr-seg.body, .kxr-seg.pad').forEach(seg => {
+        seg.dataset.grow ??= seg.style.flexGrow;
+        gsap.to(seg, { flexGrow: cut ? 0 : +seg.dataset.grow, opacity: cut ? 0 : 1, duration: animate ? 0.7 : 0, ease: 'power3.inOut', overwrite: true });
+      });
+      sizeTo(pane.querySelector<HTMLElement>('[data-size]')!, cut, animate);
+      pane.querySelector<HTMLElement>('.kxr-scale span')!.style.width = cut ? '100%' : '';
+      pane.querySelector<HTMLElement>('.kxr-scale span:last-child')!.textContent = cut ? 'to scale: only the program' : `to scale: Koko is ${pane.dataset.mode === 'com' ? 97 : 95}% of the file`;
+    }
+
+    function wireCom(pane: HTMLElement) {
+      const steps: ComStep[] = JSON.parse(pane.querySelector('[data-kxr-steps]')!.textContent!);
+      const cells = [...pane.querySelectorAll<HTMLElement>('[data-grid] > span')];
+      const rows = [...pane.querySelectorAll<HTMLElement>('[data-row]')];
+      const saved = [...pane.querySelectorAll<HTMLElement>('.kxr-saved i')];
+      const says = [...pane.querySelectorAll<HTMLElement>('.kxr-say .kxr-sl')];
+      says.forEach(li => (li.dataset.n = String(steps.length)));
+      let last = 0;
+      const fixed = (on: boolean) => cells.forEach((c, i) => {
+        const v = on ? c.dataset.out || c.dataset.in! : c.dataset.in!;
+        c.textContent = v;
+        c.className = on ? (i < 61 ? 'pg' : 'pad') : (i < 26 ? 'kk' : i < 61 ? 'pg' : 'pad');
+      });
+      function fly(done: () => void) {
+        const layer = document.body;
+        const tl = gsap.timeline({ onComplete: done });
+        saved.forEach((s, i) => {
+          const a = s.getBoundingClientRect(), b = cells[i].getBoundingClientRect();
+          const d = Object.assign(document.createElement('span'), { className: 'kxr-fly', textContent: s.textContent });
+          Object.assign(d.style, { left: `${a.left}px`, top: `${a.top}px`, width: `${Math.max(a.width, 18)}px`, height: `${a.height}px` });
+          layer.append(d);
+          tl.to(d, { x: b.left - a.left, y: b.top - a.top, width: b.width, height: b.height, duration: 0.6, ease: 'power3.inOut', onComplete: () => { d.remove(); cells[i].textContent = cells[i].dataset.out!; cells[i].className = 'pg'; } }, i * 0.025);
+        });
+        // Scrolling or a resize mid-flight would leave strays behind
+        tl.eventCallback('onInterrupt', () => document.querySelectorAll('.kxr-fly').forEach(n => n.remove()));
+      }
+      const show = (i: number, how: How) => {
+        const s = steps[i], anim = how !== 'jump' && how !== 'scrub' && !reduce();
+        cells.forEach((c, k) => { c.classList.toggle('hl', s.cells.includes(k)); });
+        rows.forEach(r => r.classList.toggle('hl', s.rows.includes(r.dataset.row!)));
+        says.forEach((li, k) => li.classList.toggle('now', k === i));
+        const after = i >= 4, cut = i >= 5;
+        if (s.fly && anim && i === last + 1) { fixed(false); cells.forEach(c => c.classList.toggle('hl', s.cells.includes(+c.dataset.i!))); fly(() => {}); }
+        else fixed(after);
+        cells.forEach((c, k) => c.classList.toggle('cut', cut && k >= 61));
+        cells.forEach((c, k) => c.classList.toggle('ok', !!s.done && k < 61));
+        cutBody(pane, cut, anim);
+        last = i;
+      };
+      return scrubber(pane.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 2.4 });
+    }
+
+    function wireExe(pane: HTMLElement) {
+      const steps: ExeStep[] = JSON.parse(pane.querySelector('[data-kxr-steps]')!.textContent!);
+      const trs = [...pane.querySelectorAll<HTMLElement>('tr[data-f]')];
+      const says = [...pane.querySelectorAll<HTMLElement>('.kxr-say .kxr-sl')];
+      says.forEach(li => (li.dataset.n = String(steps.length)));
+      const show = (i: number, how: How) => {
+        const s = steps[i], anim = how !== 'jump' && how !== 'scrub' && !reduce();
+        trs.forEach(tr => {
+          const f = tr.dataset.f!, v = tr.querySelector<HTMLElement>('[data-v]');
+          tr.classList.toggle('hl', s.f.includes(f));
+          if (!v) return;
+          const good = !!s.fix && (f !== 'size' || !!s.cut);
+          const text = good ? v.dataset.good! : v.dataset.bad!;
+          if (v.textContent !== text) {
+            v.textContent = text;
+            v.classList.toggle('good', good);
+            if (anim) gsap.fromTo(v, { opacity: 0, y: -8 }, { opacity: 1, y: 0, duration: 0.45, ease: 'expo.out' });
+          }
+        });
+        says.forEach((li, k) => li.classList.toggle('now', k === i));
+        cutBody(pane, !!s.cut, anim);
+      };
+      return scrubber(pane.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 2.4 });
+    }
+
+    const scrubs = [wireCom(panes[0]), wireExe(panes[1])];
+    scrubs.forEach(s => s.go(0, 'jump'));
+    const pick = (t: HTMLButtonElement) => {
+      tabs.forEach((x, k) => {
+        const on = x === t;
+        x.setAttribute('aria-selected', String(on));
+        x.tabIndex = on ? 0 : -1;
+        panes[k].hidden = !on;
+        if (!on) scrubs[k].pause();
+      });
+    };
+    tabs.forEach(t => t.addEventListener('click', () => pick(t)));
+    root.querySelector('[role=tablist]')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key;
+      if (k !== 'ArrowLeft' && k !== 'ArrowRight') return;
+      const t = tabs[(tabs.indexOf(document.activeElement as HTMLButtonElement) + 1) % 2];
+      pick(t); t.focus();
+    });
+    root.classList.add('is-live');
+    pick(tabs[0]);
+  });
+</script>

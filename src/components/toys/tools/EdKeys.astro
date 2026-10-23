@@ -1,0 +1,100 @@
+---
+// EDITOR.CPP's main loop: bioskey(0), then a switch with 22 cases. Borland C++ turned that switch into a table inside
+// the code at 0262:0135 (22 keys, then 22 handler addresses 44 bytes later) and a five-instruction search. Press a key
+// and watch the search run. The table is decoded from the unpacked EDITOR.EXE.
+import CodeStepper from '../CodeStepper.astro';
+import { KEYS, trace, ASM, C } from './EdKeyTable';
+
+interface Props { id?: string; start?: number }
+const { id = 'edkeys', start = 12 } = Astro.props;
+const steps = trace(start);
+const PICK = [12, 17, 14, 15, 11, 16, 13, 18, 5, 3, 2, 20, 19, 1, 8, 9, 10, 6, 7, 4, 0, 21, -1];
+---
+
+<CodeStepper id={id} title="EDITOR.EXE  main, 0262" cTitle="EDITOR.CPP, as C" asm={ASM} c={C} steps={steps} speed={0.32}>
+  <div slot="visual" class="ed-ky" data-edkeys data-key={start}>
+    <div class="ed-ky-pick" role="group" aria-label="Press a key for his editor" data-pick hidden>
+      {PICK.map(i => (
+        <button type="button" class="button k-btn" data-i={i} aria-pressed={String(i === start)}>{i < 0 ? 'a letter' : KEYS[i].label}</button>
+      ))}
+    </div>
+    <ol class="ed-ky-table" aria-label="The table at 0262:0135: 22 keys, then 22 addresses">
+      {KEYS.map((k, i) => (
+        <li data-i={i} class:list={{ hit: i === start }}>
+          <span class="ed-ky-at">{(0x135 + 2 * i).toString(16).toUpperCase().padStart(4, '0')}</span>
+          <b>{k.code}h</b><span class="ed-ky-lab">{k.label}</span>
+          <span class="ed-ky-does">{k.does}</span>
+          <span class="ed-ky-to"><small>{(0x161 + 2 * i).toString(16).toUpperCase().padStart(4, '0')}: </small><code>{k.to}</code></span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .ed-ky { display: grid; gap: 16px; }
+  .ed-ky-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ed-ky-pick .k-btn { min-height: 44px; padding: 0 12px; font-size: 0.9375rem; box-shadow: 3px 3px 0 var(--black); }
+  .ed-ky ol.ed-ky-table, .writeup .ed-ky ol.ed-ky-table { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-flow: column; grid-template-rows: repeat(11, auto); gap: 2px 18px; margin: 0; padding: 0; list-style: none; }
+  .ed-ky-table li { display: grid; grid-template-columns: 4.5ch 6ch 10ch minmax(0, 1fr) auto; column-gap: 1ch; align-items: baseline; padding: 3px 8px; max-width: none !important; font: 500 12.5px/1.45 var(--font-code) !important; color: var(--ink-2); background: var(--surface-2); transition: background-color 0.12s, color 0.12s; }
+  .ed-ky-table li::marker { content: none; }
+  .ed-ky-table b { color: var(--accent); font-weight: 700; }
+  .ed-ky-lab { color: var(--ink); font-family: var(--sans); font-size: 0.875rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ed-ky-at { color: color-mix(in oklch, var(--accent-2) 70%, transparent); }
+  .ed-ky-to small { font: inherit; color: color-mix(in oklch, var(--accent-2) 70%, transparent); }
+  .ed-ky-to code { font: inherit; color: var(--accent-2); }
+  .ed-ky-does { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--sans); font-size: 0.8125rem; color: var(--ink-2); }
+  .ed-ky-table li.look { background: var(--accent-2); color: var(--surface); }
+  .ed-ky-table li.look :is(b, span, code, small) { color: var(--surface); }
+  .ed-ky-table li.miss { opacity: 0.55; }
+  .ed-ky-table li.hit { background: var(--accent); color: var(--surface); opacity: 1; }
+  .ed-ky-table li.hit :is(b, span, code, small) { color: var(--surface); }
+  @media (max-width: 760px) {
+    .ed-ky ol.ed-ky-table, .writeup .ed-ky ol.ed-ky-table { grid-template-columns: minmax(0, 1fr); grid-auto-flow: row; grid-template-rows: none; }
+    .ed-ky-pick .k-btn { flex: 1 1 auto; }
+  }
+  @media (max-width: 560px) {
+    .ed-ky-table li { grid-template-columns: 6ch minmax(0, 1fr) auto; }
+    .ed-ky-at, .ed-ky-does, .ed-ky-to small { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .ed-ky-table li { transition: none; } }
+</style>
+
+<script>
+  import { KEYS, trace, fromEvent } from './EdKeyTable';
+
+  type St = { look?: number; hit?: number };
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-edkeys]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const stepper = root.closest<HTMLElement & { stepper?: { i: number; load(s: unknown[], at?: number): void } }>('[data-stepper]')!;
+    const rows = [...root.querySelectorAll<HTMLLIElement>('.ed-ky-table li')];
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-pick] button')];
+    let steps = trace(+root.dataset.key!);
+
+    const paint = (s: St) => rows.forEach((li, i) => {
+      li.classList.toggle('look', s.look === i);
+      li.classList.toggle('miss', s.look !== undefined && i < s.look);
+      li.classList.toggle('hit', s.hit === i);
+    });
+    stepper.addEventListener('stepper', e => paint((e as CustomEvent).detail.step));
+
+    function press(i: number) {
+      btns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.i! === i)));
+      steps = trace(i);
+      stepper.stepper?.load(steps, 0);
+      stepper.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+    }
+    btns.forEach(b => b.addEventListener('click', () => press(+b.dataset.i!)));
+    // A real key works too while the key buttons have focus (Tab still moves on)
+    root.querySelector('[data-pick]')!.addEventListener('keydown', e => {
+      const i = fromEvent(e as KeyboardEvent);
+      if (i === null) return;
+      e.preventDefault();
+      press(i);
+    });
+    root.querySelector<HTMLElement>('[data-pick]')!.hidden = false;
+    paint(steps[stepper.stepper ? stepper.stepper.i : steps.length - 1] as St);
+    void KEYS;
+  });
+</script>

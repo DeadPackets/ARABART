@@ -1,0 +1,129 @@
+---
+// The patent's own worked example (FIG. 5 style): 16-bit keys, one hex digit per level (node, shelf, card, port).
+// Node 1 is 4096, its shelf 1 is 4352, that shelf's card 1 is 4368, node 2 is 8192. Pick a container: the lower
+// bound is its key, the upper bound is the next container at the same level, and the card table between them lights up.
+import Window from '../../shell/Window.astro';
+
+const REC = [
+  { id: 'n1', lvl: 0, label: 'Node 1', k: 0x1000, p: true },
+  { id: 'n1s1', lvl: 1, label: 'Shelf 1', k: 0x1100, p: true },
+  { id: 'n1s1c1', lvl: 2, label: 'Card 1', k: 0x1110, p: true },
+  { id: 'n1s1c2', lvl: 2, label: 'Card 2', k: 0x1120 },
+  { id: 'n1s2', lvl: 1, label: 'Shelf 2', k: 0x1200 },
+  { id: 'n1s2c1', lvl: 2, label: 'Card 1', k: 0x1210 },
+  { id: 'n2', lvl: 0, label: 'Node 2', k: 0x2000, p: true },
+  { id: 'n2s1', lvl: 1, label: 'Shelf 1', k: 0x2100 },
+  { id: 'n2s1c1', lvl: 2, label: 'Card 1', k: 0x2110 },
+];
+const PARTS = ['node', 'shelf', 'card', 'port'];
+const hex = (k: number) => k.toString(16).toUpperCase().padStart(4, '0');
+const path = (k: number) => hex(k).split('').map((d, i) => +d && `${PARTS[i]} ${parseInt(d, 16)}`).filter(Boolean).join(' › ');
+const cards = REC.filter(r => r.lvl === 2);
+const next = (r: (typeof REC)[number]) => REC.filter(x => x.lvl === r.lvl && x.k > r.k)[0]?.k ?? null;
+const SEL = REC[0];
+const hiK = next(SEL);
+const inside = (k: number) => k > SEL.k && (hiK === null || k < hiK);
+---
+
+<div class="f5" data-fig5 data-rec={JSON.stringify(REC.map(r => [r.id, r.lvl, r.k]))}>
+  <Window title="The network, 16-bit keys" kind="panel" class="f5-tree">
+    <ul class="f5-tv" aria-label="Pick a container">
+      {REC.map(r => (
+        <li style={`--l:${r.lvl}`}>
+          {r.lvl < 2
+            ? <button type="button" class="f5-node" data-pick={r.id} aria-pressed={String(r.id === SEL.id)}><span>{r.label}</span><b class:list={{ pat: r.p }}>{r.k}</b></button>
+            : <span class="f5-leaf"><span>{r.label}</span><b class:list={{ pat: r.p }}>{r.k}</b></span>}
+        </li>
+      ))}
+    </ul>
+    <p class="f5-note"><b class="pat">Underlined</b> numbers are the patent's own example. The others follow the same rule.</p>
+  </Window>
+
+  <Window title="Card table, sorted by key" kind="editor" active class="f5-table">
+    <pre class="f5-sql" aria-live="polite"><span class="op">SELECT</span> * <span class="op">FROM</span> card
+<span class="op">WHERE</span> key &gt; <b data-lo>{SEL.k}</b><span data-hi-part>{hiK !== null ? <Fragment>
+  <span class="op">AND</span> key &lt; <b data-hi>{hiK}</b></Fragment> : null}</span></pre>
+    <ol class="f5-rows">
+      {cards.map(c => (
+        <li data-k={c.k} class:list={{ in: inside(c.k) }}>
+          <span class="f5-hex">{hex(c.k).split('').map((d, i) => <i data-part={i}>{d}</i>)}</span>
+          <b class:list={['f5-dec', { pat: c.p }]}>{c.k}</b>
+          <span class="f5-path">{path(c.k)}</span>
+        </li>
+      ))}
+    </ol>
+    <p class="f5-legend">{PARTS.map((p, i) => <span data-part={i}>{p}</span>)}</p>
+    <p class="f5-say" data-say>The cards of node 1: bigger than <b>4096</b>, node 1's own key, and smaller than <b>8192</b>, the key of the next node. <b>3 cards</b>, side by side.</p>
+  </Window>
+</div>
+
+<style>
+  .f5 { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 22px; align-items: start; }
+  .f5-tv { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .f5-tv li { padding-left: calc(var(--l) * 22px); }
+  .f5-node, .f5-leaf { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 0 10px; font: 400 1rem/1 var(--font-ui); color: var(--ink); }
+  .f5-node { background: none; border: 1px dotted transparent; cursor: pointer; text-align: left; }
+  .f5-node:hover { background: oklch(0.95 0 0); }
+  .f5-node[aria-pressed='true'] { background: var(--w-navy); color: var(--w-white); }
+  .f5-node:focus-visible { border-color: var(--w-black); outline: none; }
+  .f5-leaf { color: var(--ink-2); min-height: 36px; }
+  .f5-tv b { font: 700 0.9375rem/1 var(--font-code); font-variant-numeric: tabular-nums; }
+  .pat { text-decoration: underline 2px; text-underline-offset: 3px; }
+  .f5-note { margin-top: 12px; font-size: 0.875rem; color: var(--ink-2); }
+  .f5-sql { margin: 0 0 14px; padding: 10px 12px; background: oklch(0.97 0 0); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white); font: 500 0.9375rem/1.6 var(--font-code); color: var(--w-black); white-space: pre-wrap; min-height: 5.4em; }
+  .f5-sql .op { color: var(--w-navy); font-weight: 700; }
+  .f5-sql b { color: #b00000; font-variant-numeric: tabular-nums; }
+  .f5-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .f5-rows li { display: grid; grid-template-columns: auto 4.5ch minmax(0, 1fr); align-items: center; gap: 14px; min-height: 44px; padding: 4px 10px; background: oklch(0.96 0 0); color: var(--ink-2); transition: background-color 0.2s, color 0.2s; }
+  .f5-rows li.in { background: var(--w-navy); color: var(--w-white); }
+  .f5-hex { display: flex; gap: 2px; }
+  .f5-hex i, .f5-legend span { font: 700 1rem/1 var(--font-code); font-style: normal; padding: 5px 6px; color: var(--w-white); }
+  [data-part='0'] { background: var(--w-navy); } [data-part='1'] { background: var(--w-teal); } [data-part='2'] { background: #808000; }
+  .f5-hex i[data-part='2'], .f5-legend span[data-part='2'] { color: var(--w-black); } /* white on olive is 4.2:1 */ [data-part='3'] { background: #800000; }
+  .f5-rows li.in .f5-hex i { box-shadow: 0 0 0 1px var(--w-white); }
+  .f5-dec { font: 700 1.0625rem/1 var(--font-code); font-variant-numeric: tabular-nums; }
+  .f5-path { font: 400 0.875rem/1.3 var(--font-code); }
+  .f5-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .f5-legend span { font: 600 0.75rem/1 var(--font-code); }
+  .f5-say { margin-top: 14px; font: 500 1rem/1.55 var(--sans); color: var(--ink); min-height: 4.65em; }
+  .f5-say b { color: var(--accent); }
+  @media (max-width: 900px) { .f5 { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 420px) { .f5-rows li { grid-template-columns: auto 1fr; } .f5-path { grid-column: 1 / -1; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const LV = ['node', 'shelf', 'card'];
+
+  document.querySelectorAll<HTMLElement>('[data-fig5]').forEach(root => {
+    const rec = (JSON.parse(root.dataset.rec!) as [string, number, number][]).map(([id, lvl, k]) => ({ id, lvl, k }));
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-pick]')];
+    const rows = [...root.querySelectorAll<HTMLElement>('.f5-rows li')];
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const sql = root.querySelector<HTMLElement>('.f5-sql')!;
+    let tl: gsap.core.Timeline | null = null;
+
+    const pick = (id: string) => {
+      const r = rec.find(x => x.id === id)!;
+      const hi = rec.find(x => x.lvl === r.lvl && x.k > r.k)?.k ?? null;
+      btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pick === id)));
+      sql.innerHTML = `<span class="op">SELECT</span> * <span class="op">FROM</span> card\n<span class="op">WHERE</span> key &gt; <b>${r.k}</b>` + (hi === null ? '' : `\n  <span class="op">AND</span> key &lt; <b>${hi}</b>`);
+      const ins = rows.filter(li => { const k = +li.dataset.k!; return k > r.k && (hi === null || k < hi); });
+      const label = btns.find(b => b.dataset.pick === id)!.querySelector('span')!.textContent!;
+      const nm = r.lvl ? `${label.toLowerCase()} of node ${Math.floor(r.k / 4096)}` : label.toLowerCase();
+      const nextName = `the next ${LV[r.lvl]}`;
+      say.innerHTML = `The cards of ${nm}: bigger than <b>${r.k}</b>, its own key` + (hi === null
+        ? `. There is no ${LV[r.lvl]} after it, so the read runs to the end of the table.`
+        : `, and smaller than <b>${hi}</b>, the key of ${nextName}.`) + ` <b>${ins.length} card${ins.length === 1 ? '' : 's'}</b>, side by side.`;
+      tl?.kill();
+      rows.forEach(li => li.classList.remove('in'));
+      if (reduce()) { ins.forEach(li => li.classList.add('in')); return; }
+      tl = gsap.timeline();
+      tl.from(sql.querySelectorAll('b'), { scale: 1.6, color: '#ff0000', duration: 0.4, stagger: 0.1, ease: 'back.out(3)', transformOrigin: '50% 60%', display: 'inline-block' });
+      ins.forEach((li, k) => tl!.call(() => li.classList.add('in'), [], 0.25 + k * 0.18));
+    };
+    btns.forEach(b => b.addEventListener('click', () => pick(b.dataset.pick!)));
+  });
+</script>

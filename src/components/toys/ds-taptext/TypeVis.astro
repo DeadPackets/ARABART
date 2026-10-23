@@ -1,0 +1,40 @@
+---
+// The visual beside the typing CodeStepper (0x137F4): the page in Pocket Word and the last messages TapText posted.
+// Follows step.doc, step.q and step.n. Without JS it shows the end state.
+import { TYPE } from './steps.ts';
+const end = TYPE.steps[TYPE.steps.length - 1] as unknown as { doc: string; q: string[]; n: number };
+---
+
+<div class="ttt-tv" data-tv>
+  <div class="ttt-tv-doc" aria-label="The page in Pocket Word"><span data-doc>{end.doc}</span><i aria-hidden="true">|</i></div>
+  <div class="ttt-tv-side">
+    <p class="ttt-tv-n">Messages posted: <b data-n>{end.n}</b></p>
+    <ol class="ttt-tv-q" data-q aria-label="The last messages posted">
+      {end.q.map(m => <li>{m}</li>)}
+    </ol>
+  </div>
+</div>
+
+<style>
+  .ttt-tv { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .ttt-tv-doc { min-height: 140px; padding: 10px 12px; background: #fff; color: #000; border: 1px solid #000; font: 13px/1.4 Tahoma, Verdana, sans-serif; white-space: pre-wrap; }
+  .ttt-tv-doc i { font-style: normal; animation: ttt-tv-blink 1s steps(1) infinite; }
+  @keyframes ttt-tv-blink { 50% { opacity: 0; } }
+  .ttt-tv-n { margin: 0 0 8px; font-weight: 600; }
+  .ttt-tv-q { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; font: 600 0.8125rem var(--font-code); }
+  .ttt-tv-q :global(li) { padding: 4px 8px; background: var(--surface-2, #eee); border: 1px solid var(--rule); }
+  .ttt-tv-q :global(li:last-child) { border-left-color: var(--accent); background: color-mix(in oklch, var(--accent) 16%, transparent); }
+  @media (max-width: 640px) { .ttt-tv { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .ttt-tv-doc i { animation: none; } }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-tv]')) {
+    const doc = root.querySelector('[data-doc]')!, q = root.querySelector('[data-q]')!, n = root.querySelector('[data-n]')!;
+    root.closest('[data-stepper]')?.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { doc: string; q: string[]; n: number };
+      doc.textContent = s.doc; n.textContent = String(s.n);
+      q.replaceChildren(...s.q.map(m => Object.assign(document.createElement('li'), { textContent: m })));
+    });
+  }
+</script>

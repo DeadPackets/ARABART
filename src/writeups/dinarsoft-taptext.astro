@@ -1,0 +1,105 @@
+---
+// TapText 1.3 (2006-02-27), DinarSoft's saved-text typist for Windows Mobile, read back from the installer:
+// TapText.exe, TapTextLauncher.exe, TapTextSetup.dll and the default menu TapText.dmd.
+// Facts: research/dinarsoft/re/taptext/ (HOW.md, PROOF.md), research/dinarsoft/site/.
+import CodeStepper from '../components/toys/CodeStepper.astro';
+import TapPhone from '../components/toys/ds-taptext/TapPhone.astro';
+import FocusVis from '../components/toys/ds-taptext/FocusVis.astro';
+import TypeVis from '../components/toys/ds-taptext/TypeVis.astro';
+import MacroVis from '../components/toys/ds-taptext/MacroVis.astro';
+import MenuFile from '../components/toys/ds-taptext/MenuFile.astro';
+import TrialReg from '../components/toys/ds-taptext/TrialReg.astro';
+import FileMap from '../components/toys/ds-hijridate/FileMap.astro';
+import KeyMachine from '../components/toys/ds-hijridate/KeyMachine.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Term from '../components/explain/Term.astro';
+import { BORROW, TYPE, MACRO, MACRO_ASM, MACRO_C, keyStepper } from '../components/toys/ds-taptext/steps.ts';
+
+const KEY = keyStepper('GIVEAWAYVERSION1', 'TapText', 0x18098, 'TapText', 'Type it on any Pocket PC, and TapText is registered.');
+const grp = (k: string) => k.match(/.{1,4}/g)!.join(' - ');
+---
+
+<section id="tt-taps" class="tt">
+  <h2>Saved text, two taps away</h2>
+  <p class="lead">On a Pocket PC you typed with a stylus, one letter at a time, on a keyboard the size of a stamp. TapText put a pen on the top bar. Tap it, tap a saved text, and TapText types it into whatever program is in front.</p>
+  <p>Signatures, email replies, addresses, report outlines, meeting notes, links: his sample menus show what people typed again and again. Menus nest inside menus, each entry has an icon, and dates and times fill themselves in. Try it in Pocket Word, then switch to Notes and pick the same text. TapText takes a different road into each, and the next two sections show both.</p>
+  <TapPhone id="tt-phone" />
+  <p>Groups open beside each other as cascading menus, or one at a time, with a Previous Menu entry to go back. The setting is global, and each group can overrule it: his Quotes group always opens as one menu. Today your phone does the same job with text replacements and saved replies, built into the system. In 2005 no system offered it, so Yasser built it for every program at once.</p>
+</section>
+
+<section id="tt-focus" class="tt">
+  <h2>Borrowing another program’s focus</h2>
+  <p class="lead">To type into Pocket Word, TapText must know which box inside it has the cursor. Windows answers that question only for Pocket Word itself. So for the length of one message, TapText becomes part of Pocket Word.</p>
+  <p>Every window has a <Term id="tt-window-proc">window procedure</Term>, the one function that receives all its messages. TapText swaps in a helper of its own and sends one message that only that helper understands. The helper, now running inside Pocket Word, asks Windows for the <Term id="tt-focus">focus</Term>. Then the original procedure goes straight back. Step through it:</p>
+  <CodeStepper id="tt-focus-cs" title="TAPTEXT.EXE  borrowing the focus" asm={BORROW.asm} c={BORROW.c} steps={BORROW.steps}>
+    <FocusVis slot="visual" />
+  </CodeStepper>
+  <p>It works in any program, including ones written years after TapText, because it asks nothing of them. Today, a keyboard app on iPhone or Android gets the same answer from the system: an input connection to the text box in focus. TapText had no such door, so it made one that closed behind it.</p>
+</section>
+
+<section id="tt-keys" class="tt">
+  <h2>One key press at a time</h2>
+  <p class="lead">Once TapText knows the box, it types the way your finger would: one <Term id="tt-wm-char">WM_CHAR</Term> message per character, the same message a real key press makes.</p>
+  <p>A new line gets the character and the Enter key too, so programs that listen for either one see it. Notes is the one exception. TapText recognizes its editor by name, puts the whole text on the <Term id="tt-clipboard">clipboard</Term>, and presses Notes’ own Paste command: one message instead of hundreds. This is his General email reply going into Pocket Word:</p>
+  <CodeStepper id="tt-type-cs" title="TAPTEXT.EXE  typing" asm={TYPE.asm} c={TYPE.c} steps={TYPE.steps}>
+    <TypeVis slot="visual" />
+  </CodeStepper>
+</section>
+
+<section id="tt-macros" class="tt">
+  <h2>Dates that write themselves</h2>
+  <p class="lead">Saved text can hold <Term id="tt-macro">macros</Term>. {'{{DATE:…}}'} and {'{{TIME:…}}'} stand for the moment of typing, and {'{{TAB}}'} jumps to the next box of a form. {'{{CTRL-B}}'} and friends switch on bold, italic and underline.</p>
+  <p>His item editor offers ten date formats and five time formats, each shown on a sample date, 16 March 2005 at 3:27:57 in the afternoon. Each kind of macro is a small <Term id="tt-cplusplus-class">C++ class</Term> with its own Read and Run, so the typing loop never needs to know which kind it holds. After every macro, TapText borrows the focus again: after a {'{{TAB}}'}, the next text lands in the next box. Pick a format and step through his “Date and time” item:</p>
+  <CodeStepper id="tt-macro-cs" title="TAPTEXT.EXE  macros" asm={MACRO_ASM} c={MACRO_C} steps={MACRO.steps}>
+    <MacroVis slot="visual" />
+  </CodeStepper>
+  <p>The dates come from Windows’ own GetDateFormat and GetTimeFormat, so month and day names follow the language of the phone. Today a text expander does the same with a template variable like {'{date}'}.</p>
+</section>
+
+<section id="tt-file" class="tt">
+  <h2>Your menus in one small file</h2>
+  <p class="lead">Every menu, every saved text and every icon choice lives in one file, TapText.dmd. Version 1.3 added Import and Export, to back it up or keep one set for work and one for home.</p>
+  <p>The file is plain text, two bytes a character: a G starts a group, an I an item, an S a separator. Every title and every text follows an X and its length in five digits. So a saved text can hold any character, new lines and all, and TapText never has to search for where it ends. Pick an entry in his editor’s tree, switch one off or fold a group, and watch the file change:</p>
+  <MenuFile id="tt-menufile" />
+  <p>The file on this page is written by a few lines of code and comes out identical to the TapText.dmd in his installer, all 7,182 bytes. The icons are not in the file at all, only their numbers. All 60 sit side by side in one picture inside TapText.exe, 960 pixels wide and 16 tall. Each menu row shows its own 16-pixel slice, the same trick as a sprite sheet on a web page.</p>
+</section>
+
+<section id="tt-built" class="tt">
+  <h2>Four files in the box</h2>
+  <p class="lead">The TapText 1.3 installer is a <Term id="tt-cab">CAB file</Term> that unpacks four files on the Pocket PC, plus the instructions that say where each one goes.</p>
+  <FileMap id="tt-files" title="TapText 1.3 installer, unpacked" parts={[
+    { name: 'TapText.exe', bytes: 153088, hue: 220, what: 'The whole program: the pen on the top bar, the menus, the typing, the macros, the option pages and the key check. 67,584 bytes of ARM code and 69,632 bytes of pictures and dialogs, among them the 60-icon strip.' },
+    { name: 'TapText.dmd', bytes: 7182, hue: 30, what: 'His sample menus, for a made-up James Watt: signatures, email replies, reports, meeting notes, links and quotes, ready to change into your own.' },
+    { name: 'TapTextSetup.dll', bytes: 8192, hue: 140, what: 'Runs on the Pocket PC during the install. It closes a running TapText first, writes the start of the trial, makes the Start menu and Startup shortcuts and copies the sample menus. On uninstall it asks before deleting your menus.' },
+    { name: 'TapTextLauncher.exe', bytes: 5632, hue: 290, what: 'Starts TapText each time the Pocket PC starts. It looks up where TapText was installed, in main memory or on a storage card, and starts it from there.' },
+    { name: 'Setup instructions', bytes: 301, hue: 10, what: 'The installer’s list: which file goes to which folder, and which DLL to run.' },
+  ]} />
+  <ThenNow era="2005 to 2006" rows={[
+    { then: '<code>PostMessage(WM_CHAR)</code> into the program in front', now: '<code>commitText</code> on Android, <code>insertText</code> in an iOS keyboard', why: 'Text arrives in the box as if it were typed.' },
+    { then: 'A helper swapped into the front window for one message', now: 'The system’s input connection to the focused field', why: 'Find the box with the cursor.' },
+    { then: '<code>GetDateFormat</code> with <code>dddd, MMMM d, yyyy</code>', now: '<code>Intl.DateTimeFormat</code>, <code>DateFormatter</code>', why: 'Dates in the phone’s own language.' },
+    { then: 'A Startup shortcut to TapTextLauncher.exe', now: 'A login item, or a boot receiver on Android', why: 'Be ready the moment the device is.' },
+    { then: 'TapText.dmd with Import and Export', now: 'Text replacements synced to the cloud', why: 'Your snippets outlive the device.' },
+  ]} />
+</section>
+
+<section id="tt-key" class="tt">
+  <h2>The key and the 15 days</h2>
+  <p class="lead">TapText cost $9.99 and ran free for 15 days. A key unlocked it, and its check is generous: it tries three families of keys made for each Pocket PC, then five keys that work on every Pocket PC.</p>
+  <p>The per-device keys come from the Pocket PC Code, each family with its own secret word. The five universal keys are built in. Four are made from people’s names, Yasser’s own among them. The fifth is made from GIVEAWAYVERSION1, and it is the key this site gives you. The word goes through the same 120-number shuffle as HijriDate’s key, with the word TapText. Step through it:</p>
+  <CodeStepper id="tt-key-cs" title="TAPTEXT.EXE  the key" asm={KEY.asm} c={KEY.c} steps={KEY.steps}>
+    <KeyMachine slot="visual" id="tt-key-vis" pass="TapText" code="GIVEAWAYVERSION1" label="Built-in word" editable={false} />
+  </CodeStepper>
+  <p>TapText’s own check routine, running in an ARM emulator, accepted <code class="tt-key">{grp(KEY.key)}</code> on 100 different Pocket PCs. It accepted the per-device key for each of another 100, and it turned away all 600 look-alike keys it was given.</p>
+  <p>The 15 days use DinarSoft’s 14-byte date record, the same one HijriDate keeps in a file. TapText hides it in the <Term id="tt-registry">registry</Term>, in HKEY_CLASSES_ROOT, the crowded corner where programs register their file types, under a key named VB.register. Even the value’s name, Platform, never appears whole in the program: it is put together from Pl, at and form. Run the days forward, set the clock back, or reinstall:</p>
+  <TrialReg id="tt-trial" />
+  <p>In 2026, Yasser Awad released TapText as freeware. The <a href="#unlock">unlock section above</a> gives you the key.</p>
+</section>
+
+<style>
+  .tt :global(.k-fig), .tt :global(.k-cs), .tt :global(.tn), .tt > :global(.ttt-phone), .tt > :global(.ttt-mf), .tt > :global(.hdt-fm), .tt > :global(.ttt-tr) { margin-block: 32px; }
+  .tt :global(ol.k-code) { display: block; margin-top: 0; padding-left: 0; }
+  .tt :global(.k-code li) { font-size: inherit; line-height: inherit; max-width: none; }
+  .tt .tt-key { white-space: nowrap; }
+  .tt :global(.k-cs > .hdt-km) { padding: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+</style>

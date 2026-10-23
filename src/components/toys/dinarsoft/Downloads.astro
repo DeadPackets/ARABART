@@ -1,0 +1,108 @@
+---
+// The original installers, byte for byte as the Internet Archive kept them, each with its size, its SHA-256
+// fingerprint and its credit. Below them, a checker: pick a file you downloaded and your browser computes its
+// fingerprint on your own device (nothing is uploaded) and finds it in the list.
+import Window from '../../shell/Window.astro';
+import { downloads, apps, type AppId } from '../../../data/dinarsoft';
+import './ds.css';
+
+interface Props { only?: AppId; check?: boolean; table?: boolean }
+const { only, check = true, table = true } = Astro.props;
+const list = downloads.filter(d => !only || d.app === only);
+const kb = (n: number) => `${(n / 1024).toLocaleString('en-US', { maximumFractionDigits: 1 })} KB`;
+const name = (id: AppId) => apps.find(a => a.id === id)!.name;
+const all = downloads.map(d => ({ f: d.file, h: d.sha256, a: name(d.app), v: d.version }));
+---
+
+{table && list.length > 0 && (
+  <div class="dsl-table" role="region" aria-label="Installers">
+    <table class="dsl">
+      <thead><tr><th scope="col">File</th><th scope="col">Version</th><th scope="col">Size</th><th scope="col">SHA-256</th></tr></thead>
+      <tbody>
+        {list.map(d => (
+          <tr class:list={{ latest: d.latest }}>
+            <td data-h="File">
+              <a class="dsl-file" href={d.href} download>
+                <span class:list={['dsl-ico', `dsl-ico--${d.kind}`]} aria-hidden="true"></span>
+                <span class="dsl-fn">{d.file}</span>
+              </a>
+              <span class="dsl-for">{d.kind === 'device' ? 'Install on the Pocket PC' : 'Run on a Windows PC with ActiveSync'}{d.latest && <b> · latest</b>}</span>
+              <span class="dsl-credit"><a href={d.source} rel="noopener">{d.credit}</a></span>
+            </td>
+            <td data-h="Version">{!only && <b>{name(d.app)} </b>}{d.version}</td>
+            <td data-h="Size"><span title={`${d.bytes.toLocaleString('en-US')} bytes`}>{kb(d.bytes)}</span></td>
+            <td data-h="SHA-256"><code class="dsx-mono dsl-hash">{d.sha256}</code></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
+{check && (
+  <Window kind="dialog" title="Check a download" class="dsl-check" data-dsl-check>
+    <p class="dsl-ck-p">Pick an installer you downloaded. Your browser computes its SHA-256 fingerprint on your own device, nothing is uploaded, and looks for it among all {downloads.length} DinarSoft files. A match means every byte is the one the Internet Archive kept.</p>
+    <label class="button k-btn dsl-pick">
+      <input type="file" class="sr-only" data-dsl-file />
+      <span>Choose a file…</span>
+    </label>
+    <p class="dsl-out" data-dsl-out aria-live="polite"></p>
+    <script type="application/json" data-dsl-json set:html={JSON.stringify(all)} />
+  </Window>
+)}
+
+<style>
+  .dsl-table { overflow-x: auto; }
+  .dsl { width: 100%; border-collapse: collapse; font: 400 0.9375rem/1.4 var(--ds-verdana); background: #fff; border: 1px solid var(--xp-line); }
+  .dsl th { padding: 8px 10px; text-align: left; font: 700 0.8125rem/1.2 var(--ds-arial); color: #222; background: linear-gradient(#fbfaf6, #e6e3d6); border-bottom: 1px solid var(--xp-line); }
+  .dsl td { padding: 10px; vertical-align: top; border-bottom: 1px solid oklch(0.9 0.01 250); }
+  .dsl tr.latest td { background: oklch(0.97 0.02 90); }
+  .dsl-file { display: inline-flex; align-items: center; gap: 8px; min-height: 32px; font-weight: 700; color: var(--accent); overflow-wrap: anywhere; }
+  .dsl-ico { width: 16px; height: 16px; flex: none; border: 1px solid #6b6b6b; position: relative; }
+  .dsl-ico--device { background: linear-gradient(#e8c661, #c8a43c); border-radius: 2px; }
+  .dsl-ico--device::after { content: ''; position: absolute; left: 3px; right: 3px; top: 6px; height: 2px; background: #6b5313; }
+  .dsl-ico--desktop { background: linear-gradient(#fff 0 30%, #2e6bd4 30%); }
+  .dsl-for { display: block; font-size: 0.8125rem; color: var(--ink-2); }
+  .dsl-for b { color: var(--ds-rust); }
+  .dsl-credit { display: block; margin-top: 4px; font-size: 0.8125rem; }
+  .dsl-credit a { color: var(--ink-2); }
+  .dsl-hash { display: block; max-width: 34ch; color: #333; font-size: 0.75rem; }
+  .dsl-check { margin-top: 24px; max-width: 640px; }
+  .dsl-ck-p { font-size: 0.9375rem; line-height: 1.55; }
+  .dsl-pick { margin-top: 14px; box-shadow: none; cursor: pointer; }
+  .dsl-pick:focus-within { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .dsl-out { margin-top: 12px; min-height: 1.5em; font: 400 0.9375rem/1.5 var(--ds-verdana); }
+  .dsl-out.ok { color: #1b6b1b; }
+  .dsl-out.no { color: var(--ds-menu); }
+  .dsl-out code { overflow-wrap: anywhere; }
+
+  /* Phones: each file becomes a card */
+  @media (max-width: 760px) {
+    .dsl, .dsl tbody, .dsl tr, .dsl td { display: block; width: 100%; }
+    .dsl thead { display: none; }
+    .dsl tr { padding: 10px 12px; border-bottom: 1px solid var(--xp-line); }
+    .dsl td { padding: 3px 0; border: 0; }
+    .dsl td[data-h='Version']::before, .dsl td[data-h='Size']::before, .dsl td[data-h='SHA-256']::before { content: attr(data-h) ': '; font-weight: 700; color: #444; }
+    .dsl-hash { display: inline; max-width: none; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-dsl-check]').forEach(root => {
+    const files: { f: string; h: string; a: string; v: string }[] = JSON.parse(root.querySelector('[data-dsl-json]')!.textContent!);
+    const out = root.querySelector<HTMLElement>('[data-dsl-out]')!;
+    const input = root.querySelector<HTMLInputElement>('[data-dsl-file]')!;
+    input.addEventListener('change', async () => {
+      const f = input.files?.[0];
+      if (!f) return;
+      out.className = 'dsl-out';
+      out.textContent = `Reading ${f.name}…`;
+      const hex = [...new Uint8Array(await crypto.subtle.digest('SHA-256', await f.arrayBuffer()))].map(b => b.toString(16).padStart(2, '0')).join('');
+      const m = files.find(x => x.h === hex);
+      out.classList.add(m ? 'ok' : 'no');
+      out.innerHTML = '';
+      const code = Object.assign(document.createElement('code'), { className: 'dsx-mono', textContent: hex });
+      out.append(m ? `✔ This is ${m.f}, ${m.a} ${m.v}, byte for byte. Fingerprint: ` : `This file is not one of the ${files.length} DinarSoft installers here. Its fingerprint: `, code);
+    });
+  });
+</script>

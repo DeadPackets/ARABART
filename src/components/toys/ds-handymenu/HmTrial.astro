@@ -1,0 +1,157 @@
+---
+// The install-date record in \Windows\xintra.dat, built by his encoder (HandyMenu 3.6 0x181D4, the same function sits
+// in HandySwitcher 2.7 and HandyLauncher 3.4). Pick a date, step the encoder, then nudge any byte and watch the
+// decoder's four checks.
+import CodeStepper from '../CodeStepper.astro';
+import { dateSteps, record, check, hex, SLOT_NAMES } from './hm.ts';
+
+const Y = 2026, M = 10, D = 19;
+const steps = dateSteps(Y, M, D);
+const r = record(Y, M, D);
+const ok = check(r.bytes);
+const ASM = [
+  { off: '181F0', code: 'ldrh r1,[r0]', note: 'the year' },
+  { off: '181FC', code: 'add  r3,r1,#21', note: 'year + 21: slot 2' },
+  { off: '18204', code: 'ldrh r3,[r0,#2]', note: 'the month' },
+  { off: '18208', code: 'ldrh r0,[r0,#6]', note: 'the day' },
+  { off: '18210', code: 'add  r3,r2,#3', note: 'month × 2 + 3: slot 0' },
+  { off: '1821C', code: 'add  r3,r3,#5', note: 'day × 2 + 5: slot 3' },
+  { off: '18224', code: 'add  r3,r1,#7', note: 'year + 7: slot 1' },
+  { off: '1822C', code: 'add  r3,r2,#1', note: 'month × 2 + 1: slot 4' },
+  { off: '18238', code: 'lsl  r3,r3,#1', note: '(day + 2) × 2: slot 5' },
+  { off: '182CC', label: 'loop', code: 'ldrb sb,[r6,r4]!', note: 'one byte' },
+  { off: '182DC', code: 'add  r7,r7,sb', note: 'add it to the sum' },
+  { off: '182E8', code: 'add  r3,sb,r1', note: '+ i mod 2: the salt' },
+  { off: '182FC', code: 'blt  182C4', note: '12 bytes' },
+  { off: '18308', code: 'mov  r0,#31 / bl __rt_sdiv', note: 'sum mod 31' },
+  { off: '18338', code: 'strb r2,[r4,#12]', note: 'bytes 12 and 13: checksum' },
+];
+const C = [
+  { code: 'void encode(SYSTEMTIME *t, BYTE out[14]) {' },
+  { code: '  WORD y = t->wYear, m = t->wMonth,' },
+  { code: '       d = t->wDay;' },
+  { code: '  WORD s[6] = { m*2 + 3, y + 7, y + 21,' },
+  { code: '                d*2 + 5, m*2 + 1, (d+2)*2 };' },
+  { code: '  memcpy(out, s, 12);' },
+  { code: '  int sum = 0;' },
+  { code: '  for (int i = 0; i < 12; i++) {' },
+  { code: '    sum += out[i];' },
+  { code: '    out[i] += i % 2;', note: 'the salt' },
+  { code: '  }' },
+  { code: '  *(WORD *)(out + 12) = sum % 31;', note: 'the seal' },
+  { code: '}' },
+];
+const CHECKS = [['year', 'Both years agree'], ['month', 'Both months agree'], ['day', 'Both days agree'], ['sum', 'The checksum matches']] as const;
+---
+
+<div class="hm-tr" data-hm-trial>
+  <div class="hm-tr-ctl" hidden data-ctl>
+    <label>HandyMenu installed on <input type="date" value={`${Y}-${M}-${D}`} min="2003-01-01" max="2026-10-22" data-date /></label>
+    <p class="hm-tr-today" aria-live="polite" data-today>On October 22, 2026, HandyMenu says: <b>12 days left</b>.</p>
+  </div>
+  <CodeStepper id="hm-trial-code" title="HandyMenu.exe 3.6  the date in disguise" asm={ASM} c={C} steps={steps} speed={0.6}>
+    <div slot="visual" class="hm-tr-vis">
+      <ol class="hm-tr-slots" aria-label="The six numbers">
+        {r.shorts.map((v, i) => <li data-slot={i}><small>{SLOT_NAMES[i]}</small><b>{v}</b></li>)}
+      </ol>
+      <div class="hm-tr-file">
+        <p class="hm-tr-cap">\Windows\xintra.dat, 14 bytes. Tap a byte to change it.</p>
+        <ol class="hm-tr-bytes" aria-label="The 14 bytes of the file">
+          {r.bytes.map((b, i) => <li><button type="button" data-byte={i} aria-label={`Byte ${i}: ${hex(b, 2)}. Tap to add 1.`}>{hex(b, 2)}</button></li>)}
+        </ol>
+      </div>
+      <ul class="hm-tr-checks" aria-label="What the decoder checks" data-checks>
+        {CHECKS.map(([k, t]) => <li data-check={k} class={ok.ok[k] ? 'ok' : 'bad'}>{t}</li>)}
+      </ul>
+      <button type="button" class="button k-btn hm-tr-fix" hidden data-fix>Put the bytes back</button>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hm-tr { display: grid; gap: 16px; margin-block: 32px; }
+  .hm-tr-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; }
+  .hm-tr-ctl label { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font: 600 1rem var(--sans); color: var(--ink); }
+  .hm-tr-ctl input { min-height: 44px; padding: 0 10px; font: 500 1rem var(--sans); color: var(--ink); background: var(--surface-2); border: 1px solid var(--xp-line, #7f9db9); border-radius: 3px; }
+  .hm-tr-ctl input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hm-tr-today { margin: 0 !important; font-size: 1rem !important; color: var(--ink) !important; }
+  .hm-tr-today b { color: var(--accent); }
+  .hm-tr-vis { display: grid; gap: 16px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-tr-slots { list-style: none !important; margin: 0 !important; padding: 0 !important; display: grid !important; grid-template-columns: repeat(auto-fit, minmax(118px, 1fr)); gap: 6px !important; }
+  .hm-tr-slots li { display: grid; gap: 2px; margin: 0; padding: 8px 10px; max-width: none !important; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); transition: opacity 0.25s; }
+  .hm-tr-slots li.off { opacity: 0.3; }
+  .hm-tr-slots small { font: 500 12px/1.2 var(--font-code); color: var(--ink-2); }
+  .hm-tr-slots b { font: 700 18px/1.2 var(--font-code); color: var(--accent); }
+  .hm-tr-cap { margin: 0 0 6px !important; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  .hm-tr-bytes { list-style: none !important; margin: 0 !important; padding: 0 !important; display: grid !important; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 3px !important; }
+  .hm-tr-bytes li { margin: 0; max-width: none !important; }
+  .hm-tr-bytes button { width: 100%; min-height: 44px; padding: 0; font: 700 13px var(--font-code); color: var(--ink); background: var(--surface); border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; transition: background-color 0.25s, color 0.25s; }
+  .hm-tr-bytes button.off { color: var(--ink-2); opacity: 0.4; }
+  .hm-tr-bytes button.salt { box-shadow: inset 0 -4px 0 var(--accent-2), inset 0 0 0 1px var(--rule); }
+  .hm-tr-bytes button.ck { background: var(--accent); color: #fff; }
+  .hm-tr-bytes button.bent { background: var(--hot); color: #fff; }
+  .hm-tr-bytes button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .hm-tr-checks { list-style: none !important; margin: 0 !important; padding: 0 !important; display: grid !important; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 6px !important; }
+  .hm-tr-checks li { margin: 0; padding: 8px 10px 8px 34px; position: relative; font-size: 0.9375rem !important; line-height: 1.35 !important; max-width: none !important; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-tr-checks li::before { content: '✓'; position: absolute; left: 10px; top: 7px; font-weight: 700; color: var(--good); }
+  .hm-tr-checks li.bad { background: color-mix(in oklch, var(--hot) 14%, var(--surface)); }
+  .hm-tr-checks li.bad::before { content: '✗'; color: var(--hot); }
+  .hm-tr-fix { justify-self: start; }
+  @media (max-width: 560px) { .hm-tr-bytes { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+  @media (prefers-reduced-motion: reduce) { .hm-tr-slots li, .hm-tr-bytes button { transition: none; } }
+</style>
+
+<script>
+  import { dateSteps, record, check, hex, dayNo, type DateStep } from './hm.ts';
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-trial]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void; i: number; go(i: number): void } }>('[data-stepper]')!;
+    const slots = [...root.querySelectorAll<HTMLElement>('[data-slot]')], cells = [...root.querySelectorAll<HTMLButtonElement>('[data-byte]')];
+    const checks = [...root.querySelectorAll<HTMLElement>('[data-check]')], fix = root.querySelector<HTMLButtonElement>('[data-fix]')!;
+    const dateIn = root.querySelector<HTMLInputElement>('[data-date]')!, today = root.querySelector<HTMLElement>('[data-today]')!;
+    let date = [2026, 10, 19], bytes = record(2026, 10, 19).bytes, step: DateStep | null = null;
+
+    const verdict = () => {
+      const c = check(bytes);
+      checks.forEach(li => li.className = c.ok[li.dataset.check as keyof typeof c.ok] ? 'ok' : 'bad');
+      const good = Object.values(c.ok).every(Boolean);
+      const t = dayNo(2026, 10, 22), at = good ? dayNo(c.year[0], c.month[0], c.day[0]) : 0;
+      const left = at - t + 15;
+      today.innerHTML = !good
+        ? 'The record does not add up, so HandyMenu says: <b>this trial version has expired</b>.'
+        : t >= at && t <= at + 15 ? `On October 22, 2026, HandyMenu says: <b>${left} day${left === 1 ? '' : 's'} left</b>.` : 'On October 22, 2026, HandyMenu says: <b>this trial version has expired</b>.';
+      fix.hidden = good;
+    };
+    const paint = () => {
+      const s = step, r = record(date[0], date[1], date[2]);
+      slots.forEach((li, i) => { li.classList.toggle('off', !!s && !s.slots.includes(i)); li.querySelector('b')!.textContent = String(r.shorts[i]); });
+      cells.forEach((b, i) => {
+        const shownVal = !s || s.phase >= 2 ? bytes[i] : r.plain[i] ?? 0;
+        b.textContent = hex(shownVal, 2);
+        b.setAttribute('aria-label', `Byte ${i}: ${hex(shownVal, 2)}. Tap to add 1.`);
+        b.classList.toggle('off', !!s && (s.phase === 0 || (i >= 12 && s.phase < 3)));
+        b.classList.toggle('salt', !!s && s.phase >= 2 && i < 12 && i % 2 === 1);
+        b.classList.toggle('ck', i >= 12 && (!s || s.phase >= 3));
+        b.classList.toggle('bent', bytes[i] !== r.bytes[i]);
+      });
+      verdict();
+    };
+    cs.addEventListener('stepper', e => { step = (e as CustomEvent).detail.step as DateStep; paint(); });
+    const load = () => { bytes = record(date[0], date[1], date[2]).bytes; cs.stepper?.load(dateSteps(date[0], date[1], date[2])); };
+    dateIn.addEventListener('change', () => {
+      const v = dateIn.value.split('-').map(Number);
+      if (v.length === 3 && v[0] > 2000) { date = v; load(); }
+    });
+    cells.forEach((b, i) => b.addEventListener('click', () => {
+      bytes = bytes.slice();
+      bytes[i] = (bytes[i] + 1) & 0xff;
+      if (step && step.phase < 3) cs.stepper?.go(Number.MAX_SAFE_INTEGER);
+      paint();
+    }));
+    fix.addEventListener('click', () => { bytes = record(date[0], date[1], date[2]).bytes; paint(); });
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    paint();
+  });
+</script>

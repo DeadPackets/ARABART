@@ -1,0 +1,223 @@
+---
+// Type into one line of EDIT.EXE. Every key runs his insert routine (02D1:0C4E): a Tab becomes 8 spaces, the code
+// checks for room in the 255-byte line, fills any gap past the end with spaces, slides the rest of the line right
+// (insert mode) and writes the key. The 255 bytes are shown below the line, and his five steps light up as they run.
+import Window from '../../shell/Window.astro';
+
+interface Props { id?: string; text?: string; col?: number }
+const { id = 'egtype', text = 'Helo from EDIT', col = 3 } = Astro.props;
+const N = 24;
+const cell = (i: number) => (i < text.length ? text[i] : null);
+const STEPS = [
+  { c: "if (ch == '\\t') { n = tab; ch = ' '; }", say: 'a Tab is 8 spaces' },
+  { c: 'if (col + n - 1 >= 255) return;', say: 'is there room in the line?' },
+  { c: "if (col > len) memset(line + len, ' ', col - len);", say: 'past the end? fill the gap with spaces' },
+  { c: 'if (!overwrite || n > 1) movmem(line + col, line + col + n, 255 - col);', say: 'insert: slide the rest right' },
+  { c: 'memset(line + col, ch, n);', say: 'write the key' },
+];
+---
+
+<div class="eg-ty" id={id} data-egtype data-text={text} data-col={col}>
+  <Window title="EDIT-TEST  NONAME.TXT" kind="screen" class="eg-ty-win">
+    <div class="eg-ty-screen">
+      <p class="eg-ty-line" aria-hidden="true" data-line>{text.slice(0, col)}<span class="eg-ty-cur"></span>{text.slice(col)}</p>
+      <label class="eg-ty-cap">
+        <span class="sr-only">Type into his line. Arrow keys move the cursor, Insert switches insert and overwrite.</span>
+        <input class="eg-ty-in" data-in type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" hidden />
+      </label>
+    </div>
+  </Window>
+  <div class="eg-ty-ctl" data-ctl hidden>
+    <button type="button" class="button k-btn" data-k="tab">Tab</button>
+    <button type="button" class="button k-btn" data-k="ins" aria-pressed="false"><span data-mode>Insert</span></button>
+    <button type="button" class="button k-btn" data-k="left" aria-label="Cursor left">◄</button>
+    <button type="button" class="button k-btn" data-k="right" aria-label="Cursor right">►</button>
+    <button type="button" class="button k-btn" data-k="far">Past the end</button>
+    <button type="button" class="button k-btn" data-k="reset">Reset</button>
+  </div>
+  <div class="eg-ty-bytes" aria-hidden="true">
+    <p class="eg-ty-lab">The line in memory: <b>255 bytes</b>, one block of its own</p>
+    <ol class="eg-ty-cells" data-cells>
+      {Array.from({ length: N }, (_, i) => (
+        <li class:list={['eg-ty-c', { cur: i === col, z: !cell(i) }]}><b>{cell(i) === ' ' ? '·' : cell(i) ?? '00'}</b><small>{i}</small></li>
+      ))}
+      <li class="eg-ty-c eg-ty-more"><b>…</b></li>
+      <li class="eg-ty-c z"><b>00</b><small>254</small></li>
+    </ol>
+  </div>
+  <Window title="His insert, step by step" kind="editor" class="eg-ty-code">
+    <ol class="eg-ty-steps" data-insteps>
+      {STEPS.map(s => <li><code>{s.c}</code><span>{s.say}</span></li>)}
+    </ol>
+  </Window>
+  <p class="eg-ty-say" aria-live="polite" data-say>Click the line and type. An <b>l</b> fixes “Helo”: his code slides the rest of the line one place right, then writes the letter into the gap.</p>
+</div>
+
+<style is:global>
+  .eg-ty { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .eg-ty-screen { position: relative; min-height: 96px; padding: 22px 18px; background: var(--vga-7); cursor: text; }
+  .eg-ty-line { margin: 0 !important; max-width: none !important; font: 400 16px/24px var(--font-dos) !important; color: var(--vga-1) !important; white-space: pre; overflow: hidden; }
+  .eg-ty-cur { display: inline-block; width: 2px; height: 20px; margin-right: -2px; vertical-align: -4px; background: var(--vga-4); }
+  .eg-ty-screen:focus-within { box-shadow: inset 0 0 0 3px var(--focus); }
+  .eg-ty-screen:focus-within .eg-ty-cur { animation: eg-blink 1s steps(1) infinite; }
+  @keyframes eg-blink { 50% { opacity: 0; } }
+  .eg-ty-cap { position: absolute; inset: 0; }
+  .eg-ty-in { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; cursor: text; }
+  .eg-ty-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+  .eg-ty-ctl .k-btn { min-height: 44px; }
+  .eg-ty-lab { margin: 0 0 8px !important; font: 500 0.875rem/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  .eg-ty-lab b { color: var(--accent-2); }
+  .eg-ty ol.eg-ty-cells, .writeup .eg-ty ol.eg-ty-cells { display: flex; gap: 3px; margin: 0; padding: 0; list-style: none; }
+  .eg-ty-c { flex: 1 1 0; min-width: 0; display: grid; justify-items: center; gap: 2px; padding: 6px 0 4px; background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 45%, transparent); font-size: 1rem !important; max-width: none !important; }
+  .eg-ty-c::marker { content: none; }
+  .eg-ty-c b { font: 700 15px/1.2 var(--font-code); color: var(--ink); }
+  .eg-ty-c small { font: 500 9px/1 var(--font-code); color: var(--ink-2); }
+  .eg-ty-c.z b { color: color-mix(in oklch, var(--ink-2) 70%, transparent); font-weight: 500; font-size: 11px; line-height: 18px; }
+  .eg-ty-c.cur { box-shadow: inset 0 -4px 0 var(--vga-12), inset 0 0 0 1px var(--accent-2); }
+  .eg-ty-c.new { background: var(--accent); }
+  .eg-ty-c.new b, .eg-ty-c.new small { color: var(--surface); }
+  .eg-ty-c.pad { background: var(--accent-2); }
+  .eg-ty-c.pad b, .eg-ty-c.pad small { color: var(--surface); }
+  .eg-ty-more { flex: 0 0 auto; padding-inline: 6px; background: none; box-shadow: none; }
+  .eg-ty ol.eg-ty-steps, .writeup .eg-ty ol.eg-ty-steps { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; counter-reset: s; }
+  .eg-ty-steps li { counter-increment: s; display: grid; grid-template-columns: 2ch minmax(0, auto) 1fr; gap: 1.2ch; align-items: baseline; padding: 3px 8px; max-width: none !important; font: 500 13px/1.6 var(--font-code) !important; color: var(--ink); transition: background-color 0.15s, color 0.15s; }
+  .eg-ty-steps li::before { content: counter(s); color: var(--accent-2); }
+  .eg-ty-steps li::marker { content: none; }
+  .eg-ty-steps code { font: inherit; color: inherit; white-space: pre-wrap; }
+  .eg-ty-steps span { color: var(--ink-2); font-family: var(--sans); }
+  .eg-ty-steps li.run { background: var(--accent-2); color: var(--surface); }
+  .eg-ty-steps li.run::before, .eg-ty-steps li.run span { color: var(--surface); }
+  .eg-ty-steps li.skip { opacity: 0.45; }
+  .eg-ty-say { margin: 0 !important; min-height: 3.2em; font-size: 1.0625rem; }
+  .eg-ty-say b { color: var(--accent); }
+  @media (max-width: 760px) {
+    .eg-ty-steps li { grid-template-columns: 2ch minmax(0, 1fr); }
+    .eg-ty-steps span { grid-column: 2; font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .eg-ty-steps li { transition: none; }
+    .eg-ty-screen:focus-within .eg-ty-cur { animation: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+  const TAB = 8, SIZE = 255;
+
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-egtype]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const input = root.querySelector<HTMLInputElement>('[data-in]')!;
+    const lineEl = root.querySelector<HTMLElement>('[data-line]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-cells]')!;
+    const steps = [...root.querySelectorAll<HTMLLIElement>('[data-insteps] li')];
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const modeBtn = root.querySelector<HTMLButtonElement>('[data-k="ins"]')!;
+    const start = root.dataset.text!, startCol = +root.dataset.col!;
+    let line = new Uint8Array(SIZE), col = startCol, over = false, tl: gsap.core.Timeline | null = null;
+    const load = () => { line = new Uint8Array(SIZE); for (let i = 0; i < start.length; i++) line[i] = start.charCodeAt(i); col = startCol; };
+    const len = () => { const z = line.indexOf(0); return z < 0 ? SIZE : z; };
+    load();
+    input.hidden = false;
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+
+    // How many cells fit, and which part of the 255 bytes to show
+    let shown = 24, off = 0;
+    function cellsHTML(fresh: Set<number>, pad: Set<number>) {
+      off = Math.max(0, Math.min(col - Math.floor(shown * 0.6), SIZE - 1 - shown));
+      let h = '';
+      for (let i = off; i < off + shown; i++) {
+        const b = line[i], cls = ['eg-ty-c', i === col ? 'cur' : '', b ? '' : 'z', fresh.has(i) ? 'new' : '', pad.has(i) ? 'pad' : ''].join(' ');
+        h += `<li class="${cls}" data-i="${i}"><b>${b === 32 ? '·' : b ? esc(String.fromCharCode(b)) : '00'}</b><small>${i}</small></li>`;
+      }
+      return h + `<li class="eg-ty-c eg-ty-more"><b>…</b></li><li class="eg-ty-c${line[254] ? '' : ' z'}"><b>${line[254] ? esc(String.fromCharCode(line[254])) : '00'}</b><small>254</small></li>`;
+    }
+    function render(fresh = new Set<number>(), pad = new Set<number>()) {
+      const t = String.fromCharCode(...line.slice(0, Math.max(len(), col)).map(b => b || 32));
+      lineEl.innerHTML = `${esc(t.slice(0, col))}<span class="eg-ty-cur"></span>${esc(t.slice(col))}`;
+      list.innerHTML = cellsHTML(fresh, pad);
+    }
+    const fit = () => { shown = Math.max(8, Math.min(24, Math.floor((list.clientWidth - 70) / 30))); render(); };
+    new ResizeObserver(fit).observe(list);
+
+    function light(ran: (boolean | null)[]) {
+      tl?.kill();
+      steps.forEach(s => s.classList.remove('run', 'skip'));
+      if (reduce()) { ran.forEach((r, i) => steps[i].classList.add(r ? 'run' : 'skip')); return; }
+      tl = gsap.timeline();
+      ran.forEach((r, i) => tl!.call(() => steps[i].classList.add(r ? 'run' : 'skip'), [], i * 0.12));
+    }
+
+    function key(chIn: string) {
+      let ch = chIn, n = 1;
+      const tab = ch === '\t';
+      if (tab) { n = TAB; ch = ' '; }
+      const ran: (boolean | null)[] = [tab, null, null, null, null];
+      if (col + n - 1 >= SIZE) {
+        ran[1] = false; light(ran.slice(0, 2));
+        say.innerHTML = 'The line is full. His code checks for room first, so the key is simply not used.';
+        return;
+      }
+      ran[1] = true;
+      const L = len(), pad = new Set<number>();
+      ran[2] = col > L;
+      if (col > L) for (let i = L; i < col; i++) { line[i] = 32; pad.add(i); }
+      const moved = Math.max(0, len() - col);
+      ran[3] = !over || n > 1;
+      if (ran[3]) line.copyWithin(col + n, col, SIZE - n);
+      line.fill(ch.charCodeAt(0), col, col + n);
+      ran[4] = true;
+      const fresh = new Set(Array.from({ length: n }, (_, k) => col + k)), was = col;
+      col = Math.min(SIZE - 1, col + n);
+      render(fresh, pad);
+      light(ran);
+      // The bytes after the cursor arrive from the left, the way movmem slid them
+      if (ran[3] && !reduce()) {
+        const after = [...list.querySelectorAll<HTMLElement>('.eg-ty-c[data-i]')].filter(c => +c.dataset.i! >= was + n && +c.dataset.i! < was + n + moved);
+        const wd = (after[0]?.offsetWidth ?? 20) + 3;
+        gsap.fromTo(after.map(c => c.querySelector('b')), { x: -wd * n }, { x: 0, duration: 0.35, ease: 'power3.out' });
+        gsap.fromTo([...list.querySelectorAll('.eg-ty-c.new b')], { scale: 2, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, delay: 0.2, ease: 'back.out(2)' });
+      }
+      const what = tab ? 'A Tab: <b>8 spaces</b>, written in one go' : `Typed <b>${esc(chIn)}</b>`;
+      say.innerHTML = `${what} at column ${was}.` +
+        (ran[2] ? ` The cursor was ${pad.size} place${pad.size > 1 ? 's' : ''} past the end, so the gap filled with spaces first.` : '') +
+        (ran[3] ? (moved ? ` Insert mode: the ${moved} byte${moved > 1 ? 's' : ''} after the cursor slid ${n} place${n > 1 ? 's' : ''} right to make room.` : ' Nothing after the cursor, so nothing had to move.')
+          : ' Overwrite mode: it replaced the byte under the cursor, and nothing moved.');
+    }
+
+    function act(k: string) {
+      if (k === 'left') col = Math.max(0, col - 1);
+      else if (k === 'right') col = Math.min(SIZE - 1, col + 1);
+      else if (k === 'home') col = 0;
+      else if (k === 'end') col = len();
+      else if (k === 'far') col = Math.min(SIZE - 1, len() + 4);
+      else if (k === 'ins') {
+        over = !over;
+        modeBtn.setAttribute('aria-pressed', String(over));
+        modeBtn.querySelector('[data-mode]')!.textContent = over ? 'Overwrite' : 'Insert';
+        say.innerHTML = over ? '<b>Overwrite</b> mode: a key replaces the byte under the cursor.' : '<b>Insert</b> mode: a key pushes the rest of the line to the right.';
+      } else if (k === 'back') {
+        if (col > 0) { col--; if (col < len()) line.copyWithin(col, col + 1); line[SIZE - 1] = 0; }
+      } else if (k === 'reset') { load(); over = false; modeBtn.setAttribute('aria-pressed', 'false'); modeBtn.querySelector('[data-mode]')!.textContent = 'Insert'; steps.forEach(s => s.classList.remove('run', 'skip')); }
+      else if (k === 'tab') return key('\t');
+      if (k === 'far') say.innerHTML = 'The cursor is now 4 places past the end of the text. Type a key: his code fills the gap with spaces first.';
+      render();
+    }
+
+    root.querySelectorAll<HTMLButtonElement>('[data-ctl] [data-k]').forEach(b => b.addEventListener('click', () => { act(b.dataset.k!); if (matchMedia('(pointer: fine)').matches) input.focus(); }));
+    input.addEventListener('keydown', e => {
+      const map: Record<string, string> = { ArrowLeft: 'left', ArrowRight: 'right', Home: 'home', End: 'end', Insert: 'ins', Backspace: 'back' };
+      if (map[e.key]) { e.preventDefault(); act(map[e.key]); }
+    });
+    // beforeinput covers hardware keys and phone keyboards alike
+    input.addEventListener('beforeinput', e => {
+      e.preventDefault();
+      if (e.inputType === 'deleteContentBackward') return act('back');
+      for (const ch of e.data ?? '') if (ch >= ' ' && ch <= '~') key(ch);
+    });
+    render();
+  });
+</script>

@@ -1,0 +1,192 @@
+---
+// The 16-color screen is four 1-bit layers: blue, green, red and intensity. His engine draws الفن العربي in two colors;
+// flip a color's four bits and watch which planes hold it, or switch a plane off and watch every pixel lose that bit.
+import Window from '../../shell/Window.astro';
+import BitField from '../BitField.astro';
+import { render, svgRuns, PALETTE, type Bitmap } from '../arabart/core.ts';
+import { ssrBin } from '../arabart/ssr.ts';
+
+interface Props { id?: string; text?: number; shadow?: number }
+const { id = 'pr-planes', text = 14, shadow = 9 } = Astro.props;
+const img = render(ssrBin(), '~gtk ~guvfd', { font: 3, mode: '3d', color: text, shadow });
+// One role per pixel: 1 text, 2 shadow, 0 empty
+const roles = [...img.data].map(v => (v === 255 ? 0 : v === text ? 1 : 2)).join('');
+const PLANES = [
+  { k: 3, name: 'Intensity', say: 'makes a color bright', show: 15 },
+  { k: 2, name: 'Red', say: '', show: 12 },
+  { k: 1, name: 'Green', say: '', show: 10 },
+  { k: 0, name: 'Blue', say: '', show: 9 },
+];
+const ink = [0, text, shadow];
+const planeImg = (k: number, show: number): Bitmap => ({ ...img, data: Uint8Array.from(img.data, v => (v !== 255 && (v >> k) & 1 ? show : 255)) });
+const NAMES = ['black', 'blue', 'green', 'cyan', 'red', 'magenta', 'brown', 'light gray', 'dark gray', 'light blue', 'light green', 'light cyan', 'light red', 'pink', 'yellow', 'white'];
+const hexc = (i: number) => `#${PALETTE[i].toString(16).padStart(6, '0')}`;
+---
+
+<div class="prp" id={id} data-planes data-w={img.width} data-h={img.height} data-roles={roles} data-text={text} data-shadow={shadow}>
+  <Window title="SCREEN  640 × 480, 16 colors" kind="screen" class="prp-scr">
+    <div class="prp-big" data-big>
+      <svg viewBox={`0 0 ${img.width} ${img.height}`} shape-rendering="crispEdges" role="img" aria-label="الفن العربي drawn by ARABART in yellow with a light blue 3-D shadow">
+        {svgRuns(img).map(p => <path fill={p.fill} d={p.d} />)}
+      </svg>
+    </div>
+    <p class="prp-px" data-px aria-live="polite">Tap a pixel of the word to pick its color.</p>
+  </Window>
+
+  <Window title="ONE COLOR, FOUR BITS" kind="dialog" class="prp-col">
+    <div class="prp-ink" role="radiogroup" aria-label="Which color to change">
+      <button type="button" role="radio" class="button k-btn" data-ink="1" aria-checked="true" tabindex="0"><i style={`--c:${hexc(text)}`} data-sw="1"></i>Letters</button>
+      <button type="button" role="radio" class="button k-btn" data-ink="2" aria-checked="false" tabindex="-1"><i style={`--c:${hexc(shadow)}`} data-sw="2"></i>Shadow</button>
+    </div>
+    <BitField label="The color's four bits" bits={4} value={text} id={`${id}-bits`} groups={[
+      { bits: 1, label: 'I', tone: 'c' }, { bits: 1, label: 'R' }, { bits: 1, label: 'G' }, { bits: 1, label: 'B' },
+    ]} />
+    <p class="prp-name" data-name><b>{text}</b> {NAMES[text]}</p>
+    <ol class="prp-pal" aria-label="The 16 colors and their bits">
+      {NAMES.map((n, i) => <li><i style={`--c:${hexc(i)}`}></i><span>{i.toString(2).padStart(4, '0')}</span><span class="sr-only">{i}, {n}</span></li>)}
+    </ol>
+  </Window>
+
+  <div class="prp-planes" role="group" aria-label="The four planes. Switch one off to see what it carries.">
+    {PLANES.map(p => (
+      <button type="button" class="prp-plane" data-k={p.k} aria-pressed="true">
+        <span class="prp-pl-h"><b>Plane {p.k}</b> {p.name}</span>
+        <span class="prp-pl-img" data-pimg={p.k}>
+          <svg viewBox={`0 0 ${img.width} ${img.height}`} shape-rendering="crispEdges" aria-hidden="true">{svgRuns(planeImg(p.k, p.show)).map(r => <path fill={r.fill} d={r.d} />)}</svg>
+        </span>
+        <span class="prp-pl-f"><span data-on>On</span> · <span data-count></span></span>
+      </button>
+    ))}
+  </div>
+</div>
+
+<style is:global>
+  .prp { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+  .prp-planes { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+  .prp-big { position: relative; display: grid; place-items: center; min-height: 180px; padding: 18px 8px; background: var(--vga-0); cursor: crosshair; touch-action: manipulation; }
+  .prp-big svg, .prp-stage { display: block; width: 100%; max-width: 760px; height: auto; }
+  .prp-stage { position: relative; }
+  .prp-stage canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .prp-stage canvas + canvas { position: absolute; inset: 0; height: 100%; }
+  .prp-px { margin: 10px 0 0; min-height: 1.4em; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); }
+  .prp-ink { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
+  .prp-ink i, .prp-pal i { display: inline-block; width: 16px; height: 16px; background: var(--c); outline: 1px solid var(--vga-0); }
+  .prp-ink .k-btn { gap: 8px; }
+  .prp-name { margin: 14px 0 0; font: 700 1.25rem/1.2 var(--sans); color: var(--ink); }
+  .prp-name b { font-family: var(--font-code); color: var(--accent); margin-right: 6px; }
+  .prp-pal { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 6px 4px; margin: 16px 0 0; padding: 0; list-style: none; }
+  .prp-pal li { display: grid; justify-items: center; gap: 2px; padding: 3px 0; }
+  .prp-pal i { width: 100%; height: 14px; }
+  .prp-pal span { font: 500 10px/1 var(--font-code); color: var(--ink-2); }
+  .prp-pal li.on { background: var(--vga-0); }
+  .prp-pal li.on span { color: var(--vga-14); }
+  .prp-plane { display: grid; gap: 8px; padding: 12px; text-align: left; color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule), 6px 6px 0 oklch(0 0 0 / 0.5); cursor: pointer; transition: opacity 0.2s, translate 0.1s; }
+  .prp-plane:hover { box-shadow: inset 0 0 0 2px var(--accent), 6px 6px 0 oklch(0 0 0 / 0.5); }
+  .prp-plane:active { translate: 2px 2px; }
+  .prp-plane:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .prp-plane[aria-pressed='false'] { opacity: 0.5; }
+  .prp-plane[aria-pressed='false'] .prp-pl-img { filter: grayscale(1) brightness(0.5); }
+  .prp-pl-h { font: 500 0.875rem/1.2 var(--font-code); color: var(--ink-2); }
+  .prp-pl-h b { color: var(--accent); }
+  .prp-pl-img { display: grid; place-items: center; min-height: 64px; padding: 8px 4px; background: var(--vga-0); }
+  .prp-pl-img svg, .prp-pl-img canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .prp-pl-f { font: 500 0.6875rem/1.35 var(--font-code); color: var(--ink-2); }
+  .prp-pl-f [data-on] { color: var(--accent-2); font-weight: 700; }
+  .prp-plane[aria-pressed='false'] [data-on] { color: var(--hot); }
+  @media (max-width: 1023px) { .prp { grid-template-columns: minmax(0, 1fr); } .prp-planes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 420px) { .prp-planes { gap: 10px; } .prp-plane { padding: 8px; } }
+  @media (prefers-reduced-motion: reduce) { .prp-plane { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const PAL = ['#000000', '#0000aa', '#00aa00', '#00aaaa', '#aa0000', '#aa00aa', '#aa5500', '#aaaaaa', '#555555', '#5555ff', '#55ff55', '#55ffff', '#ff5555', '#ff55ff', '#ffff55', '#ffffff'];
+  const NAMES = ['black', 'blue', 'green', 'cyan', 'red', 'magenta', 'brown', 'light gray', 'dark gray', 'light blue', 'light green', 'light cyan', 'light red', 'pink', 'yellow', 'white'];
+  const SHOW = [9, 10, 12, 15];
+  type BF = HTMLElement & { bitfield?: { value: number; set(v: number, quiet?: boolean): void } };
+
+  document.querySelectorAll<HTMLElement>('[data-planes]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const W = +root.dataset.w!, H = +root.dataset.h!, roles = root.dataset.roles!;
+    const inks = [0, +root.dataset.text!, +root.dataset.shadow!];
+    let mask = 15, cur = 1;
+    const bf = $<BF>('[data-bitfield]'), big = $('[data-big]');
+    const planes = [...root.querySelectorAll<HTMLButtonElement>('.prp-plane')];
+    const inkBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-ink]')];
+    const pal = [...root.querySelectorAll<HTMLElement>('.prp-pal li')];
+
+    const canvas = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; c.setAttribute('aria-hidden', 'true'); return c; };
+    const paint = (c: HTMLCanvasElement, color: (role: number) => number | null) => {
+      const x = c.getContext('2d')!, im = x.createImageData(W, H), d = im.data;
+      for (let i = 0; i < W * H; i++) {
+        const r = +roles[i], v = r ? color(r) : null;
+        if (v == null) continue;
+        const h = PAL[v]; d[i * 4] = parseInt(h.slice(1, 3), 16); d[i * 4 + 1] = parseInt(h.slice(3, 5), 16); d[i * 4 + 2] = parseInt(h.slice(5, 7), 16); d[i * 4 + 3] = 255;
+      }
+      x.putImageData(im, 0, 0);
+    };
+    const main = canvas();
+    const stage = document.createElement('div'); stage.className = 'prp-stage'; stage.append(main);
+    big.innerHTML = ''; big.append(stage);
+    const pc = planes.map(p => { const c = canvas(); const box = p.querySelector('[data-pimg]')!; box.innerHTML = ''; box.append(c); return c; });
+
+    function draw(anim = false) {
+      const shown = (r: number) => inks[r] & mask;
+      if (anim && !reduce()) {
+        // Repaint top to bottom, the way the card redraws: a new layer wipes over the old one
+        const next = canvas(); stage.append(next); paint(next, shown);
+        gsap.fromTo(next, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 0.45, ease: 'none', onComplete: () => { paint(main, shown); next.remove(); } });
+      } else paint(main, shown);
+      planes.forEach((p, i) => {
+        const k = +p.dataset.k!;
+        paint(pc[i], r => ((inks[r] >> k) & 1 ? SHOW[k] : null));
+        let n = 0; for (let j = 0; j < W * H; j++) { const r = +roles[j]; if (r && (inks[r] >> k) & 1) n++; }
+        p.querySelector('[data-count]')!.textContent = `${n.toLocaleString('en-US')} pixels lit`;
+        p.querySelector('[data-on]')!.textContent = (mask >> k) & 1 ? 'On' : 'Off';
+      });
+      (root.querySelector(`[data-sw="1"]`) as HTMLElement).style.setProperty('--c', PAL[inks[1]]);
+      (root.querySelector(`[data-sw="2"]`) as HTMLElement).style.setProperty('--c', PAL[inks[2]]);
+      const v = inks[cur];
+      $('[data-name]').innerHTML = `<b>${v}</b> ${NAMES[v]}${mask !== 15 ? `, shown as ${NAMES[v & mask]}` : ''}`;
+      pal.forEach((li, i) => li.classList.toggle('on', i === v));
+    }
+
+    function pick(r: number, focus = false) {
+      cur = r;
+      inkBtns.forEach(b => { const on = +b.dataset.ink! === r; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; if (on && focus) b.focus(); });
+      bf.bitfield?.set(inks[r], true);
+      draw();
+    }
+
+    bf.addEventListener('bitfield', e => {
+      const { value, bit } = (e as CustomEvent).detail;
+      inks[cur] = value;
+      draw(true);
+      const p = planes.find(x => +x.dataset.k! === bit);
+      if (p && !reduce()) gsap.fromTo(p, { boxShadow: 'inset 0 0 0 3px #ffff55, 6px 6px 0 rgb(0 0 0 / 0.5)' }, { boxShadow: 'inset 0 0 0 1px rgb(85 255 255 / 0.3), 6px 6px 0 rgb(0 0 0 / 0.5)', duration: 0.8, clearProps: 'boxShadow' });
+    });
+    inkBtns.forEach(b => b.addEventListener('click', () => pick(+b.dataset.ink!)));
+    $('.prp-ink').addEventListener('keydown', e => {
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+      e.preventDefault(); pick(cur === 1 ? 2 : 1, true);
+    });
+    planes.forEach(p => p.addEventListener('click', () => {
+      const k = +p.dataset.k!; mask ^= 1 << k;
+      p.setAttribute('aria-pressed', String(!!((mask >> k) & 1)));
+      draw(true);
+    }));
+    const at = (e: PointerEvent) => {
+      const r = main.getBoundingClientRect(), x = Math.floor((e.clientX - r.left) / r.width * W), y = Math.floor((e.clientY - r.top) / r.height * H);
+      return x >= 0 && y >= 0 && x < W && y < H ? +roles[y * W + x] : -1;
+    };
+    big.addEventListener('pointermove', e => {
+      const r = at(e); if (r < 0) return;
+      const v = r ? inks[r] & mask : 0;
+      $('[data-px]').textContent = r ? `This pixel: ${v.toString(2).padStart(4, '0')} = ${v}, ${NAMES[v]}. Tap to change it.` : 'This pixel: 0000 = 0, black. Every plane has a 0 here.';
+    });
+    big.addEventListener('click', e => { const r = at(e as PointerEvent); if (r > 0) pick(r); });
+    draw();
+  });
+</script>

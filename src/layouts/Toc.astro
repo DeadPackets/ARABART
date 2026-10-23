@@ -1,0 +1,46 @@
+---
+// "On this page": filled from the page's h2s (writeup sections, plus any h2 marked data-toc). Desktop only.
+---
+
+<nav class="toc" aria-label="On this page" data-toc hidden>
+  <p class="toc-t">On this page</p>
+  <ol></ol>
+</nav>
+
+<style>
+  .toc { position: sticky; top: calc(var(--mb) + 32px); }
+  .toc-t { font: 600 0.8125rem/1.4 var(--mono); color: var(--accent-2); padding-bottom: 10px; border-bottom: 2px solid var(--accent-2); }
+  ol { list-style: none; margin-top: 8px; display: grid; }
+  .toc :global(a) {
+    display: block;
+    padding: 7px 10px 7px 12px;
+    font-size: 0.9375rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+    text-decoration: none;
+  }
+  .toc :global(a:hover) { color: var(--accent); }
+  .toc :global(a[aria-current='true']) { color: var(--black); background: var(--yellow); }
+  @media (max-width: 1199px) { .toc { display: none; } }
+</style>
+
+<script>
+  const nav = document.querySelector<HTMLElement>('nav[data-toc]');
+  const heads = [...document.querySelectorAll<HTMLElement>('main h2[data-toc], .writeup > section[id] > h2')];
+  if (nav && heads.length > 1) {
+    const list = nav.querySelector('ol')!;
+    const items = heads.map(h => {
+      const id = h.id || h.parentElement!.id;
+      const li = document.createElement('li');
+      const a = Object.assign(document.createElement('a'), { href: `#${id}`, textContent: h.textContent!.trim() });
+      li.append(a);
+      list.append(li);
+      return { el: h.id ? h : h.parentElement!, a };
+    });
+    nav.hidden = false;
+    const io = new IntersectionObserver(es => {
+      for (const e of es) if (e.isIntersecting) items.forEach(it => it.a.setAttribute('aria-current', String(it.el === e.target)));
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    items.forEach(it => io.observe(it.el));
+  }
+</script>

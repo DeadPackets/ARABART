@@ -1,0 +1,69 @@
+---
+// Elements inside the slot opt in with data-s: "2" (step 2 only), "2-4" (a range), "3+" (step 3 onward).
+// Without JS everything shows. With JS the shared Scrubber steps, runs and scrubs, and 'step' (1-based) fires on the root.
+import Window from '../shell/Window.astro';
+import Scrubber from '../toys/Scrubber.astro';
+import '../../styles/explain.css';
+
+interface Props { title: string; steps: string[] }
+const { title, steps } = Astro.props;
+const narrow = Astro.slots.has('narrow');
+---
+
+<figure class="k-fig fig steps" data-steps>
+  <Window title={title} kind="editor" active>
+    <div class:list={['fig-body', { 'has-narrow': narrow }]}>
+      <div class="fig-wide"><slot /></div>
+      {narrow && <div class="fig-narrow"><slot name="narrow" /></div>}
+    </div>
+    <Scrubber n={steps.length} label={`Step through: ${title}`} />
+    <ol class="steps-cap" aria-live="polite">
+      {/* The button covers the row; it does not wrap the caption, so glossary links inside stay their own controls */}
+      {steps.map((s, i) => <li data-i={i + 1}><button type="button" aria-label={`Step ${i + 1}`}></button><span set:html={s} /></li>)}
+    </ol>
+  </Window>
+</figure>
+
+<script>
+  import { gsap } from 'gsap';
+  import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+  import { scrubber } from '../toys/scrubber';
+
+  gsap.registerPlugin(DrawSVGPlugin);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const parse = (spec: string) => spec.trim().split(/\s+/).map(tok => {
+    if (tok.endsWith('+')) { const a = +tok.slice(0, -1); return (k: number) => k >= a; }
+    const [a, b = a] = tok.split('-').map(Number);
+    return (k: number) => k >= a && k <= b;
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-steps]').forEach(root => {
+    if (root.classList.contains('is-live')) return;
+    const parts = [...root.querySelectorAll<SVGElement | HTMLElement>('[data-s]')].map(el => ({ el, on: parse(el.dataset.s!) }));
+    const caps = [...root.querySelectorAll<HTMLElement>('.steps-cap li')];
+    const go = (i: number, how: string) => {
+      const at = i + 1;
+      root.dataset.at = String(at);
+      for (const p of parts) {
+        const now = p.on.some(f => f(at)), was = p.el.classList.contains('on');
+        p.el.classList.toggle('on', now);
+        // A wire that lights up draws itself from its start, so the eye follows the path
+        if (now && !was && how !== 'jump' && !reduce()) {
+          const wires = p.el.matches('.wire, .wire-hi') ? [p.el] : [...p.el.querySelectorAll('.wire, .wire-hi')];
+          if (wires.length) gsap.fromTo(wires, { drawSVG: '0%' }, { drawSVG: '100%', duration: 0.7, ease: 'power2.inOut', clearProps: 'strokeDasharray,strokeDashoffset' });
+        }
+      }
+      caps.forEach((li, k) => li.classList.toggle('now', k === i));
+      root.dispatchEvent(new CustomEvent('step', { detail: at }));
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, go, { speed: 1.8 });
+    caps.forEach((li, k) => li.querySelector('button')!.addEventListener('click', () => { s.pause(); s.go(k, 'step'); }));
+    root.addEventListener('keydown', e => {
+      if ((e.target as Element).matches('input[type=range]')) return;
+      if (e.key === 'ArrowRight') s.step();
+      else if (e.key === 'ArrowLeft') s.back();
+    });
+    root.classList.add('is-live');
+    go(0, 'jump');
+  });
+</script>

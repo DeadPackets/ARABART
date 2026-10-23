@@ -1,0 +1,12 @@
+---
+import '../../styles/explain.css';
+
+// mods: the page's own import.meta.glob of writeups. A glob here would put every writeup's CSS on every page
+interface Props { id: string; mods: Record<string, () => Promise<unknown>> }
+const { id, mods } = Astro.props;
+// Lazy, so a broken writeup only breaks the page that shows it
+const load = mods[`../../writeups/${id}.astro`];
+const W = load ? ((await load()) as { default: any }).default : null;
+---
+
+{W && <div class="writeup" data-writeup={id}><W /></div>}

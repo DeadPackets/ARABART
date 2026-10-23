@@ -1,0 +1,138 @@
+---
+// One engine, three apps. Every function of HandyLauncher.exe 3.4, sized by its bytes; the ones that also sit, instruction
+// for instruction, in HandySwitcher 2.7 and HandyMenu 3.6 light up. Data: research/dinarsoft/re/handylauncher/shared.py.
+import { renderDialog, type Dialog } from '../ds-handyswitcher/pocket.ts';
+import '../ds-handyswitcher/pocket.css';
+import './hl.css';
+import engine from './engine.json';
+import ui from './ui.json';
+import logo from './logo-2006.png';
+import { pocketPcCode, groups } from '../../../lib/dinarsoft/handyswitcher.ts';
+
+const D = ui['34'].dialogs as unknown as Record<string, Dialog>;
+// The code a device shows when it gives no ID: his built-in fallback, folded the way every Handy app folds it
+const lic = renderDialog(D['105'], { 1017: { img: logo.src }, 1002: { value: groups(pocketPcCode('730007B6BFA373D1380000050BFE45CE5')) } }, 'hle-l');
+const colors = renderDialog(D['179'], { 1052: { options: ['Theme Colors', 'Reverse Theme Colors', 'Custom Colors', 'No Colors'], attrs: 'aria-label="Menu colors"' } }, 'hle-c');
+
+const ROW = 4200;
+type F = [number, number, number];
+const rows: F[][] = [[]];
+let acc = 0;
+for (const f of engine.funcs as F[]) {
+  if (acc + f[1] > ROW && rows[rows.length - 1].length) { rows.push([]); acc = 0; }
+  rows[rows.length - 1].push(f); acc += f[1];
+}
+const labeled = new Map((engine.shared as { addr: number[]; label: string }[]).map((s, i) => [s.addr[1], i]));
+const hex = (n: number) => n.toString(16).toUpperCase();
+const fmt = (n: number) => n.toLocaleString('en-US');
+const first = Math.max(0, (engine.shared as { label: string }[]).findIndex(s => s.label.startsWith('The key engine')));
+const APPS = ['HandySwitcher 2.7', 'HandyLauncher 3.4', 'HandyMenu 3.6'];
+type Sh = { addr: number[]; size: number; label: string; code: [string, string, string][][] };
+const sh = engine.shared as Sh[];
+---
+
+<div class="hl-eng" data-hleng data-shared={JSON.stringify(sh)}>
+  <p class="hl-eng-big"><b>{engine.count} functions</b> <span>{fmt(engine.total)} bytes of code, instruction for instruction, in all three apps</span></p>
+  <div class="hl-eng-map" role="group" aria-label="Every function in HandyLauncher.exe, sized by its bytes. Lit: also in HandySwitcher and HandyMenu.">
+    {rows.map(r => (
+      <div class="hl-eng-row">
+        {r.map(([a, size, s]) => labeled.has(a)
+          ? <button type="button" class="hl-eng-f s lab" style={`flex-grow:${size}`} data-k={labeled.get(a)} aria-pressed={String(labeled.get(a) === first)} title={`${sh[labeled.get(a)!].label} (0x${hex(a)}, ${size} bytes)`}><span class="sr-only">{sh[labeled.get(a)!].label}</span></button>
+          : <span class:list={['hl-eng-f', { s }]} style={`flex-grow:${size}`} title={`0x${hex(a)}, ${size} bytes`}></span>)}
+      </div>
+    ))}
+  </div>
+  <p class="hl-cap"><span class="hl-eng-key s"></span> also in HandySwitcher 2.7 and HandyMenu 3.6 &nbsp; <span class="hl-eng-key"></span> HandyLauncher’s own &nbsp; {fmt(engine.funcs.length)} functions, {fmt((engine.funcs as F[]).reduce((t, f) => t + f[1], 0))} bytes in all. Tap a lit block with a dark edge.</p>
+
+  <div class="hl-eng-pick" role="group" aria-label="Pick a shared function">
+    {sh.map((s, k) => <button type="button" class:list={['button', { 'button--primary': k === first }]} data-k={k} aria-pressed={String(k === first)}>{s.label}</button>)}
+  </div>
+
+  <div class="hl-eng-cmp" data-cmp aria-live="polite">
+    {APPS.map((name, j) => (
+      <div class="hl-eng-col">
+        <p class="hl-eng-h"><b>{name}</b> <code data-at={j}>0x{hex(sh[first].addr[j])}</code></p>
+        <ol class="hl-eng-code" data-code={j}>
+          {sh[first].code[j].map((l, i) => {
+            const diff = sh[first].code.some(c => c[i]?.[1] !== l[1]);
+            return <li class:list={{ diff }}><span>{l[0]}</span><code>{l[1]}</code>{l[2] && <em>{l[2]}</em>}</li>;
+          })}
+        </ol>
+      </div>
+    ))}
+  </div>
+  <p class="hl-say" data-say><b>{sh[first].label}</b>: {sh[first].size} bytes. The same instructions in all three files. Only the addresses move, because each program puts it in a different place.</p>
+
+  <div class="hl-eng-dlgs">
+    <figure><div class="ppc hl-eng-dlg" inert set:html={lic} /><figcaption class="hl-cap">His License Key dialog, with the DINAR globe logo of the 2006 builds: the same nine controls in all three apps.</figcaption></figure>
+    <figure><div class="ppc hl-eng-dlg" inert set:html={colors} /><figcaption class="hl-cap">His Custom Colors page: the same eighteen controls, the same five colors.</figcaption></figure>
+  </div>
+</div>
+
+<style is:global>
+  .hl-eng { display: grid; gap: 16px; }
+  .hl-eng-big { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0 !important; }
+  .hl-eng-big b { font: 800 clamp(2rem, 3vw + 1rem, 3rem)/1 var(--font-display); color: var(--accent); }
+  .hl-eng-big span { font: 500 1.0625rem/1.4 var(--sans); color: var(--ink); max-width: 36ch; }
+  .hl-eng-map { display: grid; gap: 3px; padding: 10px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hl-eng-row { display: flex; gap: 2px; height: 30px; }
+  .hl-eng-f { flex-basis: 0; min-width: 2px; padding: 0; border: 0; background: color-mix(in oklch, var(--ink-2) 22%, transparent); }
+  .hl-eng-f.s { background: var(--accent); }
+  .hl-eng-f.lab { cursor: pointer; box-shadow: inset 0 -5px 0 oklch(0.25 0.12 262); }
+  .hl-eng-f.lab[aria-pressed='true'] { background: var(--hot); box-shadow: inset 0 -5px 0 oklch(0.3 0.12 25); }
+  .hl-eng-f.lab:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hl-eng-key { display: inline-block; width: 14px; height: 14px; vertical-align: -2px; background: color-mix(in oklch, var(--ink-2) 22%, transparent); }
+  .hl-eng-key.s { background: var(--accent); }
+  .hl-eng-pick { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hl-eng-pick .button { font-size: 0.875rem; }
+  .hl-eng-cmp { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  .hl-eng-col { min-width: 0; padding: 10px; background: #fff; border: 1px solid var(--xp-line, #7f9db9); }
+  .hl-eng-h { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px; margin: 0 0 6px !important; font: 600 0.875rem/1.3 var(--sans) !important; color: #000; }
+  .hl-eng-h code { font: 700 0.8125rem/1.3 var(--font-code); color: var(--hot); }
+  .hl-eng-code { margin: 0 !important; padding: 0 !important; list-style: none; font: 500 12px/1.65 var(--font-code); color: #1a1a1a; }
+  .hl-eng-code li { display: grid; grid-template-columns: 5.5ch minmax(0, 1fr); gap: 1ch; max-width: none !important; font-size: inherit !important; line-height: inherit !important; white-space: nowrap; }
+  .hl-eng-code li span { color: #6e6e6e; }
+  .hl-eng-code li code { overflow: hidden; text-overflow: ellipsis; font: inherit; color: var(--vs-key, #00f); }
+  .hl-eng-code li em { grid-column: 2; font-style: normal; color: var(--vs-comment, #008000); }
+  .hl-eng-code li.diff code { color: var(--hot); background: color-mix(in oklch, var(--hot) 10%, transparent); }
+  .hl-eng-dlgs { display: flex; flex-wrap: wrap; gap: 20px; }
+  .hl-eng-dlgs figure { display: grid; gap: 6px; margin: 0; width: min(100%, 260px); }
+  .hl-eng-dlg { border: 1px solid #000; box-shadow: 4px 4px 0 rgb(0 0 0 / 0.2); }
+  .hl-eng-dlg .ppc-dlg { pointer-events: none; }
+  .hl-eng-dlg .ppc-btn.sw:nth-of-type(1) { --sw: #000; }
+  .hl-eng-dlg .ppc-btn.sw:nth-of-type(3) { --sw: #dfe8f6; }
+  .hl-eng-dlg .ppc-btn.sw:nth-of-type(5) { --sw: #316ac5; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (max-width: 900px) { .hl-eng-cmp { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduce } from './hl.ts';
+
+  document.querySelectorAll<HTMLElement & { hl?: boolean }>('[data-hleng]').forEach(root => {
+    if (root.hl) return;
+    root.hl = true;
+    type Sh = { addr: number[]; size: number; label: string; code: [string, string, string][][] };
+    const sh: Sh[] = JSON.parse(root.dataset.shared!);
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+    const pick = (k: number) => {
+      root.querySelectorAll<HTMLElement>('[data-k]').forEach(b => {
+        const on = +b.dataset.k! === k;
+        b.setAttribute('aria-pressed', String(on));
+        if (b.classList.contains('button')) b.classList.toggle('button--primary', on);
+      });
+      const s = sh[k];
+      for (let j = 0; j < 3; j++) {
+        root.querySelector(`[data-at="${j}"]`)!.textContent = '0x' + s.addr[j].toString(16).toUpperCase();
+        root.querySelector(`[data-code="${j}"]`)!.innerHTML = s.code[j].map((l, i) =>
+          `<li class="${s.code.some(c => c[i]?.[1] !== l[1]) ? 'diff' : ''}"><span>${l[0]}</span><code>${esc(l[1])}</code>${l[2] ? `<em>${esc(l[2])}</em>` : ''}</li>`).join('');
+      }
+      const moved = s.code[0].filter((l, i) => s.code.some(c => c[i]?.[1] !== l[1])).length;
+      say.innerHTML = `<b>${esc(s.label)}</b>: ${s.size} bytes. The same instructions in all three files.${moved ? ` The ${moved} red line${moved > 1 ? 's' : ''} differ only in an address, because each program keeps the function in a different place.` : ' Not a single byte differs in these lines.'}`;
+      if (!reduce()) gsap.fromTo(root.querySelectorAll('.hl-eng-code li'), { opacity: 0, x: -6 }, { opacity: 1, x: 0, duration: 0.25, stagger: 0.012 });
+    };
+    root.querySelectorAll<HTMLElement>('[data-k]').forEach(b => b.addEventListener('click', () => pick(+b.dataset.k!)));
+  });
+</script>

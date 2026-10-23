@@ -1,0 +1,187 @@
+---
+// The live ARABART typewriter on Yasser's real engine. Type with physical keys (any layout types like a 1993 US
+// keyboard), an Arabic keyboard, a phone, the on-screen keys, or paste. Fonts 1 to 5, colors, styles, his 3-D and
+// The Brave Sun's shadow and outline. Pixel-exact VGA screen with an optional phosphor shader; a live strip shows
+// each letter's two join bits and the shape they chose. Without JS it shows the same screen as an image.
+import Window from '../shell/Window.astro';
+import { fromUnicode, toUnicode, rgb, flipNumbers, PALETTE } from './arabart/core.ts';
+import { compose, camera, framePaths, type Mode } from './arabart/screen.ts';
+import { ssrBin } from './arabart/ssr.ts';
+
+interface Props { id?: string; keys?: string; font?: number; color?: number; shadow?: number; mode?: Mode; glow?: boolean; title?: string }
+const { id = 'typewriter', keys = '~gtk ~guvfd', font = 3, color = 14, shadow = 4, mode = '3d', glow = true, title = 'ARABART.EXE  640×480, 16 colors' } = Astro.props;
+
+const bin = ssrBin();
+const f = compose(bin, keys, { font, color, shadow, mode, bold: false, italic: false, underline: false, double: false });
+const v = camera(f.box);
+const paths = framePaths(f.data, v, rgb);
+const text = toUnicode(flipNumbers(keys));
+
+const LETTERS = [...'ابتثجحخدذرزسشصضطظعغفقكلمنهوي', 'ة', 'ى', 'ء', 'أ', 'آ', 'ؤ', 'ئ', 'لا', 'ـ'].map(ar => ({ ar, k: fromUnicode(ar) }));
+const NAMES = ['black', 'blue', 'green', 'cyan', 'red', 'magenta', 'brown', 'light gray', 'dark gray', 'light blue', 'light green', 'light cyan', 'light red', 'pink', 'yellow', 'white'];
+const MODES: [Mode, string][] = [['plain', 'Plain'], ['3d', '3-D'], ['shadow', 'Shadow'], ['outline', 'Outline']];
+const STYLES = [['bold', 'Bold', '@'], ['italic', 'Italic', '!'], ['underline', 'Underline', '#'], ['double', 'Double', '$']];
+const hexc = (i: number) => `#${PALETTE[i].toString(16).padStart(6, '0')}`;
+---
+
+<div class="k-tw" id={id} data-typewriter data-keys={keys} data-font={font} data-color={color} data-shadow={shadow} data-mode={mode} data-glow={String(glow)}>
+  <Window title={title} kind="screen" class="k-tw-scr">
+    <div class="k-tw-screen" data-screen>
+      <svg class="k-tw-static" viewBox={`${v.x} ${v.y} ${v.w} ${v.h}`} preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">
+        <rect x="0" y="0" width="640" height="480" fill="#000" />
+        {paths.map(p => <path fill={p.fill} d={p.d} />)}
+      </svg>
+      <canvas class="k-tw-canvas" aria-hidden="true"></canvas>
+      <span class="k-tw-caret" aria-hidden="true"></span>
+      <label class="sr-only" for={`${id}-in`}>Type Arabic here. On an English keyboard, press the key where each Arabic letter sits on an Arabic keyboard: g is ل, h is ا.</label>
+      <textarea id={`${id}-in`} class="k-tw-input" rows="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="enter"></textarea>
+      <span class="k-tw-tap" aria-hidden="true">Tap and type</span>
+    </div>
+    <p class="sr-only" aria-live="polite" lang="ar" dir="rtl" data-said>{text}</p>
+  </Window>
+
+  <Window title="Options" kind="dialog" class="k-tw-opts">
+    <div class="k-tw-g">
+      <span class="k-tw-lab" id={`${id}-fl`}>Font</span>
+      <div class="k-tw-row" role="radiogroup" aria-labelledby={`${id}-fl`}>
+        {[1, 2, 3, 4, 5].map(n => <button type="button" role="radio" class="button k-btn" data-opt="font" data-v={n} aria-checked={String(n === font)} tabindex={n === font ? 0 : -1}>{n}</button>)}
+      </div>
+      <p class="k-tw-sun">Font 5 has its own big letters only for <span lang="ar">الشمس</span>, The Sun. Other letters come from font 1. <button type="button" class="k-tw-link" data-sun>Write it</button></p>
+    </div>
+    <div class="k-tw-g">
+      <span class="k-tw-lab" id={`${id}-cl`}>Text color</span>
+      <div class="k-tw-sw" role="radiogroup" aria-labelledby={`${id}-cl`}>
+        {NAMES.map((nm, i) => <button type="button" role="radio" data-opt="color" data-v={i} aria-checked={String(i === color)} tabindex={i === color ? 0 : -1} aria-label={nm} style={`--c:${hexc(i)}`}></button>)}
+      </div>
+    </div>
+    <div class="k-tw-g k-tw-shadow">
+      <span class="k-tw-lab" id={`${id}-sl`}>Shadow color</span>
+      <div class="k-tw-sw" role="radiogroup" aria-labelledby={`${id}-sl`}>
+        {NAMES.map((nm, i) => <button type="button" role="radio" data-opt="shadow" data-v={i} aria-checked={String(i === shadow)} tabindex={i === shadow ? 0 : -1} aria-label={nm} style={`--c:${hexc(i)}`}></button>)}
+      </div>
+    </div>
+    <div class="k-tw-g">
+      <span class="k-tw-lab" id={`${id}-ml`}>Effect</span>
+      <div class="k-tw-row" role="radiogroup" aria-labelledby={`${id}-ml`}>
+        {MODES.map(([m, label]) => <button type="button" role="radio" class="button k-btn" data-opt="mode" data-v={m} aria-checked={String(m === mode)} tabindex={m === mode ? 0 : -1}>{label}</button>)}
+      </div>
+    </div>
+    <div class="k-tw-g">
+      <span class="k-tw-lab">Style, from the first letter</span>
+      <div class="k-tw-row">
+        {STYLES.map(([k, label, key]) => <button type="button" class="button k-btn" data-toggle={k} aria-pressed="false">{label} <span class="hk" aria-hidden="true">{key}</span></button>)}
+      </div>
+    </div>
+    <div class="k-tw-g">
+      <span class="k-tw-lab">Screen</span>
+      <div class="k-tw-row">
+        <button type="button" class="button k-btn" data-toggle="glow" aria-pressed={String(glow)}>Phosphor glow</button>
+        <button type="button" class="button k-btn" data-toggle="whole" aria-pressed="false">Whole screen</button>
+      </div>
+    </div>
+  </Window>
+
+  <div class="k-tw-keys" data-keys role="group" aria-label="Arabic keys">
+    <div class="k-tw-keyrow" dir="rtl">
+      {LETTERS.map(l => <button type="button" class="k-tw-key" data-k={l.k} aria-label={l.ar}><span lang="ar">{l.ar}</span><small aria-hidden="true">{l.k}</small></button>)}
+    </div>
+    <div class="k-tw-keyacts">
+      <button type="button" class="button k-btn" data-k=" ">Space</button>
+      <button type="button" class="button k-btn" data-k="del">Delete</button>
+      <button type="button" class="button k-btn" data-k={'\n'}>New line</button>
+      <button type="button" class="button k-btn" data-k="clear">Clear</button>
+    </div>
+  </div>
+
+  <Window title="Join bits, the line you are typing" kind="panel" class="k-tw-bits">
+    <ol class="k-tw-strip" data-strip dir="rtl" tabindex="0" aria-label="Each letter, its two join bits and its shape"></ol>
+    <p class="k-tw-stored">Stored as his programs stored it: <code data-stored>{flipNumbers(keys)}</code></p>
+  </Window>
+</div>
+
+<style>
+  .k-tw {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    grid-template-areas: 'scr opts' 'keys opts' 'bits bits';
+    gap: 22px 26px;
+    align-items: start;
+  }
+  .k-tw > :global(.k-tw-scr) { grid-area: scr; }
+  .k-tw > :global(.k-tw-opts) { grid-area: opts; }
+  .k-tw > :global(.k-tw-bits) { grid-area: bits; }
+  .k-tw-keys { grid-area: keys; min-width: 0; }
+
+  .k-tw-screen { position: relative; aspect-ratio: 4 / 3; background: var(--vga-0); overflow: hidden; cursor: text; border-radius: 4px; }
+  .k-tw-static, .k-tw-canvas, :global(.k-tw-gl) { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .k-tw-canvas { image-rendering: pixelated; }
+  .k-tw.is-live .k-tw-static { display: none; }
+  .k-tw:not(.is-live) .k-tw-canvas { display: none; }
+  .k-tw.is-glow .k-tw-canvas { visibility: hidden; }
+  .k-tw-input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; resize: none; border: 0; padding: 0; font-size: 16px; color: transparent; background: none; caret-color: transparent; cursor: text; z-index: 2; }
+  .k-tw:not(.is-live) .k-tw-input { display: none; }
+  .k-tw-caret { position: absolute; left: 0; top: 0; width: 3px; height: 20px; background: var(--vga-7); opacity: 0; pointer-events: none; z-index: 1; }
+  .k-tw.is-typing .k-tw-caret { opacity: 1; animation: k-blink 1.06s steps(1) infinite; }
+  @keyframes k-blink { 50% { opacity: 0; } }
+  .k-tw-tap { position: absolute; left: 12px; bottom: 10px; z-index: 1; padding: 4px 8px; font: 600 12px/1.3 var(--font-code); color: var(--vga-0); background: var(--vga-7); pointer-events: none; transition: opacity 0.3s var(--quart); }
+  .k-tw.is-typing .k-tw-tap, .k-tw:not(.is-live) .k-tw-tap { opacity: 0; }
+
+  .k-tw-g + .k-tw-g { margin-top: 14px; }
+  .k-tw-lab { display: block; margin-bottom: 6px; font: 700 0.875rem/1.3 var(--sans); color: var(--ink); }
+  .k-tw-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .k-tw-row .k-btn { padding: 0 12px; box-shadow: 3px 3px 0 var(--black); }
+  .k-tw-sw { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 4px; }
+  .k-tw-sw button { min-height: 44px; padding: 0; background: var(--c); border: 2px solid var(--black); cursor: pointer; }
+  @media (pointer: coarse) { .k-tw-sw { grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); } } /* a fingertip per color */
+  .k-tw-sw button[aria-checked='true'] { outline: 3px solid var(--black); outline-offset: -8px; box-shadow: inset 0 0 0 3px var(--vga-15); }
+  .k-tw-sw button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .k-tw[data-mode='plain'] .k-tw-shadow { opacity: 0.45; }
+  .k-tw-sun { display: none; margin-top: 8px; font: 500 0.875rem/1.5 var(--sans); color: var(--ink); }
+  .k-tw[data-font='5'] .k-tw-sun { display: block; }
+  .k-tw-sun [lang='ar'] { font-weight: 700; }
+  .k-tw-link { min-height: 32px; padding: 0 6px; font: 700 0.875rem/1 var(--sans); color: var(--accent); background: none; border: 0; text-decoration: underline; cursor: pointer; }
+  /* Without JS the controls hide. With JS they hold their place from the first paint, so the page does not jump when the typewriter starts */
+  :global(html:not(.js)) .k-tw:not(.is-live) :global(.k-tw-opts),
+  :global(html:not(.js)) .k-tw:not(.is-live) .k-tw-keys,
+  :global(html:not(.js)) .k-tw:not(.is-live) :global(.k-tw-bits) { display: none; }
+
+  .k-tw-keyrow { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 10px; scrollbar-width: thin; overscroll-behavior-x: contain; }
+  .k-tw-key { flex: none; display: grid; place-items: center; width: 48px; height: 58px; padding: 4px 0 2px; color: var(--btn-ink); background: var(--btn-bg); border: 0; box-shadow: 3px 3px 0 var(--black); cursor: pointer; touch-action: manipulation; }
+  .k-tw-key span { font: 700 1.375rem/1 var(--font-ar); }
+  .k-tw-key small { font: 600 11px/1 var(--font-code); color: var(--hot); direction: ltr; }
+  .k-tw-key:hover { background: var(--accent); }
+  .k-tw-key:active { translate: 2px 2px; box-shadow: 1px 1px 0 var(--black); }
+  .k-tw-key:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .k-tw-keyacts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+
+  .k-tw-strip { display: flex; gap: 0; min-height: 132px; overflow-x: auto; margin: 0; padding: 4px 2px 10px; list-style: none; scrollbar-width: thin; }
+  .k-tw-strip :global(.k-tw-tile) { position: relative; flex: none; display: grid; grid-template-columns: 22px auto 22px; grid-template-areas: 'r g l' 'c c c' 'f f f'; align-items: center; justify-items: center; gap: 4px 2px; min-width: 76px; padding: 8px 6px; }
+  .k-tw-strip :global(.k-tw-tile canvas) { grid-area: g; }
+  .k-tw-strip :global(.k-tw-hand) { width: 22px; height: 22px; display: grid; place-items: center; font: 700 12px/1 var(--font-code); color: var(--ink-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 50%, transparent); }
+  .k-tw-strip :global(.k-tw-hand:first-child) { grid-area: r; }
+  .k-tw-strip :global(.k-tw-hand:nth-child(3)) { grid-area: l; }
+  .k-tw-strip :global(.k-tw-hand[data-on='true']) { color: var(--surface); background: var(--accent-2); box-shadow: none; }
+  .k-tw-strip :global(.k-tw-code) { grid-area: c; font: 600 12px/1 var(--font-code); color: var(--ink); }
+  .k-tw-strip :global(.k-tw-form) { grid-area: f; font: 600 11px/1 var(--font-code); color: var(--accent); }
+  /* Two hands holding: a bar from this letter's left hand to the next letter's right hand */
+  .k-tw-strip :global(.k-tw-tile.j-next::after) { content: ''; position: absolute; left: -11px; top: calc(8px + var(--gy, 30px)); width: 22px; height: 3px; background: var(--accent-2); }
+  .k-tw-strip :global(.is-blank) { min-width: 40px; }
+  .k-tw-strip :global(.k-tw-sp) { grid-column: 1 / -1; font: 500 11px/1 var(--font-code); color: var(--ink-2); }
+  .k-tw-stored { margin-top: 8px; font: 500 0.8125rem/1.5 var(--font-code); color: var(--ink-2); overflow-wrap: anywhere; }
+  .k-tw-stored code { color: var(--accent); font-size: 1em; white-space: pre-wrap; }
+
+  @media (max-width: 1023px) {
+    .k-tw { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'scr' 'keys' 'bits' 'opts'; }
+  }
+  @media (max-width: 520px) {
+    .k-tw-key { width: 44px; height: 54px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .k-tw.is-typing .k-tw-caret { animation: none; }
+  }
+</style>
+
+<script>
+  import { mount } from './arabart/typewriter.ts';
+  document.querySelectorAll<HTMLElement>('[data-typewriter]').forEach(el => { mount(el); });
+</script>

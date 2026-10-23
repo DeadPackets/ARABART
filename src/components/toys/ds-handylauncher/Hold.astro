@@ -1,0 +1,133 @@
+---
+// Tap, or tap and hold: HandyLauncher's tray handler (HandyLauncher.exe 3.4, sub_125FC) beside the same in C.
+// Press his icon briefly or hold it; the stepper loads that path through his code and runs it.
+import CodeStepper from '../CodeStepper.astro';
+import './hl.css';
+import icon16 from './icon-175-16.png';
+import { holdSteps, MENU1_NAME, MENU2_NAME } from './hl.ts';
+import { ringSVG } from './launcher.ts';
+
+const ASM = [
+  { off: '12620', code: 'mov  r3,#0BD0h / orr r3,r3,#5', note: 'his tray message, 0BD5h' },
+  { off: '12628', code: 'cmp  r1,r3' },
+  { off: '1262C', code: 'beq  tray' },
+  { off: '12724', label: 'tray', code: 'cmp  r5,#201h', note: 'the stylus went down?' },
+  { off: '12734', code: 'cmp  r4,#1389h', note: 'on icon 5001, his?' },
+  { off: '12744', code: 'mov  r3,#20', note: 'the form: 20 bytes' },
+  { off: '12750', code: 'bl   GetDeviceCaps', note: 'screen width' },
+  { off: '12768', code: 'bl   GetDeviceCaps', note: 'screen height' },
+  { off: '1277C', code: 'bl   WindowFromPoint', note: 'who owns the corner' },
+  { off: '127D8', code: 'mov  r3,#1', note: 'just tell me' },
+  { off: '127E0', code: 'bl   scale', note: '1, or 2 on VGA' },
+  { off: '127F0', code: 'sub  r0,r5,r3', note: 'menu y = height - 25 x scale' },
+  { off: '12800', code: 'bl   SHRecognizeGesture', note: 'watch the stylus' },
+  { off: '12804', code: 'movs r3,r0' },
+  { off: '1280C', code: 'beq  tap', note: '0: a tap' },
+  { off: '12810', code: 'ldr  r1,=menu2', note: 'held' },
+  { off: '1281C', code: 'ldr  r1,[r1,#218h]', note: 'Reverse on? swap' },
+  { off: '126A0', label: 'tap', code: 'ldr  r1,=menu1' },
+  { off: '126AC', code: 'ldr  r1,[r1,#218h]', note: 'Reverse on? swap' },
+  { off: '126C8', code: 'bl   ShowMenu' },
+];
+const C = [
+  { code: 'case WM_TRAY:', note: '0BD5h' },
+  { code: 'if (!down || icon != 5001) break;' },
+  { code: 'SHRGINFO g = { sizeof g };' },
+  { code: 'g.ptDown.x = width() - 2;' },
+  { code: 'g.ptDown.y = height() - 2;' },
+  { code: 'g.hwndClient = WindowFromPoint(pt);' },
+  { code: 'g.dwFlags = SHRG_RETURNCMD;' },
+  { code: 'menuY = height() - 25 * scale();' },
+  { code: 'if (SHRecognizeGesture(&g))', note: 'held' },
+  { code: '  menu = reverse ? &m1 : &m2;' },
+  { code: 'else', note: 'a tap' },
+  { code: '  menu = reverse ? &m2 : &m1;' },
+  { code: 'ShowMenu(menu);' },
+];
+const steps = holdSteps(true, false);
+---
+
+<div class="hl-hold" data-hlhold>
+  <div class="hl-row" data-ctl hidden>
+    <label class="hl-sw"><input type="checkbox" data-rev /> Reverse the menus</label>
+    <label class="hl-sw"><input type="checkbox" data-vga /> A VGA screen, 480 pixels</label>
+  </div>
+  <CodeStepper id="hl-holdcs" title="HandyLauncher.exe  the tray icon" asm={ASM} c={C} steps={steps} speed={0.55}>
+    <div slot="visual" class="hl-hv" data-vis>
+      <div class="hl-hv-corner">
+        <div class="hl-hv-screen" aria-hidden="true"></div>
+        <div class="hl-hv-menus" aria-hidden="true">
+          <span class="hl-hv-m" data-m="1">{MENU1_NAME}<small>menu 1</small></span>
+          <span class="hl-hv-m on" data-m="2">{MENU2_NAME}<small>menu 2</small></span>
+        </div>
+        <div class="hl-hv-bar">
+          <span class="hl-hv-xy" data-xy aria-hidden="true">x <b data-x>238</b>, y <b data-y>318</b></span>
+          <button type="button" class="hl-ticon hl-hv-icon" data-ticon aria-label="His tray icon: Enter for a tap, Shift+F10 for tap and hold"><img src={icon16.src} alt="" width="16" height="16" /><Fragment set:html={ringSVG()} /></button>
+        </div>
+      </div>
+      <p class="hl-say" data-out aria-live="polite">Press and hold his icon, or give it a quick tap.</p>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hl-hold { display: grid; gap: 14px; }
+  .hl-sw { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font: 500 1rem/1.3 var(--sans); color: var(--ink); cursor: pointer; }
+  .hl-sw input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .hl-hv { display: grid; gap: 12px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hl-hv-corner { position: relative; width: min(100%, 420px); aspect-ratio: 420 / 200; justify-self: center; border: 2px solid #23262d; border-radius: 6px 6px 18px 6px; background: #fff; overflow: hidden; font-family: Tahoma, Verdana, sans-serif; }
+  .hl-hv-screen { position: absolute; inset: 0 0 26px 0; background: repeating-linear-gradient(#fff 0 26px, #eef3fb 26px 27px); }
+  .hl-hv-bar { position: absolute; inset: auto 0 0 0; height: 26px; display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding-right: 2px; background: linear-gradient(#e8eef9, #c5d2ea); border-top: 1px solid #8ea4cc; }
+  .hl-hv-icon { width: 44px; height: 26px; }
+  .hl-hv-icon .hl-ring { width: 70px; height: 70px; }
+  .hl-hv-xy { font: 600 12px/1 var(--font-code); color: #1b3f8b; opacity: 0; transition: opacity 0.2s; }
+  .hl-hv-xy b { color: #000; }
+  [data-v='down'] .hl-hv-xy, [data-v='ring'] .hl-hv-xy, [data-v='lift'] .hl-hv-xy { opacity: 1; }
+  .hl-hv-menus { position: absolute; right: 6px; bottom: 32px; display: flex; gap: 8px; }
+  .hl-hv-m { display: grid; gap: 2px; padding: 8px 12px; font: 700 13px/1.1 Tahoma, Verdana, sans-serif; color: #1b3f8b; background: #fff; border: 1px solid #000; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.35); opacity: 0.25; transition: opacity 0.2s, transform 0.2s; }
+  .hl-hv-m small { font: 400 11px/1 Tahoma, sans-serif; color: #444; }
+  .hl-hv-m.pick { opacity: 0.7; outline: 2px dashed #316ac5; }
+  .hl-hv-m.on { opacity: 1; transform: translateY(-4px); }
+  [data-v='msg'] .hl-hv-icon { animation: hl-pulse 0.8s ease-in-out 2; }
+  @keyframes hl-pulse { 50% { background: rgb(49 106 197 / 0.25); } }
+  @media (prefers-reduced-motion: reduce) { [data-v='msg'] .hl-hv-icon { animation: none; } .hl-hv-m { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { tapOrHold } from './launcher.ts';
+  import { holdSteps, reduce, type Step } from './hl.ts';
+
+  document.querySelectorAll<HTMLElement & { hl?: boolean }>('[data-hlhold]').forEach(root => {
+    if (root.hl) return;
+    root.hl = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: Step[], at?: number): void } }>('[data-stepper]')!;
+    const vis = root.querySelector<HTMLElement>('[data-vis]')!, out = root.querySelector<HTMLElement>('[data-out]')!;
+    const rev = root.querySelector<HTMLInputElement>('[data-rev]')!, vga = root.querySelector<HTMLInputElement>('[data-vga]')!;
+    const ms = [...vis.querySelectorAll<HTMLElement>('[data-m]')];
+    const dots = [...vis.querySelectorAll<SVGCircleElement>('.hl-ring circle')];
+    let held = true;
+
+    const paint = (s: Step) => {
+      vis.dataset.v = String(s.v);
+      const v = vga.checked;
+      vis.querySelector('[data-x]')!.textContent = String((v ? 480 : 240) - 2);
+      vis.querySelector('[data-y]')!.textContent = String((v ? 640 : 320) - 2);
+      const menu = held !== rev.checked ? '2' : '1';
+      ms.forEach(m => { m.classList.toggle('on', s.v === 'menu' && m.dataset.m === menu); m.classList.toggle('pick', s.v === 'pick' && m.dataset.m === menu); });
+      if (s.v === 'ring') gsap.to(dots, { opacity: 1, duration: reduce() ? 0 : 0.05, stagger: reduce() ? 0 : 0.06 });
+      else if (s.v !== 'menu') gsap.set(dots, { opacity: 0 });
+      if (s.v === 'menu') out.innerHTML = `${held ? 'Tap and hold' : 'A tap'}${rev.checked ? ', with Reverse on' : ''}: <b>menu ${menu}</b>. Press the icon again, the other way.`;
+    };
+    cs.addEventListener('stepper', e => paint((e as CustomEvent).detail.step));
+    const run = (h: boolean) => {
+      held = h;
+      out.textContent = h ? 'Held. Follow his code below.' : 'A tap. Follow his code below.';
+      cs.stepper?.load(holdSteps(h, rev.checked, vga.checked), 0);
+      cs.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+    };
+    tapOrHold(vis.querySelector<HTMLElement>('[data-ticon]')!, { tap: () => run(false), hold: () => run(true) });
+    for (const sw of [rev, vga]) sw.addEventListener('change', () => { const st = holdSteps(held, rev.checked, vga.checked); cs.stepper?.load(st, st.length - 1); });
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+  });
+</script>

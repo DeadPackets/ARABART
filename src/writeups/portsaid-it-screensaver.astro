@@ -1,0 +1,123 @@
+---
+// SCREEN.COM (1991), the Port Said Governorate screen. Facts: research/programs.md section 9, his unpacked file
+// (public/bytes/files/SCREEN_SCREEN.COM.mem) and research/artifacts/programs/dis/screen.txt. Every picture on this page
+// is drawn by src/components/toys/graphics/player/player.ts, a port of his player that matches his screen pixel for pixel.
+import LiveScreen from '../components/toys/graphics/player/LiveScreen.astro';
+import LoopStepper from '../components/toys/graphics/player/LoopStepper.astro';
+import HeaderLab from '../components/toys/graphics/player/HeaderLab.astro';
+import ColorCycle from '../components/toys/graphics/player/ColorCycle.astro';
+import ScriptEditor from '../components/toys/graphics/player/ScriptEditor.astro';
+import SizeBars from '../components/toys/arabart/SizeBars.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Listing from '../components/explain/Listing.astro';
+import Term from '../components/explain/Term.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="scr-gift">
+  <h2>A screen that draws itself</h2>
+  <p class="lead">In 1991, as an intern in the computer department of the Port Said Governorate, Yasser gave the department a screen of its own. It shipped as 156 bytes of code that draw it, one short pen stroke at a time.</p>
+  <p>The three lines read <span lang="ar" dir="rtl">محافظة بورسعيد</span>, <span lang="ar" dir="rtl">مركز المعلومات و التوثيق</span> and <span lang="ar" dir="rtl">إدارة الحاسب الآلى</span>: Port Said Governorate, Information and Documentation Center, Computer Department. It ran on every computer in the department. Below is his real file, played by a line-for-line JavaScript copy of his player. The first line is gray with a red shadow, the second is yellow, and the third keeps changing color until someone presses a key.</p>
+  <LiveScreen />
+  <p class="scr-after">Press a key and the screen says goodbye in text: <b>K E M Y A M Software Corp., &lt;C&gt;1991 YASSER MOHAMED ALI.</b> KEMYAM is the name he signed his 1991 work with.</p>
+</section>
+
+<section id="scr-size">
+  <h2>156 bytes</h2>
+  <div class="scr-pair">
+    <div>
+      <p class="lead">The whole program is 1,672 bytes on disk. The same screen as a plain picture would take 112,000.</p>
+      <p>A picture file stores every pixel: 640 by 350 of them, half a byte each for 16 colors. Yasser stored the drawing instead. His script says where each stroke of each letter goes, and a tiny <Term id="interpreter">player</Term> follows it. Think of an SVG next to a PNG: instructions for drawing, not the pixels themselves.</p>
+      <p>Then he packed the file with <Term id="diet">DIET</Term>, a compressor for programs, the way a build step minifies and gzips a JavaScript bundle. Tap any bar to measure the others in it.</p>
+    </div>
+    <div class="gp"><SizeBars
+      title="SCREEN.COM, to scale"
+      items={[
+        { label: 'His player: all the code that draws', bytes: 156, his: true },
+        { label: 'SCREEN.COM on disk, packed', bytes: 1672, his: true },
+        { label: 'His drawing script: three lines of Arabic', bytes: 3262, his: true },
+        { label: 'The screenshot of it at the top of this page', bytes: 12371 },
+        { label: 'The same screen as a raw 16-color picture', bytes: 112000 },
+      ]}
+    /></div>
+  </div>
+</section>
+
+<section id="scr-strokes">
+  <h2>Two bytes, one stroke</h2>
+  <p class="lead">A stroke is two bytes: how far down it starts, and how many pixels it runs. The letter <code>x</code> moves the pen one column to the left.</p>
+  <div class="scr-cols">
+    <p>Every letter on the screen is a row of thin vertical strokes, like a brush pulled down the page column by column. His player reads the script one byte at a time. A byte below <Term id="hex">70h</Term> starts a stroke. The letters <code>x</code>, <code>w</code>, <code>y</code> and <code>{'{'}</code> are commands: left, right, new line, end of the picture.</p>
+    <p>Each pixel goes through the <Term id="bios">BIOS</Term>, the drawing service built into every PC, like calling a browser API instead of talking to the graphics card. Right after it, the same pixel is drawn again 2 to the right and 2 down in the shadow color. That second pixel gives every letter its carved, raised look. Step through the start of the first letter, <span lang="ar" dir="rtl">م</span>.</p>
+  </div>
+  <LoopStepper />
+  <p class="scr-after">The pen moves left 937 times and right 24 times across the three lines. Stepping back to the right lets a new letter tuck in over the one before it, the way Arabic letters overlap. 1,135 strokes in all, and not one stored pixel.</p>
+</section>
+
+<section id="scr-header">
+  <h2>Five bytes rewrite the code</h2>
+  <p class="lead">Each line starts with five bytes. His player copies them straight into its own instructions, so one tiny loop draws every style on the screen.</p>
+  <p>The ink color is not a variable the loop looks up. It is part of the instruction itself, <code>mov ax,0C07h</code>, and the header writes the <code>07</code>. The shadow switch is the jump right after the pixel. A jump of <code>00</code> runs into the shadow code, and <code>0D</code> jumps past it. Even the direction is a byte: <code>4B</code> is the instruction “one column left”, <code>43</code> is “one column right”. This is <Term id="self-modifying-code">self-modifying code</Term>, used as settings. Change the header and watch his player draw line 1 again.</p>
+  <HeaderLab />
+  <p class="scr-after">His three lines use three headers: <code>4B 43 00 07 04</code> gray with a red shadow, <code>4B 43 0D 0E 0E</code> yellow with no shadow, and <code>4B 43 0D 03 0E</code> cyan with no shadow. Today a game sets a shader's uniforms before each draw call in the same spirit: one routine, a few values changed per line.</p>
+</section>
+
+<section id="scr-cycle">
+  <h2>Always moving</h2>
+  <p class="lead">When the picture is done, he asks DOS if a key is waiting. If not, he adds 1 to the color byte inside his own code and draws line 3 again.</p>
+  <p>One byte inside his plot instruction holds the color, the <code>03</code> of <code>mov ax,0C03h</code>. So one <code>inc</code> recolors the whole line on its next pass. It counts up to 15, then starts again at 2, so line 3 never turns black. The whole animation is the short listing below. Scrub through the 14 colors, or run them.</p>
+  <ColorCycle />
+  <p class="scr-after">On the real screen the new color sweeps across the line from right to left as the pen redraws it. That is why the screenshot at the top of the page catches line 3 in two colors at once. The keyboard check is one question to DOS, “is a key waiting?”, the same question a game loop asks between frames.</p>
+</section>
+
+<section id="scr-yours">
+  <h2>Write your own</h2>
+  <p class="lead">His script is plain bytes, so anyone can write one. This editor turns your words into the exact bytes his player reads, and his player draws them as you type.</p>
+  <ScriptEditor />
+  <p class="scr-after">Try changing one length in his letter, or add a <code>y</code> and a second line. Every line here uses his line 1 header: gray ink, red shadow, the pen moving left from column 445.</p>
+  <h3>One player, three programs</h3>
+  <p>He kept this player and used it twice more in 1991. One is <a href={`${base}/program/taher/`}>TAHER.COM</a>, the calligraphy splash for a physician. The other is the 15-slide <a href={`${base}/program/arabart-commercial/`}>advertisement for a Port Said computer center</a>. Those two share their first 241 bytes, and the player in them learned two new words: one to clear the screen for the next picture, one to end the show.</p>
+  <ThenNow
+    rows={[
+      { then: 'A screen stored as drawing commands, played by a 156-byte player', now: 'An SVG, or a Lottie animation played by a small runtime', why: 'The file says how to draw, not every pixel, so it stays tiny.' },
+      { then: 'Strokes: a start and a length in each column', now: 'Run-length encoding in fax images and TIFF', why: 'A long run of ink costs two bytes, however long it is.' },
+      { then: 'Header bytes written into the drawing loop', now: 'Shader uniforms set before a draw call', why: 'One routine draws every style; a few values change per line.' },
+      { then: 'One player, three programs', now: 'A game engine that loads level files', why: 'Write the engine once, ship new work as data.' },
+    ]}
+  />
+  <Deep title="For engineers: the start and the header reader">
+    <Listing
+      title="SCREEN.COM 0100 to 012D"
+      lines={[
+        { off: '0100', code: 'mov  si,019Ch', note: 'the script starts right after the code' },
+        { off: '0103', code: 'mov  ax,10h / int 10h', note: 'EGA graphics, 640 by 350, 16 colors' },
+        { off: '0108', code: 'mov  al,[si] / inc si / mov [013Bh],al', note: "the opcode for 'x'", hi: true },
+        { off: '010E', code: 'mov  al,[si] / inc si / mov [0143h],al', note: "the opcode for 'w'" },
+        { off: '0114', code: 'mov  al,[si] / inc si / mov [0180h],al', note: 'the shadow jump', hi: true },
+        { off: '011A', code: 'mov  al,[si] / inc si / mov [0179h],al', note: 'the ink color' },
+        { off: '0120', code: 'mov  al,[si] / inc si / mov [0182h],al', note: 'the shadow color' },
+        { off: '0126', code: 'mov  di,[si] / inc si / inc si', note: 'the line top, in rows' },
+        { off: '012A', code: 'mov  bx,[si] / inc si / inc si', note: 'the starting column' },
+      ]}
+      foot="The program is a .COM file, loaded at 0100h. The script begins at 019Ch, 156 bytes in."
+    />
+    <p>It sets <Term id="ega">EGA</Term> mode 10h through <Term id="int-10h">INT 10h</Term> and plots with the same service, function 0Ch. A key ends it: text mode, then DOS prints his credit with function 09h, which reads up to a <code>$</code>.</p>
+  </Deep>
+</section>
+
+<style>
+  .scr-after { margin-top: 24px; }
+  .scr-after b { font-family: var(--font-code); font-weight: 600; font-size: 0.92em; color: var(--accent); }
+  .scr-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 0 clamp(24px, 4vw, 48px); align-items: start; }
+  .scr-pair > .gp { margin-top: 18px; }
+  .scr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 48px); margin-top: 16px; }
+  .scr-cols p + p { margin-top: 0; }
+  #scr-size .lead + p { margin-top: 16px; }
+  #scr-yours h3 { margin-top: 64px; }
+  [lang='ar'] { font-weight: 700; font-size: 1.12em; color: var(--accent); }
+  @media (max-width: 860px) {
+    .scr-pair, .scr-cols { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

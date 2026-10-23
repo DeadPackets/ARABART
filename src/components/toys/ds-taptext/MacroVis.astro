@@ -1,0 +1,84 @@
+---
+// The visual beside the macro CodeStepper (0x1E2EC, 0x139F4): his "Date and time" item, the part being handled, and
+// what lands on the page. Pick any of his ten date and five time formats; the steps are rebuilt with macroSteps().
+import { DATE_FORMATS, TIME_FORMATS, picture, SAMPLE } from './tt.ts';
+import { MACRO } from './steps.ts';
+const end = MACRO.steps[MACRO.steps.length - 1] as unknown as { out: string };
+---
+
+<div class="ttt-mv" data-mv>
+  <div class="ttt-mv-pair">
+    <figure class="ttt-mv-box">
+      <figcaption>The saved text</figcaption>
+      <pre class="ttt-mv-src" data-src>{MACRO.text.replace(/\r\n/g, '\n')}</pre>
+    </figure>
+    <figure class="ttt-mv-box">
+      <figcaption>On the page</figcaption>
+      <pre class="ttt-mv-out" data-out>{end.out}</pre>
+    </figure>
+  </div>
+  <fieldset class="ttt-mv-fmt">
+    <legend>Select Date Format</legend>
+    <div class="ttt-mv-list" role="radiogroup" aria-label="Date format">
+      {DATE_FORMATS.map((f, i) => <button type="button" role="radio" aria-checked={i === 1 ? 'true' : 'false'} data-df={f}>{picture(f, SAMPLE)}</button>)}
+    </div>
+  </fieldset>
+  <fieldset class="ttt-mv-fmt">
+    <legend>Select Time Format</legend>
+    <div class="ttt-mv-list" role="radiogroup" aria-label="Time format">
+      {TIME_FORMATS.map((f, i) => <button type="button" role="radio" aria-checked={i === 3 ? 'true' : 'false'} data-tf={f}>{picture(f, SAMPLE)}</button>)}
+    </div>
+  </fieldset>
+  <label class="ttt-mv-now"><input type="checkbox" data-now /> Use today’s date and time instead of his sample, 16 March 2005 at 3:27:57 PM</label>
+</div>
+
+<style>
+  .ttt-mv { display: grid; gap: 14px; padding: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .ttt-mv-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+  .ttt-mv-box { margin: 0; min-width: 0; }
+  .ttt-mv-box figcaption { margin-bottom: 6px; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+  .ttt-mv-src, .ttt-mv-out { min-height: 76px; margin: 0; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; border: 1px solid #000; background: #fff; color: #000; font: 13px/1.45 Tahoma, Verdana, sans-serif; }
+  .ttt-mv-src { font-family: var(--font-code); font-size: 12.5px; }
+  .ttt-mv-src :global(mark) { background: #ffd75e; color: #000; }
+  .ttt-mv-fmt { margin: 0; padding: 8px 12px 12px; border: 1px solid var(--rule); }
+  .ttt-mv-fmt legend { padding: 0 6px; font-weight: 700; font-size: 0.875rem; }
+  .ttt-mv-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ttt-mv-list button { min-height: 44px; padding: 0 10px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); font: 0.875rem Tahoma, Verdana, sans-serif; cursor: pointer; }
+  .ttt-mv-list button[aria-checked='true'] { background: #0a246a; color: #fff; }
+  .ttt-mv-now { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 0.9375rem; cursor: pointer; }
+  .ttt-mv-now input { width: 20px; height: 20px; flex: none; accent-color: var(--accent); }
+  @media (max-width: 640px) { .ttt-mv-pair { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { macroSteps } from './steps.ts';
+  import { picture, SAMPLE } from './tt.ts';
+  const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-mv]')) {
+    const src = root.querySelector<HTMLElement>('[data-src]')!, out = root.querySelector<HTMLElement>('[data-out]')!;
+    const now = root.querySelector<HTMLInputElement>('[data-now]')!;
+    const cs = root.closest<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void } }>('[data-stepper]');
+    let df = 'MMMM d, yyyy', tf = 'h:mm tt';
+    const rebuild = () => {
+      const when = now.checked ? new Date() : SAMPLE;
+      root.querySelectorAll<HTMLElement>('[data-df]').forEach(b => (b.textContent = picture(b.dataset.df!, when)));
+      root.querySelectorAll<HTMLElement>('[data-tf]').forEach(b => (b.textContent = picture(b.dataset.tf!, when)));
+      cs?.stepper?.load(macroSteps(df, tf, when).steps);
+    };
+    root.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLElement>('[data-df], [data-tf]');
+      if (!b) return;
+      if (b.dataset.df) { df = b.dataset.df; root.querySelectorAll('[data-df]').forEach(x => x.setAttribute('aria-checked', String(x === b))); }
+      else { tf = b.dataset.tf!; root.querySelectorAll('[data-tf]').forEach(x => x.setAttribute('aria-checked', String(x === b))); }
+      rebuild();
+    });
+    now.addEventListener('change', rebuild);
+    cs?.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { text: string; hi: [number, number] | null; out: string };
+      const t = s.text;
+      src.innerHTML = (s.hi ? esc(t.slice(0, s.hi[0])) + '<mark>' + esc(t.slice(s.hi[0], s.hi[1])) + '</mark>' + esc(t.slice(s.hi[1])) : esc(t)).replace(/\r\n/g, '\n');
+      out.textContent = s.out;
+    });
+  }
+</script>

@@ -1,0 +1,52 @@
+---
+// A Pocket PC with one of his settings sheets on it: every page is rebuilt from his own dialog templates (pocket.ts).
+// Tabs sit at the bottom, as Windows Mobile drew them. Without JS the pages stack and all show.
+import Window from '../../shell/Window.astro';
+import './pocket.css';
+
+interface Page { tab: string; html: string }
+interface Props { id: string; title: string; clock?: string; pages: Page[]; soft?: [string, string]; at?: number; label: string }
+const { id, title, clock = '9:41', pages, soft = ['ok', ''], at = 0, label } = Astro.props;
+---
+
+<Window title={title} kind="device" num={clock} class="ds-dev" id={id} aria-label={label}>
+  <div class="ppc ppc-sheet" data-sheet>
+    <div class="ppc-pages">
+      {pages.map((p, i) => <div class="ppc-page" id={`${id}-p${i}`} role="tabpanel" aria-label={p.tab} data-i={i} set:html={p.html} />)}
+    </div>
+    <div class="ppc-tabs" role="tablist" aria-label={`${label}: pages`} hidden>
+      {pages.map((p, i) => <button type="button" role="tab" aria-controls={`${id}-p${i}`} aria-selected={String(i === at)} tabindex={i === at ? 0 : -1}>{p.tab}</button>)}
+    </div>
+  </div>
+  <p slot="status" class="ds-soft"><span>{soft[0]}</span><span>{soft[1]}</span></p>
+</Window>
+
+<style is:global>
+  .ds-dev > .win-body { padding: 0 !important; overflow: hidden !important; }
+  .ds-dev .ds-soft { display: contents; }
+  .ds-dev .ds-soft span { min-width: 3ch; }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-sheet]:not(.is-live)').forEach(sheet => {
+    const tabs = [...sheet.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const pages = [...sheet.querySelectorAll<HTMLElement>('.ppc-page')];
+    const pick = (k: number, focus = false) => {
+      tabs.forEach((t, i) => { t.setAttribute('aria-selected', String(i === k)); t.tabIndex = i === k ? 0 : -1; });
+      pages.forEach((p, i) => (p.hidden = i !== k));
+      if (focus) tabs[k].focus();
+      sheet.dispatchEvent(new CustomEvent('sheet', { bubbles: true, detail: k }));
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => pick(i)));
+    sheet.querySelector('[role=tablist]')!.addEventListener('keydown', e => {
+      const k = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      const d = (e as KeyboardEvent).key === 'ArrowRight' ? 1 : (e as KeyboardEvent).key === 'ArrowLeft' ? -1 : 0;
+      if (k < 0 || !d) return;
+      e.preventDefault();
+      pick((k + d + tabs.length) % tabs.length, true);
+    });
+    sheet.querySelector<HTMLElement>('[role=tablist]')!.hidden = false;
+    sheet.classList.add('is-live');
+    pick(Math.max(0, tabs.findIndex(t => t.getAttribute('aria-selected') === 'true')));
+  });
+</script>

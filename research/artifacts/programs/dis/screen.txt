@@ -1,0 +1,375 @@
+0100 be9c01       mov si, 0x19c
+0103 b81000       mov ax, 0x10
+0106 cd10         int 0x10
+0108 8a04         mov al, byte ptr [si]
+010a 46           inc si
+010b a23b01       mov byte ptr [0x13b], al
+010e 8a04         mov al, byte ptr [si]
+0110 46           inc si
+0111 a24301       mov byte ptr [0x143], al
+0114 8a04         mov al, byte ptr [si]
+0116 46           inc si
+0117 a28001       mov byte ptr [0x180], al
+011a 8a04         mov al, byte ptr [si]
+011c 46           inc si
+011d a27901       mov byte ptr [0x179], al
+0120 8a04         mov al, byte ptr [si]
+0122 46           inc si
+0123 a28201       mov byte ptr [0x182], al
+0126 8b3c         mov di, word ptr [si]
+0128 46           inc si
+0129 46           inc si
+012a 8b1c         mov bx, word ptr [si]
+012c 46           inc si
+012d 46           inc si
+012e 8a14         mov dl, byte ptr [si]
+0130 46           inc si
+0131 80fa70       cmp dl, 0x70
+0134 7c39         jl 0x16f
+0136 80fa78       cmp dl, 0x78
+0139 7503         jne 0x13e
+013b 4b           dec bx
+013c ebf0         jmp 0x12e
+013e 80fa77       cmp dl, 0x77
+0141 7503         jne 0x146
+0143 43           inc bx
+0144 ebe8         jmp 0x12e
+0146 80fa79       cmp dl, 0x79
+0149 74bd         je 0x108
+014b 80fa7b       cmp dl, 0x7b
+014e 751f         jne 0x16f
+0150 be9b0a       mov si, 0xa9b
+0153 b8000b       mov ax, 0xb00
+0156 cd21         int 0x21
+0158 3cff         cmp al, 0xff
+015a 7439         je 0x195
+015c fe067901     inc byte ptr [0x179]
+0160 803e790110   cmp byte ptr [0x179], 0x10
+0165 75bf         jne 0x126
+0167 c606790102   mov byte ptr [0x179], 2
+016c 90           nop 
+016d ebb7         jmp 0x126
+016f b600         mov dh, 0
+0171 03d7         add dx, di
+0173 8a0c         mov cl, byte ptr [si]
+0175 46           inc si
+0176 b500         mov ch, 0
+0178 b8030c       mov ax, 0xc03
+017b 87cb         xchg bx, cx
+017d cd10         int 0x10
+017f eb0d         jmp 0x18e
+0181 b80e0c       mov ax, 0xc0e
+0184 41           inc cx
+0185 41           inc cx
+0186 42           inc dx
+0187 42           inc dx
+0188 cd10         int 0x10
+018a 49           dec cx
+018b 49           dec cx
+018c 4a           dec dx
+018d 4a           dec dx
+018e 42           inc dx
+018f 87cb         xchg bx, cx
+0191 e2e5         loop 0x178
+0193 eb99         jmp 0x12e
+0195 b80300       mov ax, 3
+0198 90           nop 
+0199 e9be0c       jmp 0xe5a
+019c 4b           dec bx
+019d 43           inc bx
+019e 0007         add byte ptr [bx], al
+01a0 0440         add al, 0x40
+01a2 00bd0120     add byte ptr [di + 0x2001], bh
+01a6 0478         add al, 0x78
+01a8 1f           pop ds
+01a9 06           push es
+01aa 781e         js 0x1ca
+01ac 08781d       or byte ptr [bx + si + 0x1d], bh
+01af 0423         add al, 0x23
+01b1 0478         add al, 0x78
+01b3 1c04         sbb al, 4
+01b5 2304         and ax, word ptr [si]
+01b7 781c         js 0x1d5
+01b9 0422         add al, 0x22
+01bb 0478         add al, 0x78
+01bd 1d0422       sbb ax, 0x2204
+01c0 0478         add al, 0x78
+01c2 1e           push ds
+01c3 07           pop es
+01c4 781f         js 0x1e5
+01c6 06           push es
+01c7 7820         js 0x1e9
+01c9 0478         add al, 0x78
+01cb 2104         and word ptr [si], ax
+01cd 7822         js 0x1f1
+01cf 0478         add al, 0x78
+01d1 2304         and ax, word ptr [si]
+01d3 7824         js 0x1f9
+01d5 0478         add al, 0x78
+01d7 2404         and al, 4
+01d9 7824         js 0x1ff
+01db 0478         add al, 0x78
+01dd 2404         and al, 4
+01df 7824         js 0x205
+01e1 0478         add al, 0x78
+01e3 2101         and word ptr [bx + di], ax
+01e5 2404         and al, 4
+01e7 7821         js 0x20a
+01e9 0224         add ah, byte ptr [si]
+01eb 0478         add al, 0x78
+01ed 21067821     and word ptr [0x2178], ax
+01f1 06           push es
+01f2 7821         js 0x215
+01f4 06           push es
+01f5 7821         js 0x218
+01f7 057821       add ax, 0x2178
+01fa 0478         add al, 0x78
+01fc 2005         and byte ptr [di], al
+01fe 7820         js 0x220
+0200 05781f       add ax, 0x1f78
+0203 06           push es
+0204 781f         js 0x225
+0206 06           push es
+0207 781e         js 0x227
+0209 07           pop es
+020a 781e         js 0x22a
+020c 08781d       or byte ptr [bx + si + 0x1d], bh
+020f 09781d       or word ptr [bx + si + 0x1d], di
+0212 09781c       or word ptr [bx + si + 0x1c], di
+0215 052403       add ax, 0x324
+0218 781c         js 0x236
+021a 052403       add ax, 0x324
+021d 781c         js 0x23b
+021f 0424         add al, 0x24
+0221 03781c       add di, word ptr [bx + si + 0x1c]
+0224 0424         add al, 0x24
+0226 0478         add al, 0x78
+0228 1c04         sbb al, 4
+022a 2404         and al, 4
+022c 781d         js 0x24b
+022e 0324         add sp, word ptr [si]
+0230 0478         add al, 0x78
+0232 1d0324       sbb ax, 0x2403
+0235 0478         add al, 0x78
+0237 1e           push ds
+0238 0224         add ah, byte ptr [si]
+023a 0478         add al, 0x78
+023c 1e           push ds
+023d 0324         add sp, word ptr [si]
+023f 0478         add al, 0x78
+0241 1f           pop ds
+0242 0224         add ah, byte ptr [si]
+0244 0478         add al, 0x78
+0246 2002         and byte ptr [bp + si], al
+0248 2404         and al, 4
+024a 7824         js 0x270
+024c 0478         add al, 0x78
+024e 2404         and al, 4
+0250 7824         js 0x276
+0252 0478         add al, 0x78
+0254 2404         and al, 4
+0256 7823         js 0x27b
+0258 057812       add ax, 0x1278
+025b 157813       adc ax, 0x1378
+025e 1478         adc al, 0x78
+0260 1412         adc al, 0x12
+0262 7878         js 0x2dc
+0264 7878         js 0x2de
+0266 781c         js 0x284
+0268 07           pop es
+0269 781b         js 0x286
+026b 097819       or word ptr [bx + si + 0x19], di
+026e 0c78         or al, 0x78
+0270 1909         sbb word ptr [bx + di], cx
+0272 2303         and ax, word ptr [bp + di]
+0274 7813         js 0x289
+0276 0218         add bl, byte ptr [bx + si]
+0278 041d         add al, 0x1d
+027a 0424         add al, 0x24
+027c 037812       add di, word ptr [bx + si + 0x12]
+027f 0418         add al, 0x18
+0281 031d         add bx, word ptr [di]
+0283 0424         add al, 0x24
+0285 037811       add di, word ptr [bx + si + 0x11]
+0288 06           push es
+0289 1803         sbb byte ptr [bp + di], al
+028b 1d0424       sbb ax, 0x2404
+028e 0478         add al, 0x78
+0290 11061803     adc word ptr [0x318], ax
+0294 1d0324       sbb ax, 0x2403
+0297 0478         add al, 0x78
+0299 1204         adc al, byte ptr [si]
+029b 1907         sbb word ptr [bx], ax
+029d 2404         and al, 4
+029f 7813         js 0x2b4
+02a1 021b         add bl, byte ptr [bp + di]
+02a3 0424         add al, 0x24
+02a5 0478         add al, 0x78
+02a7 2404         and al, 4
+02a9 7824         js 0x2cf
+02ab 0478         add al, 0x78
+02ad 2404         and al, 4
+02af 7824         js 0x2d5
+02b1 0478         add al, 0x78
+02b3 2404         and al, 4
+02b5 7824         js 0x2db
+02b7 0478         add al, 0x78
+02b9 2107         and word ptr [bx], ax
+02bb 7820         js 0x2dd
+02bd 08781f       or byte ptr [bx + si + 0x1f], bh
+02c0 09781e       or word ptr [bx + si + 0x1e], di
+02c3 09781d       or word ptr [bx + si + 0x1d], di
+02c6 09781d       or word ptr [bx + si + 0x1d], di
+02c9 0a781d       or bh, byte ptr [bx + si + 0x1d]
+02cc 06           push es
+02cd 2404         and al, 4
+02cf 7818         js 0x2e9
+02d1 021d         add bl, byte ptr [di]
+02d3 052404       add ax, 0x424
+02d6 7817         js 0x2ef
+02d8 041e         add al, 0x1e
+02da 0324         add sp, word ptr [si]
+02dc 0478         add al, 0x78
+02de 16           push ss
+02df 06           push es
+02e0 1e           push ds
+02e1 0324         add sp, word ptr [si]
+02e3 0478         add al, 0x78
+02e5 16           push ss
+02e6 06           push es
+02e7 1f           pop ds
+02e8 0224         add ah, byte ptr [si]
+02ea 0478         add al, 0x78
+02ec 17           pop ss
+02ed 041f         add al, 0x1f
+02ef 0224         add ah, byte ptr [si]
+02f1 0478         add al, 0x78
+02f3 1802         sbb byte ptr [bp + si], al
+02f5 2002         and byte ptr [bp + si], al
+02f7 2404         and al, 4
+02f9 7820         js 0x31b
+02fb 0224         add ah, byte ptr [si]
+02fd 0478         add al, 0x78
+02ff 2101         and word ptr [bx + di], ax
+0301 2404         and al, 4
+0303 7821         js 0x326
+0305 0224         add ah, byte ptr [si]
+0307 0478         add al, 0x78
+0309 150222       adc ax, 0x2202
+030c 0124         add word ptr [si], sp
+030e 0478         add al, 0x78
+0310 1404         adc al, 4
+0312 22067813     and al, byte ptr [0x1378]
+0316 0f2305       mov dr0, ebp
+0319 7814         js 0x32f
+031b 1478         adc al, 0x78
+031d 151378       adc ax, 0x7813
+0320 16           push ss
+0321 0223         add ah, byte ptr [bp + di]
+0323 057824       add ax, 0x2478
+0326 0478         add al, 0x78
+0328 2404         and al, 4
+032a 7824         js 0x350
+032c 0478         add al, 0x78
+032e 2305         and ax, word ptr [di]
+0330 7812         js 0x344
+0332 0222         add ah, byte ptr [bp + si]
+0334 06           push es
+0335 7811         js 0x348
+0337 0420         add al, 0x20
+0339 07           pop es
+033a 7810         js 0x34c
+033c 06           push es
+033d 1d0a78       sbb ax, 0x780a
+0340 1006180d     adc byte ptr [0xd18], al
+0344 7811         js 0x357
+0346 0418         add al, 0x18
+0348 0a7812       or bh, byte ptr [bx + si + 0x12]
+034b 0219         add bl, byte ptr [bx + di]
+034d 06           push es
+034e 2102         and word ptr [bp + si], ax
+0350 7811         js 0x363
+0352 041b         add al, 0x1b
+0354 0421         add al, 0x21
+0356 037810       add di, word ptr [bx + si + 0x10]
+0359 06           push es
+035a 1c04         sbb al, 4
+035c 2103         and word ptr [bp + di], ax
+035e 7810         js 0x370
+0360 06           push es
+0361 1d0778       sbb ax, 0x7807
+0364 1104         adc word ptr [si], ax
+0366 1e           push ds
+0367 06           push es
+0368 7812         js 0x37c
+036a 021f         add bl, byte ptr [bx]
+036c 057820       add ax, 0x2078
+036f 0478         add al, 0x78
+0371 2102         and word ptr [bp + si], ax
+0373 7878         js 0x3ed
+0375 7878         js 0x3ef
+0377 7878         js 0x3f1
+0379 7878         js 0x3f3
+037b 7878         js 0x3f5
+037d 7878         js 0x3f7
+037f 7878         js 0x3f9
+0381 7878         js 0x3fb
+0383 7878         js 0x3fd
+0385 7878         js 0x3ff
+0387 781f         js 0x3a8
+0389 06           push es
+038a 781e         js 0x3aa
+038c 08781d       or byte ptr [bx + si + 0x1d], bh
+038f 0a2c         or ch, byte ptr [si]
+0391 02781d       add bh, byte ptr [bx + si + 0x1d]
+0394 0a2b         or ch, byte ptr [bp + di]
+0396 0478         add al, 0x78
+0398 1e           push ds
+0399 0424         add al, 0x24
+039b 042a         add al, 0x2a
+039d 06           push es
+039e 781f         js 0x3bf
+03a0 0224         add ah, byte ptr [si]
+03a2 042a         add al, 0x2a
+03a4 06           push es
+03a5 7824         js 0x3cb
+03a7 042b         add al, 0x2b
+03a9 0478         add al, 0x78
+03ab 2404         and al, 4
+03ad 2c02         sub al, 2
+03af 7824         js 0x3d5
+03b1 0478         add al, 0x78
+03b3 2404         and al, 4
+03b5 7824         js 0x3db
+03b7 0478         add al, 0x78
+03b9 2404         and al, 4
+03bb 7822         js 0x3df
+03bd 087821       or byte ptr [bx + si + 0x21], bh
+03c0 0a7820       or bh, byte ptr [bx + si + 0x20]
+03c3 0c78         or al, 0x78
+03c5 200d         and byte ptr [di], cl
+03c7 781f         js 0x3e8
+03c9 052503       add ax, 0x325
+03cc 2a04         sub al, byte ptr [si]
+03ce 781f         js 0x3ef
+03d0 0425         add al, 0x25
+03d2 032b         add bp, word ptr [bp + di]
+03d4 0478         add al, 0x78
+03d6 1f           pop ds
+03d7 0325         add sp, word ptr [di]
+03d9 032c         add bp, word ptr [si]
+03db 0478         add al, 0x78
+03dd 1f           pop ds
+03de 0325         add sp, word ptr [di]
+03e0 032d         add bp, word ptr [di]
+03e2 037820       add di, word ptr [bx + si + 0x20]
+03e5 0324         add sp, word ptr [si]
+03e7 032e0378     add bp, word ptr [0x7803]
+03eb 21062e03     and word ptr [0x32e], ax
+03ef 7822         js 0x413
+03f1 042f         add al, 0x2f
+03f3 02782f       add bh, byte ptr [bx + si + 0x2f]
+03f6 02782f       add bh, byte ptr [bx + si + 0x2f]
+03f9 02782f       add bh, byte ptr [bx + si + 0x2f]
+03fc 02782e       add bh, byte ptr [bx + si + 0x2e]
+03ff db 03

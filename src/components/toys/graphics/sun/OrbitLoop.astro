@@ -1,0 +1,141 @@
+---
+// One frame of his orbit loop (06D2:0E04-111E) in the CodeStepper: the code the compiler made from his C, beside the C,
+// driving a zoomed view of the solar system window. Each planet is stamped over its last spot, then every angle turns.
+import CodeStepper from '../../CodeStepper.astro';
+import { png } from '../ssr.ts';
+import { years } from './ssr.ts';
+import { sprites, orbitClock, orbitScreen, crop, spots, PLANETS, PI } from './sun.ts';
+
+const F = 200, clk = orbitClock(years()), pics = sprites();
+const before = clk.at(F - 1).angles, now = clk.at(F).angles, after = clk.at(F + 1).angles;
+const at = spots(now), was = spots(before);
+const f2 = (n: number) => n.toFixed(4);
+
+const ASM = [
+  { off: '0E04', label: 'frame', code: 'push 1 / call bioskey', note: 'is a key waiting?' },
+  { off: '0E0F', code: 'cmp  [bp-40h],3B00h', note: 'F1? Alt+X? Esc?' },
+  { off: '0E73', code: 'fld  [bp-28h] / call sin', note: 'Mars: its angle' },
+  { off: '0E88', code: 'fmul dword [19A5h]', note: '× 70' },
+  { off: '0E99', code: 'faddp / call ftol', note: '+ 175, whole pixels' },
+  { off: '0EB7', code: 'fmul dword [19A9h]', note: 'cosine × 80, + 160' },
+  { off: '0ED0', code: 'call putimage', note: 'stamp Mars' },
+  { off: '0F3E', code: 'call putimage', note: 'Earth: 60 by 50' },
+  { off: '0FAC', code: 'call putimage', note: 'Venus: 35 by 35' },
+  { off: '101A', code: 'call putimage', note: 'Mercury: 20 by 20' },
+  { off: '1027', code: 'fdiv dword [19A9h]', note: 'pi ÷ 80' },
+  { off: '102C', code: 'fsubr [bp-10h]', note: 'Mercury turns' },
+  { off: '1047', code: 'jb   1058', note: 'at 0: pi × 2 again' },
+  { off: '1062', code: 'fdiv dword [19C1h]', note: 'Venus: ÷ 225, × 88' },
+  { off: '10A2', code: 'fdiv dword [19C9h]', note: 'Earth: ÷ its year' },
+  { off: '10E2', code: 'fdiv dword [19CDh]', note: 'Mars: ÷ 687, × 88' },
+  { off: '111E', code: 'jmp  0E04', note: 'no key: next frame' },
+];
+const C = [
+  { code: 'do {' },
+  { code: '  key = bioskey(1);', note: 'peek, never wait' },
+  { code: '  if (key == F1) help();', note: 'and Alt+X, Esc' },
+  { code: '  y = 175 + sin(mars) * 70;' },
+  { code: '  x = 160 + cos(mars) * 80;' },
+  { code: '  putimage(x, y, mars_pic, 0);', note: 'COPY_PUT' },
+  { code: '  /* Earth, Venus, Mercury: the same */' },
+  { code: '  mercury -= pi / 80;' },
+  { code: '  if (mercury <= 0) mercury = pi * 2;' },
+  { code: '  venus -= pi / 80 / 225 * 88;' },
+  { code: '  /* Earth, Mars: their own years */' },
+  { code: '} while (key == 0);' },
+];
+const ang = (name: string, v: number, changed = false) => ({ name, value: f2(v), means: `${name === 'Mer' ? 'Mercury' : name === 'Ven' ? 'Venus' : name === 'Ear' ? 'Earth' : 'Mars'}'s angle, in radians`, changed });
+const xy = (k: number) => [{ name: 'x', value: String(at[k][0]), means: 'left edge of the picture' }, { name: 'y', value: String(at[k][1]), means: 'top edge of the picture' }];
+const S = (a: number, c: number, say: string, regs: object[], k: number, mark: number[] | null, turned = 0) => ({ a, c, say, regs, k, mark, turned });
+const box = (k: number) => [at[k][0], at[k][1], PLANETS[k].w, 13];
+const sinM = Math.sin(now[0]), cosM = Math.cos(now[0]);
+const steps = [
+  S(0, 1, `Frame ${F}. First, <b>is a key waiting?</b> <code>bioskey(1)</code> only peeks, so the planets never stop to wait for you.`, [{ name: 'key', value: '0', means: 'no key: keep going' }], 0, null),
+  S(1, 2, 'F1 opens his help from anywhere, Alt+X leaves, Esc goes back. Any other key turns to the next page of text, and the planets keep moving while you read.', [{ name: 'key', value: '0', means: 'still no key' }], 0, null),
+  S(2, 3, `Mars first. Its angle is ${f2(now[0])}. The <b>sine</b> of it says how far up or down Mars is: ${f2(sinM)}.`, [ang('Mar', now[0])], 0, null),
+  S(3, 3, `Times <b>70</b>, the height of Mars's oval in pixels: ${(sinM * 70).toFixed(2)}.`, [ang('Mar', now[0]), { name: 'st0', value: (sinM * 70).toFixed(2), means: 'on the math chip' }], 0, null),
+  S(4, 3, `Plus 175, the top of the picture when Mars sits level with the sun, cut to whole pixels: <b>y = ${at[0][1]}</b>.`, [ang('Mar', now[0]), { name: 'y', value: String(at[0][1]), means: 'top edge of the picture', changed: true }], 0, null),
+  S(5, 4, `The same with the <b>cosine</b> and <b>80</b>, the oval's width: x = 160 + ${(cosM * 80).toFixed(2)}, so <b>x = ${at[0][0]}</b>.`, [ang('Mar', now[0]), { name: 'x', value: String(at[0][0]), means: 'left edge of the picture', changed: true }, { name: 'y', value: String(at[0][1]), means: 'top edge of the picture' }], 0, null),
+  S(6, 5, '<b>Stamp.</b> <code>putimage</code> copies the saved picture of Mars there, black edge included. The black edge paints over where Mars was a frame ago, so there is nothing to erase.', xy(0), 1, box(0)),
+  S(7, 6, 'Earth the same way, on its oval of 60 by 50 pixels.', xy(1), 2, box(1)),
+  S(8, 6, 'Venus, on a circle of 35.', xy(2), 3, box(2)),
+  S(9, 6, 'Mercury, on a circle of 20. All four have moved. Nothing on screen changes again until the next frame.', xy(3), 4, box(3)),
+  S(10, 7, `Now the clock. His pi is <b>22 ÷ 7</b>, the fraction every school child learns: ${PI.toFixed(4)}. Divided by 80: ${(PI / 80).toFixed(4)}.`, [{ name: 'pi', value: PI.toFixed(4), means: '22 ÷ 7' }], 4, null),
+  S(11, 7, `Mercury's angle turns back by pi/80. Going down makes the planets travel counterclockwise, as seen from above the sun.`, [ang('Mer', after[3], true)], 4, null, 4),
+  S(12, 8, 'If an angle reaches 0, it starts again at pi × 2: one full lap. Sine and cosine repeat every lap, so the planet never jumps.', [ang('Mer', after[3])], 4, null, 4),
+  S(13, 9, '<b>Venus</b> turns by the same step × 88 ÷ 225: as far as Mercury goes in 88 days, scaled to Venus\'s year of 225 days.', [ang('Ven', after[2], true)], 4, null, 3),
+  S(14, 10, '<b>Earth</b> the same way, with its year.', [ang('Ear', after[1], true)], 4, null, 2),
+  S(15, 10, '<b>Mars</b> with 687 days. So the four planets keep the true pace of their years against each other.', [ang('Mar', after[0], true)], 4, null, 1),
+  S(16, 11, 'No key yet: back to the top for the next frame. That is the whole animation.', [{ name: 'key', value: '0', means: 'next frame' }], 4, null),
+];
+const visual = (k: number) => orbitScreen(pics, now, k, before);
+const still = visual(4);
+const [X, T, CW, CH] = [22, 74, 286, 209];
+---
+
+<CodeStepper id="orbitloop" title="SUN.EXE  one frame of the orbits" cTitle="What he wrote, in C" asm={ASM} c={C} steps={steps} at={steps.length - 1}>
+  <div slot="visual" class="ol" data-orbitloop data-for="orbitloop" data-years={JSON.stringify(years())} data-f={F}>
+    <div class="ol-scr">
+      <img class="ol-still" src={png(crop(still, X, T, CW, CH), CW, CH, still.rgb())} width={CW} height={CH} alt={`Frame ${F} of his loop: the four planets around the sun.`} />
+      <canvas class="ol-cv" width={CW} height={CH} hidden role="img" aria-label="The solar system window at this step of the frame."></canvas>
+      <svg class="ol-ov" viewBox={`0 0 ${CW} ${CH}`} aria-hidden="true">
+        <rect class="ol-was" x="0" y="0" width="0" height="0" />
+        <rect class="ol-box" x="0" y="0" width="0" height="0" />
+        <g class="ol-turn"><circle r="10" cx="0" cy="0" /></g>
+      </svg>
+    </div>
+    <p class="ol-key"><span class="ol-k ol-k--box"></span> the picture being stamped <span class="ol-k ol-k--was"></span> where it was</p>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .ol { display: grid; gap: 10px; }
+  .ol-scr { position: relative; width: min(100%, 470px); margin-inline: auto; aspect-ratio: 286 / 209; background: var(--vga-0); }
+  .ol-scr :is(img, canvas, svg) { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .ol-ov { overflow: visible; }
+  .ol-box { fill: none; stroke: var(--vga-14); stroke-width: 1; opacity: 0; }
+  .ol-was { fill: none; stroke: var(--vga-11); stroke-width: 0.75; stroke-dasharray: 2 1.5; opacity: 0; }
+  .ol-turn circle { fill: none; stroke: var(--vga-14); stroke-width: 1; opacity: 0; }
+  .ol-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0 !important; font: 500 12px/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  .ol-k { display: inline-block; width: 14px; height: 10px; }
+  .ol-k--box { border: 2px solid var(--vga-14); }
+  .ol-k--was { border: 2px dashed var(--vga-11); margin-left: 8px; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { sprites, orbitClock, orbitScreen, crop, spots, PLANETS } from './sun.ts';
+  import { blit } from '../ega.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-orbitloop]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!)!;
+    const clk = orbitClock(JSON.parse(vis.dataset.years!)), pics = sprites(), F = +vis.dataset.f!;
+    const before = clk.at(F - 1).angles, now = clk.at(F).angles;
+    const at = spots(now), was = spots(before);
+    const cv = vis.querySelector<HTMLCanvasElement>('.ol-cv')!;
+    const boxEl = vis.querySelector<SVGRectElement>('.ol-box')!, wasEl = vis.querySelector<SVGRectElement>('.ol-was')!;
+    const turn = vis.querySelector<SVGCircleElement>('.ol-turn circle')!;
+    const put = (el: SVGRectElement, k: number, p: number[][]) => {
+      el.setAttribute('x', String(p[k][0] - 22 - 0.5)); el.setAttribute('y', String(p[k][1] - 74 - 0.5));
+      el.setAttribute('width', String(PLANETS[k].w + 1)); el.setAttribute('height', '14');
+    };
+    type Step = { k: number; mark: number[] | null; turned: number };
+    const render = (step: Step, how: string) => {
+      const s = orbitScreen(pics, now, step.k, before);
+      blit(cv, crop(s, 22, 74, 286, 209), 286, 209, s.rgb());
+      const d = how === 'jump' || reduce() ? 0 : 0.3;
+      const k = step.mark ? step.k - 1 : -1;
+      if (k >= 0) { put(boxEl, k, at); put(wasEl, k, was); }
+      gsap.to([boxEl, wasEl], { opacity: k >= 0 ? 1 : 0, duration: d });
+      const t = step.turned - 1;
+      if (t >= 0) { turn.setAttribute('cx', String(at[t][0] - 22 + PLANETS[t].w / 2)); turn.setAttribute('cy', String(at[t][1] - 74 + 6.5)); }
+      gsap.fromTo(turn, { opacity: t >= 0 ? 1 : 0, attr: { r: t >= 0 && d ? 4 : 10 } }, { attr: { r: 10 }, duration: d, ease: 'expo.out' });
+    };
+    root.addEventListener('stepper', e => { const { step, how } = (e as CustomEvent).detail; render(step, how); });
+    const steps: Step[] = JSON.parse(root.querySelector('[data-trace]')!.textContent!);
+    render(steps[(root as HTMLElement & { stepper?: { i: number } }).stepper?.i ?? steps.length - 1], 'jump');
+    cv.hidden = false;
+    vis.querySelector<HTMLElement>('.ol-still')!.hidden = true;
+  });
+</script>

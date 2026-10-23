@@ -1,0 +1,40 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Toc from './Toc.astro';
+import type { Era } from '../lib/eras/eras';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  lead?: string;
+  era?: Era;
+}
+const { title, description, heading, lead, era } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} era={era}>
+  <div class="container read">
+    <header class="page-head read-head">
+      <h1>{heading}</h1>
+      {lead && <p class="lead">{lead}</p>}
+      <slot name="head" />
+    </header>
+    <div class="read-grid">
+      <div class="read-main"><slot /></div>
+      <Toc />
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .read-head { padding-bottom: clamp(48px, 6vw, 88px); border-bottom: 1px solid var(--rule); }
+  .read-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 260px;
+    gap: clamp(40px, 5vw, 88px);
+    align-items: start;
+    padding-top: clamp(48px, 6vw, 88px);
+  }
+  @media (max-width: 1199px) { .read-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>

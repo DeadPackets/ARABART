@@ -1,0 +1,302 @@
+{
+ "file": "SUN/SUN.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header, rebuilt by the museum unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 7016,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "1,746 addresses that DOS patches at load time, mostly far calls between the code segments of a large-model program.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 7016,
+   "end": 7024,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Fills the header to a 16-byte boundary.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 7024,
+   "end": 7613,
+   "kind": "startup",
+   "label": "Borland C++ startup (c0)",
+   "note": "Sets up memory, then calls main() far at 0302:0007 with far argv and envp, the sign of the large memory model.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 7613,
+   "end": 18773,
+   "kind": "library",
+   "label": "Borland C++ runtime library",
+   "note": "printf, farmalloc, bioskey, sin, cos and the start of the floating-point support.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 18773,
+   "end": 19351,
+   "kind": "code",
+   "label": "Help pop-up (segment 02DE)",
+   "note": "F1 from anywhere: saves the screen under a box with getimage, draws the key list, restores it with putimage.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 19351,
+   "end": 19514,
+   "kind": "code",
+   "label": "main() (segment 0302)",
+   "note": "Checks that ARABART is in memory, shows the opening verse, the title and the poem, then runs the menu through a table of five choices.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-letters"
+  },
+  {
+   "start": 19514,
+   "end": 26331,
+   "kind": "code",
+   "label": "The sun in the Quran (segment 030C)",
+   "note": "An illustrated introduction, then the fifteen verse cards, each laid out by hand.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-quran"
+  },
+  {
+   "start": 26331,
+   "end": 26897,
+   "kind": "code",
+   "label": "ARABART helpers (segment 04B6)",
+   "note": "Small C functions with a few lines of assembly inside that call ARABART through the video service, plus his shadow and outline effects.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-letters"
+  },
+  {
+   "start": 26897,
+   "end": 32262,
+   "kind": "code",
+   "label": "Screen kit (segment 04DA)",
+   "note": "Starting the graphics, his 16 colors, the opening verse, keys, panels and edges, the menu, the sun drawn in the dark and the closing card.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-dark"
+  },
+  {
+   "start": 32262,
+   "end": 34971,
+   "kind": "code",
+   "label": "Poem screen (segment 0629)",
+   "note": "His prose poem to the sun beside a night sky with a moon and clouds.",
+   "by": "yasser",
+   "evidence": "inferred",
+   "link": "#bs-map"
+  },
+  {
+   "start": 34971,
+   "end": 40499,
+   "kind": "code",
+   "label": "The sun and nature (segment 06D2)",
+   "note": "The solar system with Mercury, Venus, Earth and Mars moving at the pace of their years, then the sun’s facts, its mass and its density.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-sky"
+  },
+  {
+   "start": 40499,
+   "end": 52368,
+   "kind": "code",
+   "label": "Cycle of life (segment 082C)",
+   "note": "Nine pages: day and night, the seasons, the phases of the Moon and the water cycle, each with its own animation.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 52368,
+   "end": 62464,
+   "kind": "library",
+   "label": "Floating-point emulator",
+   "note": "Borland code that does the math chip’s work in software, for sine and cosine on PCs without one (about 10 KB).",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 62464,
+   "end": 63952,
+   "kind": "library",
+   "label": "8087 fix-up and error handler",
+   "note": "Turns the placeholders for math instructions into real ones when the PC has a math chip.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 63952,
+   "end": 79424,
+   "kind": "library",
+   "label": "BGI graphics library",
+   "note": "initgraph, line, putimage, setrgbpalette and the rest of Borland Graphics Interface; the driver itself loads from EGAVGA.BGI.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#bs-map"
+  },
+  {
+   "start": 79424,
+   "end": 79570,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "Borland copyright and the \"Abnormal program termination\" message.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 79570,
+   "end": 90288,
+   "kind": "text",
+   "label": "His texts and constants",
+   "note": "All the Arabic, typed as the English keys of an Arabic keyboard, and the numbers of the orbits: sizes in pixels and the planets’ years.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#bs-letters"
+  },
+  {
+   "start": 90288,
+   "end": 90352,
+   "kind": "unknown",
+   "label": "Data",
+   "note": "Sixty-four bytes of data between his texts and the runtime data.",
+   "by": "unknown",
+   "evidence": "inferred"
+  },
+  {
+   "start": 90352,
+   "end": 93792,
+   "kind": "data",
+   "label": "Runtime and BGI data",
+   "note": "Floating-point error messages, math constants, BGI error strings and driver tables.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 19351,
+   "end": 19514,
+   "name": "main",
+   "note": "The ARABART check, the opening screens, then the menu loop.",
+   "link": "#bs-letters",
+   "lines": [
+    {
+     "off": 19367,
+     "note": "Asks: is ARABART in memory?"
+    },
+    {
+     "off": 19379,
+     "note": "If not, print the error and leave"
+    },
+    {
+     "off": 19390,
+     "note": "Back to DOS: mov ah,4Ch / int 21h"
+    }
+   ]
+  },
+  {
+   "start": 26331,
+   "end": 26372,
+   "name": "ar_installed",
+   "note": "INT 10h with AX=3600h asks ARABART if it is there; it answers 5944h, and minus 5943h that makes 1.",
+   "link": "#bs-letters",
+   "lines": [
+    {
+     "off": 26350,
+     "note": "mov ax,3600h: the install question"
+    },
+    {
+     "off": 26355,
+     "note": "sub ax,5943h turns the answer into 1"
+    }
+   ]
+  },
+  {
+   "start": 26675,
+   "end": 26756,
+   "name": "shadow_text",
+   "note": "Draws a line in dark color 8, 6 pixels down and right, then in its own color on top.",
+   "link": "#bs-letters"
+  },
+  {
+   "start": 26756,
+   "end": 26897,
+   "name": "outline_text",
+   "note": "Draws a string 4 times at the diagonal 1-pixel offsets, then once in the middle in a second color.",
+   "link": "#bs-letters"
+  },
+  {
+   "start": 26952,
+   "end": 27467,
+   "name": "draw_sun",
+   "note": "Six discs in 6 palette slots set to black, then the slots become six shades from (63,50,0) to (63,38,0).",
+   "link": "#bs-dark",
+   "lines": [
+    {
+     "off": 26980,
+     "note": "getpalette, then 6 slots to black"
+    },
+    {
+     "off": 27349,
+     "note": "setrgbpalette: first shade, red 63 green 50"
+    }
+   ]
+  },
+  {
+   "start": 37573,
+   "end": 39413,
+   "name": "solar_system",
+   "note": "Draws the four planet pictures, then stamps them on their ovals every frame until a key is pressed.",
+   "link": "#bs-sky",
+   "lines": [
+    {
+     "off": 37720,
+     "note": "pi = 22.0 / 7.0"
+    },
+    {
+     "off": 39090,
+     "note": "Mercury angle -= pi/80"
+    },
+    {
+     "off": 39218,
+     "note": "Earth: divided by its year, times 88"
+    },
+    {
+     "off": 38548,
+     "note": "Loop while no key is waiting"
+    }
+   ]
+  },
+  {
+   "start": 32003,
+   "end": 32045,
+   "name": "exit_screen",
+   "note": "The closing card with his name, a key, then back to text mode and DOS.",
+   "link": "#bs-map"
+  }
+ ]
+}

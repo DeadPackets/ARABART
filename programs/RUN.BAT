@@ -10,7 +10,7 @@ cd c:\ARCHIVE
 
 REM Welcome message
 CLS
-ECHO Welcome to DOSArchive!
+ECHO Welcome to ARABART!
 ECHO A collection of my father's (Yasser Awad) old DOS programs
 ECHO Each directory resembles a certain project, with a README.TXT explaining the project and how to run it.
 ECHO Enjoy!

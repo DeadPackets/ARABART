@@ -1,0 +1,552 @@
+<!--Copyright (c) DinarSoft Corporation. All rights reserved.-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Htm-Help" CONTENT="HandySwitcher.htm#Main_Contents">
+<TITLE>Help Title</TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+<!-- PegHelp -->
+ 
+<A NAME="Main_Contents"></A>
+
+<b>Contents</b><br>
+<A href="HandySwitcher.htm#hs_na" >Navigation</A><br>
+<A href="HandySwitcher.htm#hs_sh" >Shortcuts</A><br>
+<A href="HandySwitcher.htm#hs_op" >Options</A><br>
+<A href="HandySwitcher.htm#hs_ac" >Actions</A><br>
+<A href="HandySwitcher.htm#hs_il" >Special and Automation List</A><br>
+<A href="HandySwitcher.htm#hs_mi" >Menu Items</A><br>
+<A href="HandySwitcher.htm#hs_ds" >Display</A><br>
+<A href="HandySwitcher.htm#hs_ic" >Icons</A><br>
+<A href="HandySwitcher.htm#hs_co" >Colors</A><br>
+<A href="HandySwitcher.htm#hs_cp" >CPU Usage</A><br>
+<A href="HandySwitcher.htm#hs_mu" >Memory Usage</A><br>
+<A href="HandySwitcher.htm#hs_ab" >About</A><br>
+<A href="HandySwitcher.htm#hs_rg" >Registration</A><br>
+
+<BR><!-- PegHelp --><HR>
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_sh"></A><font color="#6699ff" size="3"><B>Shortcuts</B></font><br>
+ <br>
+ 
+ HandySwitcher installs several shortcuts (icons).<br />
+ The main shortcut is named HandySwitcher and is installed in the main programs folder, the other shortcuts are created in a subfolder under the programs folder named "HandySwitcher Actions".<br />
+ <br>
+ Each shortcut of those can be assigned to a hardware button (go to Start->Settings->Buttons and select the button you want to use and then from the drop down menu find the HandySwitcher action you want to assign to it).<br><br>
+ The main shortcut "HandySwitcher", runs HandySwitcher while if HandySwitcher is already
+    running, using this shortcut will show HandySwitcher's menu.<br>
+ The other shortcuts are named as HandySwitcher followed by the action name between square brackets.<br /><br />
+    Shortcuts are:<br>
+ <ul>
+ <li><b>HandySwitcher [OK-Close]</b> to close the active program. </li>
+ <li>
+ <b>HandySwitcher [Minimize]</b> to minimize the active program. </li>
+ <li>
+ <b>HandySwitcher [Close All]</b> to close all running programs. </li>
+ <li>
+ <b>HandySwitcher [Close All But Active]</b> to close all the programs running in the background.</li>
+ <li>
+ <b>HandySwitcher [Minimize All]</b> to minimize all running programs. </li>
+ <li>
+ <b>HandySwitcher [Activate Next]</b> to switch to the next running program (similar
+     to alt-tab on the desktop PC). </li>
+ </ul>
+
+<br>
+<b><em>See Also</em></b><br>
+<A href="HandySwitcher.htm#Main_Contents">Contents</a><br>
+<A href="HandySwitcher.htm#hs_op" >Options</A><br>
+<A href="HandySwitcher.htm#hs_na" >Navigation</A><BR><!-- PegHelp --><HR>
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_na"></A><font color="#6699ff" size="3"><B>Navigation</B></font><br>
+<br>
+<IMG alt="" src="file:HS1.bmp"><IMG alt="" src="file:HS2.bmp"><br>
+<IMG alt="" src="file:HS3.bmp">
+ <br>
+ <br />
+ <b>Menu<br>
+ </b>
+ HandySwitcher's menu shows a list of the running programs along with a list of
+    actions (like Close all, CPU usage ...etc).
+ HandySwitcher shows only the running
+    programs which are not in the <A href="HandySwitcher.htm#hs_il" >Ignore List</A><br>
+ <br />
+
+ To activate a program in the list, just tap on the program's name.
+ <br />
+ To close a program in the list, just tap on the [X/OK] button beside the program
+    name. Please note that the [X/OK] button beside each program does a force-close, so even if a program is in the <A href="HandySwitcher.htm#hs_il" >Minimize List</A> or <A href="HandySwitcher.htm#hs_il" >System default list</A>,
+    it will also be closed.
+ <br />
+ 
+ The list of actions below the list of running programs are configurable, you can add or remove from them through the <A href="HandySwitcher.htm#hs_mi" >Menu Items</A>
+    dialog.<br />
+ <br />
+ <b>Hardware keys support</b><br>
+ While the menu is displayed you can use your D-Pad to completely control your HandySwitcher functions.<br />
+ - Use the up/down buttons to navigate through the menu items.<br>
+ - Use the left direction key, to close the menu.<br>
+ - Use the action button, to activate the selected program or execute the selected action.<br>
+ - Use the right direction key, to close the select program.<br>
+ <br>
+ If you want to use hardware keys to bring up HandySwitcher's menu then you need to assign a hardware button to HandySwitcher's shortcut.<br>
+ For more information about HandySwitcher's shortcuts and hardware button assignment visit the <A href="HandySwitcher.htm#hs_sh" >shortcuts</A> section<br>
+ <br>
+ <br>
+ 
+ 
+
+ <b><em>See Also<BR></em></b>
+ <A href="HandySwitcher.htm#Main_Contents">Contents</a><br>
+ <A href="HandySwitcher.htm#hs_sh" >Shortcuts</A><br>
+ <A href="HandySwitcher.htm#hs_op" >Options</A><br>
+ <!-- PegHelp -->
+ <HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_cp"></A><font color="#6699ff" size="3"><B>CPU Usage</B></font><br>
+
+
+<br>
+
+This dialog shows you a list of all the running processes in the system.
+Along with the executable name, you'll see CPU percentage used. This dialog refreshes dynamically
+    to provide most up-to-date information.
+ <br>
+ <br>
+ <b>Can I change the sorting?</b>
+ <br>
+ You can sort by CPU usage or by process name by tapping on the header.<br>
+ Tapping on the header again will reverse the sort order.
+ <br>
+ <br>
+ <b>
+
+What is the "Include the calculation time"?</b>
+ <br>
+This option allows include/exclude the time taken to gather and calculate the CPU usage data. (This time is added to the services.exe as HandySwitcher is running as a service.)
+ <br>
+ <br>
+ <b>
+
+What is the "Memory >" button?</b>
+ <br>
+HandySwitcher has another dialog that provides you with the memory allocated by each process; you can switch to the memory usage dialog using this button.<br>
+    <br />
+    <br>
+<b><i>See Also</i></b><BR>
+ <A href="HandySwitcher.htm#Main_Contents">Contents</a><br>
+ <A href="HandySwitcher.htm#hs_mu">Memory Usage</A><br>
+
+ <!-- PegHelp -->
+
+<HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_mu"></A><font color="#6699ff" size="3"><B>Memory Usage</B></font><br>
+ <br>
+ This dialog shows a list of all the running processes in the system. For each process,
+    the executable name and memory used are shown. This dialog
+ will not-refresh dynamically as the memory usage calculations is a bit long process
+ on some devices.
+ <br>
+ <br>
+ <b>Can I change the sorting?<br>
+ </b>You can sort by memory usage or by process name by tapping on the header.
+ Tapping on the header again reverses the sort order.
+ <br>
+ <br>
+ <b>How can I update the memory usage information?</b>
+ <br>
+ Using the [refresh] button you can force HandySwitcher to update its data and re-calculate
+ the memory usage for each process.
+ <br>
+ <br>
+ <b>Can I terminate any running process?<br>
+ </b>HandySwitcher gives you the ability to terminate any running process by
+ selecting the process and then using the [terminate] button. However, not every
+ process can be terminated safely. HandySwitcher warns before terminating
+ any process and if the process is crucial, a second
+ warning is shown.<br>
+ <br>
+ <b>What is the "CPU &gt;" button?<br>
+ </b>HandySwitcher has another dialog that provides you with the CPU percentage
+ used by each process, you can switch to the CPU usage dialog using this button.
+ <br>
+    <br />
+    <br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</a><br>
+<A href="HandySwitcher.htm#hs_cp" >CPU Usage</A><BR><!-- PegHelp --><HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_op"></A><font color="#6699ff" size="3"><B>Options</B></font><br>
+ <br />
+ HandySwitcher offers many features and many customization abilities.
+ You enable/disable those features and customize the way it behaves through the options dialogs. Available
+    options are.
+ <br />
+ <A href="HandySwitcher.htm#hs_ac" >Actions</A><br>
+ <A href="HandySwitcher.htm#hs_il" >Special and Automation List</A><br>
+ <A href="HandySwitcher.htm#hs_mi" >Menu Items</A><br>
+ <A href="HandySwitcher.htm#hs_ds" >Display</A><br>
+ <A href="HandySwitcher.htm#hs_ic" >Icons</A><br>
+ <A href="HandySwitcher.htm#hs_co" >Colors</A><br>
+
+ <br><br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A><br>
+<A href="HandySwitcher.htm#hs_na">Navigation</A><br>
+<A href="HandySwitcher.htm#hs_sh" >Shortcuts</A><BR><!-- PegHelp --><HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_ac"></A><font color="#6699ff" size="3"><B>Actions<br>
+</B></font><br>
+ HandySwitcher takes control of the (OK / X) button on your top-right hand corner
+ to change its functionality to suite your needs.
+ <br>
+ This is optional as you can disable HandySwitcher’s handling of the (OK / X) by
+ remove the check mark beside the “OK / X Button” option. 
+ <br>
+ <br>
+ <b>
+ What are the different
+ actions that I can assign to the (X) Button? 
+ <br>
+ </b>
+ The default action in the Windows Mobile
+ operating system is to smart-minimize the active program when you tap on the
+ (X) button. With HandySwitcher, you can change this behaviour and assign a different
+ action to tap-and-hold on the (X) button.
+ <br>
+ The actions that you can assign to tap and tap-and-hold are
+ <br>
+ <ul>
+ <li>Close: HandySwitcher will try to close the active program. </li>
+ <li>Minimize: HandySwitcher will minimize the active program </li>
+ <li>MinimizeAll: HandySwitcher will minimize all running programs taking you directly to the today screen. </li>
+ <li>CloseAll: HandySwitcher will try to close all running programs. </li>
+ <li>ShowMenu:
+ HandySwitcher will display its menu. </li>
+ <li>Close All But Active: HandySwitcher will
+ try to close all the background running programs (giving the active program
+ more memory and CPU power to use). </li>
+ <li>SystemDefault: HandySwitcher will ask the system
+ to do the normal smart-minimize action to the active program (This might close or minimize the active program
+ </li>
+ </ul>
+ <br>
+ <b>What is the “(OK) Hardware button support”?</b><br>
+    You should use this feature only if your device is equipped with an (OK) hardware key or you have assigned a hardware key to the system &lt;OK/Close&gt; action.<br />
+    Once this feature is enabled, HandySwitcher will take over the handling of this button from the system allowing you to close (not just minimize) the active program
+    when you press this button.
+    <br />
+    <br />
+ <br>
+ <b>Can HandySwitcher start with the system?</b><br>
+ Yes, while in the options dialog, tap on the [file] menu/softkey at the bottom, and enable or disable the start with the system menu item.<br><br>
+ 
+ <b>How do I exit HandySwitcher?</b><br>
+ While in the options dialog, tap on the [file] menu/softkey at the bottom, and select "Exit HandySwitcher".<br><br>
+ <br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+    <br />
+<A href="HandySwitcher.htm#hs_sh">Shortcuts</A><br>
+<A href="HandySwitcher.htm#hs_na">Navigation</A><BR><!-- PegHelp --><HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_il"></A><font color="#6699ff" size="3"><B>Special and Automation List</B></font><br>
+ <br>
+ This is a list of special commands which HandySwitcher can automate for you along
+ with an advanced ignore list.<br>
+ Ignore list is a list of program which HandySwitcher will treat them different the rest of the programs. HandySwitcher provides a very advanced ignore list which allows
+    you to customize HandySwitcher’s behaviour towards running program the way you like.
+ <br>
+ <br>
+ To add an program to the ignore/minimize/system default lists, you just simply tap on the [+] button
+ beside the list, this will take you to another screen where you can select the action
+ you want HandySwitcher to do and assign it to one of the programs
+    in the list.
+ <br>
+ Important: Make sure to have the program you want to add running
+ when you try to add it.
+ <br>
+ To remove programs from the ignore list, simply select the program and tap
+ on the [-] button.<br>
+ <br>
+ <b>What are the different actions that I can assign to a certain program?
+ <br>
+ </b>There are several actions you can use
+ <br>
+ <ul>
+     <li><b>Ignore List </b>Programs in the ignore list will not show in HandySwitcher's
+         menu and whenever you tap on the (OK/X) button at the top HandySwitcher will send
+         your request to the system. </li>
+     <li><b>System Default</b> This is a different flavour of the "ignore list"
+         as HandySwitcher will send all your requests for this program
+         to the system.
+         However, unlike the "ignore list" the programs in this list will show in HandySwitcher's
+         menu allowing you to switch to them and force-close them using the [X] button beside
+         their names in the menu. </li>
+     <li><b>Minimize List</b> HandySwitcher will always try to minimize the programs
+         in this list unless they have an (OK) button at the top-right and not an (X) button. You
+         can switch to those programs through the menu or force-close them using
+         the [X] button beside their names in the menu. </li>
+ <li><b>Automation</b> This is actually not an ignore list per say but a special list of commands
+ HandySwitcher can automate for you, those commands are
+ <ul>
+ <li><b>Close ActiveSync on disconnect</b> When you add this to the list, HandySwitcher will
+ automatically close ActiveSync on your behalf whenever ActiveSync disconnects. This
+ is a great way to save memory, battery and CPU power as HandySwitcher will close
+ ActiveSync whenever it’s not needed anymore. (please note: This feature is available 
+    only on WM5 and above). On the next connection, ActiveSync will run automatically
+     again.&nbsp;</li>
+ <li><b>Reclaim RAM on close</b> A great way
+ to increase the free memory whenever you close a running program. </li>
+ <li><b>Compact
+ Memory on close all</b> Whenever you ask HandySwitcher to close all the programs
+ HandySwitcher will close them and ask the operating system to clean out the whole
+ memory for you.</li></ul></ul>
+ <b>Can I move one item in the list between different commands?
+ <br>
+ </b>To do this you’ll need to remove the item and then add it again in with
+ the new required action.
+ <br>
+ <br>
+ <b>What is this option for “confirmation”?</b><br>
+ Some programs do not respond to HandySwitcher’s request for shutting down, HandySwitcher
+    has the ability to let you know about that and waiting
+ for you confirmation to gracefully close them (force them to be closed). This confirmation
+ can be turned ON or OFF through this option, and if OFF, HandySwitcher will gracefully close the non-responding
+    program without warning.<br>
+ <br>
+ <b>What is “auto switch”?</b><br>
+ This is a nice feature for those who like to use the hardware buttons. If this feature
+ is enabled, HandySwitcher will activate the highlighted program
+ in the menu if you keep the highlight on the same entry for the configured amount
+ of time. This means, if you configure HandySwitcher to auto switch after 2 seconds,
+ then while you navigate through HandySwitcher’s menu items if you leave an entry
+ highlighted for more than 2 seconds, HandySwitcher will activate this program.
+ Please note that, when the auto switch features gets activated, if the selected
+ menu item is a program then
+    HandySwitcher will activate it and if the
+ selected menu item is an action then HandySwitcher will execute this action.
+ <br>
+ <br>
+ <b>Can I change the auto-switch delay?</b><br>
+ Yes, the auto-switch delay is configurable, once you activate the feature, you can
+ select the number of seconds (before the auto-switch kicks in) from the drop down
+ list box.<br>
+ <br>
+ 
+ 
+ <br>
+ <B><i>See Also</i></b><BR>
+ <A href="HandySwitcher.htm#Main_Contents">Contents</a>
+    <br />
+ <A href="HandySwitcher.htm#hs_na">Navigation</a><BR><!-- PegHelp --><HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+
+<A NAME="hs_mi"></A><font color="#6699ff" size="3"><B>Menu Items<br>
+</B></font><br>
+ HandySwitcher’s menu shows a list of running programs (except those in the
+ <A href="HandySwitcher.htm#hs_il">ignore list</a>) and a set of menu items for different actions. 
+ <br>
+ You can enable or disable
+ those menu items through the check boxes in the menu items dialog. 
+ <br>
+ <br>
+ <b>What are the different commands that I can add to the menu?</b>
+ <br>
+
+ <ul>
+ <li><b>Close All But Active</b> This action closes all the programs running in the background leaving the
+ active program running. (Please note: Programs in the “<A href="HandySwitcher.htm#hs_il">ignore list</a>”, the
+ “<A href="HandySwitcher.htm#hs_il">always minimize list</a>” and the “<A href="HandySwitcher.htm#hs_il">system default list</a>” will not be closed). </li>
+ <li><b>Close All</b> This action closes all the programs running in the background and
+     foreground. (Please note: Programs in the “<A href="HandySwitcher.htm#hs_il">ignore list</a>”, the
+ “<A href="HandySwitcher.htm#hs_il">always minimize list</a>” and the “<A href="HandySwitcher.htm#hs_il">system default list</a>” will not be closed).</li>
+ <li><b>Minimize All</b> This action minimizes all the running programs (Showing the today screen). </li>
+ <li><b>CPU Usage</b> This brings up the “<A href="HandySwitcher.htm#hs_cp" >CPU Usage</A>” dialog where you can see a
+ list of all running processes and their CPU usage.</li>
+ <li><b>Memory Usage</b> This action brings up the “<A href="HandySwitcher.htm#hs_mu" >Memory Usage</A>” dialog where you can see a list of running processes
+ and their memory usage. </li>
+ <li><b>Minimize Active</b> This action minimizes the active program. </li>
+ <li><b>Close Active</b> This action closes the active program (unless the program
+ was in the “<A href="HandySwitcher.htm#hs_il">ignore list</a>”, the
+ “<A href="HandySwitcher.htm#hs_il">always minimize list</a>” and the “<A href="HandySwitcher.htm#hs_il">system default list</a>”.
+ </li>
+ </ul>
+
+ <br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#hs_na">Navigation</A><br>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+
+<BR><!-- PegHelp --><HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+
+<A NAME="hs_ds"></A><font color="#6699ff" size="3"><B>Display<br>
+</B></font><br>
+
+Through the display customization dialog, you can customize many areas of HandySwitcher
+<br>
+<b>
+ <br>
+ Change the default interface language.</b>
+
+<br>
+    In the "Display" tab, there is a list of all installed interface languages. Select the language you want from the drop down list box and close the options dialog.
+ <br>
+ <br>
+ <b>Turn the icons display in the menu on and off
+ <br>
+ </b>
+ You can tick or un-tick the check box beside the “Show icons in the menu”
+ to enable/disable the showing of icons in the menu.
+ <br>
+ <br>
+ <b>Custom program icon</b>
+ <br>
+ You can change HandySwitcher’s icon (the one displayed in the top or bottom bar
+ and usually used to bring HandySwitcher’s menu up). You can achieve this by enabling
+ this feature and providing the full path of your custom icon file. The custom icon
+ file has to be a BMP file 16x16 for QVGA devices and 32x32 for VGA devices. Pure
+ pink RGB(255,0,255) is used as a transparent color.
+ <br>
+ <br>
+ <b>Change the menu background (skin).</b>
+ <br>
+ You can select between<br>
+ <ul>
+ <li>
+ No image, where HandySwitcher will use your “<A href="HandySwitcher.htm#hs_co" >Menu Colors</A>” settings</li>
+ <li>Theme image, where HandySwitcher will use your theme image as a background.</li>
+ <li>Custom image, where you need to provide your own image to be displayed. 
+ <br>
+ The supported formats for the menu background are BMP, JPEG, GIF or PNG. <br>
+ Please note, if HandySwitcher doesn't display your custom image, then the size your image might be very big, try to use a smaller one instead.</li>
+ </ul>
+
+ Along with the background image you can also change the colors
+ through the <A href="HandySwitcher.htm#hs_co">colors</A> dialog.
+ <br>
+
+
+ <b><em>
+     <br />
+ <br>
+ See Also</em></b><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+    <br />
+<A href="HandySwitcher.htm#hs_co" >Colors</A><br>
+<A href="HandySwitcher.htm#hs_ic" >Icons</A><br>
+<A href="HandySwitcher.htm#hs_mi" >Menu Items</A><br>
+
+<BR><!-- PegHelp -->
+<HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+
+<A NAME="hs_ic"></A><font color="#6699ff" size="3"><B>Icons<br>
+</B></font>
+    <br />
+ By default HandySwitcher displays its icon at the top with the ability to display
+ shortcuts to the other “DinarSoft Handy” products (HandyMenu and HandyLauncher).
+ <br>
+ Through this dialog you can turn on/off the display of the shortcuts for HandySwitcher,
+    HandyMenu and/or HandyLauncher.
+ <br>
+ Using the arrows beside each shortcut name, you can move the shortcut in the top
+ bar left or right to the position you like most.
+ <br>
+ <br>
+ <b>Compact icons display
+ <br>
+ </b>This is a “shortcut display mode” to save space in the top bar; HandySwitcher
+ can display the shortcuts to HandyMenu and/or HandyLauncher as small arrows below
+ HandySwitcher’s. And by default HandyMenu is displayed to the right and HandyLauncher
+ is displayed to the left; however, you can also reserve this behaviour using the
+ “HandyMenu to the left” option.
+ <br>
+ <br>
+ <b>Calculate locations from the right.</b>
+ <br>
+ By default the shortcuts’ positions are calculated from the right so when you switch
+ the orientation the shortcuts will maintain their position relative to the start
+ menu. By enabling this feature, the opposite is used and the shortcuts will maintain
+ their distance from the (OK/Close) button whenever the orientation changes.<br>
+ <br>
+ <b>Show Icon in the tray bar</b>
+ <br>
+ By enabling this feature you can have a shortcut to HandySwitcher in the tray bar
+ (bottom bar) and this can be used along or without the top bar icon. Same Tap and
+ tap-and-hold actions are supported on the tray bar icon (as configured in the “Actions”
+ dialog.
+
+ <br>
+<B><i>
+    <br />
+ <br>
+ See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+    <br />
+<A href="HandySwitcher.htm#hs_mi" >Menu Items</A><br>
+<A href="HandySwitcher.htm#hs_ds" >Display</A><br>
+<A href="HandySwitcher.htm#hs_co" >Colors</A><BR>
+ <!-- PegHelp -->
+ <HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_co"></A><font color="#6699ff" size="3"><B>Colors</B></font><br>
+ <br>
+ Through this dialog you’ll be able to change the colors used in HandySwitcher’s
+ menu. Choose between
+ <br>
+ <ul>
+ <li><b>No colors</b> (system default menu colors) </li>
+ <li><b>Theme colors </b>(Let HandySwitcher find the colors that matches your
+ theme) </li>
+ <li><b>Theme colors reverse </b>(Another variation of theme colors). </li>
+ <li><b>Custom colors </b>(where you select your own colors for each item in
+ the menu. 
+ <br />
+     (while in the custom mode, you'll need to tap on the box that shows the current color
+ to be able to select a different color).</li>
+ </ul>
+ Please note that, background colors will not show if you use background image for
+ the menu.<br><br><br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+    <br />
+<A href="HandySwitcher.htm#hs_mi" >Menu Items</A><br>
+<A href="HandySwitcher.htm#hs_ds" >Display</A><br>
+<A href="HandySwitcher.htm#hs_ic" >Icons</A><BR>
+ <!-- PegHelp -->
+ <HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_ab"></A><font color="#6699ff" size="3"><B>About</B></font><br>
+ <br>
+ The about screen gives information about the version number of the product and the
+ copyright.<br>
+ It also shows you the status of the version you have (being a demo version or a
+ registered version), if this is a trial version, this dialog will show you the number of days left before it expires and will give you a [register] button that takes
+ you to the registration dialog.<br>
+    <br />
+ <br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+<BR>
+ <!-- PegHelp -->
+ <HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+<A NAME="hs_rg"></A><font color="#6699ff" size="3"><B>Registration</B></font><br>
+ <br>
+ This dialog shows when your trial version expires or when you tap on the [register] button in the about dialog.
+ This dialog allows you to enter you registration code to unlock the trial copy into a full copy.
+ To obtain a registration code, you'll need to purchase a license from our web-store or from any other reseller.
+ The registration code is sent to you once your order is confirmed.
+ <br><br><br>
+<B><i>See Also</i></B><BR>
+<A href="HandySwitcher.htm#Main_Contents">Contents</A>
+<BR>
+ <!-- PegHelp -->
+ <HR style="font-weight: bold">
+<!-- ************************Topic Break************************* -->
+</BODY>
+</HTML>

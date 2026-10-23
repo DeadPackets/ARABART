@@ -1,0 +1,31 @@
+<svg class="dg" viewBox="0 0 640 162" role="img" aria-labelledby="scr-file-t">
+<title id="scr-file-t">SCREEN.COM to scale: 156 bytes of player code, then three lines of drawing script, then the exit code and credit.</title>
+<text class="t-cy" x="20" y="22">SCREEN.COM unpacked, 3,504 bytes, to scale</text>
+<rect class="box-hi" x="20" y="34" width="26.7123" height="44" />
+<rect class="box" x="46.7123" y="34" width="161.815" height="44" />
+<text x="127.62" y="62" text-anchor="middle">line 1: 945 B</text>
+<rect class="box" x="208.527" y="34" width="231.678" height="44" />
+<text x="324.366" y="62" text-anchor="middle">line 2: 1,353 B</text>
+<rect class="box" x="440.205" y="34" width="164.897" height="44" />
+<text x="522.654" y="62" text-anchor="middle">line 3: 963 B</text>
+<rect class="box-ink" x="605.103" y="34" width="14.8973" height="44" />
+<rect class="box-hi" x="20" y="104" width="18" height="18" />
+<text x="48" y="118">player: 156 bytes of code</text>
+<rect class="box-ink" x="340" y="104" width="18" height="18" />
+<text x="368" y="118">end, exit, credit: 87 B</text>
+<text class="t-cy" x="20" y="150">Each line: 5-byte header, origin, then strokes.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 190" role="img" aria-labelledby="scr-file-tn">
+<title id="scr-file-tn">SCREEN.COM parts and their sizes in bytes.</title>
+<text class="t-cy" x="10" y="18">SCREEN.COM, 3,504 bytes</text>
+<rect class="box-hi" x="10" y="30" width="9.22395" height="22" />
+<text x="98" y="47">player code 156</text>
+<rect class="box" x="10" y="62" width="55.8758" height="22" />
+<text x="98" y="79">line 1 945</text>
+<rect class="box" x="10" y="94" width="80" height="22" />
+<text x="98" y="111">line 2 1,353</text>
+<rect class="box" x="10" y="126" width="56.9401" height="22" />
+<text x="98" y="143">line 3 963</text>
+<rect class="box-ink" x="10" y="158" width="5.14412" height="22" />
+<text x="98" y="175">end, credit 87</text>
+</svg>

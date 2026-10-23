@@ -1,0 +1,28 @@
+---
+// One window, drawn in the chrome of the nearest ancestor [data-era]. API: src/components/shell/README.md
+import './window.css';
+
+interface Props {
+  title: string;
+  kind?: 'editor' | 'dialog' | 'panel' | 'help' | 'screen' | 'device';
+  active?: boolean;
+  num?: string | number;
+  as?: 'div' | 'section' | 'article' | 'aside' | 'figure';
+  class?: string;
+  [attr: string]: unknown;
+}
+
+const { title, kind = 'editor', active = false, num, as: Tag = 'div', class: cls, ...rest } = Astro.props;
+const status = Astro.slots.has('status');
+---
+
+<Tag class:list={['win', kind !== 'device' && 'wx', `win--${kind}`, { 'is-active': active }, cls]} data-win={kind} {...rest}>
+  <div class="win-bar">
+    <span class="win-sys" aria-hidden="true"></span>
+    <span class="win-title">{title}</span>
+    {num != null && <span class="win-num" aria-hidden="true">{num}</span>}
+    <span class="win-ctl" aria-hidden="true"><i></i><i></i><i></i></span>
+  </div>
+  <div class="win-body"><slot /></div>
+  {status && <div class="win-status"><slot name="status" /></div>}
+</Tag>
