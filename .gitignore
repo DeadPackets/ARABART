@@ -3,3 +3,18 @@ dist/
 .astro/
 public/bundles/
 .DS_Store
+
+# Unpacked binaries and string dumps hold personal phone numbers in plain text (the packed originals in programs/ do not).
+# Rebuild them locally with research/artifacts/programs/unpack.py before running scripts/bytes/build.py.
+research/artifacts/**/unpacked/
+research/artifacts/**/*.unp.*
+research/artifacts/programs/strings/
+research/e2e/out/
+__pycache__/
+# DinarSoft archive mirror: pages and captures hold a street address, phone/fax numbers and third-party emails,
+# and total ~100 MB. Publish only reviewed, blurred selections under public/dinarsoft/.
+research/dinarsoft/site/
+research/dinarsoft/captures/
+research/dinarsoft/downloads/
+research/dinarsoft/chip/
+research/dinarsoft/cdx/

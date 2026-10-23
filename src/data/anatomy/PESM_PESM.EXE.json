@@ -1,0 +1,188 @@
+{
+ "file": "PESM/PESM.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header, rebuilt by the museum unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 36,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "1 segment addresses that DOS patches with the real load address.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 36,
+   "end": 48,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Fills the header to a 16-byte boundary.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 48,
+   "end": 300,
+   "kind": "code",
+   "label": "Main: 16 calls",
+   "note": "Mode 12h, then 16 copies of “set DX, AX, CX, BX, call 0284”, then back to DOS with the picture still on screen.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#walk"
+  },
+  {
+   "start": 300,
+   "end": 692,
+   "kind": "text",
+   "label": "16 strings",
+   "note": "fsl hggi hgvplk hgvpdl (the Basmala on an Arabic keyboard), each with its own style keys in front.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#walk"
+  },
+  {
+   "start": 692,
+   "end": 756,
+   "kind": "code",
+   "label": "Engine entry",
+   "note": "Saves the ARABART-style registers and translates each key into a glyph code, in place.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#engine"
+  },
+  {
+   "start": 756,
+   "end": 892,
+   "kind": "code",
+   "label": "Shaper",
+   "note": "136 bytes identical to ARABART 4.15: two neighbors stay joined only if both join bits allow it.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#engine"
+  },
+  {
+   "start": 892,
+   "end": 1508,
+   "kind": "code",
+   "label": "Glyph drawing",
+   "note": "Styles, glyph runs and VGA graphics controller writes.",
+   "by": "yasser",
+   "evidence": "inferred",
+   "link": "#engine"
+  },
+  {
+   "start": 1508,
+   "end": 1528,
+   "kind": "data",
+   "label": "Engine variables",
+   "note": "Text address, x, y, color and style flags.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 1528,
+   "end": 1585,
+   "kind": "text",
+   "label": "His name and Al-Nour",
+   "note": "ياسر محمد علي, his name, and مركز النور للكومبيوتر, Al-Nour Computer Center, typed as keyboard keys with his style markup.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#keys"
+  },
+  {
+   "start": 1585,
+   "end": 2585,
+   "kind": "table",
+   "label": "Row address table",
+   "note": "500 entries, 80 bytes apart: the start of each VGA row.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 2585,
+   "end": 2603,
+   "kind": "table",
+   "label": "VGA tables",
+   "note": "Segment A000h, the bit-reverse table 0 4 2 6 1 5 3 7, and pixel masks 80h to 01h.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 2603,
+   "end": 2699,
+   "kind": "table",
+   "label": "Key to glyph table",
+   "note": "96 entries for ASCII 20h-7Fh; the top two bits of each code are the join bits.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#engine"
+  },
+  {
+   "start": 2699,
+   "end": 2726,
+   "kind": "table",
+   "label": "Font pointers",
+   "note": "Font count and pointer.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 2726,
+   "end": 6144,
+   "kind": "font",
+   "label": "Font",
+   "note": "Glyph pointer table and glyph runs. 2,758 of these bytes are identical to ARABART 4.15.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#engine"
+  }
+ ],
+ "routines": [
+  {
+   "start": 692,
+   "end": 756,
+   "name": "arabart_entry",
+   "note": "The same registers as the ARABART TSR, reached with CALL instead of INT 10h.",
+   "link": "#engine",
+   "lines": [
+    {
+     "off": 702,
+     "note": "AL = color"
+    },
+    {
+     "off": 739,
+     "note": "Key to glyph code through the table at 09FB"
+    },
+    {
+     "off": 744,
+     "note": "Written back over the text"
+    }
+   ]
+  },
+  {
+   "start": 55,
+   "end": 295,
+   "name": "sixteen_calls",
+   "note": "Every mix of bold, underline and italic, at two sizes.",
+   "link": "#walk",
+   "lines": [
+    {
+     "off": 67,
+     "note": "First call: white, x 600, y 60"
+    },
+    {
+     "off": 175,
+     "note": "Call 9: *$ resets and doubles the size"
+    }
+   ]
+  }
+ ]
+}

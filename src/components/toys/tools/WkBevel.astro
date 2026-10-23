@@ -1,0 +1,142 @@
+---
+// One button from his style table at CS:09B2, drawn ring by ring. Press it (pointer, touch, Space or Enter), pick any of
+// the 6 styles in the table, and change the face color with his rule. Without JS: the raised button and the table.
+import Window from '../../shell/Window.astro';
+import { fb, button, icon, tokens, rings, tint, STYLES, TABLE, EGA, COLOR_NAMES, hex2 } from './wk.ts';
+import { menu2, png, b64 } from './wk-ssr.ts';
+
+const dat = menu2();
+const W = 56, H = 42;
+const f = fb(W, H, 7);
+button(f, 4, 4, 48, 34, 0x60, 7);
+icon(f, tokens(dat, 0x0ac2), 6, 10);
+const img = png(f);
+const FACES = [7, 1, 2, 3, 4, 5, 6];
+const pairs = (s: number) => rings(s).map(([a, b]) => ({ a, b }));
+---
+
+<div class="wk-bv" data-wkbevel data-dat={b64(dat)}>
+  <Window title="BUTTON  style 60h, face 7" kind="dialog" class="wk-bv-win">
+    <div class="wk-bv-stage">
+      <img src={img} width={W} height={H} alt="His raised button at 6 times its size: a black outline, two rings of white on the top and left and dark gray on the bottom and right, a gray face and the DOS logo." />
+      <button type="button" class="wk-bv-btn" aria-pressed="false" aria-label="Press his button" hidden><canvas width={W} height={H}></canvas></button>
+    </div>
+    <p class="wk-bv-say" data-say aria-live="polite">Style 60h, raised: a black outline, then light on the top and left. Press it.</p>
+  </Window>
+  <Window title="STYLES  his style table" kind="editor" active class="wk-bv-table">
+    <div class="wk-bv-rows" role="radiogroup" aria-label="Button style" data-rows>
+      {STYLES.map(st => (
+        <button type="button" role="radio" class="wk-bv-row" data-s={st.s} aria-checked={String(st.s === 0x60)} tabindex={st.s === 0x60 ? 0 : -1}>
+          <span class="wk-bv-off">{(0x9b2 + st.s - 0x10).toString(16).toUpperCase().padStart(4, '0')}</span>
+          <span class="wk-bv-name"><b>{st.s.toString(16).toUpperCase()}h</b> {st.name}</span>
+          <span class="wk-bv-pairs">
+            {pairs(st.s).map(p => (
+              <span class="wk-bv-pair" data-a={p.a} data-b={p.b}>
+                <i style={`--c:${EGA[p.a]}`}></i>{hex2(p.a)} <i style={`--c:${EGA[p.b]}`}></i>{hex2(p.b)}
+              </span>
+            ))}
+            <span class="wk-bv-end">10</span>
+          </span>
+        </button>
+      ))}
+    </div>
+    <div class="wk-bv-faces" role="radiogroup" aria-label="Face color" data-faces hidden>
+      <span class="wk-bv-lab" aria-hidden="true">Face</span>
+      {FACES.map(c => (
+        <button type="button" role="radio" class="wk-bv-face" data-c={c} aria-checked={String(c === 7)} tabindex={c === 7 ? 0 : -1}
+          aria-label={`Face color ${c}, ${COLOR_NAMES[c]}`} style={`--c:${EGA[c]};--hi:${EGA[tint(15, c)]}`}></button>
+      ))}
+    </div>
+  </Window>
+</div>
+
+<style is:global>
+  .wk-bv { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 22px 26px; align-items: start; }
+  .wk-bv-stage { display: grid; place-items: center; padding: 18px 0; background: var(--vga-7); }
+  .wk-bv-stage img, .wk-bv-btn { width: min(100%, 336px); aspect-ratio: 56 / 42; }
+  .wk-bv-stage img, .wk-bv-btn canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+  .wk-bv-btn { padding: 0; background: none; border: 0; cursor: pointer; touch-action: none; -webkit-tap-highlight-color: transparent; }
+  .wk-bv-btn:focus-visible { outline: 3px solid var(--vga-0); outline-offset: 4px; }
+  .wk-bv-say { margin: 14px 0 0 !important; font: 500 1rem/1.5 var(--sans) !important; color: var(--ink) !important; min-height: 3em; }
+  .wk-bv-rows { display: grid; gap: 4px; }
+  .wk-bv-row {
+    display: grid; grid-template-columns: 4.5ch 9.5rem minmax(0, 1fr); gap: 4px 12px; align-items: center;
+    min-height: 44px; padding: 6px 8px; text-align: left; font: 500 13px/1.4 var(--font-code); color: var(--ink);
+    background: none; border: 0; box-shadow: inset 0 0 0 1px transparent; cursor: pointer;
+  }
+  .wk-bv-row:hover { box-shadow: inset 0 0 0 1px var(--accent-2); }
+  .wk-bv-row[aria-checked='true'] { background: var(--accent-2); color: var(--surface); }
+  .wk-bv-row:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .wk-bv-off { color: var(--accent-2); }
+  .wk-bv-row[aria-checked='true'] .wk-bv-off { color: var(--surface); }
+  .wk-bv-name b { color: var(--accent); }
+  .wk-bv-row[aria-checked='true'] .wk-bv-name b { color: var(--surface); }
+  .wk-bv-pairs { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+  .wk-bv-pair { white-space: nowrap; }
+  .wk-bv-pair i { display: inline-block; width: 10px; height: 10px; margin: 0 3px 0 0; vertical-align: -1px; background: var(--c); box-shadow: 0 0 0 1px var(--ink-2); }
+  .wk-bv-end { opacity: 0.7; }
+  .wk-bv-faces { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  .wk-bv-lab { font: 600 12px/1 var(--font-code); color: var(--accent-2); margin-right: 4px; }
+  .wk-bv-face { width: 44px; height: 44px; padding: 0; border: 0; cursor: pointer; background: linear-gradient(135deg, var(--hi) 0 22%, var(--c) 22% 78%, #555 78%); box-shadow: inset 0 0 0 1px #000; }
+  .wk-bv-face[aria-checked='true'] { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .wk-bv-face:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  @media (max-width: 860px) { .wk-bv { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 480px) {
+    .wk-bv-row { grid-template-columns: 4.5ch minmax(0, 1fr); }
+    .wk-bv-pairs { grid-column: 2; }
+  }
+</style>
+
+<script>
+  import { fb, button, icon, tokens, STYLES, COLOR_NAMES, blit, bytesOf } from './wk.ts';
+
+  document.querySelectorAll<HTMLElement & { wk?: boolean }>('[data-wkbevel]').forEach(root => {
+    if (root.wk) return;
+    root.wk = true;
+    const dos = tokens(bytesOf(root), 0x0ac2);
+    const btn = root.querySelector<HTMLButtonElement>('.wk-bv-btn')!, cv = btn.querySelector('canvas')!;
+    const say = root.querySelector('[data-say]')!, title = root.querySelector<HTMLElement>('.wk-bv-win .win-title');
+    const rows = [...root.querySelectorAll<HTMLButtonElement>('.wk-bv-row')], faces = [...root.querySelectorAll<HTMLButtonElement>('.wk-bv-face')];
+    let style = 0x60, face = 7, down = false;
+
+    const draw = () => {
+      const s = down ? 0x50 : style, f = fb(56, 42, 7);
+      button(f, 4, 4, 48, 34, s, face);
+      icon(f, dos, 6 + (down ? 2 : 0), 10 + (down ? 2 : 0));
+      blit(cv, f);
+      rows.forEach(r => r.classList.toggle('live', +r.dataset.s! === s));
+      const st = STYLES.find(x => x.s === s)!;
+      if (title) title.textContent = `BUTTON  style ${s.toString(16).toUpperCase()}h, face ${face}`;
+      say.textContent = down ? 'Pressed: style 50h, and the icon moves 2 pixels down and to the right. Let go.'
+        : `Style ${s.toString(16).toUpperCase()}h, ${st.name.toLowerCase()}: ${st.say}.${face !== 7 ? ` Face ${COLOR_NAMES[face]}: white and gray moved with it.` : ''}`;
+    };
+    const press = (on: boolean) => { if (on === down) return; down = on; btn.setAttribute('aria-pressed', String(on)); draw(); };
+    btn.addEventListener('pointerdown', e => { try { btn.setPointerCapture(e.pointerId); } catch {} press(true); });
+    for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture', 'blur']) btn.addEventListener(ev, () => press(false));
+    btn.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); press(true); } });
+    btn.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') press(false); });
+    btn.addEventListener('click', e => e.preventDefault());
+
+    // Radio groups: click, or arrows to move
+    const radios = (list: HTMLButtonElement[], pick: (b: HTMLButtonElement) => void) => {
+      const set = (b: HTMLButtonElement) => { list.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; }); pick(b); draw(); };
+      list.forEach((b, k) => {
+        b.addEventListener('click', () => set(b));
+        b.addEventListener('keydown', e => {
+          const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+          if (!d) return;
+          e.preventDefault();
+          const t = list[(k + d + list.length) % list.length];
+          set(t); t.focus();
+        });
+      });
+    };
+    radios(rows, b => (style = +b.dataset.s!));
+    radios(faces, b => (face = +b.dataset.c!));
+
+    root.querySelector('img')!.hidden = true;
+    btn.hidden = false;
+    root.querySelector<HTMLElement>('[data-faces]')!.hidden = false;
+    draw();
+  });
+</script>

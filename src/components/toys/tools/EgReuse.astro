@@ -1,0 +1,226 @@
+---
+// EDIT.EXE function by function. Each block is one of its 124 functions, sized by its instruction count; 89 are the
+// same, instruction for instruction, as a function in Digi-Test, and a thread runs up to where that twin sits in
+// MAIN.EXE. Step through the parts he brought over, or pick any block to read it.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { FUNCS } from './EgFuncs';
+
+interface Props { id?: string }
+const { id = 'egreuse' } = Astro.props;
+const GROUPS = [
+  { g: 0, name: 'New for EDIT', note: 'his TextEditor class, the key loop, main' },
+  { g: 1, name: 'Windows and dialogs' },
+  { g: 2, name: 'Screen drawing' },
+  { g: 3, name: 'Menu bar and menus' },
+  { g: 4, name: 'The file name box' },
+  { g: 5, name: 'Start-up helpers' },
+  { g: 6, name: 'Container classes', note: 'Borland’s, built into Digi-Test' },
+].map(x => ({ ...x, n: FUNCS.filter(f => f.g === x.g).length }));
+// The order the steps bring them in
+const ORDER = [[], [1], [2], [3], [4], [5, 6], [0]];
+const SAY = [
+  'EDIT.EXE holds 124 functions of his own code, in 8 blocks of memory. Where did they come from?',
+  '26 are Digi-Test’s windows and dialogs, copied whole.',
+  '39 more are its screen drawing: boxes, frames and text.',
+  '11 run the menu bar and its drop-down menus.',
+  '6 are the box where you type a file name.',
+  'And 7 more: two start-up helpers, and five of Borland’s container classes that Digi-Test had built in.',
+  '35 are new. 22 of them are his TextEditor class. So 89 of 124 functions, and 12,674 of 17,393 instructions, came straight from Digi-Test.',
+];
+const segs = [...new Set(FUNCS.map(f => f.at.slice(0, 4)))];
+const w = (n: number) => Math.round(8 + Math.sqrt(n) * 2.6);
+const END = 0x2ad40;
+const pct = (seg: string) => { const [s, o] = seg.split(':').map(h => parseInt(h, 16)); return ((s * 16 + o) / END) * 100; };
+// MAIN.EXE's code: Borland's runtime, his code, Borland's container classes, his code, Borland's graphics
+const BANDS = [[0, 0x4520, 0], [0x4520, 0x1d2a0, 1], [0x1d2a0, 0x1f5c0, 0], [0x1f5c0, 0x270d0, 1], [0x270d0, END, 0]];
+---
+
+<div class="eg-ru" id={id} data-egreuse data-at={ORDER.length - 1}>
+  <Window title="DIGI-TEST  MAIN.EXE" kind="panel" class="eg-ru-dt">
+    <div class="eg-ru-strip" aria-hidden="true">
+      {BANDS.map(([a, b, his]) => <span class:list={['eg-ru-band', { his }]} style={`left:${(a / END) * 100}%;width:${((b - a) / END) * 100}%`} />)}
+      {FUNCS.filter(f => f.twin).map(f => <span class="eg-ru-tick" data-g={f.g} data-twin={f.twin} style={`left:${pct(f.twin)}%`} />)}
+    </div>
+    <div class="eg-ru-key" aria-hidden="true"><span class="his">his code</span><span>Borland’s libraries</span></div>
+  </Window>
+  <svg class="eg-ru-threads" aria-hidden="true"><g data-threads></g></svg>
+  <Window title="EDIT.EXE  124 functions" kind="editor" active class="eg-ru-ed">
+    <div class="eg-ru-segs" role="group" aria-label="EDIT.EXE's functions, one block each. Arrow keys move between them.">
+      {segs.map(s => {
+        const fs = FUNCS.map((f, i) => ({ ...f, i })).filter(f => f.at.startsWith(s));
+        return (
+          <div class="eg-ru-seg">
+            <span class="eg-ru-seglab">{s}<small>{fs.length}</small></span>
+            <div class="eg-ru-cells">
+              {fs.map(f => (
+                <button type="button" class="eg-ru-cell" data-i={f.i} data-g={f.g} data-on="true" tabindex={f.i === 0 ? 0 : -1} style={`--w:${w(f.n)}px`}
+                  aria-label={`${f.at}, ${f.n} instructions, ${f.g ? `the same as Digi-Test ${f.twin}` : 'new'}`}></button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+    <div class="eg-ru-legend" role="group" aria-label="Where EDIT's functions came from">
+      {GROUPS.map(gr => (
+        <button type="button" class="eg-ru-chip" data-g={gr.g} aria-pressed="false">
+          <i aria-hidden="true"></i><b>{gr.n}</b> <span>{gr.name}{gr.note && <small>, {gr.note}</small>}</span>
+        </button>
+      ))}
+    </div>
+    <p class="eg-ru-say" aria-live="polite" data-say>{SAY[SAY.length - 1]}</p>
+    <div class="eg-ru-bar" aria-hidden="true"><span style="width:72.87%"></span></div>
+    <Scrubber n={ORDER.length} at={ORDER.length - 1} label="Step through where EDIT's functions came from" />
+  </Window>
+  <script type="application/json" data-cfg set:html={JSON.stringify({ ORDER, SAY, GROUPS: GROUPS.map(g => g.name), FUNCS })} />
+</div>
+
+<style is:global>
+  .eg-ru { --eg-dt: var(--vga-11); --eg-new: var(--vga-14); position: relative; display: grid; gap: 40px; }
+  .eg-ru-strip { position: relative; height: 34px; margin: 4px 0 6px; background: color-mix(in oklch, var(--ink-2) 22%, transparent); }
+  .eg-ru-band { position: absolute; top: 0; bottom: 0; background: color-mix(in oklch, var(--ink-2) 25%, transparent); }
+  .eg-ru-band.his { background: color-mix(in oklch, var(--eg-dt) 30%, transparent); }
+  .eg-ru-tick { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--eg-dt); opacity: 0.35; transition: opacity 0.2s, background-color 0.2s; }
+  .eg-ru-tick.lit { opacity: 1; background: var(--eg-new); }
+  .eg-ru-key { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .eg-ru-key span::before { content: ''; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; background: color-mix(in oklch, var(--ink-2) 40%, transparent); }
+  .eg-ru-key .his::before { background: color-mix(in oklch, var(--eg-dt) 55%, transparent); }
+  .eg-ru-legend { margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 6px; }
+  .eg-ru-chip { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 10px; text-align: left; font: 500 0.9375rem/1.3 var(--sans); color: var(--ink); background: none; border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; }
+  .eg-ru-chip i { flex: none; width: 16px; height: 16px; background: var(--eg-dt); }
+  .eg-ru-chip[data-g='0'] i { background: var(--eg-new); }
+  .eg-ru-chip b { font: 700 1rem/1 var(--font-code); color: var(--eg-dt); min-width: 2ch; }
+  .eg-ru-chip[data-g='0'] b { color: var(--eg-new); }
+  .eg-ru-chip small { font-size: 0.85em; color: var(--ink-2); }
+  .eg-ru-chip:hover { box-shadow: inset 0 0 0 2px var(--eg-dt); }
+  .eg-ru-chip[aria-pressed='true'] { box-shadow: inset 0 0 0 2px var(--eg-new); background: color-mix(in oklch, var(--eg-new) 12%, transparent); }
+  .eg-ru-chip:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .eg-ru-threads { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 3; }
+  .eg-ru-threads path { fill: none; stroke: var(--eg-new); stroke-width: 1.25; opacity: 0.75; }
+  .eg-ru-segs { display: grid; gap: 10px; }
+  .eg-ru-seg { display: grid; grid-template-columns: 6ch minmax(0, 1fr); gap: 12px; align-items: start; }
+  .eg-ru-seglab { display: grid; padding-top: 4px; font: 700 13px/1.2 var(--font-code); color: var(--eg-dt); }
+  .eg-ru-seglab small { font-weight: 500; color: var(--ink-2); }
+  .eg-ru-cells { display: flex; flex-wrap: wrap; gap: 4px; }
+  .eg-ru-cell { width: var(--w); height: 30px; padding: 0; border: 0; background: none; box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--ink-2) 60%, transparent); cursor: pointer; transform-origin: 50% 100%; }
+  .eg-ru-cell[data-on='true'] { background: var(--eg-dt); box-shadow: none; }
+  .eg-ru-cell[data-on='true'][data-g='0'] { background: var(--eg-new); }
+  .eg-ru-cell.hi { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .eg-ru-cell[aria-pressed='true'] { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .eg-ru-cell:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .eg-ru-say { margin: 18px 0 10px !important; min-height: 3.4em; font: 500 1rem/1.55 var(--sans) !important; color: var(--ink); max-width: none !important; }
+  .eg-ru-say b { color: var(--eg-new); }
+  .eg-ru-bar { height: 10px; margin-bottom: 16px; background: var(--eg-new); }
+  .eg-ru-bar span { display: block; height: 100%; background: var(--eg-dt); transition: width 0.4s var(--quart); }
+  @media (pointer: coarse) { .eg-ru-cell { height: 40px; min-width: 24px; } }
+  @media (max-width: 560px) {
+    .eg-ru-seg { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .eg-ru-seglab { display: flex; gap: 8px; padding: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .eg-ru-tick, .eg-ru-bar span { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber } from '../scrubber';
+
+  type F = { at: string; n: number; g: number; twin: string };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-egreuse]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const cfg = JSON.parse(root.querySelector('[data-cfg]')!.textContent!) as { ORDER: number[][]; SAY: string[]; GROUPS: string[]; FUNCS: F[] };
+    const cells = [...root.querySelectorAll<HTMLButtonElement>('.eg-ru-cell')];
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('.eg-ru-chip')];
+    const ticks = new Map([...root.querySelectorAll<HTMLElement>('.eg-ru-tick')].map(t => [t.dataset.twin!, t]));
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const bar = root.querySelector<HTMLElement>('.eg-ru-bar span')!;
+    const threads = root.querySelector<SVGGElement>('[data-threads]')!;
+    const strip = root.querySelector<HTMLElement>('.eg-ru-strip')!;
+    const svg = threads.ownerSVGElement!;
+    const stepOf = (g: number) => cfg.ORDER.findIndex(o => o.includes(g));
+    let step = cfg.ORDER.length - 1, pick: number | null = null;
+
+    // Threads from each lit block up to its twin's place in MAIN.EXE
+    function draw(list: number[], animate: boolean) {
+      threads.replaceChildren();
+      const box = root.getBoundingClientRect(), sb = strip.getBoundingClientRect();
+      svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
+      const paths: SVGPathElement[] = [];
+      for (const i of list) {
+        const f = cfg.FUNCS[i], t = ticks.get(f.twin);
+        if (!t) continue;
+        const c = cells[i].getBoundingClientRect(), tb = t.getBoundingClientRect();
+        const x1 = tb.left + tb.width / 2 - box.left, y1 = sb.bottom - box.top;
+        const x2 = c.left + c.width / 2 - box.left, y2 = c.top - box.top;
+        const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        const m = (y1 + y2) / 2;
+        p.setAttribute('d', `M${x1} ${y1} C${x1} ${m} ${x2} ${m} ${x2} ${y2}`);
+        threads.append(p);
+        paths.push(p);
+      }
+      if (animate && !reduce()) {
+        for (const p of paths) { const L = p.getTotalLength(); p.style.strokeDasharray = `${L}`; p.style.strokeDashoffset = `${L}`; }
+        gsap.to(paths, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut', stagger: 0.012 });
+      }
+      ticks.forEach(t => t.classList.remove('lit'));
+      for (const i of list) ticks.get(cfg.FUNCS[i].twin)?.classList.add('lit');
+    }
+
+    function lit() {
+      if (pick !== null) return [pick];
+      return step > 0 && step < cfg.ORDER.length - 1 ? cells.filter(c => cfg.ORDER[step].includes(+c.dataset.g!)).map(c => +c.dataset.i!) : [];
+    }
+
+    function show(i: number, how: string) {
+      const prev = step;
+      step = i; pick = null;
+      const on = new Set(cfg.ORDER.slice(0, i + 1).flat());
+      const fresh: HTMLElement[] = [];
+      for (const c of cells) {
+        const now = on.has(+c.dataset.g!);
+        if (now && c.dataset.on !== 'true') fresh.push(c);
+        c.dataset.on = String(now);
+        c.setAttribute('aria-pressed', 'false');
+        c.classList.toggle('hi', i > 0 && cfg.ORDER[i].includes(+c.dataset.g!));
+      }
+      chips.forEach(ch => ch.setAttribute('aria-pressed', String(i > 0 && cfg.ORDER[i].includes(+ch.dataset.g!))));
+      say.textContent = cfg.SAY[i];
+      const shared = cfg.FUNCS.filter(f => f.g && on.has(f.g)).reduce((s, f) => s + f.n, 0);
+      bar.style.width = `${(shared / 17393) * 100}%`;
+      const anim = how !== 'jump' && i > prev && !reduce();
+      if (anim && fresh.length) gsap.fromTo(fresh, { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.45, ease: 'back.out(2)', stagger: 0.01, overwrite: true });
+      draw(lit(), anim);
+    }
+
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 1.6 });
+
+    function choose(i: number) {
+      const f = cfg.FUNCS[i];
+      if (scrub.i !== cfg.ORDER.length - 1) scrub.go(cfg.ORDER.length - 1, 'jump');
+      pick = i;
+      cells.forEach((c, k) => { c.setAttribute('aria-pressed', String(k === i)); c.classList.remove('hi'); });
+      chips.forEach(ch => ch.setAttribute('aria-pressed', String(+ch.dataset.g! === f.g)));
+      say.innerHTML = f.g
+        ? `<b>${f.at}</b>, ${f.n} instructions: the same, instruction for instruction, as Digi-Test’s function at <b>${f.twin}</b>. ${cfg.GROUPS[f.g]}.`
+        : `<b>${f.at}</b>, ${f.n} instructions: new for EDIT.${f.at.startsWith('02D1') ? ' Part of his TextEditor class.' : ''}`;
+      draw([i], true);
+    }
+
+    cells.forEach((c, i) => c.addEventListener('click', () => choose(i)));
+    chips.forEach(ch => ch.addEventListener('click', () => { scrub.pause(); scrub.go(stepOf(+ch.dataset.g!), 'step'); }));
+    // One tab stop for 124 blocks; arrows move, Home and End jump
+    root.querySelector('.eg-ru-segs')!.addEventListener('keydown', e => {
+      const ke = e as KeyboardEvent, k = cells.indexOf(document.activeElement as HTMLButtonElement);
+      if (k < 0 || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(ke.key)) return;
+      e.preventDefault();
+      const to = ke.key === 'Home' ? 0 : ke.key === 'End' ? cells.length - 1 : Math.max(0, Math.min(cells.length - 1, k + (ke.key === 'ArrowRight' || ke.key === 'ArrowDown' ? 1 : -1)));
+      cells.forEach((c, j) => (c.tabIndex = j === to ? 0 : -1));
+      cells[to].focus();
+      choose(to);
+    });
+    new ResizeObserver(() => draw(lit(), false)).observe(root);
+  });
+</script>

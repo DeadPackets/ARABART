@@ -1,0 +1,11 @@
+---
+// A bitmap from his engine as crisp inline SVG: the server-rendered, no-JS form of every glyph on the page.
+import { svgRuns, type Bitmap } from './core.ts';
+
+interface Props { img: Bitmap; scale?: number; class?: string; label?: string }
+const { img, scale = 2, class: cls, label } = Astro.props;
+---
+
+<svg class:list={['pix', cls]} viewBox={`0 0 ${img.width} ${img.height}`} width={img.width * scale} height={img.height * scale} shape-rendering="crispEdges" role={label ? 'img' : undefined} aria-label={label} aria-hidden={label ? undefined : 'true'}>
+  {svgRuns(img).map(p => <path fill={p.fill} d={p.d} />)}
+</svg>

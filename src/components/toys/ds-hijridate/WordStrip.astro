@@ -1,0 +1,84 @@
+---
+// How one date becomes one picture: his list of word pictures in reading order (digits last-first), read back from
+// its end and pasted left to right (sub_104fd4 + sub_104e5c). Follows its CodeStepper: step.phase and step.k.
+import { ids, strip, svgPath, label, width } from './ar.ts';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const list = ids(0, { y: 1427, m: 9, d: 2, dow: 0 }, true);
+const s = strip(list);
+const S = 3; // pixels per glyph pixel in the strip
+const chipW = 64, gap = 6;
+const cols = list.length;
+const VB = Math.max(cols * (chipW + gap), s.width * S + 20);
+const g = (one: number) => svgPath([one]);
+---
+
+<div class="hdt-ws" id={id} tabindex="0" role="region" aria-label="How the date becomes one picture" data-ws data-phase="done" data-k={list.length} data-n={list.length}>
+  <svg class="dg" viewBox={`0 0 ${VB} 330`} role="img" aria-labelledby={`${id}-t`}>
+    <title id={`${id}-t`}>The list for الأحد ٢، رمضان ١٤٢٧: {list.map(label).join(', ')}. Read from its end and pasted left to right, it becomes one strip {s.width} pixels wide.</title>
+    <text class="t-cy" x="0" y="14">THE LIST, IN READING ORDER (RIGHT TO LEFT IN ARABIC)</text>
+    {list.map((one, i) => {
+      const p = g(one), x = VB - (i + 1) * (chipW + gap);
+      return (
+        <g class="hdt-ws-chip" data-i={i}>
+          <rect class="box" x={x} y="24" width={chipW} height="70" />
+          <svg x={x + (chipW - Math.min(p.width * 1.4, chipW - 6)) / 2} y="34" width={Math.min(p.width * 1.4, chipW - 6)} height="22" viewBox={`0 0 ${p.width} 16`} shape-rendering="crispEdges"><path class="hdt-ws-ink" d={p.d} /></svg>
+          <text class="t-sm" x={x + chipW / 2} y="74" text-anchor="middle">{one}</text>
+          <text class="t-sm" x={x + chipW / 2} y="88" text-anchor="middle">{width(one)} px</text>
+        </g>
+      );
+    })}
+    <text class="t-cy" x="0" y="124" data-ws-load>LOADED LAST FIRST</text>
+    {[...list].reverse().map((one, j) => {
+      const x = j * (chipW + gap);
+      return (
+        <g class="hdt-ws-rev" data-j={j}>
+          <rect class="box-bk" x={x} y="134" width={chipW} height="36" />
+          <text class="t-yl" x={x + chipW / 2} y="157" text-anchor="middle">{one}</text>
+        </g>
+      );
+    })}
+    <text class="t-cy" x="0" y="206" data-ws-measure>ONE STRIP, {s.width} × 16, PASTED LEFT TO RIGHT</text>
+    <rect class="box-dash hdt-ws-frame" x="0" y="216" width={s.width * S} height={16 * S} />
+    {s.placed.map((p, j) => (
+      <g class="hdt-ws-paste" data-j={j}>
+        <svg x={p.x * S} y="216" width={p.w * S} height={16 * S} viewBox={`0 0 ${p.w} 16`} shape-rendering="crispEdges"><path class="hdt-ws-ink" d={g(p.id).d} /></svg>
+        {(j === 0 || p.w > 20) && <text class="t-sm" x={p.x * S + 2} y="290">x = {p.x}</text>}
+      </g>
+    ))}
+  </svg>
+</div>
+
+<style>
+  .hdt-ws { min-width: 0; overflow-x: auto; }
+  .hdt-ws > svg { min-width: 620px; }
+  .hdt-ws :global(.hdt-ws-ink) { fill: var(--ink); }
+  .hdt-ws :global(g) { transition: opacity 0.25s; }
+  .hdt-ws :global(.hdt-ws-rev), .hdt-ws :global(.hdt-ws-paste), .hdt-ws :global(.hdt-ws-frame), .hdt-ws :global([data-ws-load]), .hdt-ws :global([data-ws-measure]) { transition: opacity 0.25s; }
+  .hdt-ws :global(.is-off) { opacity: 0.12; }
+  .hdt-ws :global(.is-hot rect) { stroke: var(--accent); stroke-width: 3; }
+  @media (prefers-reduced-motion: reduce) { .hdt-ws :global(g) { transition: none; } }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-ws]')) {
+    const n = +root.dataset.n!;
+    const all = (sel: string) => [...root.querySelectorAll<SVGElement>(sel)];
+    const chips = all('.hdt-ws-chip'), rev = all('.hdt-ws-rev'), paste = all('.hdt-ws-paste');
+    const frame = root.querySelector('.hdt-ws-frame')!, load = root.querySelector('[data-ws-load]')!, meas = root.querySelector('[data-ws-measure]')!;
+    const show = (phase: string, k: number) => {
+      const p = ['list', 'load', 'measure', 'paste', 'done'].indexOf(phase);
+      chips.forEach((c, i) => { c.classList.toggle('is-hot', phase === 'load' && i === n - k); });
+      rev.forEach((c, j) => c.classList.toggle('is-off', p < 1 || (p === 1 && j >= k)));
+      load.classList.toggle('is-off', p < 1);
+      meas.classList.toggle('is-off', p < 2); frame.classList.toggle('is-off', p < 2);
+      paste.forEach((c, j) => c.classList.toggle('is-off', p < 3 || (p === 3 && j >= k)));
+      rev.forEach((c, j) => c.classList.toggle('is-hot', phase === 'paste' && j === k - 1));
+    };
+    root.closest('[data-stepper]')?.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { phase?: string; k?: number };
+      show(s.phase ?? 'done', s.k ?? n);
+    });
+  }
+</script>

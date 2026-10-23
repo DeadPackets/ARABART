@@ -1,0 +1,397 @@
+---
+// KEMYAM, his graduation-defense circuit, drawn from FIL0.CIR exactly as stored: 4 chips, 11 inputs and outputs,
+// 8 nodes, 38 wires walked from their keypad digits. Modes: 'play' (flip inputs), 'fault' (break a pin, watch D
+// travel), 'probe' (find a hidden broken pin the way his guided probe does). Simulation: dt-sim.ts, his own evaluator.
+import { circuit } from './dt-data';
+import { simulate, NAME, O, Z } from './dt-sim';
+
+interface Props { id: string; mode: 'play' | 'fault' | 'probe'; label: string }
+const { id, mode, label } = Astro.props;
+const C = circuit();
+const IN = C.primes.filter(p => p.kind === 0x20).sort((a, b) => a.num - b.num);
+const OUTP = C.primes.find(p => p.kind === 0x40)!;
+const power = new Set(C.primes.filter(p => p.kind === 0x02 || p.kind === 0x10).map(p => p.net));
+const start: Record<number, number> = { 1: O, 2: O, 3: O, 4: O, 6: Z, 7: Z, 9: Z, 10: Z };
+const fixed = (ins: Record<number, number>) => {
+  const f: Record<number, number> = {};
+  for (const p of C.primes) f[p.net] = p.kind === 0x02 ? O : p.kind === 0x10 ? Z : p.kind === 0x20 ? ins[p.num] : f[p.net];
+  for (const k of Object.keys(f)) if (f[+k] === undefined) delete f[+k];
+  return f;
+};
+const sim = simulate(C.gates, C.nets, fixed(start));
+const cls = (net: number) => (power.has(net) ? 'pw' : `v${sim[net]}`);
+
+const pinXY = (inst: number, p: number): [number, number] => {
+  const ic = C.ics.find(i => i.inst === inst)!;
+  return p <= 7 ? [ic.x, ic.y + 1 + 2 * (p - 1)] : [ic.x + 6, ic.y + 1 + 2 * (14 - p)];
+};
+// An arrow per input or output, anchored the way his file anchors it
+function arrow(p: (typeof C.primes)[number]) {
+  const outward = p.kind === 0x02 || p.kind === 0x10;
+  if (p.side === 2) {
+    const x = p.x - 1, y0 = p.y - 6;
+    return { pts: `${x - 1.15},${p.y} ${x - 1.15},${y0 + 1} ${x},${y0} ${x + 1.15},${y0 + 1} ${x + 1.15},${p.y}`, tx: x, ty: p.y - 2.2, rot: -90, end: [x, y0] };
+  }
+  const left = p.side === 3, x0 = left ? p.x : p.x - 6, y = left ? p.y - 1 : p.y + 1;
+  const pts = outward
+    ? `${x0 + 6},${y - 1.15} ${x0 + 1},${y - 1.15} ${x0},${y} ${x0 + 1},${y + 1.15} ${x0 + 6},${y + 1.15}`
+    : `${x0},${y - 1.15} ${x0 + 5},${y - 1.15} ${x0 + 6},${y} ${x0 + 5},${y + 1.15} ${x0},${y + 1.15}`;
+  return { pts, tx: x0 + (outward ? 3.4 : 2.7), ty: y, rot: 0, end: [left ? x0 + 6 : x0, y] };
+}
+const tag = (p: (typeof C.primes)[number]) => (p.kind === 0x02 ? 'VCC' : p.kind === 0x10 ? 'GND' : `P${p.num}`);
+const kind = (p: (typeof C.primes)[number]) => (p.kind === 0x02 ? 'vcc' : p.kind === 0x10 ? 'gnd' : p.kind === 0x40 ? 'out' : 'in');
+const pathD = (pts: [number, number][]) => 'M' + pts.map(([x, y]) => `${x} ${y}`).join('L');
+const res = C.wires.flatMap(w => w.res.map(j => {
+  const [a, b] = [w.pts[j], w.pts[j + 1]];
+  return { x: (a[0] + b[0]) / 2, y: (a[1] + b[1]) / 2, rot: Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI, net: w.net };
+}));
+const data = JSON.stringify({
+  gates: C.gates.map(g => ({ ctrl: g.ctrl, inv: g.inv, ins: g.ins, out: g.out, part: g.part, pin: g.outPin, inst: g.inst, inPins: g.inPins, xy: pinXY(g.inst, g.outPin), inXY: g.inPins.map(p => pinXY(g.inst, p)) })),
+  nets: C.nets,
+  primes: C.primes.map(p => ({ num: p.num, kind: p.kind, net: p.net, xy: arrow(p).end })),
+  power: [...power],
+  wires: C.wires.map(w => w.path.filter(b => b).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join(' ')),
+  mode,
+});
+const outv = sim[OUTP.net];
+---
+
+<div class:list={['dtb', `dtb--${mode}`]} id={id} data-dtboard>
+  <script type="application/json" set:html={data.replace(/</g, '\\u003c')} />
+  <div class="dtb-screen">
+    <p class="dtb-menu" aria-hidden="true"><span>ABOUT</span><span>FILE</span><span>OBJECTS</span><span>ANALYZE</span><span>PRINT</span></p>
+    <svg class="dtb-svg" viewBox="10 14.5 130 75" role="img" aria-label={label} data-svg>
+      <rect class="dtb-sheet" x="10" y="14.5" width="130" height="75" />
+      <g class="dtb-wires">
+        {C.wires.map((w, k) => <path class:list={['dtb-w', cls(w.net)]} data-net={w.net} data-k={k} d={pathD(w.pts)} />)}
+      </g>
+      <g class="dtb-res" aria-hidden="true">
+        {res.map(r => (
+          <g transform={`translate(${r.x} ${r.y}) rotate(${r.rot})`} data-net={r.net}>
+            <rect x="-2.4" y="-0.75" width="4.8" height="1.5" rx="0.7" class="dtb-rb" />
+            <rect x="-0.9" y="-0.75" width="0.45" height="1.5" class="dtb-band" /><rect x="0.1" y="-0.75" width="0.45" height="1.5" class="dtb-band dtb-band--y" /><rect x="1" y="-0.75" width="0.45" height="1.5" class="dtb-band" />
+          </g>
+        ))}
+      </g>
+      <g class="dtb-nodes">{C.nodes.map(n => <rect class="dtb-node" x={n.x + 0.25} y={n.y + 0.25} width="1.5" height="1.5" />)}</g>
+      <g class="dtb-ics">
+        {C.ics.map(ic => (
+          <g>
+            {Array.from({ length: 14 }, (_, k) => { const [x, y] = pinXY(ic.inst, k + 1); return <rect class="dtb-pin" x={k < 7 ? x : x - 0.7} y={y - 0.3} width="0.7" height="0.6" />; })}
+            <rect class="dtb-chip" x={ic.x + 0.6} y={ic.y} width="4.8" height="14" />
+            <path class="dtb-notch" d={`M${ic.x + 2.2} ${ic.y}a0.8 0.8 0 0 0 1.6 0z`} />
+            <text class="dtb-part" transform={`translate(${ic.x + 3.75} ${ic.y + 7.6}) rotate(-90)`} text-anchor="middle">{ic.part}</text>
+          </g>
+        ))}
+      </g>
+      <g class="dtb-primes">
+        {C.primes.map(p => { const a = arrow(p); return (
+          <g class:list={['dtb-p', `dtb-p--${kind(p)}`, kind(p) === 'in' && (start[p.num] === O ? 'on' : ''), kind(p) === 'out' && outv === O && 'on']} data-prime={p.num}>
+            <polygon points={a.pts} />
+            <text transform={`translate(${a.tx} ${a.ty}) rotate(${a.rot})`} text-anchor="middle" dominant-baseline="central">{tag(p)}</text>
+          </g>
+        ); })}
+      </g>
+      <g class="dtb-tags" aria-hidden="true">
+        {C.gates.map((g, k) => { const [x, y] = pinXY(g.inst, g.outPin); const right = g.outPin > 7; return (
+          <g class="dtb-tag" data-g={k} transform={`translate(${right ? x + 0.6 : x - 3.6} ${y - 2.6})`}><rect width="3" height="2" rx="0.3" /><text x="1.5" y="1.05" text-anchor="middle" dominant-baseline="central"></text></g>
+        ); })}
+      </g>
+      <g class="dtb-marks" aria-hidden="true" data-marks></g>
+      <g class="dtb-probe" aria-hidden="true" data-probe><circle r="2.2" /><circle r="1" class="dtb-probe-dot" /></g>
+    </svg>
+    <p class="dtb-status" aria-live="polite" data-status>{mode === 'probe' ? 'Press Apply to send the test pattern.' : `P8 = ${NAME[outv]}`}</p>
+  </div>
+
+  <div class="dtb-ctl">
+    {mode !== 'probe' && (
+      <div class="dtb-row" role="group" aria-label="Circuit inputs">
+        <span class="dtb-lab">Inputs</span>
+        {IN.map(p => <button type="button" class="dtb-in" data-in={p.num} aria-pressed={String(start[p.num] === O)} disabled>P{p.num}<b>{start[p.num] === O ? 1 : 0}</b></button>)}
+      </div>
+    )}
+    {mode === 'play' && (
+      <div class="dtb-row">
+        <p class="dtb-out" data-out>Output P8 is <b>{NAME[outv]}</b></p>
+        <button type="button" class="button k-btn" data-act="redraw" hidden>Draw it again</button>
+      </div>
+    )}
+    {mode === 'fault' && (
+      <>
+        <div class="dtb-row" role="group" aria-label="Break one gate output">
+          <span class="dtb-lab">Break</span>
+          {C.gates.map((g, k) => <button type="button" class="dtb-brk" data-brk={k} aria-pressed={String(g.part === '7408' && g.outPin === 6)} disabled>{g.part}<b>pin {g.outPin}</b></button>)}
+        </div>
+        <div class="dtb-row" role="group" aria-label="Stuck at">
+          <span class="dtb-lab">Stuck at</span>
+          <button type="button" class="dtb-sa" data-sa="0" aria-pressed="true" disabled>0</button>
+          <button type="button" class="dtb-sa" data-sa="1" aria-pressed="false" disabled>1</button>
+        </div>
+        <p class="dtb-out" data-out aria-live="polite">Pick a pin to break.</p>
+      </>
+    )}
+    {mode === 'probe' && (
+      <>
+        <div class="dtb-row">
+          <button type="button" class="button button--primary k-btn" data-act="apply" disabled>Apply the pattern</button>
+          <button type="button" class="button k-btn" data-act="probe" disabled>Probe</button>
+          <button type="button" class="button k-btn" data-act="new" disabled>Break another chip</button>
+          <button type="button" class="button k-btn" data-act="siren" hidden>Hear his alarm</button>
+        </div>
+        <ol class="dtb-log" data-log aria-live="polite"></ol>
+      </>
+    )}
+  </div>
+</div>
+
+<style is:global>
+  .dtb { display: grid; gap: 16px; min-width: 0; }
+  .dtb > * { min-width: 0; }
+  .dtb-screen { background: #aaa; padding: 6px 8px 4px; box-shadow: inset 2px 2px 0 #fff, inset -2px -2px 0 #555, 8px 8px 0 var(--black); }
+  .dtb-menu { display: flex; flex-wrap: wrap; gap: 4px clamp(14px, 3vw, 34px); margin: 0 0 6px !important; padding: 2px 8px; font: 700 clamp(10px, 0.5vw + 8px, 13px)/1.6 var(--font-code) !important; letter-spacing: 0.06em; color: #0000aa !important; max-width: none !important; }
+  .dtb-svg { display: block; width: 100%; height: auto; border: 2px solid #000; box-shadow: 0 0 0 2px #fff; font-family: var(--font-code); }
+  .dtb-sheet { fill: #007900; }
+  .dtb-w { fill: none; stroke: #55ff55; stroke-width: 0.5; stroke-linejoin: round; stroke-linecap: square; transition: stroke 0.25s; }
+  .dtb-w.v2 { stroke: #ffff55; stroke-width: 0.6; }
+  .dtb-w.v6 { stroke: #ff5555; stroke-width: 0.7; }
+  .dtb-w.v9 { stroke: #ff55ff; stroke-width: 0.7; }
+  .dtb-w.v15 { stroke: #8fb88f; }
+  .dtb-rb { fill: #aa0000; }
+  .dtb-band { fill: #ff5555; } .dtb-band--y { fill: #ffff55; }
+  .dtb-node { fill: #55ff55; }
+  .dtb-chip { fill: #000; }
+  .dtb-notch { fill: #616161; }
+  .dtb-pin { fill: #f3f3f3; }
+  .dtb-part { font-size: 2.3px; font-weight: 700; fill: #8a8a8a; letter-spacing: 0.15px; }
+  .dtb-p polygon { stroke: #f3f3f3; stroke-width: 0.25; }
+  .dtb-p text { font-size: 1.55px; font-weight: 700; fill: #f3f3f3; }
+  .dtb-p--in polygon { fill: #0000aa; }
+  .dtb-p--out polygon { fill: #aa00aa; }
+  .dtb-p--vcc polygon { fill: #aa0000; }
+  .dtb-p--gnd polygon { fill: #000; }
+  .dtb-p.on polygon { fill: #ffff55; } .dtb-p.on text { fill: #000; }
+  .dtb--play .dtb-p--in, .dtb--fault .dtb-p--in { cursor: pointer; }
+  .dtb-tag { opacity: 0; transition: opacity 0.2s; }
+  .dtb-tag.show { opacity: 1; }
+  .dtb-tag rect { fill: #000; stroke: #ff5555; stroke-width: 0.2; }
+  .dtb-tag.d9 rect { stroke: #ff55ff; }
+  .dtb-tag text { font-size: 1.5px; font-weight: 700; fill: #fff; }
+  .dtb-mark { fill: #55ff55; stroke: #000; stroke-width: 0.25; }
+  .dtb-mark.bad { fill: #ff5555; }
+  .dtb-probe { opacity: 0; pointer-events: none; }
+  .dtb-probe.show { opacity: 1; }
+  .dtb-probe circle { fill: none; stroke: #fff; stroke-width: 0.45; }
+  .dtb-probe .dtb-probe-dot { fill: #ff5555; stroke: none; }
+  .dtb-probe.show circle:first-child { animation: dtb-ping 1.1s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes dtb-ping { from { transform: scale(0.6); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+  .dtb-status { margin: 4px 0 0 !important; padding: 3px 8px; min-height: 1.6em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: none !important; font: 600 clamp(11px, 0.4vw + 9px, 13px)/1.5 var(--font-code) !important; color: #222 !important; }
+  .dtb-ctl { display: grid; gap: 10px; }
+  .dtb-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .dtb-lab { min-width: 4.5em; font: 600 0.8125rem/1 var(--font-code); color: var(--accent-2); }
+  .dtb-in, .dtb-brk, .dtb-sa {
+    display: inline-grid; grid-auto-flow: column; align-items: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 10px;
+    font: 600 0.8125rem/1 var(--font-code); color: var(--ink); background: var(--surface-2); border: 0;
+    box-shadow: inset 0 0 0 1px var(--accent-2); cursor: pointer; touch-action: manipulation;
+  }
+  .dtb-in b, .dtb-brk b { font-weight: 700; color: var(--accent); }
+  .dtb-in[aria-pressed='true'] { background: #ffff55; color: #000; box-shadow: none; }
+  .dtb-in[aria-pressed='true'] b { color: #000; }
+  .dtb-brk[aria-pressed='true'], .dtb-sa[aria-pressed='true'] { background: var(--accent); color: var(--surface); box-shadow: none; }
+  .dtb-brk[aria-pressed='true'] b { color: var(--surface); }
+  :is(.dtb-in, .dtb-brk, .dtb-sa):hover { box-shadow: inset 0 0 0 2px var(--accent); }
+  :is(.dtb-in, .dtb-brk, .dtb-sa):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  :is(.dtb-in, .dtb-brk, .dtb-sa):disabled { cursor: default; }
+  .dtb-out { margin: 0 !important; font: 500 1rem/1.5 var(--sans); }
+  .dtb-out b { color: var(--accent); font-family: var(--font-code); }
+  .dtb-log { display: grid; gap: 4px; margin: 0 !important; padding: 0 !important; list-style: none !important; counter-reset: probe; }
+  .dtb-log li { counter-increment: probe; display: grid; grid-template-columns: 2.2em 1fr; gap: 8px; max-width: none !important; font: 500 0.9375rem/1.45 var(--sans) !important; }
+  .dtb-log li::before { content: counter(probe); font: 600 0.8125rem/1.6 var(--font-code); color: var(--accent-2); }
+  .dtb-log li::marker { content: none; }
+  .dtb-log li.found { color: var(--accent); font-weight: 700; }
+  .dtb-log b { color: var(--accent); font-family: var(--font-code); font-weight: 600; }
+  @media (max-width: 560px) {
+    .dtb-lab { width: 100%; }
+    .dtb-brk { padding: 0 8px; gap: 4px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dtb-w, .dtb-tag { transition: none; }
+    .dtb-probe.show circle:first-child { animation: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+  import { simulate, good, bad, NAME, O, Z, D, DB } from './dt-sim';
+
+  gsap.registerPlugin(DrawSVGPlugin);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type G = { ctrl: number; inv: number; ins: number[]; out: number; part: string; pin: number; inst: number; inPins: number[]; xy: [number, number]; inXY: [number, number][] };
+  type Data = { gates: G[]; nets: number; primes: { num: number; kind: number; net: number; xy: [number, number] }[]; power: number[]; wires: string[]; mode: 'play' | 'fault' | 'probe' };
+
+  // His IC tester's alarm (246A:000A): the PC speaker at 1,193 Hz and 746 Hz, 20 tones in turn
+  function siren() {
+    const ac = new AudioContext(), o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'square'; g.gain.value = 0.05; o.connect(g).connect(ac.destination);
+    const t = ac.currentTime;
+    for (let k = 0; k < 20; k++) o.frequency.setValueAtTime(1193182 / (k % 2 ? 1600 : 1000), t + k * 0.075);
+    o.start(t); o.stop(t + 1.5); o.onended = () => ac.close();
+  }
+
+  document.querySelectorAll<HTMLElement & { dtb?: boolean }>('[data-dtboard]').forEach(root => {
+    if (root.dtb) return;
+    root.dtb = true;
+    const S: Data = JSON.parse(root.querySelector('script[type="application/json"]')!.textContent!);
+    const svg = root.querySelector<SVGSVGElement>('[data-svg]')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const outEl = root.querySelector<HTMLElement>('[data-out]');
+    const wires = [...svg.querySelectorAll<SVGPathElement>('.dtb-w')];
+    const tags = [...svg.querySelectorAll<SVGGElement>('.dtb-tag')];
+    const probe = svg.querySelector<SVGGElement>('[data-probe]')!;
+    const power = new Set(S.power);
+    const OUT = S.primes.find(p => p.kind === 0x40)!;
+    const ins: Record<number, number> = { 1: O, 2: O, 3: O, 4: O, 6: Z, 7: Z, 9: Z, 10: Z };
+    let fault: { net: number; stuck: 0 | 1 } | undefined = S.mode === 'fault' ? { net: S.gates.find(g => g.part === '7408' && g.pin === 6)!.out, stuck: 0 } : undefined;
+    const fixed = () => {
+      const f: Record<number, number> = {};
+      for (const p of S.primes) if (p.kind === 0x02) f[p.net] = O; else if (p.kind === 0x10) f[p.net] = Z; else if (p.kind === 0x20) f[p.net] = ins[p.num];
+      return f;
+    };
+    let v: number[] = [];
+
+    function paint(showFault: boolean) {
+      v = simulate(S.gates, S.nets, fixed(), showFault ? fault : undefined);
+      for (const w of wires) {
+        const n = +w.dataset.net!;
+        // The probe game shows only what a working board would carry: the break stays hidden until you find it
+        w.setAttribute('class', `dtb-w ${power.has(n) ? 'pw' : `v${S.mode === 'probe' ? good(v[n]) : v[n]}`}`);
+      }
+      tags.forEach((t, k) => {
+        const val = v[S.gates[k].out], on = S.mode !== 'probe' && (val === D || val === DB);
+        t.classList.toggle('show', on); t.classList.toggle('d9', val === DB);
+        t.querySelector('text')!.textContent = on ? NAME[val] : '';
+      });
+      for (const p of S.primes) {
+        const el = svg.querySelector(`[data-prime="${p.num}"]`);
+        if (p.kind === 0x20) el?.classList.toggle('on', ins[p.num] === O);
+        if (p.kind === 0x40) el?.classList.toggle('on', v[p.net] === O);
+      }
+      root.querySelectorAll<HTMLButtonElement>('[data-in]').forEach(b => {
+        const on = ins[+b.dataset.in!] === O;
+        b.setAttribute('aria-pressed', String(on)); b.querySelector('b')!.textContent = on ? '1' : '0';
+      });
+      const o = v[OUT.net];
+      if (S.mode === 'play') {
+        outEl!.innerHTML = `Output P8 is <b>${NAME[o]}</b>${o === O ? ': the lamp is on.' : '.'}`;
+        status.textContent = `P8 = ${NAME[o]}`;
+      }
+      if (S.mode === 'fault') {
+        const g = S.gates.find(x => x.out === fault!.net)!;
+        const seen = o === D || o === DB;
+        outEl!.innerHTML = `${g.part} pin ${g.pin} stuck at ${fault!.stuck}. Working circuit: P8 = <b>${NAME[good(o)]}</b>. Broken circuit: P8 = <b>${NAME[bad(o)]}</b>. ` +
+          (seen ? 'The outputs differ, so this pattern <b>finds</b> the broken pin.' : 'The outputs are the same, so this pattern cannot see it. Try other inputs.');
+        status.textContent = `P8 = ${NAME[o]}${seen ? `   (${o === D ? '1 working, 0 broken' : '0 working, 1 broken'})` : ''}`;
+      }
+    }
+
+    const flip = (num: number) => { ins[num] = ins[num] === O ? Z : O; paint(S.mode === 'fault'); };
+    root.querySelectorAll<HTMLButtonElement>('[data-in]').forEach(b => { b.disabled = false; b.addEventListener('click', () => flip(+b.dataset.in!)); });
+    if (S.mode !== 'probe') svg.querySelectorAll<SVGGElement>('.dtb-p--in').forEach(g => g.addEventListener('click', () => flip(+g.dataset.prime!)));
+
+    // Break a pin
+    const brk = [...root.querySelectorAll<HTMLButtonElement>('[data-brk]')], sa = [...root.querySelectorAll<HTMLButtonElement>('[data-sa]')];
+    brk.forEach(b => { b.disabled = false; b.addEventListener('click', () => {
+      fault = { net: S.gates[+b.dataset.brk!].out, stuck: fault?.stuck ?? 0 };
+      brk.forEach(x => x.setAttribute('aria-pressed', String(x === b))); paint(true);
+    }); });
+    sa.forEach(b => { b.disabled = false; b.addEventListener('click', () => {
+      fault = { net: fault!.net, stuck: +b.dataset.sa! as 0 | 1 };
+      sa.forEach(x => x.setAttribute('aria-pressed', String(x === b))); paint(true);
+    }); });
+
+    // Wires draw themselves in file order, digit by digit
+    const redraw = root.querySelector<HTMLButtonElement>('[data-act="redraw"]');
+    let tl: gsap.core.Timeline | null = null;
+    function replay() {
+      if (reduce()) return;
+      tl?.kill();
+      tl = gsap.timeline({ onComplete: () => { status.textContent = `P8 = ${NAME[v[OUT.net]]}`; } });
+      tl.set(wires, { drawSVG: '0%' }).set(svg.querySelectorAll('.dtb-res g, .dtb-node'), { opacity: 0 });
+      wires.forEach((w, k) => tl!.to(w, { drawSVG: '100%', duration: 0.11, ease: 'none', onStart: () => { status.textContent = `wire ${k + 1} of ${wires.length}: ${S.wires[k].length > 60 ? S.wires[k].slice(0, 57) + ' …' : S.wires[k]}`; } }));
+      tl.to(svg.querySelectorAll('.dtb-res g, .dtb-node'), { opacity: 1, duration: 0.3, stagger: 0.02 });
+    }
+    if (redraw) { redraw.hidden = reduce(); redraw.addEventListener('click', replay); }
+    if (S.mode === 'play' && !reduce()) {
+      const r = root.getBoundingClientRect();
+      if (r.top > innerHeight) {
+        gsap.set(wires, { drawSVG: '0%' });
+        const io = new IntersectionObserver(es => { if (es[0].isIntersecting) { io.disconnect(); replay(); } }, { threshold: 0.35 });
+        io.observe(svg);
+      }
+    }
+
+    // The guided probe: walk back from the wrong output, one point at a time
+    if (S.mode === 'probe') {
+      const btn = (a: string) => root.querySelector<HTMLButtonElement>(`[data-act="${a}"]`)!;
+      const log = root.querySelector<HTMLOListElement>('[data-log]')!;
+      const marks = svg.querySelector<SVGGElement>('[data-marks]')!;
+      const driver = (net: number) => S.gates.find(g => g.out === net);
+      const where = (net: number) => { const g = driver(net); if (g) return `${g.part} pin ${g.pin}`; const p = S.primes.find(x => x.net === net); return p ? `input P${p.num}` : 'a wire'; };
+      // The faults this pattern can find
+      const pool: { net: number; stuck: 0 | 1 }[] = [];
+      for (const g of S.gates) for (const s of [0, 1] as const) {
+        const o = simulate(S.gates, S.nets, fixed(), { net: g.out, stuck: s })[OUT.net];
+        if (o === D || o === DB) pool.push({ net: g.out, stuck: s });
+      }
+      let hidden = pool[0], queue: { net: number; xy: [number, number]; name: string }[] = [], cur: G | undefined, k = 0, state: 'ready' | 'probing' | 'done' = 'ready';
+      const add = (html: string, cls = '') => { const li = document.createElement('li'); li.innerHTML = `<span>${html}</span>`; if (cls) li.className = cls; log.append(li); };
+      const point = (xy?: [number, number]) => {
+        probe.classList.toggle('show', !!xy);
+        if (xy) probe.setAttribute('transform', `translate(${xy[0]} ${xy[1]})`);
+      };
+      const enter = (g: G) => { cur = g; k = 0; queue = g.ins.map((n, i) => ({ net: n, xy: g.inXY[i], name: `${g.part} pin ${g.inPins[i]}` })); };
+      function next() {
+        if (state !== 'probing' || !cur) return;
+        if (k >= queue.length) {
+          state = 'done'; point(cur.xy);
+          add(`Every input of ${cur.part} reads right, but its pin ${cur.pin} reads wrong. <b>Possible fault locations: ${cur.part} pin ${cur.pin}.</b>`, 'found');
+          status.textContent = `Possible fault locations: ${cur.part} pin ${cur.pin}`;
+          btn('probe').disabled = true; btn('siren').hidden = false;
+          return;
+        }
+        const q = queue[k++];
+        point(q.xy);
+        const ok = good(v[q.net]) === bad(v[q.net]);
+        const m = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        m.setAttribute('cx', String(q.xy[0])); m.setAttribute('cy', String(q.xy[1])); m.setAttribute('r', '0.9');
+        m.setAttribute('class', ok ? 'dtb-mark' : 'dtb-mark bad'); marks.append(m);
+        status.textContent = `Place the guided probe here: ${q.name}`;
+        add(`Place the guided probe here: <b>${q.name}</b>. It should read <b>${NAME[good(v[q.net])]}</b> and reads <b>${NAME[bad(v[q.net])]}</b>. ${ok ? 'Good.' : `Wrong: step back to ${where(q.net)}.`}`);
+        if (!ok) { const g = driver(q.net); if (g) enter(g); }
+      }
+      function reset(pick: boolean) {
+        if (pick) { let n; do n = pool[Math.floor(Math.random() * pool.length)]; while (pool.length > 1 && n === hidden); hidden = n; }
+        state = 'ready'; log.replaceChildren(); marks.replaceChildren(); point(); fault = undefined; paint(false);
+        btn('apply').disabled = false; btn('probe').disabled = true; btn('siren').hidden = true;
+        status.textContent = 'Press Apply to send the test pattern.';
+      }
+      btn('apply').addEventListener('click', () => {
+        fault = hidden; paint(true);
+        const o = v[OUT.net];
+        add(`The card sends the test pattern. P8 should be <b>${NAME[good(o)]}</b> and comes back <b>${NAME[bad(o)]}</b>. Something on the board is broken.`);
+        state = 'probing'; enter(driver(OUT.net)!);
+        btn('apply').disabled = true; btn('probe').disabled = false; btn('probe').focus();
+        status.textContent = 'Wrong output. Press Probe.';
+      });
+      btn('probe').addEventListener('click', next);
+      probe.addEventListener('click', next);
+      btn('new').addEventListener('click', () => reset(true));
+      btn('siren').addEventListener('click', siren);
+      for (const a of ['apply', 'new']) btn(a).disabled = false;
+      hidden = pool[Math.floor(Math.random() * pool.length)];
+      reset(false);
+      return;
+    }
+    paint(S.mode === 'fault');
+  });
+</script>

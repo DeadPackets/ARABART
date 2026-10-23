@@ -1,0 +1,130 @@
+---
+// Any date through his engine, step by step, beside the Islamic calendars every browser ships (Intl.DateTimeFormat).
+// The engine is hijri.ts, proven equal to HijriPlugin.dll on 37,700 dates. Without JS it shows 24 September 2006.
+import { toHijri, HIJRI_EN } from './hijri.ts';
+import { ids, svgPath, arText } from './ar.ts';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const r = toHijri(2006, 9, 24, 0);
+const line = svgPath(ids(0, { y: r.hy, m: r.hm, d: r.hd, dow: 0 }, true));
+const text = arText(ids(0, { y: r.hy, m: r.hm, d: r.hd, dow: 0 }, true));
+---
+
+<div class="hdt-lab" id={id} data-hdt-lab>
+  <div class="hdt-lab-in">
+    <label class="hdt-lab-f"><span>Gregorian date</span><input type="date" value="2006-09-24" min="1700-01-01" max="2300-12-31" data-date /></label>
+    <label class="hdt-lab-f"><span>Crescent adjustment <output data-adj-out>0</output></span><input type="range" min="-2" max="2" step="1" value="0" data-adj aria-valuetext="0 days" /></label>
+    <button type="button" class="button k-btn" data-today>Today</button>
+  </div>
+
+  <div class="hdt-lab-ans">
+    <div class="hdt-lab-ar" lang="ar" role="img" aria-label={text} data-ar>
+      <svg viewBox={`0 0 ${line.width} 16`} width={line.width * 3} height="48" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d={line.d} /></svg>
+    </div>
+    <p class="hdt-lab-en" data-en>{r.hd} {HIJRI_EN[r.hm - 1].replace('MuHarram', 'Muharram')} {r.hy}</p>
+  </div>
+
+  <ol class="hdt-lab-steps" data-steps>
+    <li><b>Count the days.</b> 24 September 2006 at midnight, London time, is Julian day <code>2,454,002.5</code>: days since 4713 BC, the number astronomers use so dates subtract cleanly.</li>
+    <li><b>Estimate the new moon.</b> 106.7 years since 1900, times 12.3685 new moons a year, gives new moon number <code>1320</code>.</li>
+    <li><b>Find its birth.</b> New moon 1320 is born on 22 September 2006 at 14:43 in Mecca. That is after 6:00 in the morning, so day 1 of the month is 24 September 2006.</li>
+    <li><b>Name the month.</b> New moon 1048 opened Muharram 1405. 1320 is 272 months later: 22 years and 8 months. Year 1427, month 9: Ramadan.</li>
+    <li><b>Count the day.</b> 24 September is the first full day of that month: <b>1 Ramadan 1427</b>.</li>
+  </ol>
+
+  <table class="hdt-lab-cmp" data-cmp>
+    <caption>The same day in the Islamic calendars your browser knows</caption>
+    <thead><tr><th scope="col">Calendar</th><th scope="col">Date</th></tr></thead>
+    <tbody>
+      <tr class="is-his"><th scope="row">HijriDate 1.5, his engine</th><td>1 Ramadan 1427</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .hdt-lab { display: grid; gap: 22px; min-width: 0; }
+  .hdt-lab-in { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: end; }
+  .hdt-lab-f { display: grid; gap: 6px; font-weight: 600; }
+  .hdt-lab-f input[type='date'] { min-height: 44px; padding: 0 10px; font: inherit; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); }
+  .hdt-lab-f input[type='range'] { width: min(260px, 70vw); min-height: 44px; accent-color: var(--accent); }
+  .hdt-lab-ans { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px; padding: 16px 18px; background: var(--ink); color: var(--surface); }
+  .hdt-lab-ar svg { display: block; max-width: 100%; height: auto; image-rendering: pixelated; }
+  .hdt-lab-en { margin: 0; font: 800 clamp(1.25rem, 2vw, 1.6rem)/1.2 var(--font-display); }
+  .hdt-lab-steps { display: grid; gap: 10px; margin: 0; padding-left: 1.4em; }
+  .hdt-lab-steps :global(li) { padding-left: 4px; line-height: 1.55; }
+  .hdt-lab-steps :global(code) { font-family: var(--font-code); font-size: 0.95em; }
+  .hdt-lab-cmp { width: 100%; border-collapse: collapse; font-size: 0.9375rem; }
+  .hdt-lab-cmp caption { text-align: left; font-weight: 700; padding-bottom: 8px; }
+  .hdt-lab-cmp :global(th), .hdt-lab-cmp :global(td) { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--rule); }
+  .hdt-lab-cmp thead th { font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+  .hdt-lab-cmp tbody :global(th) { font-weight: 600; }
+  .hdt-lab-cmp :global(.is-his) { background: color-mix(in oklch, var(--accent) 14%, transparent); }
+  .hdt-lab-cmp :global(.hdt-same) { font-weight: 700; }
+  .hdt-lab-cmp :global(small) { display: block; color: var(--ink-2); font-size: 0.8125rem; }
+</style>
+
+<script>
+  import { toHijri, HIJRI_EN } from './hijri.ts';
+  import { ids, svgPath, arText } from './ar.ts';
+
+  const MONTHS = HIJRI_EN.map(m => m.replace('MuHarram', 'Muharram'));
+  const fmtNum = (x: number, d = 1) => x.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const jdDate = (jd: number) => new Date((jd - 2440587.5) * 864e5);
+  const meccaTime = (jd: number) => { const t = jdDate(jd + 3 / 24); return `${t.getUTCDate()} ${t.toLocaleString('en-US', { month: 'long', timeZone: 'UTC' })} ${t.getUTCFullYear()} at ${String(t.getUTCHours()).padStart(2, '0')}:${String(t.getUTCMinutes()).padStart(2, '0')}`; };
+  const CALS: [string, string][] = [
+    ['islamic-umalqura', 'Umm al-Qura, Saudi Arabia’s official calendar'],
+    ['islamic-civil', 'Civil: pure arithmetic, months of 30 and 29 days'],
+    ['islamic-tbla', 'Tabular: the same arithmetic, counted from a day earlier'],
+    ['islamic', 'Islamic: an astronomical estimate'],
+  ];
+  const fmts = CALS.flatMap(([c, name]) => {
+    try {
+      const f = new Intl.DateTimeFormat(`en-u-ca-${c}-nu-latn`, { day: 'numeric', month: 'numeric', year: 'numeric', timeZone: 'UTC' });
+      return f.resolvedOptions().calendar === c ? [{ c, name, f }] : [];
+    } catch { return []; }
+  });
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-hdt-lab]')) {
+    const date = root.querySelector<HTMLInputElement>('[data-date]')!, adj = root.querySelector<HTMLInputElement>('[data-adj]')!;
+    const adjOut = root.querySelector('[data-adj-out]')!, ar = root.querySelector<HTMLElement>('[data-ar]')!, en = root.querySelector('[data-en]')!;
+    const steps = root.querySelector('[data-steps]')!, tbody = root.querySelector('[data-cmp] tbody')!;
+    const run = () => {
+      const [y, m, d] = date.value.split('-').map(Number);
+      if (!(y >= 1700 && y <= 2300)) return;
+      const a = +adj.value;
+      adjOut.textContent = `${a > 0 ? '+' : ''}${a}`; adj.setAttribute('aria-valuetext', `${a} days`);
+      const r = toHijri(y, m, d, a), dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+      const list = ids(0, { y: r.hy, m: r.hm, d: r.hd, dow }, true), p = svgPath(list);
+      ar.setAttribute('aria-label', arText(list));
+      ar.innerHTML = `<svg viewBox="0 0 ${p.width} 16" width="${p.width * 3}" height="48" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="${p.d}"/></svg>`;
+      en.textContent = `${r.hd} ${MONTHS[r.hm - 1]} ${r.hy}`;
+      const [sy, sm, sd] = r.shifted, s = r.tried[r.tried.length - 1];
+      const gname = (yy: number, mm: number, dd: number) => new Date(Date.UTC(yy, mm - 1, dd)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+      const years = Math.trunc((r.lunation - 1048) / 12), months = r.lunation - 1048 - years * 12;
+      const local = jdDate(s.jd + 3 / 24), day1 = jdDate(Math.ceil(s.start - 0.5) + 0.5);
+      const early = day1.getTime() - Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) === 864e5;
+      steps.innerHTML = [
+        `<b>Count the days.</b> ${a ? `With the adjustment at ${a > 0 ? '+' : ''}${a}, he first moves the date to ${gname(sy, sm, sd)}. ` : ''}${gname(sy, sm, sd)} at midnight, London time, is Julian day <code>${fmtNum(r.jd)}</code>: days since 4713 BC, the number astronomers use so dates subtract cleanly.`,
+        `<b>Estimate the new moon.</b> ${fmtNum(sy + (sm - 1) / 12 + sd / 365 - 1900, 1)} years since 1900, times 12.3685 new moons a year, gives new moon number <code>${r.guess}</code>.`,
+        `<b>Find its birth.</b> ${r.tried.length > 1 ? `${r.tried.slice(0, -1).map(t => `New moon ${t.k} is still ahead of this date, so he steps back one. `).join('')}` : ''}New moon ${s.k} is born on ${meccaTime(s.jd)} in Mecca. That is ${early ? 'before' : 'after'} 6:00 in the morning, so day 1 of the month is ${gname(day1.getUTCFullYear(), day1.getUTCMonth() + 1, day1.getUTCDate())}.`,
+        `<b>Name the month.</b> New moon 1048 opened Muharram 1405. ${r.lunation} is ${r.lunation - 1048} months ${r.lunation >= 1048 ? 'later' : 'earlier'}: ${Math.abs(years)} years and ${Math.abs(months)} months. Year ${r.hy}, month ${r.hm}: ${MONTHS[r.hm - 1]}.`,
+        `<b>Count the day.</b> ${gname(sy, sm, sd)} is day ${r.hd} of that month: <b>${r.hd} ${MONTHS[r.hm - 1]} ${r.hy}</b>.`,
+      ].map(h => `<li>${h}</li>`).join('');
+      const t = new Date(Date.UTC(y, m - 1, d));
+      tbody.innerHTML = `<tr class="is-his"><th scope="row">HijriDate 1.5, his engine${a ? ` (adjustment ${a > 0 ? '+' : ''}${a})` : ''}</th><td>${r.hd} ${MONTHS[r.hm - 1]} ${r.hy}</td></tr>` +
+        fmts.map(({ name, f }) => {
+          const parts = Object.fromEntries(f.formatToParts(t).map(x => [x.type, x.value]));
+          const dd = +parts.day, mm = +parts.month, yy = parseInt(parts.relatedYear ?? parts.year);
+          const same = dd === r.hd && mm === r.hm && yy === r.hy;
+          return `<tr><th scope="row">${name}</th><td${same ? ' class="hdt-same"' : ''}>${dd} ${MONTHS[mm - 1]} ${yy}${same ? ' · the same day' : ''}</td></tr>`;
+        }).join('');
+    };
+    date.addEventListener('change', run);
+    adj.addEventListener('input', run);
+    root.querySelector('[data-today]')!.addEventListener('click', () => { const n = new Date(); date.value = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`; run(); });
+    const n = new Date();
+    date.value = `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, '0')}-${String(n.getDate()).padStart(2, '0')}`;
+    run();
+  }
+</script>

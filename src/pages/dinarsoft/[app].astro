@@ -1,0 +1,198 @@
+---
+// One DinarSoft app: running on a Pocket PC with its name and slogan beside it; then its story and versions, its
+// installers, the freeware unlock, its awards and reviews, and the tour of its code (src/writeups/dinarsoft-<app>.astro).
+// The unlock module and the writeup are loaded only if they exist, so the page builds before they land.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Toc from '../../layouts/Toc.astro';
+import Window from '../../components/shell/Window.astro';
+import Writeup from '../../components/explain/Writeup.astro';
+import Device from '../../components/toys/dinarsoft/Device.astro';
+import Versions from '../../components/toys/dinarsoft/Versions.astro';
+import Downloads from '../../components/toys/dinarsoft/Downloads.astro';
+import Unlock, { type UnlockModule } from '../../components/toys/dinarsoft/Unlock.astro';
+import Awards from '../../components/toys/dinarsoft/Awards.astro';
+import Reviews from '../../components/toys/dinarsoft/Reviews.astro';
+import { apps, icon, downloads, awards, reviews, honors, discs, longDate, type App } from '../../data/dinarsoft';
+import '../../components/toys/dinarsoft/ds.css';
+import type { GetStaticPaths } from 'astro';
+
+export const getStaticPaths: GetStaticPaths = () => apps.map(app => ({ params: { app: app.id }, props: { app } }));
+
+const { app } = Astro.props as { app: App };
+const base = import.meta.env.BASE_URL;
+const ic = icon(app.id);
+
+// The unlock module of this app, if its builder has written it
+const mods = import.meta.glob<{ unlock?: UnlockModule }>('../../lib/dinarsoft/*.ts');
+let unlock: UnlockModule | null = null;
+const load = mods[`../../lib/dinarsoft/${app.id}.ts`];
+if (load) {
+  try {
+    const u = (await load()).unlock;
+    if (u && typeof u.generate === 'function' && Array.isArray(u.inputs)) unlock = u;
+  } catch { unlock = null; }
+}
+const writeups = import.meta.glob('../../writeups/dinarsoft-*.astro');
+const hasWriteup = `../../writeups/dinarsoft-${app.id}.astro` in writeups;
+
+const files = downloads.filter(d => d.app === app.id);
+const r0 = app.releases[0], rN = app.releases.at(-1)!;
+const press = awards.some(a => a.app === app.id) || reviews.some(r => r.app === app.id) || honors.some(h => h.app === app.id) || discs.some(d => d.app === app.id);
+const i = apps.findIndex(a => a.id === app.id);
+const next = apps[(i + 1) % apps.length];
+---
+
+<BaseLayout
+  title={`${app.name} · DinarSoft · Yasser Awad`}
+  description={app.one}
+  image={`/ARABART/dinarsoft/screens/${app.screens[0].key}.webp`}
+  era="vs2005"
+  keys={[{ k: 'F5', label: 'Download', href: '#download' }, { k: 'F6', label: 'Unlock key', href: '#unlock' }, { k: '►', label: `Next: ${next.name}`, href: `${base}/dinarsoft/${next.id}/` }]}
+>
+  <article class="dsp">
+    <div class="dsp-band">
+      <div class="container dsp-top">
+        <header class="dsp-ph">
+          <a class="crumb" href={`${base}/dinarsoft/`}>← DinarSoft</a>
+          <div class="dsp-brand">
+            <img src={ic.src} width={ic.w} height={ic.h} alt="" fetchpriority="high" />
+            <div>
+              <h1 class="dsx-word dsp-h1">{app.pre}<b>{app.post}</b>{app.id === 'hijridate' && <span class="dsp-plug"> Plugin</span>}</h1>
+              <p class="dsx-slogan dsp-slogan">{app.slogan}</p>
+            </div>
+          </div>
+          <p class="dsp-lead">{app.one}</p>
+          <dl class="dsp-facts">
+            <div><dt>Latest</dt><dd>{rN.v}, {longDate(rN.date.slice(0, 7))}</dd></div>
+            <div><dt>First</dt><dd>{r0.v}, {longDate(r0.date.slice(0, 7))}</dd></div>
+            <div><dt>Price then</dt><dd>{app.price}</dd></div>
+            <div><dt>Today</dt><dd>Free</dd></div>
+            <div class="wide"><dt>Runs on</dt><dd>{app.runs}</dd></div>
+          </dl>
+          <div class="dsp-acts">
+            <a class="button button--primary" href="#download">Download, free</a>
+            <a class="button" href="#unlock">Get the unlock key</a>
+          </div>
+        </header>
+        <div class="dsp-run">
+          <Device app={app} eager />
+        </div>
+      </div>
+    </div>
+
+    <div class="container dsp-body">
+      <div class="dsp-read">
+        <section id="story" aria-labelledby="story-h">
+          <h2 id="story-h" class="dsx-h2" data-toc>The story</h2>
+          {app.story.map(p => <p class="dsp-p">{p}</p>)}
+          <h3 class="dsp-h3">Every version</h3>
+          <p class="dsp-p dsp-p--s">From his revision history and his installers. Press Run to play through them, or step one at a time.</p>
+          <Versions app={app} />
+        </section>
+
+        <div id="inside" class="dsp-inside">
+          {hasWriteup ? <Writeup id={`dinarsoft-${app.id}`} mods={writeups} /> : (
+            <section aria-labelledby="inside-h">
+              <h2 id="inside-h" class="dsx-h2" data-toc>How it works</h2>
+              <Window kind="editor" title={`${app.name}.cpp`} active class="dsp-soon">
+                <p class="dsp-soon-t">A tour of {app.name}’s code is on its way.</p>
+                <p>It is being read back from {app.name}’s own ARM code: its parts, the Windows Mobile services it calls and what they are called on iOS and Android today, its cleverest tricks stepped through beside the same idea in C, and its own screens rebuilt so you can click through them.</p>
+                <p slot="status">Ready</p>
+              </Window>
+            </section>
+          )}
+        </div>
+
+        {press && (
+          <section id="press" aria-labelledby="press-h">
+            <h2 id="press-h" class="dsx-h2" data-toc>Awards and reviews</h2>
+            <Awards only={app.id} />
+            <div class="dsp-rev"><Reviews only={app.id} /></div>
+          </section>
+        )}
+
+        <section id="download" aria-labelledby="download-h">
+          <h2 id="download-h" class="dsx-h2" data-toc>Download</h2>
+          <p class="dsp-p">Here {files.length === 1 ? 'is the installer' : `are all ${files.length} installers`} the Internet Archive kept, as DinarSoft published them. Take the one marked latest: the .CAB installs straight on the device, the .exe installs from a Windows PC.{app.id === 'memmaid' && ' The multilingual files speak eight languages, and version 1.73 is the one for Pocket PC 2002.'}</p>
+          <Downloads only={app.id} />
+        </section>
+
+        <section id="unlock" aria-labelledby="unlock-h">
+          <h2 id="unlock-h" class="dsx-h2" data-toc>Unlock the full version</h2>
+          <Unlock app={app} unlock={unlock} />
+        </section>
+      </div>
+      <Toc />
+    </div>
+
+    <nav class="container dsp-more" aria-label="DinarSoft’s apps">
+      <ul>
+        {apps.map(a => {
+          const c = icon(a.id);
+          return <li><a href={`${base}/dinarsoft/${a.id}/`} aria-current={a.id === app.id ? 'page' : undefined}><img src={c.src} width="40" height="40" alt="" loading="lazy" /><span class="dsx-word">{a.pre}<b>{a.post}</b></span></a></li>;
+        })}
+      </ul>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .dsp-band { background: linear-gradient(oklch(0.86 0.04 250), oklch(0.95 0.015 250)); padding-bottom: clamp(40px, 6vw, 80px); }
+  .dsp-top { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 32px clamp(32px, 5vw, 80px); align-items: start; padding-top: 16px; }
+  .dsp-brand { display: flex; align-items: center; gap: clamp(14px, 2vw, 24px); margin-top: 8px; }
+  .dsp-brand img { width: clamp(72px, 7vw, 100px); height: auto; animation: dsp-rise 0.7s var(--expo) both; }
+  .dsp-h1 { font-size: clamp(2rem, 4.5vw + 1rem, 5rem); font-weight: 400; color: #3d3d3d; letter-spacing: -0.02em; line-height: 1; animation: dsp-rise 0.7s 0.06s var(--expo) both; }
+  .dsp-plug { font-size: 0.6em; }
+  .dsp-slogan { margin-top: 8px; font-size: clamp(1rem, 0.5vw + 0.85rem, 1.25rem); animation: dsp-rise 0.7s 0.12s var(--expo) both; }
+  @keyframes dsp-rise { from { opacity: 0; translate: 0 12px; } }
+  .dsp-lead { margin-top: 24px; max-width: 46ch; font-size: clamp(1.1875rem, 0.6vw + 1rem, 1.5rem); line-height: 1.45; font-weight: 500; color: var(--ds-ink); }
+  .dsp-facts { display: grid; grid-template-columns: repeat(4, minmax(0, auto)); justify-content: start; gap: 12px 32px; margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--rule); }
+  .dsp-facts .wide { grid-column: 1 / -1; }
+  .dsp-facts dt { font: 700 0.75rem/1.3 var(--ds-verdana); text-transform: uppercase; letter-spacing: 0.06em; color: var(--ds-rust); }
+  .dsp-facts dd { margin-top: 3px; font-size: 1rem; line-height: 1.45; }
+  .dsp-acts { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
+  .dsp-run :global(.dsd) { width: 320px; }
+
+  .dsp-body { display: grid; grid-template-columns: minmax(0, 980px) 240px; justify-content: space-between; gap: clamp(40px, 5vw, 88px); align-items: start; padding-top: clamp(56px, 7vw, 96px); }
+  .dsp-read > :global(* + *) { margin-top: clamp(72px, 9vw, 120px); }
+  .dsp-p { max-width: 68ch; margin-top: 18px; font-size: clamp(1.125rem, 0.3vw + 1.05rem, 1.25rem); line-height: 1.7; }
+  .dsp-p--s { margin-top: 8px; font-size: 1rem; color: var(--ink-2); }
+  .dsp-h3 { margin-top: 44px; font: 700 1.5rem/1.2 var(--ds-arial); color: var(--ds-ink); letter-spacing: 0; }
+  #story :global(.dsv) { margin-top: 18px; }
+  #download :global(.dsl-table), #unlock :global(.dsk), #press :global(.dsa) { margin-top: 24px; }
+  .dsp-rev { margin-top: 36px; }
+  .dsp-rev :global(.dsr-wall) { columns: 2 300px; }
+  .dsp-soon { margin-top: 24px; max-width: 760px; }
+  .dsp-soon p { font-size: 1.0625rem; line-height: 1.65; }
+  .dsp-soon p + p { margin-top: 10px; }
+  .dsp-soon-t { font: 700 1.25rem/1.3 var(--ds-arial) !important; color: var(--ds-ink); }
+
+  /* The outline's title, readable on this light era */
+  .dsp-body :global(.toc-t) { color: var(--ds-ink); border-bottom-color: var(--ds-red); }
+  .dsp-body :global(.toc a[aria-current='true']) { color: #fff; background: var(--xp-sel); }
+  .dsp-more { margin-top: clamp(80px, 10vw, 140px); padding-top: 28px; padding-bottom: 40px; border-top: 1px solid var(--rule); }
+  .dsp-more ul { list-style: none; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; }
+  .dsp-more a { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 10px; text-decoration: none; border: 1px solid transparent; border-radius: 3px; }
+  .dsp-more a:hover { background: #fff; border-color: var(--xp-line); }
+  .dsp-more a[aria-current='page'] { background: var(--xp-sel); }
+  .dsp-more a[aria-current='page'] .dsx-word { color: #fff; }
+  .dsp-more .dsx-word { font-size: 1.0625rem; }
+
+  @media (max-width: 1199px) {
+    .dsp-body { grid-template-columns: minmax(0, 1fr); }
+    .dsp-more ul { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 860px) {
+    .dsp-top { grid-template-columns: minmax(0, 1fr); }
+    .dsp-run { justify-self: center; order: 1; }
+    .dsp-run :global(.dsd) { width: min(320px, 100%); }
+    .dsp-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .dsp-brand img { width: 60px; }
+    .dsp-more ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 420px) {
+    .dsp-more ul { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

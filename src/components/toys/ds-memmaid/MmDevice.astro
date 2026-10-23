@@ -1,0 +1,591 @@
+---
+// MemMaid 2.3, rebuilt from its own resources: the six tab icons and toolbar from MemMaidVGARes.dll, every label from
+// its 709-string table in the language you pick (all 8 language DLLs), the menus from resource 233, and the screens'
+// sample contents from DinarSoft's own 2007 screenshots. Tap through it; Tools > About > Register takes a key.
+import Window from '../../shell/Window.astro';
+import tabsImg from './img/tabs.png';
+import toolsImg from './img/tools.png';
+import filesImg from './img/files.png';
+import checksImg from './img/checks.png';
+import regImg from './img/regtypes.png';
+import logoImg from './img/logo-2.png';
+import { STR, LANGS, s, CLEANERS } from './data';
+import { pocketCode } from '../../../lib/dinarsoft/memmaid';
+
+const TABS = [
+  { id: 'cleaner', icon: 1, views: ['quick', 'advanced', 'reclaimram'] },
+  { id: 'databases', icon: 0, views: ['notif', 'registry', 'dbusage', 'ext'] },
+  { id: 'tweaks', icon: 3, views: ['systweaks', 'appcache', 'info', 'dllopt'] },
+  { id: 'startups', icon: 5, views: ['startitems', 'startsvc', 'today'] },
+  { id: 'storage', icon: 4, views: ['storusage', 'finder', 'cab', 'installed', 'cardtools'] },
+  { id: 'processes', icon: 2, views: ['running', 'cpu', 'runproc'] },
+];
+const GENERIC: Record<string, string> = {
+  dbusage: 'Every database on the device: its records, its size, and an explorer for its rows.',
+  ext: 'Every file type and the program that opens it. Add, change or remove one.',
+  appcache: 'Move the caches of Pocket IE, Opera, NetFront, AvantGo, ring tones and mail to a card.',
+  info: 'The processor, the screen, the memory and the cards. On Windows Mobile 2003, a slider that splits RAM between files and programs.',
+  dllopt: 'Move program DLLs off the main memory onto a card. The section on the DLL Optimizer shows how.',
+  startsvc: 'The services that start with the device. Stop one, start one, or switch it to manual.',
+  today: 'The Today screen plug-ins: switch them on and off, and put them in your order.',
+  finder: 'Find files by name, with wild cards, and by size.',
+  cab: 'Every CAB installer on the device, ready to install.',
+  installed: 'Every installed program, sorted by name, date or size. Uninstall from here.',
+  cardtools: 'Format a card, scan it for errors, make it ready for a digital camera.',
+  cpu: 'How busy the processor is, program by program.',
+  runproc: 'Every process with its threads, modules and memory. Compact one, or all.',
+};
+const tabOf = (v: string) => TABS.find(t => t.views.includes(v))!;
+const CATS = STR.cats as string[][];
+// A sample scan, in bytes. Close and Compact work on RAM, so they show no size.
+const SAMPLE = [0, 0, 49152, 12288, 1992294, 3565158, 65536, 2048, 215040, 0, 0, 3072, 1024, 36864, 1024, 0, 839680, 2, 1, 0, 8192, 0, 0, 0, 0, 20480, 0, 0, 102400];
+const ON = [1, 2, 3, 5];
+const code = pocketCode('730007B6BFA373D1380000050BFE45CE5');
+const RUNNING = [['Windows Media', '319.78 KB', 7], ['MemMaid', '227.81 KB', 1], ['Notes', '119.90 KB', 2], ['Contacts', '31.90 KB', 4], ['File Explorer', '23.90 KB', 1], ['Solitaire', '23.90 KB', 5]] as const;
+const STORAGE = [['Windows', '58.86 MB', 1], ['Storage Card', '22.6 MB', 3], ['Program Files', '1.27 MB', 1], ['My Documents', '1.16 MB', 1], ['Documents and Settings', '748.0 KB', 1], ['Application Data', '1.28 KB', 1], ['ConnMgr', '158 Bytes', 1], ['Temp', '0 Bytes', 1]] as const;
+const STARTUP = [['poutlook.lnk', true, '\\Windows\\poutlook.exe'], ['HandyLauncher.lnk', true, '\\Program Files\\HandyLauncher\\HandyLauncher.exe'], ['HandyMenu.lnk', true, '\\Program Files\\HandyMenu\\HandyMenu.exe'], ['HandySwitcher.lnk', false, '\\Program Files\\HandySwitcher\\HandySwitcher.exe']] as const;
+const TIMED = ['sqmevent.exe', '\\windows\\enrollnot.exe', '\\Windows\\calupd.exe', 'CALNOT.EXE', 'clocknot.exe'];
+const MMKEYS = ['LicKey', 'Language', 'AdvancedMode', 'EnabledItems', 'SecureDelete', 'ShowReport', 'ShowProgress', 'EnableSchedule', 'ScheduleFreq', 'ScheduleTime', 'RRHibernate', 'RRCompact', 'RRCloseAll', 'SilentReclaim', 'SkinColor', 'LastTab', 'Pie3D'];
+const tool = (i: number) => `--x:${-i * 28}px`;
+const file = (i: number) => `--x:${-i * 32}px`;
+const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c');
+---
+
+<div class="mmd" data-mm-device style={`--tabs:url(${tabsImg.src});--tools:url(${toolsImg.src});--files:url(${filesImg.src});--checks:url(${checksImg.src});--reg:url(${regImg.src})`}>
+  <script type="application/json" data-mmd set:html={json} />
+  <Window title="MemMaid" kind="device" num="12:00" class="mmd-dev" aria-label="MemMaid 2.3 on a Pocket PC. Tap through it.">
+    <div class="mmd-scr" data-scr data-tab="cleaner" lang="en">
+      <header class="mmd-head">
+        <button type="button" class="mmd-view" data-act="views" aria-haspopup="menu" aria-expanded="false"><span data-title data-s="quick">{s('quick')}</span> ▾</button>
+        <span class="mmd-tools" aria-hidden="true"><i style={tool(14)}></i><i style={tool(5)}></i><i style={tool(17)}></i></span>
+      </header>
+      <ul class="mmd-menu mmd-views" data-pop="views" role="menu" hidden>
+        {TABS.map(t => t.views.map(v => <li role="none" data-of={t.id}><button type="button" role="menuitem" data-go={v} data-s={v}>{s(v)}</button></li>))}
+      </ul>
+
+      <div class="mmd-body">
+        <!-- Cleaner -->
+        <section data-view="quick" class="mmd-v">
+          <ul class="mmd-list" data-cats>
+            {CATS.map((c, i) => (
+              <li><button type="button" class="mmd-row" role="checkbox" aria-checked={String(ON.includes(i))} data-cat={i}>
+                <i class="mmd-ck" aria-hidden="true"></i><span data-s={`cats.${i}`}>{c[0]}</span><b data-size>-</b>
+              </button></li>
+            ))}
+          </ul>
+          <p class="mmd-total"><span data-s="found">{s('found')}</span><b data-total>0 Bytes</b></p>
+          <div class="mmd-prog" aria-hidden="true"><i data-prog></i></div>
+          <div class="mmd-btns">
+            <button type="button" class="mmd-row mmd-all" role="checkbox" aria-checked="false" data-act="all"><i class="mmd-ck" aria-hidden="true"></i><span data-s="all">{s('all')}</span></button>
+            <button type="button" class="mmd-b" data-act="clean" data-s="clean">{s('clean')}</button>
+            <button type="button" class="mmd-b" data-act="scan" data-s="scan">{s('scan')}</button>
+          </div>
+        </section>
+        <section data-view="advanced" class="mmd-v" hidden>
+          <ul class="mmd-list mmd-tree" data-adv>
+            {CATS.map((c, i) => (
+              <li data-advcat={i} hidden><button type="button" class="mmd-row" data-act="info" data-i={i}><i class="mmd-ico" style={file(CLEANERS[i].area === 'reg' ? 9 : CLEANERS[i].area === 'queue' ? 11 : CLEANERS[i].area === 'ram' ? 0 : 1)} aria-hidden="true"></i><span data-s={`cats.${i}`}>{c[0]}</span></button></li>
+            ))}
+          </ul>
+          <p class="mmd-info" data-advinfo><span data-s="notscanned">{s('notscanned')}</span></p>
+        </section>
+        <section data-view="reclaimram" class="mmd-v" hidden>
+          <ul class="mmd-list mmd-plain">
+            {['r_close', 'r_free', 'r_compact'].map((k, i) => <li><button type="button" class="mmd-row" role="checkbox" aria-checked={String(i > 0)} data-rr={k}><i class="mmd-ck" aria-hidden="true"></i><span data-s={k}>{s(k)}</span></button></li>)}
+          </ul>
+          <dl class="mmd-stats">
+            <div><dt data-s="free0">{s('free0')}</dt><dd><b data-rr0>6.21</b> MB</dd></div>
+            <div><dt data-s="freed">{s('freed')}</dt><dd><b data-rr1>0.00</b> MB</dd></div>
+            <div><dt data-s="free1">{s('free1')}</dt><dd><b data-rr2>6.21</b> MB</dd></div>
+          </dl>
+          <p class="mmd-info" data-rrsay></p>
+          <div class="mmd-btns"><button type="button" class="mmd-b" data-act="reclaim" data-s="reclaim">{s('reclaim')}</button></div>
+        </section>
+
+        <!-- Databases -->
+        <section data-view="notif" class="mmd-v" hidden>
+          <ul class="mmd-list mmd-tree">
+            <li><button type="button" class="mmd-row" aria-expanded="true" data-act="fold"><i class="mmd-ico" style={file(11)} aria-hidden="true"></i><span><span data-s="timebased">{s('timebased')}</span> : 5</span></button>
+              <ul>{TIMED.map((t, i) => <li><span class:list={['mmd-row', { 'is-sel': i === 0 }]}><i class="mmd-ico" style={file(2)} aria-hidden="true"></i>{t}</span></li>)}</ul></li>
+            <li><button type="button" class="mmd-row" aria-expanded="true" data-act="fold"><i class="mmd-ico" style={file(12)} aria-hidden="true"></i><span><span data-s="eventbased">{s('eventbased')}</span> : 7</span></button>
+              <ul><li><span class="mmd-row"><i class="mmd-ico" style={file(2)} aria-hidden="true"></i>calnot.exe</span></li></ul></li>
+          </ul>
+          <p class="mmd-info">When: Run at time<br />Argument: AppRunAtTime<br />Tuesday, July 10, 2007, 11:40:54 AM</p>
+        </section>
+        <section data-view="registry" class="mmd-v" hidden>
+          <ul class="mmd-list mmd-tree">
+            <li><button type="button" class="mmd-row" aria-expanded="false" data-act="fold"><i class="mmd-ico" style={file(9)} aria-hidden="true"></i>HKEY_CLASSES_ROOT</button>
+              <ul hidden><li><button type="button" class="mmd-row" aria-expanded="false" data-act="fold"><i class="mmd-ico" style={file(5)} aria-hidden="true"></i>TapHelp</button>
+                <ul hidden><li><span class="mmd-row"><i class="mmd-rt" style="--x:-32px" aria-hidden="true"></i>Ready2</span></li></ul></li></ul></li>
+            <li><button type="button" class="mmd-row" aria-expanded="false" data-act="fold"><i class="mmd-ico" style={file(9)} aria-hidden="true"></i>HKEY_CURRENT_USER</button><ul hidden><li><span class="mmd-row"><i class="mmd-ico" style={file(5)} aria-hidden="true"></i>Software</span></li></ul></li>
+            <li><button type="button" class="mmd-row" aria-expanded="true" data-act="fold"><i class="mmd-ico" style={file(9)} aria-hidden="true"></i>HKEY_LOCAL_MACHINE</button>
+              <ul><li><button type="button" class="mmd-row" aria-expanded="true" data-act="fold"><i class="mmd-ico" style={file(5)} aria-hidden="true"></i>Software\DinarSoft\MemMaid</button>
+                <ul>{MMKEYS.map(k => <li><span class="mmd-row"><i class="mmd-rt" style={k === 'LicKey' ? '--x:0px' : '--x:-64px'} aria-hidden="true"></i>{k}</span></li>)}</ul></li></ul></li>
+            <li><span class="mmd-row"><i class="mmd-ico" style={file(9)} aria-hidden="true"></i>HKEY_USERS</span></li>
+          </ul>
+        </section>
+
+        <!-- Tweaks -->
+        <section data-view="systweaks" class="mmd-v" hidden>
+          <div class="mmd-form">
+            <p class="mmd-grp" data-s="ie">{s('ie')}</p>
+            {[['cachesize', '10922', 'KB'], ['readbuf', '81920', 'B'], ['histsize', '10', ''], ['maxconn', '4', '']].map(([k, v, u]) => (
+              <label><span data-s={k}>{s(k)}</span><input type="text" inputmode="numeric" value={v} /><small>{u}</small></label>
+            ))}
+            <label><span data-s="fscache">{s('fscache')}</span><input type="text" value="Auto" /><small>K</small></label>
+          </div>
+          <div class="mmd-btns"><button type="button" class="mmd-b" data-act="noop" data-s="optimize">{s('optimize')}</button><button type="button" class="mmd-b" data-act="noop" data-s="apply">{s('apply')}</button></div>
+        </section>
+
+        <!-- Startups -->
+        <section data-view="startitems" class="mmd-v" hidden>
+          <ul class="mmd-list" data-start>
+            {STARTUP.map(([n, on, t], i) => (
+              <li><button type="button" class:list={['mmd-row', { 'is-sel': i === 1 }]} data-st={i} data-target={t} aria-pressed={String(on)}><i class="mmd-ico mmd-ball" aria-hidden="true"></i>{n}</button></li>
+            ))}
+          </ul>
+          <p class="mmd-info" data-stinfo><span data-s="type">{s('type')}</span><span data-s="shortcut">{s('shortcut')}</span><br /><span data-s="target">{s('target')}</span><span data-sttarget>{STARTUP[1][2]}</span></p>
+          <div class="mmd-btns mmd-icons">
+            <button type="button" class="mmd-tb" data-act="up" aria-label="Move up"><i style={tool(4)}></i></button>
+            <button type="button" class="mmd-tb" data-act="down" aria-label="Move down"><i style={tool(6)}></i></button>
+            <button type="button" class="mmd-tb" data-act="stop" aria-label="Disable"><i style={tool(21)}></i></button>
+            <button type="button" class="mmd-tb" data-act="play" aria-label="Enable"><i style={tool(20)}></i></button>
+          </div>
+        </section>
+
+        <!-- Storage -->
+        <section data-view="storusage" class="mmd-v" hidden>
+          <ul class="mmd-list mmd-tree">
+            <li><button type="button" class="mmd-row" aria-expanded="true" data-act="fold"><i class="mmd-ico" style={file(0)} aria-hidden="true"></i>Pocket PC : 84.78 MB</button>
+              <ul>{STORAGE.map(([n, v, ic]) => <li><span class="mmd-row"><i class="mmd-ico" style={file(ic)} aria-hidden="true"></i>{n} : {v}</span></li>)}</ul></li>
+          </ul>
+          <div class="mmd-btns"><button type="button" class="mmd-b" data-act="noop" data-s="browse">{s('browse')}</button><button type="button" class="mmd-b" data-act="noop" data-s="chart">{s('chart')}</button></div>
+        </section>
+
+        <!-- Processes -->
+        <section data-view="running" class="mmd-v" hidden>
+          <p class="mmd-cols"><span data-s-fmt="programs_n" data-n="6">Programs (6)</span><span data-s="memory">{s('memory')}</span></p>
+          <ul class="mmd-list" data-run>
+            {RUNNING.map(([n, kb], i) => <li><button type="button" class:list={['mmd-row', { 'is-sel': i === 0 }]} data-r={i}><span>{n}</span><b>{kb}</b></button></li>)}
+          </ul>
+          <p class="mmd-info"><span data-s="installedby">{s('installedby')}</span>Windows Mobile<br />Target: \Windows\wmplayer.exe<br />Threads: 4</p>
+          <div class="mmd-btns"><button type="button" class="mmd-b" data-act="noop" data-s="activate">{s('activate')}</button><button type="button" class="mmd-b" data-act="noop" data-s="terminate">{s('terminate')}</button></div>
+        </section>
+
+        {Object.entries(GENERIC).map(([v, say]) => (
+          <section data-view={v} class="mmd-v mmd-gen" hidden>
+            <i class="mmd-big" style={`--i:${tabOf(v).icon}`} aria-hidden="true"></i>
+            <p class="mmd-gen-t" data-s={v}>{s(v)}</p>
+            <p>{say}</p>
+          </section>
+        ))}
+      </div>
+
+      <nav class="mmd-tabs" aria-label="MemMaid's six screens">
+        {TABS.map(t => <button type="button" data-tab-btn={t.id} aria-pressed={String(t.id === 'cleaner')} aria-label={s(t.id)} data-s-label={t.id}><i style={`--i:${t.icon}`}></i></button>)}
+      </nav>
+
+      <!-- Soft-key menus -->
+      <ul class="mmd-menu mmd-jump" data-pop="jump" role="menu" hidden>
+        {TABS.map(t => (
+          <li role="none"><span class="mmd-mh" data-s={t.id}>{s(t.id)}</span>
+            <ul role="group">{t.views.map(v => <li role="none"><button type="button" role="menuitem" data-go={v} data-s={v}>{s(v)}</button></li>)}</ul></li>
+        ))}
+      </ul>
+      <ul class="mmd-menu mmd-toolsmenu" data-pop="tools" role="menu" hidden>
+        {['poweroff', 'softreset', 'settings', 'schedule', '-', 'look', '-', 'about', 'help', 'exit'].map(k => k === '-' ? <li role="separator"></li> : <li role="none"><button type="button" role="menuitem" data-tool={k} data-s={k}>{s(k)}</button></li>)}
+      </ul>
+
+      <!-- Full-screen dialogs -->
+      <section class="mmd-dlg" data-dlg="about" hidden>
+        <p class="mmd-dt" data-s="about">{s('about')}</p>
+        <img src={logoImg.src} width="150" height="32" alt="DinarSoft" />
+        <p class="mmd-ver">MemMaid 2.3</p>
+        <p>www.dinarsoft.com<br />Copyrights Reserved 2004-2008 (c)</p>
+        <p class="mmd-lic" data-lic data-days="15">The trial period will expire after 15 day(s)</p>
+        <button type="button" class="mmd-b" data-act="register" data-s="register">{s('register')}</button>
+      </section>
+      <section class="mmd-dlg" data-dlg="license" hidden>
+        <p class="mmd-dt" data-s="lickey">{s('lickey')}</p>
+        <img src={logoImg.src} width="150" height="32" alt="DinarSoft" />
+        <fieldset>
+          <p data-s="code">{s('code')}</p>
+          <p class="mmd-code">{code.match(/.{4}/g)!.join(' - ')}</p>
+          <p class="mmd-small" data-s="keyfor">{s('keyfor')}</p>
+          <p data-s="enter">{s('enter')}</p>
+          <div class="mmd-key">{[0, 1, 2, 3].map(i => <input type="text" maxlength="4" autocapitalize="characters" spellcheck="false" autocomplete="off" aria-label={`Unlock key, group ${i + 1} of 4`} data-k={i} />)}</div>
+        </fieldset>
+        <p class="mmd-small" data-keysay aria-live="polite"></p>
+      </section>
+      <section class="mmd-dlg" data-dlg="settings" hidden>
+        <p class="mmd-dt" data-s="settings">{s('settings')}</p>
+        <label class="mmd-lang"><span data-s="language">{s('language')}</span>
+          <select data-lang>{LANGS.map((l, i) => <option value={i} lang={l.id}>{l.name}</option>)}</select></label>
+        <p class="mmd-small">Every label in MemMaid comes from a table of 709 strings. A language is one small DLL with the same 709 strings, translated.</p>
+      </section>
+      <section class="mmd-dlg" data-dlg="look" hidden>
+        <p class="mmd-dt" data-s="look">{s('look')}</p>
+        <p><span data-s="background">{s('background')}</span></p>
+        <div class="mmd-skins">{(STR.skins as string[][]).slice(0, 4).map((k, i) => <button type="button" class="mmd-row" role="radio" aria-checked={String(i === 0)} data-skin={i}><i class="mmd-ck" aria-hidden="true"></i><span data-s={`skins.${i}`}>{k[0]}</span></button>)}</div>
+      </section>
+      <section class="mmd-dlg mmd-ask" data-dlg="softq" hidden>
+        <p class="mmd-dt" data-s="question">{s('question')}</p>
+        <p data-s="softq">{s('softq')}</p>
+      </section>
+      <section class="mmd-dlg mmd-black" data-dlg="off" hidden><p>Tap to turn it back on.</p></section>
+      <section class="mmd-dlg mmd-today" data-dlg="exit" hidden><button type="button" class="mmd-b" data-act="run" data-s="run">{s('run')}</button></section>
+      <p class="mmd-toast" data-toast aria-live="polite" hidden></p>
+    </div>
+    <div slot="status" class="mmd-keys">
+      <button type="button" data-soft="0" data-s="jump">{s('jump')}</button>
+      <span class="mmd-kbd" aria-hidden="true"></span>
+      <button type="button" data-soft="1" data-s="tools">{s('tools')}</button>
+    </div>
+  </Window>
+  <p class="mmd-cap">Rebuilt from MemMaid’s own icons, menus and strings. Lists show what DinarSoft’s own 2007 screenshots show; scan sizes are a sample.</p>
+</div>
+
+<style is:global>
+  .mmd { display: grid; justify-items: center; gap: 12px; }
+  .mmd .mmd-dev { width: min(100%, 372px); }
+  .mmd .mmd-dev > .win-body { padding: 0; overflow: hidden; }
+  .mmd-cap { max-width: 44ch; font-size: 0.875rem !important; line-height: 1.5 !important; color: var(--ink-2) !important; text-align: center; }
+
+  .mmd-scr {
+    --hd: oklch(0.52 0.1 205); --sel: oklch(0.86 0.06 205); --bar: linear-gradient(oklch(0.42 0.02 250), oklch(0.2 0.02 250));
+    position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%;
+    font: 500 13px/1.25 Tahoma, Verdana, var(--font-ui), sans-serif; color: #000;
+    background: repeating-linear-gradient(#fff 0 3px, oklch(0.95 0.015 220) 3px 6px);
+  }
+  .mmd-scr[data-tab='databases'], .mmd-scr[data-tab='storage'] { --hd: oklch(0.5 0.14 145); --sel: oklch(0.88 0.08 145); }
+  .mmd-scr[data-tab='tweaks'], .mmd-scr[data-tab='processes'] { --hd: oklch(0.5 0.17 25); --sel: oklch(0.86 0.07 25); }
+  .mmd-scr[data-tab='startups'] { --hd: oklch(0.48 0.15 255); --sel: oklch(0.86 0.07 255); }
+  .mmd-scr[data-skin='1'] { background: #fff; }
+  .mmd-scr[data-skin='2'] { background: linear-gradient(#fff, oklch(0.9 0.03 220)); }
+  .mmd-scr[data-skin='3'] { background: radial-gradient(circle at 30% 20%, #fff, oklch(0.9 0.03 220)); }
+  .mmd-scr button { font: inherit; color: inherit; }
+  .mmd-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 4px 6px 2px; }
+  .mmd-view { min-height: 32px; padding: 0 4px; font-weight: 700 !important; font-size: 15px !important; color: var(--hd) !important; background: none; border: 0; cursor: pointer; text-align: left; }
+  .mmd-tools { display: flex; gap: 4px; }
+  .mmd-tools i, .mmd-tb i { display: block; width: 28px; height: 22px; background: var(--tools) var(--x) 0 / 616px 22px no-repeat; }
+  .mmd-tools i { width: 30px; border-radius: 3px; background-color: #5f6670; background-position: calc(var(--x) + 1px) 0; box-shadow: inset 0 1px 0 #8b929c, inset 0 -2px 0 #2b3037; opacity: 0.85; }
+  .mmd-body { position: relative; min-height: 0; overflow: hidden; border-top: 1px solid #000; }
+  .mmd-v { display: grid; grid-template-rows: minmax(0, 1fr) auto auto auto auto; height: 100%; }
+  .mmd-v[hidden] { display: none !important; }
+  .mmd-list { margin: 0; padding: 0; list-style: none; overflow: auto; overscroll-behavior: contain; background: #fff; }
+  .mmd-list ul { margin: 0; padding: 0 0 0 16px; list-style: none; }
+  .mmd-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px; width: 100%; min-height: 28px; padding: 1px 6px; text-align: left; background: none; border: 0; border-bottom: 1px solid oklch(0.93 0 0); cursor: pointer; }
+  span.mmd-row { cursor: default; }
+  .mmd-row > span, .mmd-row { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mmd-row b { font-weight: 500; }
+  .mmd-row:hover, .mmd-row.is-sel { background: var(--sel); }
+  .mmd-row:focus-visible, .mmd-b:focus-visible, .mmd-tabs button:focus-visible, .mmd-menu button:focus-visible, .mmd-keys button:focus-visible, .mmd-view:focus-visible { outline: 2px solid var(--hd); outline-offset: -2px; }
+  .mmd-ck { width: 18px; height: 18px; background: var(--checks) -18px 0 / 72px 18px; }
+  .mmd-row[aria-checked='true'] .mmd-ck { background-position: -36px 0; }
+  .mmd-ico { width: 20px; height: 20px; background: var(--files) calc(var(--x) * 0.625) 0 / 280px 20px; }
+  .mmd-rt { width: 20px; height: 19px; background: var(--reg) calc(var(--x) * 0.625) 0 / 80px 19px; }
+  .mmd-ball { --x: -224px; }
+  .mmd-row[aria-pressed='false'] .mmd-ball { --x: -192px; }
+  .mmd-tree .mmd-row { grid-template-columns: auto minmax(0, 1fr); }
+  .mmd-tree button.mmd-row::before { content: '+'; display: none; }
+  .mmd-total, .mmd-cols { display: flex; justify-content: space-between; margin: 0 !important; padding: 3px 6px; font-size: 12px !important; color: #000 !important; background: oklch(0.93 0.01 220); border-top: 1px solid #000; }
+  .mmd-prog { height: 12px; margin: 0 4px; border: 1px solid oklch(0.45 0.05 220); border-radius: 6px; background: oklch(0.85 0.03 220); overflow: hidden; }
+  .mmd-prog i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(oklch(0.75 0.1 205), oklch(0.5 0.1 210)); }
+  .mmd-cols { border-top: 0; border-bottom: 1px solid #000; font-weight: 700; }
+  .mmd-info { margin: 0 !important; min-height: 4.2em; padding: 4px 6px; font-size: 12px !important; line-height: 1.35 !important; color: #000 !important; background: #fff; border-top: 1px solid #000; overflow-wrap: anywhere; }
+  .mmd-btns { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding: 4px; }
+  .mmd-btns .mmd-all { width: auto; margin-right: auto; border: 0; background: none; }
+  .mmd-b { min-width: 72px; min-height: 30px; padding: 0 10px; font-weight: 700 !important; color: #fff !important; border: 1px solid #000; border-radius: 3px; background: var(--bar); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.35); cursor: pointer; }
+  .mmd-b:active { background: oklch(0.25 0.02 250); }
+  .mmd-tb { display: grid; place-items: center; width: 40px; height: 30px; border: 1px solid #000; border-radius: 3px; background: var(--bar); cursor: pointer; }
+  .mmd-plain .mmd-row { border: 0; background: none; }
+  .mmd-plain { background: none; padding: 4px 0; }
+  .mmd-stats { display: grid; gap: 4px; margin: 0; padding: 6px; }
+  .mmd-stats div { display: flex; justify-content: space-between; }
+  .mmd-stats dd { margin: 0; }
+  .mmd-form { display: grid; align-content: start; gap: 4px; padding: 6px; overflow: auto; }
+  .mmd-form label { display: grid; grid-template-columns: minmax(0, 1fr) 80px 18px; align-items: center; gap: 6px; }
+  .mmd-form input { width: 100%; min-height: 26px; padding: 0 4px; font: inherit; border: 1px solid #000; background: #fff; }
+  .mmd-grp { font-weight: 700; }
+  .mmd-gen { place-items: center; align-content: center; gap: 8px; padding: 16px; text-align: center; grid-template-rows: none; }
+  .mmd-gen p { max-width: 26ch; font-size: 13px; color: #000; }
+  .mmd-gen-t { font-weight: 700; color: var(--hd) !important; font-size: 15px !important; }
+  .mmd-big { width: 64px; height: 50px; background: var(--tabs) calc(var(--i) * -64px) 0 / 384px 50px; }
+
+  .mmd-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid #000; background: oklch(0.88 0 0); }
+  .mmd-tabs button { display: grid; place-items: center; min-height: 48px; padding: 0; background: oklch(0.88 0 0); border: 0; border-left: 1px solid #000; cursor: pointer; }
+  .mmd-tabs button:first-child { border-left: 0; }
+  .mmd-tabs i { width: 46px; height: 36px; background: var(--tabs) calc(var(--i) * -46px) 0 / 276px 36px; filter: grayscale(1) contrast(0.9); opacity: 0.85; transition: filter 0.2s, transform 0.2s; }
+  .mmd-tabs button[aria-pressed='true'] { background: #fff; }
+  .mmd-tabs button[aria-pressed='true'] i { filter: none; opacity: 1; transform: translateY(-2px) scale(1.08); }
+
+  .mmd-menu { position: absolute; z-index: 5; margin: 0; padding: 2px; list-style: none; background: #fff; border: 1px solid #000; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.35); }
+  .mmd-menu button { display: block; width: 100%; min-height: 30px; padding: 0 10px; text-align: left; background: none; border: 0; cursor: pointer; white-space: nowrap; }
+  .mmd-menu button:hover { color: #fff; background: var(--hd); }
+  .mmd-views { left: 6px; top: 36px; min-width: 60%; }
+  .mmd-jump { left: 4px; bottom: 4px; max-height: calc(100% - 8px); overflow: auto; width: 62%; }
+  .mmd-jump .mmd-mh { display: block; padding: 4px 6px 0; font-size: 11px; font-weight: 700; color: var(--hd); }
+  .mmd-jump ul { margin: 0; padding: 0; list-style: none; }
+  .mmd-toolsmenu { right: 4px; bottom: 4px; width: 52%; }
+  .mmd-toolsmenu li[role='separator'] { height: 1px; margin: 2px 4px; background: #000; }
+
+  .mmd-dlg { position: absolute; inset: 0; z-index: 4; display: grid; align-content: start; justify-items: center; gap: 8px; padding: 0 10px 10px; text-align: center; background: #fff; overflow: auto; }
+  .mmd-dlg[hidden] { display: none !important; }
+  .mmd-dt { justify-self: stretch; margin: 0 -10px 6px !important; padding: 6px 10px; font-weight: 700; font-size: 15px !important; text-align: left; color: var(--hd) !important; border-bottom: 1px solid #000; }
+  .mmd-dlg p { font-size: 13px; color: #000; }
+  .mmd-ver { font-weight: 700; font-size: 15px !important; }
+  .mmd-lic { color: var(--hd) !important; font-weight: 700; }
+  .mmd-dlg fieldset { display: grid; justify-items: center; gap: 4px; width: 100%; margin: 4px 0 0; padding: 8px; border: 1px solid #000; }
+  .mmd-code { font: 700 14px/1 var(--font-code) !important; letter-spacing: 0.04em; }
+  .mmd-small { font-size: 11px !important; color: #333 !important; }
+  .mmd-key { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; }
+  .mmd-key input { min-width: 0; min-height: 32px; padding: 0; font: 700 14px/1 var(--font-code); text-align: center; text-transform: uppercase; border: 1px solid #000; background: #fff; }
+  .mmd-key input:focus-visible, .mmd-lang select:focus-visible { outline: 2px solid var(--hd); outline-offset: 1px; }
+  .mmd-lang { display: grid; gap: 6px; justify-items: start; width: 100%; text-align: left; }
+  .mmd-lang select { width: 100%; min-height: 34px; font: inherit; border: 1px solid #000; background: #fff; }
+  .mmd-skins { display: grid; width: 100%; }
+  .mmd-skins .mmd-row { grid-template-columns: auto 1fr; }
+  .mmd-skins .mmd-row[aria-checked='true'] .mmd-ck { background-position: -36px 0; }
+  .mmd-ask { align-content: center; }
+  .mmd-black { place-content: center; background: #000; cursor: pointer; }
+  .mmd-black p { color: #777 !important; }
+  .mmd-today { place-content: center; background: linear-gradient(oklch(0.55 0.1 220), oklch(0.35 0.08 230)); }
+  .mmd-toast { position: absolute; left: 8px; right: 8px; bottom: 56px; z-index: 6; margin: 0 !important; padding: 8px 10px; font-size: 12px !important; line-height: 1.35 !important; color: #000 !important; background: oklch(0.97 0.05 95); border: 1px solid #000; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.3); }
+
+  .mmd-keys { display: grid !important; grid-template-columns: 1fr auto 1fr; align-items: center; height: 100%; padding: 0 !important; }
+  .mmd-keys button { min-height: 32px; font: 700 13px/1 var(--font-ui, sans-serif); color: #fff; background: none; border: 0; cursor: pointer; }
+  .mmd-keys button:active { background: oklch(1 0 0 / 0.15); }
+  .mmd-kbd { width: 22px; height: 12px; border: 2px solid #fff; border-radius: 2px; opacity: 0.85; }
+  .mmd .mmd-dev > .win-status { height: 34px; padding: 0 4px; }
+  .mmd-keys { flex: 1; }
+  @media (prefers-reduced-motion: reduce) { .mmd-tabs i { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scramble } from '../../../lib/dinarsoft/memmaid';
+
+  type Data = { STR: Record<string, string[] | string[][]>; SAMPLE: number[]; TABS: { id: string; icon: number; views: string[] }[]; code: string };
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const size = (b: number) => (b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : b >= 1024 ? `${(b / 1024).toFixed(1)} KB` : `${b} Bytes`);
+
+  document.querySelectorAll<HTMLElement>('[data-mm-device]').forEach(root => {
+    const D: Data = JSON.parse(root.querySelector('[data-mmd]')!.textContent!);
+    const scr = root.querySelector<HTMLElement>('[data-scr]')!;
+    const $ = (q: string) => scr.querySelector<HTMLElement>(q)!;
+    const $$ = (q: string) => [...scr.querySelectorAll<HTMLElement>(q)];
+    const soft = [...root.querySelectorAll<HTMLButtonElement>('[data-soft]')];
+    let lang = 0, view = 'quick', dlg = '', registered = false;
+    const last: Record<string, string> = {};
+    const t = (k: string) => {
+      const [a, b] = k.split('.');
+      const v = D.STR[a];
+      return (b === undefined ? (v as string[])[lang] : (v as string[][])[+b][lang]) ?? '';
+    };
+
+    // Language: every label carries its string key, like MemMaid's GetString(index)
+    const relabel = () => {
+      $$('[data-s]').forEach(el => (el.textContent = t(el.dataset.s!)));
+      $$('[data-s-label]').forEach(el => el.setAttribute('aria-label', t(el.dataset.sLabel!)));
+      $$('[data-s-fmt]').forEach(el => (el.textContent = t(el.dataset.sFmt!).replace('%d', el.dataset.n!)));
+      root.querySelectorAll<HTMLElement>('.mmd-keys [data-s]').forEach(el => (el.textContent = t(el.dataset.s!)));
+      scr.lang = ['en', 'de', 'fr', 'it', 'cs', 'sk', 'ru', 'zh-Hans'][lang];
+      paintLic();
+      $('[data-title]').textContent = t(view);
+    };
+    const paintLic = () => {
+      const p = $('[data-lic]');
+      p.textContent = registered ? t('registered') : t('trial').replace('%d', p.dataset.days!);
+      $('[data-act="register"]').hidden = registered;
+    };
+
+    const closePops = () => { $$('[data-pop]').forEach(p => (p.hidden = true)); $('[data-act="views"]').setAttribute('aria-expanded', 'false'); };
+    const go = (v: string) => {
+      const tab = D.TABS.find(x => x.views.includes(v))!;
+      view = v; last[tab.id] = v;
+      closePops();
+      scr.dataset.tab = tab.id;
+      $$('[data-view]').forEach(s => (s.hidden = s.dataset.view !== v));
+      $$('[data-tab-btn]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tabBtn === tab.id)));
+      $$('.mmd-views [data-of]').forEach(li => (li.hidden = li.dataset.of !== tab.id));
+      const tl = $('[data-title]');
+      tl.dataset.s = v; tl.textContent = t(v);
+      if (!reduce()) gsap.fromTo(scr.querySelector(`[data-view="${v}"]`), { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.25, ease: 'power2.out' });
+    };
+    const toast = (msg: string) => {
+      const el = $('[data-toast]');
+      el.textContent = msg; el.hidden = false;
+      clearTimeout((el as unknown as { _t: number })._t);
+      (el as unknown as { _t: number })._t = window.setTimeout(() => (el.hidden = true), 3200);
+    };
+    const open = (name: string) => {
+      dlg = name;
+      closePops();
+      $$('[data-dlg]').forEach(d => (d.hidden = d.dataset.dlg !== name));
+      soft[0].dataset.s = name ? 'done' : 'jump';
+      soft[1].dataset.s = name ? 'cancel' : 'tools';
+      soft.forEach(b => (b.textContent = t(b.dataset.s!)));
+      if (name === 'license') ($('[data-k="0"]') as HTMLInputElement).focus();
+    };
+    const pop = (name: string, btn?: HTMLElement) => {
+      const p = $(`[data-pop="${name}"]`), was = p.hidden;
+      closePops();
+      p.hidden = !was;
+      if (btn) btn.setAttribute('aria-expanded', String(was));
+      if (was) p.querySelector<HTMLButtonElement>('button:not([hidden])')?.focus();
+    };
+
+    // Quick Cleaner
+    const rows = $$('[data-cat]');
+    const total = $('[data-total]'), prog = $('[data-prog]');
+    let scanning = false;
+    const scan = (clean: boolean) => {
+      if (scanning) return;
+      scanning = true;
+      let sum = 0, items = 0;
+      const on = rows.filter(r => r.getAttribute('aria-checked') === 'true');
+      const tl = gsap.timeline({ onComplete: () => {
+        scanning = false;
+        total.textContent = size(clean ? 0 : sum);
+        if (clean) toast(t('cleaned').replace('%d', String(items)).replace('%d', String(sum)));
+        $$('[data-advcat]').forEach(li => (li.hidden = !on.some(r => r.dataset.cat === li.dataset.advcat)));
+      } });
+      rows.forEach(r => (r.querySelector('[data-size]')!.textContent = '-'));
+      tl.fromTo(prog, { scaleX: 0 }, { scaleX: 1, duration: reduce() ? 0 : on.length * 0.18 + 0.1, ease: 'none' }, 0);
+      on.forEach((r, n) => {
+        const b = D.SAMPLE[+r.dataset.cat!];
+        sum += b; items += b > 0 ? 1 : 0;
+        tl.call(() => {
+          rows.forEach(x => x.classList.toggle('is-sel', x === r));
+          const L = r.closest<HTMLElement>('.mmd-list')!, rr = r.getBoundingClientRect(), lr = L.getBoundingClientRect();
+          if (rr.top < lr.top || rr.bottom > lr.bottom) L.scrollTop += rr.top - lr.top - lr.height / 2;
+          r.querySelector('[data-size]')!.textContent = clean ? '0 Bytes' : b ? size(b) : '-';
+        }, [], reduce() ? 0 : n * 0.18);
+      });
+      tl.call(() => rows.forEach(x => x.classList.remove('is-sel')), [], reduce() ? 0 : on.length * 0.18 + 0.1);
+    };
+
+    // Reclaim RAM: a sample run, the same arithmetic as MemMaid (after minus before)
+    const reclaim = () => {
+      const box = (k: string) => $(`[data-rr="${k}"]`).getAttribute('aria-checked') === 'true';
+      const before = 6.21, got = (box('r_close') ? 1.18 : 0) + (box('r_free') ? 0.19 : 0) + (box('r_compact') ? 0.35 : 0);
+      const o = { v: 0 };
+      gsap.to(o, { v: got, duration: reduce() ? 0 : 1, ease: 'power2.out', onUpdate: () => {
+        $('[data-rr1]').textContent = o.v.toFixed(2); $('[data-rr2]').textContent = (before + o.v).toFixed(2);
+      } });
+      $('[data-rr0]').textContent = before.toFixed(2);
+      $('[data-rrsay]').textContent = got > 0 ? `${t('reclaimed')}${got.toFixed(2)} MB` : t('claimed');
+    };
+
+    // Startup items
+    let st = 1;
+    const stRows = () => $$('[data-st]');
+    const pickSt = (el: HTMLElement) => {
+      st = stRows().indexOf(el);
+      stRows().forEach(r => r.classList.toggle('is-sel', r === el));
+      $('[data-sttarget]').textContent = el.dataset.target!;
+    };
+
+    // The key: the same check as MemMaid 2.3 (6AB44): his scramble of this device's code, or of a built-in word
+    const keyCheck = () => {
+      const k = $$('[data-k]').map(i => (i as HTMLInputElement).value.toUpperCase()).join('');
+      const say = $('[data-keysay]');
+      if (k.length < 16) { say.textContent = ''; return false; }
+      const ok = k === scramble(D.code, 'MemMaid2') || ['YASSERMOHAMEDALI', 'GIVEAWAYVERSION1'].some(w => scramble(k, 'MemMaid2') === scramble(scramble(w, 'MemMaid2'), 'MemMaid2'));
+      say.textContent = ok ? t('registered') : '';
+      return ok;
+    };
+
+    root.addEventListener('click', e => {
+      const el = (e.target as Element).closest<HTMLElement>('button, [data-dlg="off"]');
+      if (!el || !root.contains(el)) return;
+      const a = el.dataset.act;
+      if (el.dataset.dlg === 'off') return open('');
+      if (el.dataset.tabBtn) return go(last[el.dataset.tabBtn] ?? D.TABS.find(x => x.id === el.dataset.tabBtn)!.views[0]);
+      if (el.dataset.go) return go(el.dataset.go);
+      if (el.dataset.soft) {
+        if (dlg) {
+          if (dlg === 'license' && el.dataset.soft === '0') {
+            if (keyCheck()) { registered = true; paintLic(); toast(t('registered')); return open('about'); }
+            return toast('Try the key on this page, or the one MemMaid would make for this device.');
+          }
+          if (dlg === 'softq' && el.dataset.soft === '0') {
+            open('off');
+            return gsap.delayedCall(reduce() ? 0 : 1.2, () => { open(''); go('quick'); toast('Soft reset: the device starts again.'); });
+          }
+          return open('');
+        }
+        return pop(el.dataset.soft === '0' ? 'jump' : 'tools');
+      }
+      if (el.dataset.tool) {
+        const k = el.dataset.tool;
+        if (k === 'about' || k === 'settings' || k === 'look' || k === 'exit') return open(k);
+        if (k === 'softreset') return open('softq');
+        if (k === 'poweroff') return open('off');
+        closePops();
+        return toast(k === 'help' ? 'Help opens MemMaid.htm at this screen’s own topic.' : k === 'schedule' ? 'Clean on soft reset, or daily, weekly, or once, at a time you pick.' : '');
+      }
+      if (el.dataset.cat !== undefined || el.dataset.rr || el.dataset.act === 'all') {
+        const on = el.getAttribute('aria-checked') !== 'true';
+        el.setAttribute('aria-checked', String(on));
+        if (a === 'all') rows.forEach(r => r.setAttribute('aria-checked', String(on)));
+        return;
+      }
+      if (el.dataset.skin !== undefined) {
+        $$('[data-skin]').forEach(b => b.setAttribute('aria-checked', String(b === el)));
+        scr.dataset.skin = el.dataset.skin;
+        return;
+      }
+      if (el.dataset.st !== undefined) return pickSt(el);
+      if (el.dataset.r !== undefined) return $$('[data-r]').forEach(r => r.classList.toggle('is-sel', r === el));
+      switch (a) {
+        case 'views': return pop('views', el);
+        case 'scan': return scan(false);
+        case 'clean': return scan(true);
+        case 'reclaim': return reclaim();
+        case 'register': return open('license');
+        case 'run': open(''); return go('quick');
+        case 'fold': {
+          const sub = el.nextElementSibling as HTMLElement | null;
+          if (!sub) return;
+          sub.hidden = !sub.hidden;
+          el.setAttribute('aria-expanded', String(!sub.hidden));
+          return;
+        }
+        case 'info': {
+          const i = +el.dataset.i!;
+          $$('[data-act="info"]').forEach(r => r.classList.toggle('is-sel', r === el));
+          $('[data-advinfo]').textContent = `${t('catinfo')}\n${t(`cats.${i}`)}`;
+          return;
+        }
+        case 'up': case 'down': {
+          const list = $('[data-start]'), items = stRows(), to = st + (a === 'up' ? -1 : 1);
+          if (to < 0 || to >= items.length) return;
+          const li = items[st].parentElement!, other = items[to].parentElement!;
+          if (a === 'up') list.insertBefore(li, other); else list.insertBefore(other, li);
+          st = to;
+          if (!reduce()) gsap.fromTo(li, { y: a === 'up' ? 28 : -28 }, { y: 0, duration: 0.25 });
+          return;
+        }
+        case 'stop': case 'play': return stRows()[st]?.setAttribute('aria-pressed', String(a === 'play'));
+        case 'noop': return toast(el.textContent ?? '');
+      }
+    });
+    root.addEventListener('keydown', e => {
+      if (e.key === 'Escape') { closePops(); if (dlg) open(''); }
+    });
+    root.querySelector<HTMLSelectElement>('[data-lang]')!.addEventListener('change', e => {
+      lang = +(e.target as HTMLSelectElement).value;
+      relabel();
+    });
+    // The four boxes move on by themselves after four letters, like MemMaid's (EM_LIMITTEXT 4)
+    $$('[data-k]').forEach((inp, i, all) => inp.addEventListener('input', () => {
+      const v = (inp as HTMLInputElement).value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (v.length > 4 && i < 3) { (inp as HTMLInputElement).value = v.slice(0, 4); (all[i + 1] as HTMLInputElement).value = v.slice(4, 8); }
+      else (inp as HTMLInputElement).value = v;
+      if ((inp as HTMLInputElement).value.length === 4 && i < 3) (all[i + 1] as HTMLInputElement).focus();
+      keyCheck();
+    }));
+    go('quick');
+  });
+</script>

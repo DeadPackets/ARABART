@@ -1,174 +1,444 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ProgramCard from '../components/ProgramCard.astro';
-import SearchFilter from '../components/SearchFilter.astro';
-import { programs } from '../data/programs';
+import Window from '../components/shell/Window.astro';
+import Hero from '../components/shell/Hero.astro';
+import Programs from '../components/shell/Programs.astro';
 
 const base = import.meta.env.BASE_URL;
-const yearCounts = programs.reduce((acc, p) => {
-  acc[p.year] = (acc[p.year] || 0) + 1;
-  return acc;
-}, {} as Record<number, number>);
+
+const sakhr = [
+  { id: 'print', name: 'Printing core', icon: 'print', text: 'Arabic on paper, exactly as it looks on the screen. His printing core laid out each page right to left and sent it to the printer. Think of the print engine inside your browser, written for Arabic.' },
+  { id: 'bidi', name: 'Bilingual text', icon: 'bidi', text: 'Arabic runs right to left and English left to right, and real documents mix both on one line. His text displayer drew each one in the right order, side by side. Every browser does this for you today. Then, someone had to write it.' },
+  { id: 'api', name: 'Arabic APIs', icon: 'api', text: 'One set of Arabic functions that any program could call, on Arabic Windows and on English Windows too. Like a shared package that every app imports, so no team has to write Arabic support twice.' },
+  { id: 'setup', name: 'Installer framework', icon: 'setup', text: 'The framework behind the installers for Sakhr’s multimedia titles: one tool that put each title on a PC and made it ready to run. The setup program of every app you install today does the same job.' },
+];
+
+const KEY = { node: 5, shelf: 2, slot: 3, card: 1, port: 17 };
+const FIELDS = [['node', 10], ['shelf', 5], ['slot', 5], ['card', 5], ['port', 7]] as const;
+const keyOf = (v: Record<string, number>) => FIELDS.reduce((k, [f, w]) => k * 2 ** w + v[f], 0);
+const bits = FIELDS.map(([f, w]) => KEY[f].toString(2).padStart(w, '0'));
+const lo = Math.floor(keyOf(KEY) / 2 ** 17) * 2 ** 17;
+
+const apps = [
+  { id: 'memmaid', name: 'MemMaid', what: 'Cleans the phone: frees memory, manages the programs and services that start with it, and tidies the registry.', first: '1.0, June 2003', last: '2.3, June 2008', awards: 'Finalist four years running, 2005 to 2008', soft: ['Menu', 'Clean'] },
+  { id: 'handyswitcher', name: 'HandySwitcher', what: 'A task switcher with an X button that really closes programs, and Close All.', first: '1.0, September 2003', last: '3.1, April 2008', awards: 'Best Task Manager, 2007 and 2008', soft: ['Close all', 'Menu'] },
+  { id: 'handymenu', name: 'HandyMenu', what: 'A menu in the corner of the screen: power off, reset, screen capture, rotate the screen.', first: '1.0, July 2003', last: '3.6, March 2006', awards: 'Finalist, System and Registry, 2008', soft: ['Menu', 'Close'] },
+  { id: 'handylauncher', name: 'HandyLauncher', what: 'Opens programs and documents from the corner of the screen, each in the screen direction you choose.', first: '1.0, August 2003', last: '3.4, March 2006', awards: 'Nominee, 2007 and 2008', soft: ['Edit', 'Menu'] },
+  { id: 'taptext', name: 'TapText', what: 'Saved phrases and date stamps, typed into any program in two taps.', first: '1.0, March 2005', last: '1.3, February 2006', awards: 'Best Misc. Utility, 2007; finalist, 2008', soft: ['New', 'Menu'] },
+  { id: 'hijridate', name: 'HijriDate', what: 'Shows the Hijri and the Gregorian date on the Today screen, in Arabic or English.', first: '1.0, June 2003', last: '1.5', awards: '', soft: ['Calendar', 'Contacts'] },
+];
+const now = new Date();
+const hijriAr = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
 ---
 
 <BaseLayout
-  title="DOSArchive - Yasser Awad's DOS Works"
-  description="A web archive of 15 DOS programs written by Yasser Awad in 1990s Egypt. Run them in your browser."
+  title="ARABART: Yasser Awad, the engineer and his code"
+  description="Yasser Awad taught a PC to write Arabic in 1991. Type with his engine, run his fifteen DOS programs in your browser, and follow him from Port Said to Sakhr, Alcatel and DinarSoft."
+  keys={[{ k: 'F2', label: 'Type in Arabic', act: 'type' }, { k: 'F9', label: 'Run his programs', href: '#programs' }]}
 >
-  <div class="container">
-    <!-- Hero -->
-    <section class="hero" aria-label="Introduction">
-      <div class="hero-prompt" aria-hidden="true">
-        <span class="hero-path">C:\ARCHIVE&gt;</span>
-        <span class="hero-cmd">dir /w</span>
-        <span class="cursor"></span>
+  <link slot="head" rel="preload" href={`${base}/arabart/fonts.bin`} as="fetch" crossorigin />
+  <canvas class="era-bg" aria-hidden="true"></canvas>
+
+  <Hero />
+  <Programs />
+
+  <!-- Sakhr: Windows 3.1 -->
+  <section class="era-sec sakhr" data-era="win31" id="sakhr" aria-labelledby="sk-h">
+    <div class="container sk-grid">
+      <div class="copy">
+        <h2 id="sk-h">Cairo, 1993. Arabic comes to Windows.</h2>
+        <p>Sakhr, in Cairo, made the first Arabic version of Windows 3.x. He joined in 1993 as a project leader. He built core parts of its Arabic office software, the programs people used to write, print and publish in Arabic.</p>
+        <p>Open each one to see what it did.</p>
+        <a class="more" href={`${base}/career/`}>Read his whole career</a>
       </div>
-
-      <h1 class="hero-title glow-strong">DOSArchive</h1>
-
-      <p class="hero-subtitle">
-        A collection of <strong class="text-phosphor">{programs.length} programs</strong> written by
-        <strong>Yasser Awad</strong> in 1990s Egypt.<br />
-        Assembly, C, and C++ &mdash; running in your browser.
-      </p>
-
-      <div class="hero-stats" aria-label="Archive statistics">
-        <div class="stat">
-          <span class="stat-value text-phosphor">{programs.length}</span>
-          <span class="stat-label">Programs</span>
-        </div>
-        <div class="stat-sep" aria-hidden="true">|</div>
-        <div class="stat">
-          <span class="stat-value text-amber">{Object.keys(yearCounts).length}</span>
-          <span class="stat-label">Years</span>
-        </div>
-        <div class="stat-sep" aria-hidden="true">|</div>
-        <div class="stat">
-          <span class="stat-value text-phosphor">1991&ndash;93</span>
-          <span class="stat-label">Era</span>
-        </div>
+      <div class="desk sk-desk" data-tabs>
+        <Window kind="panel" title="Program Manager" class="pm">
+          <p class="pm-group">Sakhr Arabic Office</p>
+          <div class="pm-icons" role="tablist" aria-label="What he built at Sakhr">
+            {sakhr.map((s, i) => (
+              <button type="button" role="tab" id={`sk-t-${s.id}`} aria-controls={`sk-p-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+                <svg class="ico" viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges">
+                  {s.icon === 'print' && <g><rect x="8" y="3" width="16" height="10" fill="#fff" stroke="#000" /><rect x="3" y="13" width="26" height="11" fill="#c0c0c0" stroke="#000" /><rect x="8" y="21" width="16" height="8" fill="#fff" stroke="#000" /><rect x="24" y="16" width="3" height="2" fill="#0f0" /><rect x="10" y="24" width="12" height="1" fill="#000" /></g>}
+                  {s.icon === 'bidi' && <g><rect x="2" y="4" width="28" height="24" fill="#fff" stroke="#000" /><rect x="5" y="9" width="10" height="2" fill="#000080" /><rect x="5" y="14" width="7" height="2" fill="#000080" /><rect x="18" y="9" width="9" height="2" fill="#800000" /><rect x="20" y="14" width="7" height="2" fill="#800000" /><rect x="5" y="20" width="22" height="2" fill="#808080" /></g>}
+                  {s.icon === 'api' && <g><rect x="4" y="4" width="11" height="11" fill="#ffff00" stroke="#000" /><rect x="17" y="4" width="11" height="11" fill="#00ffff" stroke="#000" /><rect x="4" y="17" width="11" height="11" fill="#00ff00" stroke="#000" /><rect x="17" y="17" width="11" height="11" fill="#ff00ff" stroke="#000" /></g>}
+                  {s.icon === 'setup' && <g><rect x="3" y="6" width="26" height="22" fill="#c0c0c0" stroke="#000" /><rect x="3" y="6" width="26" height="5" fill="#000080" /><circle cx="16" cy="19" r="6" fill="#fff" stroke="#000" /><circle cx="16" cy="19" r="2" fill="#808080" /></g>}
+                </svg>
+                <span>{s.name}</span>
+              </button>
+            ))}
+          </div>
+        </Window>
+        {sakhr.map((s, i) => (
+          <Window kind="dialog" title={s.name} active class="pm-detail" role="tabpanel" id={`sk-p-${s.id}`} aria-labelledby={`sk-t-${s.id}`} data-panel hidden={i !== 0}>
+            <p>{s.text}</p>
+          </Window>
+        ))}
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Search & Filter -->
-    <SearchFilter />
-
-    <!-- Program Grid -->
-    <section id="program-grid" class="program-grid" aria-label="Program archive">
-      {programs.map(program => (
-        <ProgramCard program={program} />
-      ))}
-    </section>
-
-    <!-- Terminal CTA -->
-    <section class="terminal-cta">
-      <hr class="dos-separator" />
-      <div class="terminal-cta-inner">
-        <h2>Interactive DOS Terminal</h2>
-        <p class="terminal-cta-text">
-          Browse the entire archive from a real DOS command line.
-          Navigate directories, read READMEs, and run any program.
-        </p>
-        <a href={`${base}/terminal`} class="btn btn-amber">
-          <span aria-hidden="true">&gt;</span> OPEN TERMINAL
-        </a>
+  <!-- Newbridge and Alcatel: Windows 95 / NT 4 -->
+  <section class="era-sec kanata" data-era="win9x" id="kanata" aria-labelledby="ka-h">
+    <div class="container ka-grid">
+      <div class="copy">
+        <h2 id="ka-h">Kanata, 1996. The networks of phone companies.</h2>
+        <p>He moved to Canada and joined Newbridge Networks, which Alcatel bought in 2000. For ten years he was a senior designer and team leader there.</p>
+        <p>He was the architect of the CORBA interface of the 5620 Network Manager, the control room of a phone company’s network. Through that door, an operator’s own systems read alarms and inventory and order new connections. In today’s terms, it is the network’s public API.</p>
+        <a class="more" href={`${base}/patents/`}>Read the patent, explained</a>
       </div>
-    </section>
-  </div>
+      <div class="desk">
+        <Window kind="dialog" title="US 7,603,377 Properties" active class="pat" as="section" aria-labelledby="pat-h" data-key>
+          <h3 id="pat-h">One number for every port.</h3>
+          <p class="pat-lede">In 2005 he filed the idea that became US patent 7,603,377, granted in 2009, with Yasser Awad as first-named inventor. Each part of the network gets one 32-bit number, and the number spells out where the part sits.</p>
+          <fieldset class="pat-fields">
+            <legend>Where is it?</legend>
+            {FIELDS.map(([f, w]) => (
+              <label><span>{f[0].toUpperCase() + f.slice(1)}</span><input type="number" name={f} min="0" max={2 ** w - 1} value={KEY[f]} inputmode="numeric" /></label>
+            ))}
+          </fieldset>
+          <div class="pat-bits" aria-hidden="true">
+            {FIELDS.map(([f, w], g) => (
+              <span class={`grp g${g}`}><i data-bits={f}>{bits[g]}</i><small>{f} · {w}</small></span>
+            ))}
+          </div>
+          <p class="pat-num">Key <output data-key-out>{keyOf(KEY).toLocaleString('en-US')}</output></p>
+          <p class="pat-range" data-range>Everything in shelf {KEY.shelf} of node {KEY.node} has keys from <b>{lo.toLocaleString('en-US')}</b> to <b>{(lo + 2 ** 17 - 1).toLocaleString('en-US')}</b>. Sorted, they sit side by side, so the database finds the whole shelf in one read. A subnet works the same way: 10.1.0.0/16 holds every address that starts with 10.1.</p>
+          <p slot="status">Node 10 bits · shelf, slot, card 5 bits each · port 7 bits</p>
+        </Window>
+      </div>
+    </div>
+  </section>
+
+  <!-- DinarSoft: Visual Studio 2005 -->
+  <section class="era-sec dinar" data-era="vs2005" id="dinarsoft" aria-labelledby="ds-h">
+    <div class="container">
+      <div class="copy ds-copy">
+        <h2 id="ds-h">Kanata, 2002. His own company.</h2>
+        <p>In November 2002 he founded DinarSoft and wrote six apps for Pocket PC and Windows Mobile phones, the smartphones of the day. Reviewers called MemMaid “the Swiss Army Knife of PPC utilities”. <cite>Smartphone &amp; Pocket PC</cite> magazine named HandySwitcher the best task manager in 2007 and again in 2008, and TapText the best Misc. Utility of 2007. His apps earned 22 nominations from 2003 to 2008.</p>
+        <a class="more" href={`${base}/dinarsoft/`}>Visit DinarSoft</a>
+      </div>
+      <div class="ide" data-ide>
+        <Window kind="panel" title="Solution Explorer" active class="ide-sol">
+          <p class="sol-root">Solution ‘DinarSoft’ (6 projects)</p>
+          <div class="sol-list" role="tablist" aria-label="DinarSoft apps" aria-orientation="vertical">
+            {apps.map((a, i) => (
+              <button type="button" role="tab" id={`ds-t-${a.id}`} aria-controls="ds-device" aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-app={i}>
+                <span class="proj" aria-hidden="true"></span>{a.name}
+              </button>
+            ))}
+          </div>
+        </Window>
+        <div class="ide-dev" id="ds-device" role="tabpanel" aria-labelledby="ds-t-memmaid" data-device>
+          {apps.map((a, i) => (
+            <Window kind="device" title={a.name} num="9:41" data-screen={a.id} hidden={i !== 0} class="dev">
+              {a.id === 'memmaid' && (
+                <div class="app mm">
+                  <p class="app-h">Program memory</p>
+                  <div class="mm-bar" data-mm><i></i></div>
+                  <button type="button" class="app-btn" data-mm-go>Reclaim RAM</button>
+                  <p class="app-note" data-mm-note>Tap to free memory that closed programs left behind.</p>
+                </div>
+              )}
+              {a.id === 'handyswitcher' && (
+                <ul class="app hs" data-hs>
+                  {['Calendar', 'Contacts', 'Inbox', 'Internet Explorer', 'Notes'].map(t => <li><span>{t}</span><button type="button" aria-label={`Close ${t}`}>×</button></li>)}
+                </ul>
+              )}
+              {a.id === 'handymenu' && (
+                <ul class="app hm">
+                  {['Power off', 'Soft reset', 'Screen capture', 'Rotate screen'].map(t => <li><button type="button" data-hm={t}>{t}</button></li>)}
+                </ul>
+              )}
+              {a.id === 'handylauncher' && (
+                <ul class="app hl">
+                  {[['Calculator', 'portrait'], ['Notes', 'portrait'], ['Pictures', 'landscape'], ['Tasks', 'portrait']].map(([t, o]) => <li><span class="hl-i" aria-hidden="true"></span>{t}<small>{o}</small></li>)}
+                </ul>
+              )}
+              {a.id === 'taptext' && (
+                <div class="app tt">
+                  <label class="tt-l" for="tt-field">Message</label>
+                  <textarea id="tt-field" rows="3" data-tt></textarea>
+                  <div class="tt-snips">
+                    {['Running late, there in 10.', 'Thank you!', 'Call me back.'].map(t => <button type="button" data-snip={t}>{t}</button>)}
+                    <button type="button" data-snip="@date">Today’s date</button>
+                  </div>
+                </div>
+              )}
+              {a.id === 'hijridate' && (
+                <div class="app hd">
+                  <p class="hd-ar" lang="ar" dir="rtl" data-hijri>{hijriAr}</p>
+                  <p class="hd-en" data-greg>{greg}</p>
+                  <p class="app-note">Calculated for Mecca, as in his app.</p>
+                </div>
+              )}
+              <Fragment slot="status"><span>{a.soft[0]}</span><span>{a.soft[1]}</span></Fragment>
+            </Window>
+          ))}
+        </div>
+        <Window kind="panel" title="Properties" class="ide-props">
+          {apps.map((a, i) => (
+            <dl class="props" data-props={a.id} hidden={i !== 0}>
+              <div><dt>Name</dt><dd>{a.name}</dd></div>
+              <div><dt>Does</dt><dd>{a.what}</dd></div>
+              <div><dt>First</dt><dd>{a.first}</dd></div>
+              <div><dt>Latest</dt><dd>{a.last}</dd></div>
+              {a.awards && <div><dt>Awards</dt><dd>{a.awards}</dd></div>}
+            </dl>
+          ))}
+        </Window>
+      </div>
+    </div>
+  </section>
+
+  <!-- Closing: back to Port Said -->
+  <section class="era-sec family" data-era="dos" id="family" aria-labelledby="fa-h">
+    <div class="container fa-in">
+      <div class="fa-name" aria-hidden="true">
+        <canvas data-name-canvas hidden></canvas>
+        <div class="fa-static" lang="ar" dir="rtl">ياسر عوض</div>
+      </div>
+      <h2 id="fa-h">Still running.</h2>
+      <p>He wrote these programs in Port Said with a few books and no internet. Today his son has put them back on a screen, so anyone can run them, type with his engine and see how he built them.</p>
+      <div class="fa-acts">
+        <a class="button button--primary" href="#programs">Run his programs</a>
+        <a class="button" href={`${base}/arabart/`}>See how ARABART works</a>
+        <a class="button" href={`${base}/about/`}>A note from his son</a>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
 
+<style is:global>
+  /* Era sections: each one carries its own wallpaper until the WebGL desktop takes over */
+  .era-sec[data-era='dos'] { background: var(--blue) radial-gradient(var(--blue-deep) 1px, transparent 1.5px) 0 0 / 4px 4px; }
+  .era-sec[data-era='win31'] { background: linear-gradient(#00009e, #000014); }
+  .era-sec[data-era='win9x'] { background: #007070; }
+  .era-sec[data-era='vs2005'] { background: linear-gradient(oklch(0.86 0.04 250), oklch(0.96 0.012 250)); }
+  .gl-bg .era-sec[data-era] { background: transparent; }
+  .era-bg { display: none; }
+  .gl-bg .era-bg { display: block; position: fixed; inset: 0; width: 100%; height: 100lvh; z-index: -1; image-rendering: pixelated; }
+  .gl-bg body { background: transparent; }
+</style>
+
 <style>
-  /* ── Hero ─────────────────────────────────────── */
-  .hero {
-    text-align: center;
-    padding: 3rem 0 2.5rem;
-  }
+  .copy h2 { font-size: clamp(2.25rem, 3vw + 1rem, 4rem); max-width: 15ch; }
+  .copy p { margin-top: 18px; max-width: 48ch; color: var(--ink-2); font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.1875rem); }
+  .copy cite { font-style: italic; }
+  .more { display: inline-flex; align-items: center; min-height: 44px; margin-top: 14px; color: var(--accent); font-weight: 700; }
+  .more:hover { color: var(--ink); }
 
-  .hero-prompt {
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-  }
+  /* Sakhr */
+  .sakhr, .kanata, .dinar, .family { padding-block: clamp(96px, 12vw, 180px); }
+  .sk-grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 48px clamp(40px, 6vw, 96px); align-items: center; }
+  .sk-desk { display: grid; }
+  .pm { width: min(100%, 560px); }
+  .pm-group { font: 700 0.9375rem/1 var(--font-pixel); color: var(--ink-2); margin-bottom: 14px; }
+  .pm-icons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .pm-icons button { display: grid; justify-items: center; gap: 8px; min-height: 96px; padding: 10px 4px; background: none; border: 0; cursor: pointer; font: 500 0.9375rem/1.2 var(--font-pixel); color: var(--ink); text-align: center; }
+  .pm-icons .ico { width: 40px; height: 40px; }
+  .pm-icons button span { padding: 1px 4px; }
+  .pm-icons button[aria-selected='true'] span { background: var(--w-navy); color: var(--w-white); }
+  .pm-icons button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -3px; }
+  .pm-detail { justify-self: end; width: min(88%, 460px); margin-top: -36px; }
+  .pm-detail p { font-size: 1rem; line-height: 1.55; }
+  .pm-detail:not([hidden]) { animation: win-open 0.28s var(--expo); }
+  @keyframes win-open { from { opacity: 0; scale: 0.94; } }
 
-  .hero-path {
-    color: var(--color-text-muted);
-  }
+  /* Kanata */
+  .ka-grid { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 48px clamp(40px, 6vw, 96px); align-items: center; }
+  .ka-grid .desk { order: -1; }
+  .pat h3 { font-size: clamp(1.5rem, 1vw + 1rem, 2rem); color: var(--w-black); }
+  .pat-lede { margin-top: 10px; font-size: 1rem; line-height: 1.55; }
+  .pat-fields { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-top: 18px; padding: 12px 12px 14px; border: 0; box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-white), inset -2px -2px var(--w-gray); }
+  .pat-fields legend { padding: 0 4px; font: 400 0.9375rem/1 var(--font-pixel); }
+  .pat-fields label { display: grid; gap: 4px; font: 400 0.875rem/1.2 var(--font-pixel); }
+  .pat-fields input { width: 100%; min-height: 44px; padding: 0 6px; font: 500 1.125rem/1 var(--sans); color: var(--w-black); background: var(--w-white); border: 0; border-radius: 0; box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-black), inset -2px -2px var(--w-silver); font-variant-numeric: tabular-nums; }
+  .pat-fields input:focus-visible { outline: 1px dotted var(--w-black); outline-offset: 2px; }
+  .pat-bits { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .grp { display: grid; gap: 4px; }
+  .grp i { font: 400 16px/1 var(--font-dos); font-style: normal; letter-spacing: 0.12em; padding: 6px 6px 5px; color: var(--w-white); }
+  .grp small { font: 400 0.8125rem/1 var(--sans); color: oklch(0.3 0 0); }
+  .g0 i { background: var(--w-navy); } .g1 i { background: var(--w-teal); } .g2 i { background: #800080; } .g3 i { background: #808000; color: var(--w-black); } .g4 i { background: #800000; }
+  .grp i.flash { animation: flash 0.5s steps(2); }
+  @keyframes flash { 50% { background: var(--vga-14); color: var(--w-black); } }
+  .pat-num { margin-top: 14px; font: 400 1rem/1.3 var(--font-pixel); }
+  .pat-num output { font: 400 32px/1 var(--font-dos); color: var(--w-navy); margin-left: 8px; font-variant-numeric: tabular-nums; }
+  .pat-range { margin-top: 10px; font-size: 1rem; line-height: 1.55; }
 
-  .hero-cmd {
-    color: var(--color-phosphor-dim);
-  }
+  /* DinarSoft */
+  .ds-copy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 52ch); gap: 0 56px; align-items: end; }
+  .ds-copy p { margin-top: 0; }
+  .ds-copy .more { grid-column: 2; }
+  .ide { display: grid; grid-template-columns: minmax(200px, 0.8fr) auto minmax(240px, 1fr); gap: 24px; align-items: start; margin-top: clamp(40px, 5vw, 64px); }
+  .sol-root { font-size: 0.9375rem; font-weight: 600; padding: 2px 4px 6px; }
+  .sol-list { display: grid; padding-left: 14px; }
+  .sol-list button { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px; font: 400 1rem/1 var(--sans); color: var(--ink); background: none; border: 1px solid transparent; cursor: pointer; text-align: left; }
+  .sol-list button[aria-selected='true'] { background: var(--xp-sel); color: var(--w-white); }
+  .sol-list button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -3px; }
+  .proj { width: 16px; height: 14px; border: 1px solid #5a7bb8; background: linear-gradient(#fff, #d6e2f6); position: relative; }
+  .proj::after { content: ''; position: absolute; left: 3px; top: 3px; width: 8px; height: 6px; background: #3f7d3f; }
+  .ide-dev { display: grid; justify-items: center; }
+  .dev { width: 300px; }
+  .ide-props .props { display: grid; font-size: 0.9375rem; }
+  .props div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); border-bottom: 1px solid var(--rule); }
+  .props dt { padding: 6px 8px; background: var(--xp-beige); color: oklch(0.3 0 0); }
+  .props dd { padding: 6px 8px; line-height: 1.45; }
 
-  .hero-title {
-    font-size: clamp(3rem, 8vw, 5.5rem);
-    letter-spacing: 0.06em;
-    margin-bottom: 1rem;
-    line-height: 1;
-  }
+  .app { list-style: none; font: 400 0.9375rem/1.35 var(--sans); }
+  .app-h { font-weight: 700; }
+  .app-note { margin-top: 10px; font-size: 0.8125rem; color: var(--ink-2); }
+  .app-btn { margin-top: 12px; min-height: 44px; padding: 0 14px; border: 1px solid #5a7bb8; border-radius: 3px; background: linear-gradient(#fff, #dde7f6); font: 600 0.9375rem/1 var(--sans); color: var(--w-black); cursor: pointer; }
+  .mm-bar { margin-top: 8px; height: 18px; border: 1px solid #5a7bb8; background: #fff; }
+  .mm-bar i { display: block; height: 100%; width: var(--used, 82%); background: linear-gradient(#7fb0f2, #2c63c8); transition: width 1.4s var(--expo); }
+  .hs li { display: flex; align-items: center; justify-content: space-between; min-height: 44px; border-bottom: 1px solid var(--rule); }
+  .hs li.gone { animation: gone 0.3s var(--quart) forwards; }
+  @keyframes gone { to { opacity: 0; translate: 30px 0; } }
+  .hs button { width: 44px; height: 40px; border: 0; background: none; font: 700 1.25rem/1 var(--sans); color: #b3261e; cursor: pointer; }
+  .hm li + li { border-top: 1px solid var(--rule); }
+  .hm button { width: 100%; min-height: 44px; text-align: left; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0 6px; }
+  .hm button.done { background: #c1d2ee; }
+  .rot :global(.win-body) { rotate: 90deg; transition: rotate 0.5s var(--expo); }
+  .hl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hl li { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; text-align: center; }
+  .hl small { font-size: 0.75rem; color: var(--ink-2); }
+  .hl-i { width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #7fb0f2, #2c63c8); }
+  .tt-l { font-weight: 700; font-size: 0.875rem; }
+  .tt textarea { width: 100%; margin-top: 4px; padding: 6px; font: 400 0.9375rem/1.35 var(--sans); border: 1px solid #7f9db9; resize: none; color: var(--w-black); background: #fff; }
+  .tt-snips { display: grid; gap: 4px; margin-top: 8px; }
+  .tt-snips button { min-height: 44px; text-align: left; padding: 0 8px; border: 1px solid #c5d3ea; background: #f2f6fc; font: 400 0.875rem/1.2 var(--sans); color: var(--w-black); cursor: pointer; }
+  .hd { display: grid; gap: 6px; padding-top: 6px; }
+  .hd-ar { font: 700 1.5rem/1.5 var(--ar); color: oklch(0.35 0.14 258); }
+  .hd-en { font-weight: 600; }
 
-  .hero-subtitle {
-    font-size: 0.95rem;
-    color: var(--color-text);
-    max-width: 560px;
-    margin: 0 auto 1.5rem;
-    line-height: 1.7;
-  }
+  /* Closing */
+  .fa-in { display: grid; justify-items: center; text-align: center; }
+  .fa-name { min-height: 120px; display: grid; place-items: center; }
+  .fa-name canvas { image-rendering: pixelated; }
+  .fa-static { font: 700 clamp(3rem, 8vw, 6rem)/1.3 var(--ar); color: var(--yellow); text-shadow: -3px -3px 0 var(--vga-4); }
+  .fa-name.live .fa-static { display: none; }
+  .family h2 { margin-top: 24px; font-size: clamp(2.5rem, 4vw + 1rem, 5rem); }
+  .family p { margin-top: 18px; max-width: 52ch; color: var(--ink-2); font-size: clamp(1.0625rem, 0.4vw + 1rem, 1.25rem); }
+  .fa-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-top: 32px; }
 
-  .hero-stats {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
-    font-family: var(--font-display);
+  @media (pointer: coarse) {
+    .sol-list button, .tt-snips button, .hs button { min-height: 44px; }
   }
-
-  .stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.1rem;
+  @media (max-width: 1100px) {
+    .ide { grid-template-columns: minmax(0, 1fr) auto; }
+    .ide-props { grid-column: 1 / -1; }
   }
-
-  .stat-value {
-    font-size: 1.6rem;
-    letter-spacing: 0.04em;
+  @media (max-width: 900px) {
+    .sk-grid, .ka-grid { grid-template-columns: 1fr; }
+    .ka-grid .desk { order: 0; }
+    .ds-copy { grid-template-columns: 1fr; }
+    .ds-copy p { margin-top: 18px; }
+    .ds-copy .more { grid-column: 1; }
   }
-
-  .stat-label {
-    font-size: 0.85rem;
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-  }
-
-  .stat-sep {
-    color: var(--color-border-bright);
-    font-size: 1.2rem;
-    align-self: center;
-  }
-
-  /* ── Terminal CTA ────────────────────────────── */
-  .terminal-cta {
-    padding-bottom: 1rem;
-  }
-
-  .terminal-cta-inner {
-    text-align: center;
-    padding: 2rem 0;
-  }
-
-  .terminal-cta-inner h2 {
-    margin-bottom: 0.75rem;
-  }
-
-  .terminal-cta-text {
-    color: var(--color-text);
-    font-size: 0.9rem;
-    max-width: 480px;
-    margin: 0 auto 1.5rem;
+  @media (max-width: 760px) {
+    .sk-desk { padding-bottom: 0; display: grid; gap: 16px; }
+    .pm-detail { width: auto; margin-top: 0; }
+    .pm-icons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pat-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ide { grid-template-columns: 1fr; }
+    .dev { width: min(300px, 100%); }
   }
 </style>
+
+<script>
+  import '../scripts/shell/home';
+  import { load, render, paint, fromUnicode } from '../lib/arabart';
+
+  // Tabs (Program Manager icons, Solution Explorer): click, or arrow keys between them
+  function tabs(list: HTMLElement, show: (i: number) => void) {
+    const ts = [...list.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const go = (i: number, focus = false) => {
+      ts.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+      if (focus) ts[i].focus();
+      show(i);
+    };
+    ts.forEach((t, i) => {
+      t.addEventListener('click', () => go(i));
+      t.addEventListener('keydown', e => {
+        const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (d) { e.preventDefault(); go((i + d + ts.length) % ts.length, true); }
+      });
+    });
+  }
+
+  const sk = document.querySelector<HTMLElement>('.pm-icons')!;
+  const skPanels = [...document.querySelectorAll<HTMLElement>('.sk-desk [data-panel]')];
+  tabs(sk, i => skPanels.forEach((p, k) => (p.hidden = k !== i)));
+
+  const sol = document.querySelector<HTMLElement>('.sol-list')!;
+  const screens = [...document.querySelectorAll<HTMLElement>('[data-screen]')];
+  const props = [...document.querySelectorAll<HTMLElement>('[data-props]')];
+  const dev = document.querySelector<HTMLElement>('[data-device]')!;
+  tabs(sol, i => {
+    screens.forEach((s, k) => (s.hidden = k !== i));
+    props.forEach((p, k) => (p.hidden = k !== i));
+    dev.setAttribute('aria-labelledby', sol.querySelectorAll('[role="tab"]')[i].id);
+  });
+
+  // The small apps on the Pocket PC
+  const mm = document.querySelector<HTMLElement>('[data-mm]')!;
+  document.querySelector('[data-mm-go]')!.addEventListener('click', () => {
+    mm.style.setProperty('--used', '38%');
+    document.querySelector('[data-mm-note]')!.textContent = 'Memory reclaimed. The phone has room again.';
+    setTimeout(() => mm.style.setProperty('--used', '82%'), 6000);
+  });
+  document.querySelectorAll<HTMLButtonElement>('[data-hs] button').forEach(b => b.addEventListener('click', () => {
+    const li = b.closest('li')!;
+    li.classList.add('gone');
+    li.addEventListener('animationend', () => li.remove(), { once: true });
+  }));
+  const hmScreen = document.querySelector<HTMLElement>('[data-screen="handymenu"]')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-hm]').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.hm === 'Rotate screen') hmScreen.classList.toggle('rot');
+    b.classList.add('done');
+    setTimeout(() => b.classList.remove('done'), 600);
+  }));
+  const tt = document.querySelector<HTMLTextAreaElement>('[data-tt]')!;
+  document.querySelectorAll<HTMLButtonElement>('[data-snip]').forEach(b => b.addEventListener('click', () => {
+    const s = b.dataset.snip === '@date' ? new Date().toLocaleDateString('en-US', { dateStyle: 'long' }) : b.dataset.snip!;
+    tt.value = (tt.value ? tt.value + ' ' : '') + s;
+  }));
+  const now = new Date();
+  document.querySelector('[data-hijri]')!.textContent = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+  document.querySelector('[data-greg]')!.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
+
+  // The patent's key: five numbers in, one 32-bit number out
+  const pat = document.querySelector<HTMLElement>('[data-key]')!;
+  const F = [['node', 10], ['shelf', 5], ['slot', 5], ['card', 5], ['port', 7]] as const;
+  const fmt = (n: number) => n.toLocaleString('en-US');
+  function calc(changed?: string) {
+    const v: Record<string, number> = {};
+    for (const [f, w] of F) {
+      const el = pat.querySelector<HTMLInputElement>(`input[name="${f}"]`)!;
+      const n = Math.min(2 ** w - 1, Math.max(0, Math.floor(+el.value || 0)));
+      v[f] = n;
+      const b = pat.querySelector<HTMLElement>(`[data-bits="${f}"]`)!;
+      const s = n.toString(2).padStart(w, '0');
+      if (b.textContent !== s) { b.textContent = s; if (f === changed) { b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash'); } }
+    }
+    const key = F.reduce((k, [f, w]) => k * 2 ** w + v[f], 0);
+    const lo = Math.floor(key / 2 ** 17) * 2 ** 17;
+    pat.querySelector('[data-key-out]')!.textContent = fmt(key);
+    pat.querySelector('[data-range]')!.innerHTML = `Everything in shelf ${v.shelf} of node ${v.node} has keys from <b>${fmt(lo)}</b> to <b>${fmt(lo + 2 ** 17 - 1)}</b>. Sorted, they sit side by side, so the database finds the whole shelf in one read. A subnet works the same way: 10.1.0.0/16 holds every address that starts with 10.1.`;
+  }
+  pat.querySelectorAll<HTMLInputElement>('input').forEach(el => el.addEventListener('input', () => calc(el.name)));
+
+  // His name in his own pixels, at the end
+  const nameBox = document.querySelector<HTMLElement>('.fa-name')!;
+  new IntersectionObserver(async ([e], io) => {
+    if (!e.isIntersecting) return;
+    io.disconnect();
+    const bin = await load(`${import.meta.env.BASE_URL}/arabart/fonts.bin`);
+    const c = nameBox.querySelector('canvas')!;
+    const img = render(bin, fromUnicode('ياسر عوض'), { font: 3, color: 14, mode: '3d', shadow: 4 });
+    const d = devicePixelRatio || 1;
+    paint(c, img, Math.max(1, Math.floor(Math.min(innerWidth * 0.8 / img.width, 6) * d)) / d);
+    c.hidden = false;
+    nameBox.classList.add('live');
+  }, { rootMargin: '200px' }).observe(nameBox);
+</script>

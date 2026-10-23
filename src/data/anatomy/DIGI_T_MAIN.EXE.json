@@ -1,0 +1,659 @@
+{
+ "file": "DIGI_T/MAIN.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header, rebuilt by the museum unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 16932,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "4,225 addresses that DOS patches at load time, almost all of them far calls between code segments.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 16932,
+   "end": 16944,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Fills the header to a 16-byte boundary.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 16944,
+   "end": 17479,
+   "kind": "startup",
+   "label": "Borland C++ startup (c0)",
+   "note": "Sets up memory and the stack, then calls main() at 0E9D:000F with far argv and envp.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 17479,
+   "end": 34640,
+   "kind": "library",
+   "label": "Borland C++ runtime library",
+   "note": "File I/O, memory, strings and conio.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#dt-files"
+  },
+  {
+   "start": 34640,
+   "end": 35552,
+   "kind": "code",
+   "label": "Truth-table printer",
+   "note": "Prints the truth table to PRN, one character at a time through DOS INT 21h function 05h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-kemyam"
+  },
+  {
+   "start": 35552,
+   "end": 56256,
+   "kind": "code",
+   "label": "Analysis engine",
+   "note": "Truth table, fault dictionary and the recursive test-pattern search (the largest module, 20,704 bytes).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 56256,
+   "end": 72448,
+   "kind": "code",
+   "label": "Netlist builder and shared helpers",
+   "note": "Turns the drawing into gates; also holds compiler copies of class-library inline functions such as Object::Object().",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 72448,
+   "end": 76800,
+   "kind": "code",
+   "label": "Logic element base class",
+   "note": "Five-valued AND, OR and NOT, and setting a pin value with a conflict check.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 76800,
+   "end": 78368,
+   "kind": "code",
+   "label": "main()",
+   "note": "Creates the four catalogs (gates, chips, technologies, circuits) and starts BGI graphics.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 78368,
+   "end": 81408,
+   "kind": "code",
+   "label": "Gate class",
+   "note": "Evaluates a gate in five-valued logic; saves and loads .GAT files.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 81408,
+   "end": 87296,
+   "kind": "code",
+   "label": "Drawing helpers",
+   "note": "Text placement and sizing for the screen.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 87296,
+   "end": 91664,
+   "kind": "code",
+   "label": "Chip definition class",
+   "note": "Pin maps of the 74xx chips; saves and loads .IC files.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-chips"
+  },
+  {
+   "start": 91664,
+   "end": 96352,
+   "kind": "code",
+   "label": "Sheet object base class",
+   "note": "Base class of everything drawn on the circuit sheet, and the chip symbol class.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 96352,
+   "end": 100992,
+   "kind": "code",
+   "label": "Wire class",
+   "note": "A wire between two pins, stored as keypad direction digits.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-wires"
+  },
+  {
+   "start": 100992,
+   "end": 109856,
+   "kind": "code",
+   "label": "Circuit propagation helpers",
+   "note": "Moves values through the circuit; two classes built on Borland Array and SortedArray.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 109856,
+   "end": 111616,
+   "kind": "code",
+   "label": "Node class",
+   "note": "A junction where several wires meet.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 111616,
+   "end": 111792,
+   "kind": "code",
+   "label": "Sheet helpers",
+   "note": "Three small methods used by the circuit sheet.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 111792,
+   "end": 114512,
+   "kind": "code",
+   "label": "Pin terminal class",
+   "note": "Circuit inputs, outputs, VCC and GND.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 114512,
+   "end": 121312,
+   "kind": "code",
+   "label": "Circuit sheet class",
+   "note": "The 30,105-byte circuit object with its cell grid; saves and loads .CIR files.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-files"
+  },
+  {
+   "start": 121312,
+   "end": 129392,
+   "kind": "code",
+   "label": "Main window and menus",
+   "note": "Draws the frame and menus with 283 BGI calls and starts the graphics with auto-detect.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 129392,
+   "end": 131408,
+   "kind": "code",
+   "label": "SPARR.CPP: second root class and sparse array",
+   "note": "The root class of every sheet and file class, its own operator new, and a sparse array class built like Borland's ABSTARRY.CPP.",
+   "by": "unknown",
+   "evidence": "inferred",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 131408,
+   "end": 133104,
+   "kind": "code",
+   "label": "Technology class",
+   "note": "Logic families TTL and TTL open-collector; saves and loads .TCK files.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-files"
+  },
+  {
+   "start": 133104,
+   "end": 136400,
+   "kind": "code",
+   "label": "Group catalog class",
+   "note": "Names member files FILn, keeps the previous save as BFLn, and writes and checks the 4-byte size trailer.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-files"
+  },
+  {
+   "start": 136400,
+   "end": 145392,
+   "kind": "library",
+   "label": "Borland container class library",
+   "note": "Object, AbstractArray, Array, SortedArray and Error (ABSTARRY.CPP), compiled into the program.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#dt-cpp"
+  },
+  {
+   "start": 145392,
+   "end": 154848,
+   "kind": "code",
+   "label": "Chip symbol drawing",
+   "note": "Draws each chip with its gate labels: a jump table on the part number, 7400 to 7440.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 154848,
+   "end": 157904,
+   "kind": "code",
+   "label": "File dialog",
+   "note": "Asks for a file name and lists catalog entries.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 157904,
+   "end": 166096,
+   "kind": "code",
+   "label": "Dialogs and windows",
+   "note": "Pop-up windows and their frames.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 166096,
+   "end": 167792,
+   "kind": "code",
+   "label": "IC tester and alarm",
+   "note": "The IC TESTER screen and a two-tone speaker alarm written in inline assembly.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-probe"
+  },
+  {
+   "start": 167792,
+   "end": 169152,
+   "kind": "code",
+   "label": "Probe prompts",
+   "note": "Tells the user where to apply the input and output probes, GND and VCC.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-probe"
+  },
+  {
+   "start": 169152,
+   "end": 174048,
+   "kind": "code",
+   "label": "Fault location and test-card I/O",
+   "note": "Applies test patterns through ports 301h and 300h, reads the answers, and runs the guided probe.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-probe"
+  },
+  {
+   "start": 174048,
+   "end": 176896,
+   "kind": "code",
+   "label": "Menu commands",
+   "note": "Runs the FILE, OBJECTS, ANALYZE and PRINT commands.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 176896,
+   "end": 192368,
+   "kind": "library",
+   "label": "Borland BGI graphics library",
+   "note": "initgraph, line, bar, outtextxy and the rest; loads EGAVGA.BGI and the .CHR fonts from disk.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 192368,
+   "end": 192832,
+   "kind": "data",
+   "label": "Far globals",
+   "note": "Far global variables, 16 bytes each (for example the current circuit pointer at 2ADF:0000).",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 192832,
+   "end": 192978,
+   "kind": "data",
+   "label": "Runtime start-up data",
+   "note": "Borland copyright string and runtime error messages.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 192978,
+   "end": 195480,
+   "kind": "text",
+   "label": "Strings, file headers and vtables",
+   "note": "Truth-table text, catalog names, the KEMYAM copyright headers of every file type, and the vtables of his classes.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#dt-files"
+  },
+  {
+   "start": 195480,
+   "end": 196262,
+   "kind": "data",
+   "label": "Class-library data",
+   "note": "Messages and vtables of the Borland container classes (ABSTARRY.CPP, Array, SortedArray).",
+   "by": "borland",
+   "evidence": "inferred"
+  },
+  {
+   "start": 196262,
+   "end": 197963,
+   "kind": "text",
+   "label": "Menus and prompts",
+   "note": "Menu text, the About box with five student names, help lines and probe prompts.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 197963,
+   "end": 199280,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "File handle table, file mode, stack size and C++ runtime messages.",
+   "by": "borland",
+   "evidence": "inferred",
+   "link": "#dt-files"
+  },
+  {
+   "start": 199280,
+   "end": 200996,
+   "kind": "data",
+   "label": "BGI data",
+   "note": "Font and driver names (TRIP, LITT, EGAVGA...) and graphics error messages.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 200996,
+   "end": 202720,
+   "kind": "data",
+   "label": "Zero-filled variables",
+   "note": "Variables that start as zero.",
+   "by": "unknown",
+   "evidence": "inferred"
+  }
+ ],
+ "routines": [
+  {
+   "start": 76815,
+   "end": 77748,
+   "name": "main",
+   "note": "Builds the four catalogs, starts the BGI graphics, then runs the menu loop.",
+   "link": "#dt-cpp",
+   "lines": [
+    {
+     "off": 77196,
+     "note": "Window setup, which starts the graphics with auto-detect"
+    }
+   ]
+  },
+  {
+   "start": 78512,
+   "end": 78656,
+   "name": "Gate::Gate",
+   "note": "Constructor: allocates 28 bytes if needed, calls the base constructor, installs the Gate method table, loads the .GAT file.",
+   "link": "#dt-cpp",
+   "lines": [
+    {
+     "off": 78536,
+     "note": "operator new(1Ch): 28 bytes"
+    },
+    {
+     "off": 78597,
+     "note": "Install the Gate method table at DS:0335"
+    }
+   ]
+  },
+  {
+   "start": 78656,
+   "end": 79184,
+   "name": "Gate::evaluate",
+   "note": "Counts the inputs by value (controlling, non-controlling, D, D-bar, unknown); D and D-bar together count as the controlling value.",
+   "link": "#dt-faults",
+   "lines": [
+    {
+     "off": 78769,
+     "note": "Compare an input with the controlling value"
+    },
+    {
+     "off": 78805,
+     "note": "Is it D (stored as 6)?"
+    },
+    {
+     "off": 78810,
+     "note": "Is it D-bar (stored as 9)?"
+    },
+    {
+     "off": 78961,
+     "note": "Unknown inputs plus a fault value: mark the gate as D-frontier"
+    },
+    {
+     "off": 78992,
+     "note": "Apply the inversion flag"
+    }
+   ]
+  },
+  {
+   "start": 80436,
+   "end": 80845,
+   "name": "Gate::load",
+   "note": "Reads a .GAT file and checks its KEMYAM header.",
+   "link": "#dt-files"
+  },
+  {
+   "start": 80845,
+   "end": 81115,
+   "name": "Gate::save",
+   "note": "Writes header, Ctrl-Z, then 6 bytes at offset 32h.",
+   "link": "#dt-files",
+   "lines": [
+    {
+     "off": 80933,
+     "note": "Ctrl-Z (1Ah) right after the copyright text"
+    },
+    {
+     "off": 80959,
+     "note": "Seek to offset 32h: the data always starts there"
+    }
+   ]
+  },
+  {
+   "start": 73292,
+   "end": 73443,
+   "name": "and5",
+   "note": "Five-valued AND: any 0 wins; D AND D-bar is 0; X spreads.",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 73443,
+   "end": 73594,
+   "name": "or5",
+   "note": "Five-valued OR, the mirror of AND.",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 73594,
+   "end": 73788,
+   "name": "not5",
+   "note": "NOT by jump table: 1 and 2 swap (0 and 1), 6 and 9 swap (D and D-bar), anything else becomes X (15).",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 44986,
+   "end": 45382,
+   "name": "truth_table",
+   "note": "Tries all 2^n input rows with an odometer counter and prints each row.",
+   "link": "#dt-kemyam",
+   "lines": [
+    {
+     "off": 45268,
+     "note": "Input is 0? make it 1 and stop"
+    },
+    {
+     "off": 45288,
+     "note": "Else make it 0 and carry to the next input"
+    }
+   ]
+  },
+  {
+   "start": 45382,
+   "end": 46326,
+   "name": "make_dictionary",
+   "note": "The fault dictionary command: a fixed pipeline of passes over the circuit.",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 46326,
+   "end": 47287,
+   "name": "search",
+   "note": "Recursive search that resets values to X (15) as it backs out (backtracking).",
+   "link": "#dt-faults"
+  },
+  {
+   "start": 133164,
+   "end": 133203,
+   "name": "dos_write",
+   "note": "Raw DOS write in inline assembly, used by the .CIR save.",
+   "link": "#dt-files"
+  },
+  {
+   "start": 133493,
+   "end": 133892,
+   "name": "Group::create",
+   "note": "Before saving FILn, deletes BFLn and renames FILn to BFLn, then opens the file for writing.",
+   "link": "#dt-files",
+   "lines": [
+    {
+     "off": 133752,
+     "note": "unlink(BFLn)"
+    },
+    {
+     "off": 133771,
+     "note": "rename(FILn, BFLn): the one-level backup"
+    },
+    {
+     "off": 133782,
+     "note": "open flags 302h: write, create, truncate"
+    }
+   ]
+  },
+  {
+   "start": 134076,
+   "end": 134520,
+   "name": "Group::read",
+   "note": "Opens a member file, compares its last 4 bytes with its length, then reads it whole.",
+   "link": "#dt-files",
+   "lines": [
+    {
+     "off": 134357,
+     "note": "Trailer equals the file length? Otherwise the file is refused"
+    }
+   ]
+  },
+  {
+   "start": 134520,
+   "end": 134599,
+   "name": "Group::close",
+   "note": "Appends the 4-byte size trailer and closes the file.",
+   "link": "#dt-files"
+  },
+  {
+   "start": 120021,
+   "end": 121151,
+   "name": "Circuit::save",
+   "note": "Writes all parts first, then all wires with their keypad paths.",
+   "link": "#dt-wires"
+  },
+  {
+   "start": 171984,
+   "end": 172069,
+   "name": "card_apply",
+   "note": "Reverses the 8 test bits, writes them to port 301h and one bit to port 300h, then reads port 300h 2,000 times.",
+   "link": "#dt-probe",
+   "lines": [
+    {
+     "off": 172014,
+     "note": "Reverse the 8 bits"
+    },
+    {
+     "off": 172030,
+     "note": "OUT 301h: inputs to the card"
+    },
+    {
+     "off": 172038,
+     "note": "OUT 300h: the second write"
+    },
+    {
+     "off": 172046,
+     "note": "IN 300h, 2,000 times; the last reading is kept"
+    },
+    {
+     "off": 172063,
+     "note": "Store the answer in place of the pattern"
+    }
+   ]
+  },
+  {
+   "start": 172069,
+   "end": 172277,
+   "name": "probe_read",
+   "note": "Guided probe: reads port 300h 2,001 times and keeps bit 3 of the last read, as code 1 (0) or 2 (1).",
+   "link": "#dt-probe",
+   "lines": [
+    {
+     "off": 172253,
+     "note": "AND 08h: bit 3 is the probe"
+    }
+   ]
+  },
+  {
+   "start": 166106,
+   "end": 166173,
+   "name": "alarm",
+   "note": "Two-tone speaker alarm: 20 tones, 1,193 Hz and 746 Hz in turn.",
+   "link": "#dt-probe"
+  },
+  {
+   "start": 34655,
+   "end": 34706,
+   "name": "lprint",
+   "note": "Sends a string to the printer with DOS function 05h, in inline assembly.",
+   "link": "#dt-kemyam"
+  },
+  {
+   "start": 21213,
+   "end": 21515,
+   "name": "write (Borland)",
+   "note": "Runtime write(): in text mode it writes 0Dh before every 0Ah, the DOS line ending.",
+   "link": "#dt-files",
+   "lines": [
+    {
+     "off": 21315,
+     "note": "Byte is 0Ah? insert 0Dh first"
+    }
+   ]
+  }
+ ]
+}

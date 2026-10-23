@@ -1,0 +1,387 @@
+{
+ "file": "ARABART/ARABART.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 28,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "The DOS EXE header, rebuilt by the museum's unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 28,
+   "end": 32,
+   "kind": "unused",
+   "label": "Header gap",
+   "note": "Four zero bytes before the relocation table.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 36,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "One address: the word at 05EDh, where the handler keeps its own segment so it can find its data.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 36,
+   "end": 48,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Zeros that round the header up to a 16-byte paragraph.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 48,
+   "end": 108,
+   "kind": "code",
+   "label": "Install",
+   "note": "Reads the INT 10h vector, compares 12 bytes with its own tag, then hooks INT 10h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 108,
+   "end": 120,
+   "kind": "code",
+   "label": "DALYASSER tag",
+   "note": "The handler entry: EB 0A 90 \"DALYASSER\", the 12 bytes the install check looks for.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 120,
+   "end": 131,
+   "kind": "code",
+   "label": "AH = 36h check",
+   "note": "Any call that is not AH = 36h jumps on to the old INT 10h through a patched JMP FAR at 004Eh.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 131,
+   "end": 305,
+   "kind": "code",
+   "label": "Function dispatch",
+   "note": "Functions 0 to 6, 9 and 0Ah: install check, colors, font, measure and cursor.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 305,
+   "end": 553,
+   "kind": "code",
+   "label": "Draw setup",
+   "note": "Checks the video mode and position, copies the string and sets the start point.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#small"
+  },
+  {
+   "start": 553,
+   "end": 607,
+   "kind": "code",
+   "label": "Key translation",
+   "note": "Turns each key into a glyph code with the table at 0682h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#joining"
+  },
+  {
+   "start": 607,
+   "end": 749,
+   "kind": "code",
+   "label": "Shaper",
+   "note": "One pass that clears the join bits of letters with no partner; style codes are skipped.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#joining"
+  },
+  {
+   "start": 749,
+   "end": 1421,
+   "kind": "code",
+   "label": "Glyph draw loop",
+   "note": "Walks the run-length glyphs, applies bold, italic, underline and size, and writes VGA memory.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#effects"
+  },
+  {
+   "start": 1421,
+   "end": 1556,
+   "kind": "code",
+   "label": "Finish and return",
+   "note": "Resets the VGA Graphics Controller, runs the 3-D second pass, and returns the status.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#effects"
+  },
+  {
+   "start": 1556,
+   "end": 1596,
+   "kind": "data",
+   "label": "State",
+   "note": "Colors, font, cursor, style flags and the saved segment, kept between calls.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 1596,
+   "end": 1696,
+   "kind": "data",
+   "label": "Text buffer",
+   "note": "90 bytes for the caller's string plus a 10-byte zero gap.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#small"
+  },
+  {
+   "start": 1696,
+   "end": 1714,
+   "kind": "table",
+   "label": "VGA tables",
+   "note": "Segment A000h, the bit-reversal table 00 04 02 06 01 05 03 07 and the pixel masks 80h to 01h.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#effects"
+  },
+  {
+   "start": 1714,
+   "end": 1810,
+   "kind": "table",
+   "label": "Keyboard table",
+   "note": "96 bytes: one glyph code for each key from space to ~, with the join bits already set.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#joining"
+  },
+  {
+   "start": 1810,
+   "end": 1846,
+   "kind": "table",
+   "label": "Font list",
+   "note": "The font count (5) and the address of each font's pointer table.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fonts"
+  },
+  {
+   "start": 1846,
+   "end": 5288,
+   "kind": "font",
+   "label": "Font 1, 18 px",
+   "note": "256 glyph pointers, then 95 run-length glyphs (3,442 bytes).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fonts"
+  },
+  {
+   "start": 5288,
+   "end": 16126,
+   "kind": "font",
+   "label": "Font 3, 34 px",
+   "note": "256 glyph pointers, then 141 run-length glyphs (10,838 bytes).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fonts"
+  },
+  {
+   "start": 16126,
+   "end": 23063,
+   "kind": "font",
+   "label": "Font 4, 38 px",
+   "note": "256 glyph pointers, then 87 run-length glyphs (6,937 bytes).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fonts"
+  },
+  {
+   "start": 23063,
+   "end": 28739,
+   "kind": "font",
+   "label": "Font 2, 27 px",
+   "note": "256 glyph pointers, then 103 run-length glyphs (5,676 bytes).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fonts"
+  },
+  {
+   "start": 28739,
+   "end": 29778,
+   "kind": "font",
+   "label": "Font 5, 50 px",
+   "note": "Only the 6 glyphs for \"The Sun\"; the other 143 used slots point into font 1.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fonts"
+  },
+  {
+   "start": 29778,
+   "end": 29956,
+   "kind": "text",
+   "label": "Messages",
+   "note": "The version 4.15 banner and \"This utility is already active in your RAM.\"",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 29956,
+   "end": 29998,
+   "kind": "code",
+   "label": "Banner and exit",
+   "note": "Prints the banner, waits 112 vertical retraces, then INT 27h keeps 759Eh bytes.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#service"
+  },
+  {
+   "start": 29998,
+   "end": 30144,
+   "kind": "unused",
+   "label": "Zeros",
+   "note": "Zero bytes at the end of the image; DOS frees them when the program stays resident.",
+   "by": "yasser",
+   "evidence": "inferred"
+  }
+ ],
+ "routines": [
+  {
+   "start": 48,
+   "end": 108,
+   "name": "install",
+   "note": "Install check and INT 10h hook.",
+   "link": "#service",
+   "lines": [
+    {
+     "off": 48,
+     "note": "DOS: who answers INT 10h?"
+    },
+    {
+     "off": 64,
+     "note": "Compare 12 bytes with the DALYASSER tag"
+    },
+    {
+     "off": 87,
+     "note": "Write the old vector into its own JMP FAR"
+    },
+    {
+     "off": 95,
+     "note": "Point INT 10h at 003Ch"
+    }
+   ]
+  },
+  {
+   "start": 131,
+   "end": 305,
+   "name": "dispatch",
+   "note": "Small functions answered at once.",
+   "link": "#service",
+   "lines": [
+    {
+     "off": 131,
+     "note": "AL = function number"
+    }
+   ]
+  },
+  {
+   "start": 305,
+   "end": 553,
+   "name": "draw_setup",
+   "note": "Checks before drawing.",
+   "link": "#small",
+   "lines": [
+    {
+     "off": 438,
+     "note": "x against 640, then y against 480"
+    }
+   ]
+  },
+  {
+   "start": 553,
+   "end": 607,
+   "name": "translate",
+   "note": "Keys to glyph codes.",
+   "link": "#joining",
+   "lines": [
+    {
+     "off": 579,
+     "note": "Keys from 80h up are set to 0"
+    }
+   ]
+  },
+  {
+   "start": 607,
+   "end": 749,
+   "name": "shape",
+   "note": "Picks isolated, initial, medial or final.",
+   "link": "#joining",
+   "lines": [
+    {
+     "off": 713,
+     "note": "Next letter, style codes skipped"
+    },
+    {
+     "off": 736,
+     "note": "No partner: drop the join bits"
+    }
+   ]
+  },
+  {
+   "start": 749,
+   "end": 1421,
+   "name": "draw_glyphs",
+   "note": "Run-length glyphs to VGA memory.",
+   "link": "#effects",
+   "lines": []
+  },
+  {
+   "start": 1421,
+   "end": 1556,
+   "name": "finish",
+   "note": "Restore VGA state and return.",
+   "link": "#effects",
+   "lines": [
+    {
+     "off": 1421,
+     "note": "Graphics Controller back to normal"
+    },
+    {
+     "off": 1494,
+     "note": "Registers back for the caller"
+    }
+   ]
+  },
+  {
+   "start": 29956,
+   "end": 29998,
+   "name": "stay_resident",
+   "note": "Banner, pause and INT 27h.",
+   "link": "#service",
+   "lines": [
+    {
+     "off": 29971,
+     "note": "Wait 112 vertical retraces"
+    },
+    {
+     "off": 29996,
+     "note": "INT 27h"
+    }
+   ]
+  }
+ ]
+}

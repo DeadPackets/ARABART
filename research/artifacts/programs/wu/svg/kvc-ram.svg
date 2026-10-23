@@ -1,0 +1,48 @@
+<svg class="dg" viewBox="0 0 640 300" role="img" aria-labelledby="kvc-ram-t">
+<title id="kvc-ram-t">KVC asks INT 21h for Koko, then copies the real DOS address from the INT 3 entry into the INT 21h entry, so DOS calls no longer pass through the virus.</title>
+<rect class="box" x="10" y="120" width="120" height="56" />
+<text x="70" y="154" text-anchor="middle">KVC.EXE</text>
+<text class="t-cy" x="310" y="70" text-anchor="middle">Interrupt table</text>
+<rect class="box" x="210" y="80" width="200" height="136" />
+<rect class="box-bk" x="222" y="96" width="176" height="44" />
+<text x="234" y="124">0084  INT 21h</text>
+<rect class="box-bk" x="222" y="156" width="176" height="44" />
+<text x="234" y="184">000C  INT 3</text>
+<rect class="box-ink" x="480" y="20" width="150" height="56" />
+<text class="t-bk" x="555" y="54" text-anchor="middle">Koko</text>
+<rect class="box" x="480" y="224" width="150" height="56" />
+<text x="555" y="258" text-anchor="middle">DOS</text>
+<path class="wire dash" d="M555 76 V222" />
+<g data-s="1-2"><path class="wire-hi arrow" d="M130 140 H220" /><text x="176" y="130" text-anchor="middle">FF0Ch</text></g>
+<g data-s="1-4"><path class="wire-hi arrow" d="M398 112 L478 54" /></g>
+<g data-s="2-5"><text class="t-yl" x="472" y="40" text-anchor="end">replies C0C1h</text></g>
+<g data-s="3+"><path class="wire-hi arrow" d="M130 160 H220" /><path class="wire-hi arrow" d="M398 184 L478 246" /></g>
+<g data-s="4+"><text class="t-yl" x="310" y="238" text-anchor="middle">INT 3 = DOS address</text></g>
+<g data-s="5+"><path class="wire-hi arrow" d="M398 124 C446 124 452 220 478 236" /><text class="t-yl" x="310" y="262" text-anchor="middle">INT 21h = DOS address</text></g>
+<g data-s="6"><text class="t-yl" x="630" y="100" text-anchor="end">cut off</text><text class="t-yl" x="310" y="290" text-anchor="middle">asks again: no reply, Freezed</text></g>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 440" role="img" aria-labelledby="kvc-ram-tn">
+<title id="kvc-ram-tn">KVC finds Koko through INT 21h, then points INT 21h back at DOS.</title>
+<rect class="box" x="90" y="0" width="120" height="44" />
+<text x="150" y="28" text-anchor="middle">KVC.EXE</text>
+<g data-s="1+"><path class="wire-hi arrow" d="M150 44 V98" /></g>
+<g data-s="1-2"><text x="160" y="76">FF0Ch</text></g>
+<rect class="box" x="20" y="100" width="260" height="112" />
+<text class="t-cy" x="150" y="124" text-anchor="middle">Interrupt table</text>
+<rect class="box-bk" x="32" y="134" width="236" height="30" />
+<text x="44" y="155">0084  INT 21h</text>
+<rect class="box-bk" x="32" y="172" width="236" height="30" />
+<text x="44" y="193">000C  INT 3</text>
+<rect class="box-ink" x="10" y="300" width="120" height="50" />
+<text class="t-bk" x="70" y="330" text-anchor="middle">Koko</text>
+<rect class="box" x="170" y="300" width="120" height="50" />
+<text x="230" y="330" text-anchor="middle">DOS</text>
+<path class="wire dash" d="M130 325 H168" />
+<g data-s="1-4"><path class="wire-hi arrow" d="M32 149 H16 V298" /></g>
+<g data-s="3+"><path class="wire-hi arrow" d="M268 187 H276 V298" /></g>
+<g data-s="5+"><path class="wire-hi arrow" d="M268 149 H290 V298" /></g>
+<g data-s="2-5"><text class="t-yl" x="70" y="374" text-anchor="middle">C0C1h</text></g>
+<g data-s="4+"><text class="t-yl" x="150" y="236" text-anchor="middle">INT 3 = DOS address</text></g>
+<g data-s="5+"><text class="t-yl" x="150" y="262" text-anchor="middle">INT 21h = DOS</text></g>
+<g data-s="6"><text class="t-yl" x="70" y="398" text-anchor="middle">cut off</text><text class="t-yl" x="150" y="430" text-anchor="middle">asks again: no reply</text></g>
+</svg>

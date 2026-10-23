@@ -1,0 +1,114 @@
+---
+// One loop draws every style. Pick a style: his engine draws the measured line in it, and the chart shows what it
+// cost his code (measured on his binary: research/artifacts/arabart/port/HOW.md).
+import Window from '../../shell/Window.astro';
+import { render, svgMarkup } from './core.ts';
+import { ssrBin } from './ssr.ts';
+
+interface Props { id?: string }
+const { id = 'stylelab' } = Astro.props;
+const LINE = '~gtk ~guvfd 51<4';
+const S = [
+  { k: 'plain', label: 'Plain', ins: 25193, px: 1357, what: 'The line as his loop draws it: 16 keys, 1,357 pixels, 18.6 instructions for each pixel.' },
+  { k: 'bold', label: 'Bold', key: '@', ins: 27438, px: 1645, what: 'Every run is 1 pixel longer and every letter 1 pixel wider. That costs 1 instruction per run and 3 per letter: 9% more work.' },
+  { k: 'italic', label: 'Italic', key: '!', ins: 25766, px: 1357, what: 'Each row starts 1 pixel further left than the row below. No extra code: the step to the next row always subtracts the italic flag, which is 0 or 1. Only 2% more work.' },
+  { k: 'underline', label: 'Underline', key: '#', ins: 27013, px: 1574, what: 'One more run along the line, as wide as the letter.' },
+  { k: 'double', label: 'Double', key: '$', ins: 35713, px: 5428, what: 'Skips and lengths doubled, and every row written twice: 4 times the pixels for 42% more work.' },
+  { k: '3d', label: '3-D', what: 'His function 8: the same loop runs twice, first in the shadow color 2 pixels up and left, then in the text color. The letters are joined only once.' },
+  { k: 'shadow', label: 'Shadow', what: 'Built by The Brave Sun on top of ARABART: a copy 6 pixels down and right, drawn first.' },
+  { k: 'outline', label: 'Outline', what: 'Also from The Brave Sun: four copies 1 pixel around the letters, drawn first, then the text on top.' },
+];
+const max = { ins: 35713, px: 5428 };
+const bin = ssrBin();
+const first = svgMarkup(render(bin, LINE, { font: 3, color: 14 }), 1, '');
+const n = (x: number) => x.toLocaleString('en-US');
+---
+
+<div class="st" id={id} data-stylelab data-line={LINE}>
+  <Window title="STYLES  one loop draws them all" kind="screen" class="st-scr">
+    <div class="st-vga" data-vga set:html={first} />
+    <p class="sr-only" lang="ar">الفن العربي ٤,١٥</p>
+  </Window>
+  <div class="st-side">
+    <div class="st-chart" role="radiogroup" aria-label="Style">
+      <div class="st-head" aria-hidden="true"><span></span><span>instructions</span><span>pixels</span></div>
+      {S.filter(s => s.ins).map((s, i) => (
+        <button type="button" role="radio" class="st-row" data-k={s.k} aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1}>
+          <span class="st-name">{s.label}{s.key && <span class="hk" aria-hidden="true">{s.key}</span>}</span>
+          <span class="st-bar"><i style={`--w:${s.ins! / max.ins}`}></i><b>{n(s.ins!)}</b></span>
+          <span class="st-bar st-bar--px"><i style={`--w:${s.px! / max.px}`}></i><b>{n(s.px!)}</b></span>
+        </button>
+      ))}
+      <div class="st-more">
+        {S.filter(s => !s.ins).map(s => (
+          <button type="button" role="radio" class="button k-btn" data-k={s.k} aria-checked="false" tabindex="-1">{s.label}</button>
+        ))}
+      </div>
+    </div>
+    <p class="st-what" aria-live="polite" data-what>{S[0].what}</p>
+  </div>
+  <script type="application/json" data-styles set:html={JSON.stringify(S.map(s => ({ k: s.k, what: s.what })))} />
+</div>
+
+<style is:global>
+  .st { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px 28px; align-items: start; }
+  .st-vga { display: grid; place-items: center; min-height: 260px; padding: 24px; background: var(--vga-0); }
+  .st-vga svg { width: 100%; max-width: 660px; height: auto; }
+  .st-chart { display: grid; gap: 4px; }
+  .st-head { display: grid; grid-template-columns: 7.5rem 1fr 1fr; gap: 12px; padding: 0 10px; font: 600 12px/1.4 var(--font-code); color: var(--accent-2); }
+  .st-row { display: grid; grid-template-columns: 7.5rem 1fr 1fr; gap: 12px; align-items: center; min-height: 44px; padding: 6px 10px; font: inherit; color: var(--ink); text-align: left; background: none; border: 0; cursor: pointer; transition: background-color 0.2s var(--quart); }
+  .st-row:hover { background: color-mix(in oklch, var(--ink) 8%, transparent); }
+  .st-row[aria-checked='true'] { background: color-mix(in oklch, var(--accent) 18%, transparent); }
+  .st-row:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+  .st-name { font-weight: 600; }
+  .st-name .hk { margin-left: 8px; font: 700 0.8125rem/1 var(--font-code); color: var(--accent-2); }
+  .st-bar { display: flex; align-items: center; gap: 6px; height: 26px; }
+  .st-bar i { flex: none; width: calc(var(--w) * (100% - 6.5ch)); height: 12px; background: var(--ink-2); transform-origin: 0 50%; }
+  .st-row[aria-checked='true'] .st-bar i { background: var(--accent); }
+  .st-bar b { font: 700 0.8125rem/1 var(--font-code); font-variant-numeric: tabular-nums; }
+  .st-more { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .st-what { margin-top: 16px; font-size: 1.0625rem; line-height: 1.6; color: var(--ink); min-height: 5em; }
+  @media (max-width: 1100px) { .st { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 520px) { .st-row, .st-head { grid-template-columns: 6.75rem 1fr 1fr; gap: 8px; } .st-vga { min-height: 160px; padding: 12px; } }
+  @media (prefers-reduced-motion: reduce) { .st-row { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, render, svgMarkup } from './core.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const OPTS: Record<string, object> = {
+    plain: {}, bold: { bold: true }, italic: { italic: true }, underline: { underline: true }, double: { double: true },
+    '3d': { mode: '3d', shadow: 4 }, shadow: { mode: 'shadow', shadow: 8 }, outline: { mode: 'outline', shadow: 1 },
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-stylelab]').forEach(async root => {
+    const bin = await fonts();
+    const vga = root.querySelector<HTMLElement>('[data-vga]')!, what = root.querySelector<HTMLElement>('[data-what]')!;
+    const S = JSON.parse(root.querySelector('[data-styles]')!.textContent!) as { k: string; what: string }[];
+    const radios = [...root.querySelectorAll<HTMLButtonElement>('[role=radio]')];
+    const pick = (b: HTMLButtonElement) => {
+      radios.forEach(x => { x.setAttribute('aria-checked', String(x === b)); x.tabIndex = x === b ? 0 : -1; });
+      const k = b.dataset.k!;
+      vga.innerHTML = svgMarkup(render(bin, root.dataset.line!, { font: 3, color: 14, ...OPTS[k] }), 1, '');
+      what.textContent = S.find(s => s.k === k)!.what;
+      if (!reduce()) gsap.fromTo(vga.firstElementChild, { opacity: 0.3, scale: 0.985 }, { opacity: 1, scale: 1, duration: 0.45, ease: 'expo.out' });
+    };
+    radios.forEach((b, i) => {
+      b.addEventListener('click', () => pick(b));
+      b.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const t = radios[(i + d + radios.length) % radios.length]; pick(t); t.focus();
+      });
+    });
+    // The bars grow in the first time they are seen
+    if (reduce()) return;
+    const bars = root.querySelectorAll('.st-bar i');
+    gsap.set(bars, { scaleX: 0 });
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); gsap.to(bars, { scaleX: 1, duration: 1, ease: 'expo.out', stagger: 0.06 }); } }, { threshold: 0.4 });
+    io.observe(root);
+  });
+</script>

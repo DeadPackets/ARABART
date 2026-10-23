@@ -1,0 +1,159 @@
+---
+// His fly-in (PORTSAID.EXE 0592) in the CodeStepper, beside the C he wrote it in, linked to the screen: the logo tile
+// moves along its straight line, and the readout shows x and y as decimals, then as whole pixels, then as a byte.
+import Window from '../../../shell/Window.astro';
+import CodeStepper from '../../CodeStepper.astro';
+import { memSync, png } from '../ssr.ts';
+import { portsaid, picPixels, line, FLY, PORTSAID } from './rle.ts';
+import './rle.css';
+
+const ps = portsaid(memSync(PORTSAID));
+const tiles = FLY.map(([id]) => png(picPixels(ps.pics[id]), 64, 79));
+
+const ASM = [
+  { off: '0595', code: 'sub  sp,24h', note: 'room for x, y, dx and dy' },
+  { off: '05A0', code: 'sub  ax,[bp+0Ah]', note: 'x1 - x0' },
+  { off: '05BA', code: 'fdivr qword [bp-18h]', note: 'dx = (x1 - x0) / n' },
+  { off: '05C7', code: 'sub  ax,di', note: 'y1 - y0' },
+  { off: '05E0', code: 'fdivr qword [bp-20h]', note: 'dy = (y1 - y0) / n' },
+  { off: '05F4', code: 'fstp qword [bp-08h]', note: 'x = x0' },
+  { off: '0601', code: 'fstp qword [bp-10h]', note: 'y = y0' },
+  { off: '0605', code: 'xor  si,si', note: 'i = 0' },
+  { off: '060B', label: 'step', code: 'fld  qword [bp-08h]', note: 'x, then _ftol cuts it to a whole number' },
+  { off: '0615', code: 'fld  qword [bp-10h]', note: 'y, cut the same way' },
+  { off: '0621', code: 'imul dx', note: 'y × 80 bytes a row' },
+  { off: '062B', code: 'idiv bx', note: 'x ÷ 8: the byte' },
+  { off: '062E', code: 'add  dx,ax', note: 'where the tile lands' },
+  { off: '0643', code: 'call 04FA', note: 'copy the tile, four layers' },
+  { off: '064D', code: 'fadd qword [bp-18h]', note: 'x += dx' },
+  { off: '0659', code: 'fadd qword [bp-20h]', note: 'y += dy' },
+  { off: '0666', code: 'call 0311', note: 'wait' },
+  { off: '066A', code: 'inc  si', note: 'i++' },
+  { off: '066E', code: 'jle  step', note: 'until i passes n' },
+];
+const C = [
+  { code: 'void fly(word pic, int x0, int y0, int x1, int y1,' },
+  { code: '         int w, int h, int n, int wait) {' },
+  { code: '  double dx = (double)(x1 - x0) / n;' },
+  { code: '  double dy = (double)(y1 - y0) / n;' },
+  { code: '  double x = x0, y = y0;' },
+  { code: '  for (int i = 0; i <= n; i++) {' },
+  { code: '    int at = (int)y * 80 + (int)x / 8;' },
+  { code: '    copy(pic, at, w, h);', note: 'all four layers' },
+  { code: '    x += dx;' },
+  { code: '    y += dy;' },
+  { code: '    delay(wait);' },
+  { code: '  }' },
+  { code: '}' },
+];
+const C_OF: Record<string, number> = { '0595': 1, '05A0': 2, '05BA': 2, '05C7': 3, '05E0': 3, '05F4': 4, '0601': 4, '0605': 5, '060B': 6, '0615': 6, '0621': 6, '062B': 6, '062E': 6, '0643': 7, '064D': 8, '0659': 9, '0666': 10, '066A': 5, '066E': 5 };
+const a = (off: string) => ASM.findIndex(l => l.off === off);
+
+// Tile 4 of the logo: from the top right corner (576, 0) to (64, 100) in 100 steps
+const [, X0, Y0, X1, Y1] = FLY[0], N = 100, pts = line(X0, Y0, X1, Y1, N);
+const DX = (X1 - X0) / N, DY = (Y1 - Y0) / N;
+const fx = (v: number) => (Number.isInteger(v) ? v.toFixed(1) : String(+v.toFixed(13)));
+type Reg = { name: string; value: string; means: string; changed?: boolean };
+const steps: { a: number; c: number; say: string; regs: Reg[]; i: number; x: number; y: number; bx: number; drawn: boolean }[] = [];
+let last: Record<string, string> = {};
+const push = (off: string, say: string, s: { i: number; x: number; y: number; drawn?: boolean; ax?: string }) => {
+  const xi = Math.trunc(s.x), bx = Math.trunc(xi / 8);
+  const v: Record<string, string> = { i: s.i < 0 ? '-' : String(s.i), x: fx(s.x), y: fx(s.y), dx: fx(DX), AX: s.ax ?? last.AX ?? '0' };
+  const means: Record<string, string> = { i: 'the step, 0 to 100', x: 'a decimal, in the math unit', y: 'a decimal', dx: 'added every step', AX: 'the last whole number' };
+  steps.push({
+    a: a(off), c: C_OF[off], say, i: Math.max(0, s.i), x: s.x, y: s.y, bx, drawn: !!s.drawn,
+    regs: ['i', 'x', 'y', 'dx', 'AX'].map(name => ({ name, value: v[name], means: means[name], changed: last[name] !== undefined && last[name] !== v[name] })),
+  });
+  last = v;
+};
+push('0595', 'Logo tile 4 flies from the top right corner, (576, 0), toward (64, 100), in 100 steps. The function is C; Turbo C++ wrote this start.', { i: -1, x: X0, y: Y0 });
+push('05A0', 'How far to go across: 64 - 576 = -512 pixels.', { i: -1, x: X0, y: Y0, ax: '-512' });
+push('05BA', `Divide by 100 steps in the math unit: dx = <b>${fx(DX)}</b> pixels a step. A decimal, so the line stays straight.`, { i: -1, x: X0, y: Y0 });
+push('05C7', 'How far to go down: 100 - 0 = 100 rows.', { i: -1, x: X0, y: Y0, ax: '100' });
+push('05E0', `dy = 100 ÷ 100 = <b>${DY}</b> row a step.`, { i: -1, x: X0, y: Y0 });
+push('05F4', 'Start at x = 576.', { i: -1, x: X0, y: Y0 });
+push('0601', 'And y = 0.', { i: -1, x: X0, y: Y0 });
+push('0605', 'Step 0.', { i: 0, x: X0, y: Y0 });
+const iter = (i: number, first: boolean) => {
+  let x = X0, y = Y0;
+  for (let k = 0; k < i; k++) { x += DX; y += DY; }
+  const [xi, yi] = pts[i], bx = Math.trunc(xi / 8);
+  push('060B', first ? `Cut x to a whole number: ${fx(x)} becomes <b>${xi}</b>.` : `x = ${fx(x)}, cut to <b>${xi}</b>.`, { i, x, y, ax: String(xi) });
+  push('0615', `y = ${fx(y)}, cut to <b>${yi}</b>.`, { i, x, y, ax: String(yi) });
+  push('0621', `Row ${yi} starts ${yi} × 80 = ${yi * 80} bytes into the screen.`, { i, x, y, ax: String(yi * 80) });
+  push('062B', `${xi} ÷ 8 = <b>${bx}</b>: the tile lands on byte ${bx}, pixel ${bx * 8}. It moves in steps of 8 pixels, one byte.`, { i, x, y, ax: String(bx) });
+  push('062E', `So the tile goes to byte ${yi * 80 + bx} of the screen.`, { i, x, y, ax: String(yi * 80 + bx) });
+  push('0643', `Copy the 64 by 79 tile there, through his plane copy. Nothing is erased, so the copies before it stay behind as a ribbon.`, { i, x, y, drawn: true });
+  if (i === N) return;
+  push('064D', `x + dx = ${fx(x + DX)}.`, { i, x: x + DX, y, drawn: true });
+  push('0659', `y + dy = ${fx(y + DY)}.`, { i, x: x + DX, y: y + DY, drawn: true });
+  push('0666', 'Wait the number of refreshes he asked for. For the logo, none: straight on.', { i, x: x + DX, y: y + DY, drawn: true });
+  push('066A', `Step ${i + 1}.`, { i: i + 1, x: x + DX, y: y + DY, drawn: true });
+  push('066E', i + 1 <= N ? 'Not past 100 yet: round again.' : 'Done.', { i: i + 1, x: x + DX, y: y + DY, drawn: true });
+};
+iter(0, true); iter(1, false); iter(2, false);
+push('060B', 'And so on, 97 more times. Jump ahead to the last step.', { i: 100, x: X0 + 100 * DX, y: 100 });
+iter(N, false);
+const lastStep = steps[steps.length - 1];
+lastStep.say = `Step 100: the tile is home, at pixel ${pts[N][0] >> 3 << 3}, row 100. Three more tiles follow the same way, and the logo is whole.`;
+const paths = FLY.map(([, x0, y0, x1, y1]) => [line(x0, y0, x1, y1, 100)[0], line(x0, y0, x1, y1, 100)[100]].map(([x, y]) => [Math.trunc(x / 8) * 8, y]));
+---
+
+<CodeStepper id="ps-flyer" title="PORTSAID.EXE  fly a tile" asm={ASM} c={C} steps={steps} at={0} cTitle="His C">
+  <div slot="visual" class="ps-fly" data-psfly data-for="ps-flyer">
+    <Window title="THE SCREEN   640 x 350" kind="screen" class="g-win ps-fly-win">
+      <svg class="ps-fly-svg" viewBox="0 0 640 350" role="img" aria-label="The four logo tiles' straight paths across the screen, from the right edge to the logo's place on the left, with tile 4 on its way.">
+        <g class="ps-fly-grid" aria-hidden="true">{[...Array(80)].map((_, c) => <line x1={c * 8} x2={c * 8} y1="0" y2="350" />)}</g>
+        {paths.map(([[x0, y0], [x1, y1]], k) => (
+          <g class:list={['ps-fly-path', { me: k === 0 }]}>
+            <line x1={x0 + 32} y1={y0 + 40} x2={x1 + 32} y2={y1 + 40} />
+            <image href={tiles[k]} x={x1} y={y1} width="64" height="79" opacity={k === 0 ? 0 : 0.28} preserveAspectRatio="none" style="image-rendering: pixelated" />
+          </g>
+        ))}
+        <rect class="ps-fly-ghost" data-ghost x="0" y="0" width="64" height="79" />
+        <image data-tile href={tiles[0]} x={paths[0][0][0]} y={paths[0][0][1]} width="64" height="79" preserveAspectRatio="none" style="image-rendering: pixelated" />
+      </svg>
+    </Window>
+    <div class="ps-fly-read" aria-live="polite">
+      <span><i>x, a decimal</i><b data-x>576.0</b></span>
+      <span><i>whole x</i><b data-xi>576</b></span>
+      <span><i>÷ 8: the byte</i><b data-bx>72</b></span>
+      <span><i>y</i><b data-y>0</b></span>
+    </div>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .ps-fly { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .ps-fly-svg { display: block; width: 100%; height: auto; aspect-ratio: 8 / 5; background: #000; }
+  .ps-fly-grid line { stroke: oklch(1 0 0 / 0.07); stroke-width: 1; }
+  .ps-fly-path line { stroke: var(--vga-8); stroke-width: 2; stroke-dasharray: 6 6; }
+  .ps-fly-path.me line { stroke: var(--vga-14); }
+  .ps-fly-ghost { fill: none; stroke: var(--vga-14); stroke-width: 2; stroke-dasharray: 3 3; opacity: 0; }
+  .ps-fly-read { display: flex; flex-wrap: wrap; gap: 10px; }
+  .ps-fly-read span { display: grid; gap: 4px; min-width: 110px; padding: 8px 12px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .ps-fly-read i { font: 500 11px/1.2 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .ps-fly-read b { font: 700 18px/1.1 var(--font-code); color: var(--accent); font-variant-numeric: tabular-nums; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduce } from './view.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-psfly]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!)!;
+    const tile = vis.querySelector<SVGImageElement>('[data-tile]')!, ghost = vis.querySelector<SVGRectElement>('[data-ghost]')!;
+    const q = (s: string) => vis.querySelector<HTMLElement>(s)!;
+    const num = (v: number) => (Number.isInteger(v) ? v.toFixed(1) : String(+v.toFixed(13)));
+    root.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail as { step: { x: number; y: number; bx: number; drawn: boolean }; how: string };
+      const xi = Math.trunc(step.x), yi = Math.trunc(step.y), px = Math.trunc(xi / 8) * 8;
+      q('[data-x]').textContent = num(step.x); q('[data-xi]').textContent = String(xi);
+      q('[data-bx]').textContent = String(Math.trunc(xi / 8)); q('[data-y]').textContent = String(yi);
+      // The tile sits where it was last copied; the dashed box shows where the next copy will land
+      const d = how === 'jump' || reduce() ? 0 : 0.25;
+      if (step.drawn || how === 'jump') gsap.to(tile, { attr: { x: px, y: yi }, duration: d, ease: 'power2.out', overwrite: true });
+      gsap.set(ghost, { attr: { x: px, y: yi }, opacity: step.drawn ? 0 : 1 });
+    });
+  });
+</script>

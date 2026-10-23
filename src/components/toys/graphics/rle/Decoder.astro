@@ -1,0 +1,202 @@
+---
+// His decoder (NAMES.COM 0899) in the CodeStepper, run on the real first bytes of his background tile, beside the C
+// that does the same. The linked view shows the packed bytes going in and the bytes and pixels coming out.
+import Window from '../../../shell/Window.astro';
+import CodeStepper from '../../CodeStepper.astro';
+import { memSync } from '../ssr.ts';
+import { NAMES } from './rle.ts';
+import './rle.css';
+
+const bin = memSync(NAMES);
+const AT = 0x09b8, base = AT - 0x100;
+const h2 = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
+const h4 = (n: number) => n.toString(16).toUpperCase().padStart(4, '0');
+
+const ASM = [
+  { off: '0899', code: 'mov  es,[0509h]', note: 'the buffer, just past the program' },
+  { off: '089D', code: 'xor  di,di', note: 'write from its first byte' },
+  { off: '089F', code: 'mov  si,[0503h]', note: 'read from the next picture' },
+  { off: '08A3', label: 'next', code: 'lodsb', note: 'read one byte' },
+  { off: '08A4', code: 'cmp  al,37h', note: 'his marker?' },
+  { off: '08A6', code: 'je   run' },
+  { off: '08A8', code: 'stosb', note: 'no: copy it out as it is' },
+  { off: '08A9', code: 'jmp  next' },
+  { off: '08AB', label: 'run', code: 'lodsb', note: 'how many' },
+  { off: '08AC', code: 'cmp  al,0', note: '0 means the picture ends' },
+  { off: '08AE', code: 'je   done' },
+  { off: '08B0', code: 'xor  ch,ch' },
+  { off: '08B2', code: 'mov  cl,al', note: 'CX = how many' },
+  { off: '08B4', code: 'lodsb', note: 'which byte' },
+  { off: '08B5', code: 'rep  stosb', note: 'write it CX times' },
+  { off: '08B7', code: 'jmp  next' },
+  { off: '08B9', label: 'done', code: 'lodsw', note: 'the size of one color layer' },
+  { off: '08BA', code: 'push cs / pop ds' },
+  { off: '08BC', code: 'mov  [0511h],ax', note: 'kept for the plane copy' },
+  { off: '08BF', code: 'mov  [0503h],si', note: 'the next picture starts here' },
+  { off: '08C3', code: 'ret' },
+];
+const C = [
+  { code: 'void decode(void) {' },
+  { code: '  byte far *out = buffer;', note: 'ES:DI' },
+  { code: '  byte *in = next_picture;', note: 'SI' },
+  { code: '  for (;;) {' },
+  { code: '    byte b = *in++;' },
+  { code: '    if (b != 0x37) {' },
+  { code: '      *out++ = b;', note: 'a plain byte' },
+  { code: '      continue;' },
+  { code: '    }' },
+  { code: '    byte count = *in++;' },
+  { code: '    if (count == 0) break;', note: 'the end' },
+  { code: '    byte value = *in++;' },
+  { code: '    while (count--) *out++ = value;' },
+  { code: '  }' },
+  { code: '  plane_size = *(word *)in; in += 2;' },
+  { code: '  next_picture = in;' },
+  { code: '}' },
+];
+const C_OF: Record<string, number> = { '0899': 1, '089D': 1, '089F': 2, '08A3': 4, '08A4': 5, '08A6': 5, '08A8': 6, '08A9': 7, '08AB': 9, '08AC': 10, '08AE': 10, '08B0': 9, '08B2': 9, '08B4': 11, '08B5': 12, '08B7': 3, '08B9': 14, '08BA': 14, '08BC': 14, '08BF': 15, '08C3': 16 };
+const line = (off: string) => ASM.findIndex(l => l.off === off);
+
+// Run his loop on the tile's first 8 bytes, then on its last 4, keeping a step per instruction
+type Reg = { name: string; value: string; means: string; changed?: boolean };
+const steps: { a: number; c: number; say: string; regs: Reg[]; si: number; out: number; hot: number[] }[] = [];
+let si = 0, di = 0, al = 0, cx = 0, last: Record<string, string> = {};
+const push = (off: string, say: string, hot: number[] = []) => {
+  const v = { SI: h4(AT + si), DI: h4(di), AL: `${h2(al)}h`, CX: String(cx) };
+  const means = { SI: `next byte in: ${si + 1} of 612`, DI: `${di} bytes out`, AL: 'the byte just read', CX: 'how many' };
+  steps.push({
+    a: line(off), c: C_OF[off], say, si, out: di, hot,
+    regs: (['SI', 'DI', 'AL', 'CX'] as const).map(n => ({ name: n, value: v[n], means: means[n], changed: last[n] !== undefined && last[n] !== v[n] })),
+  });
+  last = v;
+};
+push('0899', 'The picture is unpacked into free memory just past the program, like a buffer you allocate before you decode a PNG.');
+push('089D', 'DI counts the bytes written, from 0.');
+push('089F', `SI points at the packed picture: his background tile, at ${h4(AT)} in his file.`);
+const run = (stopAt: number) => {
+  while (si < stopAt) {
+    al = bin[base + si]; si++;
+    push('08A3', `Read <b>${h2(al)}</b>.`, [si - 1]);
+    push('08A4', al === 0x37 ? '<b>37h</b> is his marker: a run is coming.' : `<b>${h2(al)}</b> is not the marker.`, [si - 1]);
+    if (al !== 0x37) {
+      push('08A6', 'So no jump.');
+      di++;
+      push('08A8', `Copy <b>${h2(al)}</b> out as it is: one byte in, one byte out.`, [si - 1]);
+      push('08A9', 'Back for the next byte.');
+      continue;
+    }
+    push('08A6', 'Jump to the run.');
+    al = bin[base + si]; si++;
+    push('08AB', `Read the count: <b>${h2(al)}h</b> = ${al}.`, [si - 1]);
+    push('08AC', al === 0 ? 'A count of 0 means the picture ends.' : 'Not 0, so it is a real run.', [si - 1]);
+    if (al === 0) { push('08AE', 'Jump to the end.'); return; }
+    push('08AE', 'So no jump.');
+    push('08B0', 'Clear the top half of CX.');
+    cx = al;
+    push('08B2', `CX = ${cx}.`);
+    al = bin[base + si]; si++;
+    push('08B4', `Read the byte to repeat: <b>${h2(al)}</b>.`, [si - 1]);
+    const from = di;
+    di += cx;
+    push('08B5', `<code>rep stosb</code> writes <b>${h2(al)}</b> ${cx} times in one instruction: 3 bytes in, ${cx} bytes out.`, [si - 3, si - 2, si - 1]);
+    cx = 0;
+    push('08B7', `Back for the next byte. ${di - from > 1 ? `${di} bytes out so far.` : ''}`);
+  }
+};
+run(8);
+// The rest of the tile, unpacked the same way, then its last four bytes
+si = 608; di = 800 - 0; al = 0x3f;
+push('08A3', 'The same loop runs on through the tile: 600 more bytes in, 755 more out. Here are the last four.', []);
+run(612);
+const stride = bin[base + 610] | (bin[base + 611] << 8); si = 612;
+push('08B9', `Read a whole word: <b>C8 00</b> = ${stride}, the size of one color layer.`, [610, 611]);
+push('08BA', 'Back to his own data segment.');
+push('08BC', `Keep ${stride} for the plane copy: the four layers sit one after another, ${stride} bytes apart.`);
+push('08BF', 'SI now points at the next picture, so the next call needs no address.');
+push('08C3', `Done: 612 bytes in, 800 bytes out, four layers of ${stride}. The tile is ready to copy to the screen.`);
+
+const IN = [0, 1, 2, 3, 4, 5, 6, 7, -1, 608, 609, 610, 611].map(i => (i < 0 ? null : { i, v: h2(bin[base + i]), at: h4(AT + i) }));
+const OUT = [...Array(45)].map((_, i) => (i < 39 || (i > 39 && i < 44) ? 'FF' : i === 39 ? 'BF' : '3F'));
+const bits = (h: string) => [...parseInt(h, 16).toString(2).padStart(8, '0')];
+---
+
+<CodeStepper id="ky-dec" title="NAMES.COM  0899  his decoder" asm={ASM} c={C} steps={steps} at={0} cTitle="The same in C">
+  <div slot="visual" class="ky-dec" data-kydec data-for="ky-dec">
+    <Window title="IN   his packed bytes" kind="panel" num="4" class="ky-in-win">
+      <div class="ky-in" data-in>
+        {IN.map(b => b ? (
+          <span class="ky-b" data-i={b.i}><i>{b.at}</i><b>{b.v}</b></span>
+        ) : <span class="ky-gap" aria-hidden="true">· · · 600 bytes · · ·</span>)}
+      </div>
+      <p class="ky-key"><span class="ky-sw ky-sw--m"></span> 37h marker, count, byte <span class="ky-sw"></span> copied as it is</p>
+    </Window>
+    <Window title="OUT  the buffer, 5 bytes to a row" kind="panel" num="5" class="ky-out-win">
+      <div class="ky-out" data-out>
+        {OUT.map((h, i) => (
+          <span class="ky-o" data-o={i}><b>{h}</b><span class="ky-px" aria-hidden="true">{bits(h).map(x => <i class:list={{ on: x === '1' }} />)}</span></span>
+        ))}
+      </div>
+      <p class="ky-count" aria-live="off"><b data-outn>0</b> bytes out. Each bit is one pixel of the first color layer.</p>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .ky-dec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+  .ky-in { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ky-b { display: grid; justify-items: center; gap: 2px; min-width: 44px; padding: 6px 4px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow 0.2s, opacity 0.2s; }
+  .ky-b i { font: 500 10px/1 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .ky-b b { font: 700 16px/1.1 var(--font-code); color: var(--ink); }
+  .ky-b.is-m b { color: var(--accent); }
+  .ky-b.is-used { opacity: 0.45; }
+  .ky-b.is-hot { box-shadow: inset 0 0 0 2px var(--accent); opacity: 1; }
+  .ky-gap { align-self: center; padding: 0 6px; font: 500 12px/1 var(--font-code); color: var(--ink-2); }
+  .ky-key, .ky-count { margin: 12px 0 0 !important; font: 500 12px/1.5 var(--font-code) !important; color: var(--ink-2) !important; max-width: none !important; }
+  .ky-count b { color: var(--accent); }
+  .ky-sw { display: inline-block; width: 10px; height: 10px; vertical-align: -1px; background: var(--ink); }
+  .ky-sw--m { background: var(--accent); }
+  .ky-out { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .ky-o { display: grid; gap: 2px; justify-items: center; padding: 3px 2px; background: var(--surface-2); transition: opacity 0.2s; }
+  .ky-o b { font: 700 12px/1.1 var(--font-code); color: var(--ink); }
+  .ky-px { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; height: 8px; gap: 1px; }
+  .ky-px i { background: color-mix(in oklch, var(--ink-2) 25%, transparent); }
+  .ky-px i.on { background: var(--vga-9); }
+  .ky-dec.is-live .ky-o:not(.is-on) { opacity: 0.12; }
+  .ky-o.is-new { box-shadow: inset 0 0 0 2px var(--accent); }
+  @media (max-width: 1023px) { .ky-dec { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .ky-b, .ky-o { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduce } from './view.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-kydec]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!)!;
+    const ins = [...vis.querySelectorAll<HTMLElement>('.ky-b')], outs = [...vis.querySelectorAll<HTMLElement>('.ky-o')];
+    const n = vis.querySelector<HTMLElement>('[data-outn]')!;
+    const marks = new Set<number>();
+    // Which input bytes are markers, counts and run values: 37, the count and the byte after it
+    for (let k = 0; k < ins.length; k++) {
+      const v = ins[k].querySelector('b')!.textContent;
+      if (v === '37') { marks.add(+ins[k].dataset.i!); marks.add(+ins[k].dataset.i! + 1); if (ins[k + 1]?.querySelector('b')!.textContent !== '00') marks.add(+ins[k].dataset.i! + 2); }
+    }
+    ins.forEach(b => b.classList.toggle('is-m', marks.has(+b.dataset.i!)));
+    vis.classList.add('is-live');
+    let shown = -1;
+    root.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail as { step: { si: number; out: number; hot: number[] }; how: string };
+      ins.forEach(b => {
+        const i = +b.dataset.i!;
+        b.classList.toggle('is-hot', step.hot.includes(i));
+        b.classList.toggle('is-used', i < step.si && !step.hot.includes(i));
+      });
+      const visible = Math.min(step.out, outs.length);
+      outs.forEach((o, i) => { o.classList.toggle('is-on', i < visible); o.classList.toggle('is-new', i >= shown && i < visible && visible !== shown); });
+      const fresh = outs.slice(Math.max(0, shown), visible);
+      if (how !== 'jump' && !reduce() && fresh.length && fresh.length < 45) gsap.fromTo(fresh, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, stagger: 0.012, ease: 'back.out(2)', clearProps: 'opacity,transform' });
+      shown = visible;
+      n.textContent = String(step.out);
+    });
+  });
+</script>

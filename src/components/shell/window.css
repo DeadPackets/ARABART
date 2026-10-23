@@ -1,0 +1,187 @@
+/* Window chrome. Each era is an @scope that stops at the next [data-era], so a window takes the chrome of its nearest era.
+   Inside a window the semantic tokens (--surface, --ink, --accent ...) are re-pointed, so content styled with them fits any kind. */
+
+.win { position: relative; min-width: 0; display: flex; flex-direction: column; background: var(--surface); color: var(--ink); }
+.win-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.win-sys, .win-ctl { display: none; }
+.win-body { flex: 1; min-width: 0; }
+.win-ctl i { display: block; }
+
+/* ---------- dos: Borland Turbo C++ and Norton Commander, double-line text-mode frames ---------- */
+@scope ([data-era='dos']) to ([data-era]) {
+  .wx {
+    --surface: var(--vga-1); --surface-2: var(--blue-deep); --ink: var(--vga-14); --ink-2: var(--dos-ink-2); --accent: var(--vga-15);
+    --accent-2: var(--vga-11); --rule: oklch(0.668 0.114 194.8 / 0.6); --focus: var(--vga-14); --frame: var(--vga-15);
+    padding: 26px 20px 20px;
+    box-shadow: 14px 12px 0 oklch(0 0 0 / 0.55);
+  }
+  .wx::before { content: ''; position: absolute; inset: 10px 7px 7px; border: 1px solid var(--frame); pointer-events: none; }
+  .wx.is-active::before { inset: 9px 6px 6px; border: 3px double var(--frame); }
+  .wx > .win-bar {
+    position: absolute; top: 0; left: 16px; right: 16px; height: 22px;
+    display: flex; justify-content: center; align-items: center;
+    font: 400 16px/22px var(--font-dos); pointer-events: none;
+  }
+  .wx > .win-bar > * { padding: 0 6px; background: var(--surface); color: var(--frame); }
+  .wx > .win-bar .win-title { max-width: calc(100% - 96px); }
+  .wx > .win-bar .win-sys { display: block; position: absolute; left: 0; }
+  .wx > .win-bar .win-sys::before { content: '[\25A0]'; }
+  .wx.is-active > .win-bar .win-sys::before { content: '[\25A0]'; color: var(--vga-10); }
+  .wx > .win-bar .win-num { position: absolute; right: 0; }
+  .wx > .win-status { margin-top: 14px; padding-top: 8px; border-top: 1px solid var(--rule); font: 400 16px/1.4 var(--font-dos); color: var(--accent-2); }
+
+  .wx.win--panel { --ink: var(--vga-11); --ink-2: var(--vga-7); --accent: var(--vga-14); --accent-2: var(--vga-15); --frame: var(--vga-11); }
+  .wx.win--panel::before { inset: 9px 6px 6px; border: 3px double var(--frame); }
+  .wx.win--panel.is-active > .win-bar .win-title { background: var(--vga-3); color: var(--vga-0); }
+  .wx.win--panel > .win-bar .win-sys { display: none; }
+
+  .wx.win--dialog, .wx.win--help {
+    --surface: var(--vga-7); --surface-2: oklch(0.86 0 0); --ink: var(--vga-0); --ink-2: oklch(0.25 0 0); --accent: var(--vga-1);
+    --accent-2: var(--hot); --rule: oklch(0 0 0 / 0.35); --focus: var(--vga-1); --frame: var(--vga-15);
+    --btn-bg: var(--vga-2); --btn-ink: var(--vga-0); /* Borland's dialog buttons: black on green */
+  }
+  .wx.win--dialog > .win-bar > *, .wx.win--help > .win-bar > * { color: var(--vga-0); }
+  .wx.win--dialog::before, .wx.win--help::before { inset: 9px 6px 6px; border: 3px double var(--frame); }
+  .wx.win--dialog > .win-bar .win-sys { display: none; }
+  .wx.win--help { --surface: var(--vga-3); --surface-2: oklch(0.8 0.1 195); --accent: var(--vga-1); --accent-2: var(--vga-0); }
+  .wx.win--help > .win-bar .win-sys { display: none; }
+
+  .wx.win--screen { --surface: var(--vga-0); --ink: var(--vga-7); --ink-2: var(--vga-7); --frame: var(--vga-7); padding: 26px 12px 12px; }
+  .wx.win--screen::before, .wx.win--screen.is-active::before { inset: 10px 5px 5px; border: 1px solid var(--frame); }
+  .wx.win--screen > .win-bar .win-sys { display: none; }
+  @media (max-width: 760px) { .wx { margin-right: 8px; box-shadow: 8px 8px 0 oklch(0 0 0 / 0.55); } }
+}
+
+/* ---------- win31: Windows 3.1, thick silver frames, navy title bars, white client areas ---------- */
+@scope ([data-era='win31']) to ([data-era]) {
+  .wx {
+    --surface: var(--w-white); --surface-2: var(--w-silver); --ink: var(--w-black); --ink-2: oklch(0.35 0 0); --accent: var(--w-navy);
+    --accent-2: var(--w-teal); --rule: var(--w-gray); --focus: var(--w-navy); --btn-bg: var(--w-silver); --btn-ink: var(--w-black);
+    padding: 4px; background: var(--w-silver); border: 1px solid var(--w-black);
+    box-shadow: inset 0 0 0 1px var(--w-white), 6px 6px 0 oklch(0 0 0 / 0.35);
+  }
+  .wx > .win-bar {
+    display: flex; align-items: stretch; height: 24px; border: 1px solid var(--w-black);
+    background: var(--w-white); color: var(--w-black); font: 700 0.9375rem/22px var(--font-ui);
+  }
+  .wx.is-active > .win-bar { background: var(--w-navy); color: var(--w-white); }
+  .wx > .win-bar .win-title { flex: 1; text-align: center; padding: 0 6px; }
+  .wx > .win-bar .win-sys { display: block; width: 24px; flex: none; background: var(--w-silver); border-right: 1px solid var(--w-black); position: relative; }
+  .wx > .win-bar .win-sys::before { content: ''; position: absolute; left: 4px; right: 4px; top: 9px; height: 4px; background: var(--w-white); border: 1px solid var(--w-black); box-shadow: 1px 1px 0 var(--w-gray); }
+  .wx > .win-bar .win-ctl { display: flex; flex: none; }
+  .wx > .win-bar .win-ctl i { width: 22px; border-left: 1px solid var(--w-black); background: var(--w-silver); box-shadow: inset -2px -2px var(--w-gray), inset 1px 1px var(--w-white); position: relative; }
+  .wx > .win-bar .win-ctl i:first-child { display: none; }
+  .wx > .win-bar .win-ctl i::before { content: ''; position: absolute; left: 6px; top: 8px; border: 5px solid transparent; border-top-color: var(--w-black); }
+  .wx > .win-bar .win-ctl i:last-child::before { top: 3px; border-top-color: transparent; border-bottom-color: var(--w-black); }
+  .wx > .win-bar .win-num { display: none; }
+  .wx > .win-body { margin-top: 0; padding: 18px 18px 20px; background: var(--surface); border: 1px solid var(--w-black); border-top: 0; }
+  .wx > .win-status { margin-top: 3px; padding: 3px 8px; border: 1px solid var(--w-black); background: var(--w-white); font: 400 0.875rem/1.4 var(--font-ui); }
+  .wx.win--dialog { --surface: var(--w-silver); }
+  .wx.win--dialog > .win-bar .win-ctl { display: none; }
+  .wx.win--help { --accent: oklch(0.45 0.15 145); }
+  .wx.win--screen { --surface: var(--w-black); --ink: var(--w-silver); --ink-2: var(--w-silver); --accent: var(--vga-14); }
+}
+
+/* ---------- win9x: Windows 95 and NT 4, beveled silver, navy title on the left, three caption buttons ---------- */
+@scope ([data-era='win9x']) to ([data-era]) {
+  .wx {
+    --surface: var(--w-white); --surface-2: var(--w-silver); --ink: var(--w-black); --ink-2: oklch(0.35 0 0); --accent: var(--w-navy);
+    --accent-2: #005555; --rule: var(--w-gray); --focus: var(--w-black); --btn-bg: var(--w-silver); --btn-ink: var(--w-black); /* a deeper teal: 4.75:1 on silver too */
+    padding: 4px; background: var(--w-silver);
+    box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-silver), inset -2px -2px var(--w-gray), inset 2px 2px var(--w-white), 4px 4px 0 oklch(0 0 0 / 0.3);
+  }
+  .wx > .win-bar {
+    display: flex; align-items: center; gap: 4px; height: 24px; padding: 0 3px;
+    background: #6b6b6b; color: var(--w-white); font: 700 0.875rem/1 var(--font-ui); /* Windows 95's inactive gray, darkened to 5.4:1 */
+  }
+  .wx.is-active > .win-bar { background: var(--w-navy); color: var(--w-white); }
+  .wx > .win-bar .win-title { flex: 1; }
+  .wx > .win-bar .win-sys { display: block; width: 16px; height: 16px; flex: none; background: linear-gradient(var(--w-navy) 0 4px, var(--w-white) 4px); border: 1px solid var(--w-black); }
+  .wx > .win-bar .win-ctl { display: flex; gap: 0; }
+  .wx > .win-bar .win-ctl i { position: relative; width: 18px; height: 16px; background: var(--w-silver); box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray); }
+  .wx > .win-bar .win-ctl i:last-child { margin-left: 2px; }
+  .wx > .win-bar .win-ctl i::before { content: ''; position: absolute; left: 4px; right: 6px; bottom: 4px; height: 2px; background: var(--w-black); }
+  .wx > .win-bar .win-ctl i:nth-child(2)::before { top: 3px; bottom: 4px; height: auto; background: none; border: 1px solid var(--w-black); border-top-width: 2px; }
+  .wx > .win-bar .win-ctl i:last-child::before { content: '\00D7'; inset: 0; height: auto; background: none; font: 700 14px/15px var(--font-ui); color: var(--w-black); text-align: center; }
+  .wx > .win-bar .win-num { display: none; }
+  .wx > .win-body { margin-top: 3px; padding: 18px 18px 20px; background: var(--surface); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-black), inset -2px -2px var(--w-silver); }
+  .wx > .win-status { margin-top: 3px; padding: 3px 8px; font: 400 0.875rem/1.4 var(--font-ui); color: var(--w-black); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white); }
+  .wx.win--dialog { --surface: var(--w-silver); }
+  .wx.win--dialog > .win-body { box-shadow: none; }
+  .wx.win--dialog > .win-bar .win-ctl i:not(:last-child) { display: none; }
+  .wx.win--help { --surface: oklch(0.99 0.03 100); }
+  .wx.win--screen { --surface: var(--w-black); --ink: var(--w-silver); --ink-2: var(--w-silver); --accent: var(--vga-14); }
+}
+
+/* ---------- vs2005: Visual Studio 2005 on Windows XP. Editors are tabbed documents, panels are tool windows, dialogs are Luna ---------- */
+@scope ([data-era='vs2005']) to ([data-era]) {
+  .wx {
+    --surface: var(--w-white); --surface-2: var(--xp-beige); --ink: var(--w-black); --ink-2: oklch(0.4 0 0); --accent: var(--vs-key);
+    --accent-2: var(--vs-comment); --hot: var(--vs-string); --rule: var(--xp-line); --focus: var(--xp-sel); --btn-bg: var(--xp-beige); --btn-ink: var(--w-black);
+    background: var(--surface); border: 1px solid var(--xp-line); box-shadow: 0 2px 6px oklch(0.3 0.05 250 / 0.16);
+  }
+  .wx > .win-bar { display: flex; align-items: center; gap: 6px; min-height: 26px; padding: 0 4px 0 8px; font: 400 0.875rem/1 var(--font-ui); }
+  .wx > .win-bar .win-title { flex: 1; }
+  .wx > .win-bar .win-ctl { display: flex; gap: 2px; }
+  .wx > .win-bar .win-ctl i { width: 18px; height: 18px; position: relative; }
+  .wx > .win-bar .win-ctl i:not(:last-child) { display: none; }
+  .wx > .win-bar .win-ctl i:last-child::before { content: '\00D7'; position: absolute; inset: 0; font: 400 16px/18px var(--font-ui); text-align: center; color: currentColor; }
+  .wx > .win-bar .win-num { display: none; }
+  .wx > .win-body { padding: 16px 18px 18px; }
+  .wx > .win-status { padding: 4px 10px; border-top: 1px solid var(--xp-line); background: var(--xp-beige); font: 400 0.8125rem/1.4 var(--font-ui); color: var(--ink-2); }
+
+  /* editor: a document tab on the tab well */
+  .wx.win--editor > .win-bar, .wx.win--screen > .win-bar { padding: 4px 4px 0 6px; background: linear-gradient(var(--vs-well-1), var(--vs-well-2)); border-bottom: 1px solid var(--xp-line); align-items: end; }
+  .wx.win--editor > .win-bar .win-title { flex: none; max-width: calc(100% - 40px); padding: 5px 14px 6px; background: var(--w-white); border: 1px solid var(--xp-line); border-bottom: 0; margin-bottom: -1px; font-weight: 700; }
+  .wx.win--editor > .win-bar .win-ctl { margin-left: auto; align-self: center; }
+
+  /* panel and help: tool windows with a gradient caption, blue when active */
+  .wx.win--panel > .win-bar, .wx.win--help > .win-bar { background: linear-gradient(var(--vs-cap-1), var(--vs-cap-2)); color: var(--w-black); }
+  .wx.win--panel.is-active > .win-bar, .wx.win--help.is-active > .win-bar { background: linear-gradient(var(--vs-act-1), var(--vs-act-2)); color: var(--w-white); }
+  .wx.win--panel > .win-bar .win-ctl i:first-child { display: block; }
+  .wx.win--panel > .win-bar .win-ctl i:first-child::before { content: ''; position: absolute; left: 5px; top: 4px; width: 6px; height: 7px; border: 1px solid currentColor; border-bottom-width: 2px; }
+  .wx.win--panel > .win-body { padding: 10px 12px 12px; }
+  .wx.win--help { --surface: var(--xp-tip); }
+
+  /* dialog and screen: Luna title bar */
+  .wx.win--dialog, .wx.win--screen { border: 0; border-radius: 8px 8px 0 0; background: var(--xp-luna-3); padding: 0 3px 3px; overflow: hidden; }
+  .wx.win--dialog > .win-bar, .wx.win--screen > .win-bar {
+    min-height: 30px; margin: 0 -3px; padding: 0 5px 0 8px; align-items: center;
+    background: linear-gradient(var(--xp-luna-1), var(--xp-luna-2) 12%, var(--xp-luna-3) 90%, var(--xp-luna-4));
+    color: var(--w-white); font-weight: 700; text-shadow: 1px 1px oklch(0.25 0.12 260); border: 0;
+  }
+  .wx.win--dialog > .win-bar .win-ctl i:last-child, .wx.win--screen > .win-bar .win-ctl i:last-child { width: 22px; height: 22px; border: 1px solid var(--w-white); border-radius: 3px; background: linear-gradient(135deg, oklch(0.72 0.17 40), oklch(0.58 0.2 32)); color: var(--w-white); }
+  .wx.win--dialog > .win-bar .win-ctl i:last-child::before, .wx.win--screen > .win-bar .win-ctl i:last-child::before { font: 700 17px/20px var(--font-ui); }
+  .wx.win--dialog > .win-bar .win-title, .wx.win--screen > .win-bar .win-title { padding: 0; background: none; border: 0; margin: 0; flex: 1; }
+  .wx.win--dialog { --surface: var(--xp-beige); }
+  .wx.win--dialog > .win-body { background: var(--surface); }
+  .wx.win--screen { --surface: var(--w-black); --ink: var(--w-silver); --ink-2: var(--w-silver); --accent: var(--vga-14); }
+  .wx.win--screen > .win-body { background: var(--surface); }
+}
+
+/* ---------- device: a Pocket PC running Windows Mobile 5, the same in every era ---------- */
+.win--device {
+  --surface: var(--w-white); --surface-2: oklch(0.95 0.01 250); --ink: var(--w-black); --ink-2: oklch(0.4 0 0); --accent: oklch(0.45 0.16 258);
+  --accent-2: oklch(0.5 0.13 150); --rule: oklch(0.85 0.01 250); --focus: oklch(0.45 0.16 258); --btn-bg: oklch(0.93 0.01 250); --btn-ink: var(--w-black);
+  width: min(100%, 320px);
+  padding: 40px 16px 52px;
+  border-radius: 30px;
+  background: linear-gradient(160deg, oklch(0.42 0.012 260), oklch(0.22 0.01 260) 55%, oklch(0.3 0.01 260));
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.25), inset 0 -2px 6px oklch(0 0 0 / 0.5), 0 24px 48px oklch(0 0 0 / 0.35);
+}
+.win--device::after { content: ''; position: absolute; left: 50%; bottom: 14px; width: 54px; height: 24px; translate: -50% 0; border-radius: 12px; background: linear-gradient(oklch(0.32 0.01 260), oklch(0.18 0.01 260)); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.18); }
+.win--device > .win-bar {
+  display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px;
+  border-radius: 3px 3px 0 0; color: var(--w-white); font: 600 0.8125rem/1 var(--font-ui, sans-serif);
+  background: linear-gradient(oklch(0.48 0.15 258), oklch(0.32 0.14 262));
+}
+.win--device > .win-bar .win-sys { display: block; width: 14px; height: 14px; flex: none; background: conic-gradient(from 90deg, oklch(0.65 0.2 145) 25%, oklch(0.75 0.17 85) 0 50%, oklch(0.62 0.19 255) 0 75%, oklch(0.62 0.22 28) 0); border-radius: 2px; transform: skewY(-6deg); }
+.win--device > .win-bar .win-title { flex: 1; }
+.win--device > .win-bar .win-num { font-weight: 400; }
+.win--device > .win-body { aspect-ratio: 240 / 268; overflow: auto; padding: 10px 12px; background: var(--surface); font-size: 0.9375rem; }
+.win--device > .win-status {
+  display: flex; justify-content: space-between; align-items: center; height: 28px; padding: 0 12px;
+  border-radius: 0 0 3px 3px; color: var(--w-white); font: 600 0.8125rem/1 var(--font-ui, sans-serif);
+  background: linear-gradient(oklch(0.42 0.14 258), oklch(0.3 0.13 262));
+}
+.win--device:not(:has(> .win-status)) > .win-body { border-radius: 0 0 3px 3px; }

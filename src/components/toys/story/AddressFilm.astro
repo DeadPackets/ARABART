@@ -1,0 +1,85 @@
+---
+// The patents hero: one address becomes its bits, and the bits become one number. Without JS (and with reduced
+// motion) all three rows simply show. With motion the rows build in order when it scrolls in; Replay runs it again.
+import Window from '../../shell/Window.astro';
+import { FIELDS, pack } from '../key';
+
+const v = [5, 2, 3, 1, 17];
+const key = pack(v);
+---
+
+<div class="af" data-addrfilm data-num={key.toLocaleString('en-US')}>
+  <Window title="Where is port 17?" kind="dialog" active class="af-win">
+    <ol class="af-rows">
+      <li class="af-row">
+        <span class="af-lab">The address</span>
+        <div class="af-cells">{FIELDS.map(([f, w], i) => <span class="af-c af-c--path" style={`--w:${w}`} data-g={i}><small>{f}</small><b>{v[i]}</b></span>)}</div>
+      </li>
+      <li class="af-row" data-row="bits">
+        <span class="af-lab">The same, in bits</span>
+        <div class="af-cells af-cells--bits">{FIELDS.map(([, w], i) => <span class="af-c af-c--bits" style={`--w:${w}`} data-g={i}><b data-bits={v[i].toString(2).padStart(w, '0')}>{v[i].toString(2).padStart(w, '0')}</b><small>{w} bits</small></span>)}</div>
+      </li>
+      <li class="af-row" data-row="num">
+        <span class="af-lab">One number</span>
+        <b class="af-num" data-out>{key.toLocaleString('en-US')}</b>
+      </li>
+    </ol>
+    <p slot="status" class="af-status"><span>10 + 5 + 5 + 5 + 7 = 32 bits</span><button type="button" class="button k-btn af-replay" data-replay hidden>Replay</button></p>
+  </Window>
+</div>
+
+<style>
+  .af-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+  .af-row { display: grid; gap: 6px; }
+  .af-lab { font: 400 0.9375rem/1.2 var(--font-ui); color: var(--ink-2); }
+  .af-cells { container-type: inline-size; display: flex; gap: 8px; transition: gap 0.5s var(--expo); }
+  .af.is-joined .af-cells--bits { gap: 0; }
+  .af-c { flex: var(--w) 1 0; min-width: 0; display: grid; gap: 2px; }
+  .af-c b { display: block; padding: 6px 0 5px; text-align: center; color: var(--w-white); font: 700 clamp(15px, 4.6cqw, 26px)/1 var(--font-code); font-variant-numeric: tabular-nums; }
+  .af-c small { font: 500 clamp(9px, 2.6cqw, 11px)/1.3 var(--font-code); color: var(--ink-2); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .af-c--bits b { font-size: clamp(8px, calc((100cqw - 40px) / 23), 20px); padding-inline: 0; overflow: hidden; }
+  .af-c[data-g='0'] b { background: var(--w-navy); } .af-c[data-g='1'] b { background: var(--w-teal); } .af-c[data-g='2'] b { background: #800080; }
+  .af-c[data-g='3'] b { background: #808000; color: var(--w-black); } .af-c[data-g='4'] b { background: #800000; }
+  .af-num { font: 400 clamp(32px, 6vw, 48px)/1.1 var(--font-dos); color: var(--w-navy); font-variant-numeric: tabular-nums; }
+  .af-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .af-replay { min-height: 36px; }
+  @media (pointer: coarse) { .af-replay { min-height: 44px; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+
+  gsap.registerPlugin(ScrambleTextPlugin);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-addrfilm]').forEach(root => {
+    const bits = [...root.querySelectorAll<HTMLElement>('[data-bits]')];
+    const paths = [...root.querySelectorAll<HTMLElement>('.af-c--path')];
+    const out = root.querySelector<HTMLElement>('[data-out]')!;
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-row]')];
+    const replay = root.querySelector<HTMLButtonElement>('[data-replay]')!;
+    let tl: gsap.core.Timeline | null = null;
+
+    const run = () => {
+      tl?.kill();
+      root.classList.remove('is-joined');
+      tl = gsap.timeline()
+        .set(rows, { opacity: 0, y: 10 })
+        .call(() => { bits.forEach(b => (b.textContent = '')); out.textContent = ''; })
+        .from(paths, { opacity: 0, y: -12, stagger: 0.08, duration: 0.4, ease: 'expo.out' })
+        .to(rows[0], { opacity: 1, y: 0, duration: 0.3 })
+        .add(() => {}, '+=0.1');
+      bits.forEach((b, i) => tl!.to(b, { duration: 0.45, scrambleText: { text: b.dataset.bits!, chars: '01', speed: 0.6 } }, i ? '<0.12' : '>'));
+      tl.add(() => root.classList.add('is-joined'), '+=0.15')
+        .to(rows[1], { opacity: 1, y: 0, duration: 0.4 }, '+=0.35')
+        .to(out, { duration: 0.9, scrambleText: { text: root.dataset.num!, chars: '0123456789', speed: 0.5 } }, '<');
+    };
+
+    if (reduce()) return;
+    replay.hidden = false;
+    replay.addEventListener('click', run);
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { io.disconnect(); run(); } }, { threshold: 0.5 });
+    io.observe(root);
+  });
+</script>

@@ -1,0 +1,124 @@
+---
+// Rotate Screen (L), Rotate Screen (R) and Flip Screen all call one function: HandyMenu.exe 3.7 0x1293C.
+// Tap a button and step it: the lazy lookup of ChangeDisplaySettingsEx, the question, the toggle, the turn.
+import CodeStepper from '../CodeStepper.astro';
+import items32 from './items-32.png';
+import { rotateSteps } from './hm.ts';
+
+const steps = rotateSteps(1, 0, true);
+const ASM = [
+  { off: '12954', code: 'ldr  r4,=1CDD4', note: 'the saved library' },
+  { off: '1295C', code: 'ldr  r3,[r4] / cmp r3,#0', note: 'loaded before?' },
+  { off: '12964', code: 'bne  12988', note: 'yes: use the saved address' },
+  { off: '1296C', code: 'bl   LoadLibraryW', note: '"coredll.dll"' },
+  { off: '1297C', code: 'bl   GetProcAddressW', note: '"ChangeDisplaySettingsEx"' },
+  { off: '12980', code: 'str  r0,[r5]', note: 'keep it for next time' },
+  { off: '1298C', code: 'cmp  r0,#0', note: 'found?' },
+  { off: '129C4', code: 'bl   MessageBoxW', note: 'not found: his string 66' },
+  { off: '12A0C', code: 'strh r7,[sp,#72]', note: 'dmSize = 192' },
+  { off: '12A10', code: 'str  r8,[sp,#76]', note: 'dmFields = orientation' },
+  { off: '12A18', code: 'mov  r3,#2', note: 'CDS_TEST: only ask' },
+  { off: '12A2C', code: 'ldr  pc,[r5]', note: 'call it: the angle now?' },
+  { off: '12A30', code: 'ldr  r3,[sp,#192] / cmp r3,#0', note: 'already turned?' },
+  { off: '12A4C', code: 'movne r6,#0', note: 'yes: go back to 0' },
+  { off: '12A88', code: 'str  r6,[sp,#384]', note: 'the angle to set' },
+  { off: '12A98', code: 'mov  pc,r4', note: 'call it again: turn' },
+];
+const C = [
+  { code: 'static HMODULE lib; static CDSEX cds;' },
+  { code: 'if (!lib) {', note: 'first time only' },
+  { code: '  lib = LoadLibrary(L"coredll.dll");' },
+  { code: '  cds = GetProcAddress(lib,' },
+  { code: '          L"ChangeDisplaySettingsEx");' },
+  { code: '}' },
+  { code: 'if (!cds) { say(66); return; }', note: 'unsupported' },
+  { code: 'DEVMODE dm = { .dmSize = 192,' },
+  { code: '  .dmFields = DM_DISPLAYORIENTATION };' },
+  { code: 'cds(NULL, &dm, NULL, CDS_TEST, NULL);' },
+  { code: 'if (dm.dmDisplayOrientation)', note: 'turned?' },
+  { code: '  angle = 0;', note: 'go back' },
+  { code: 'dm.dmDisplayOrientation = angle;' },
+  { code: 'cds(NULL, &dm, NULL, 0, NULL);', note: 'turn' },
+];
+const BTN = [[21, 'Rotate Screen (L)', 4], [22, 'Rotate Screen (R)', 1], [23, 'Flip Screen', 2]] as const;
+---
+
+<div class="hm-rot" data-hm-rotate style={`--sprite:url(${items32.src})`}>
+  <div class="hm-rot-ctl" role="group" aria-label="Pick a menu item" hidden data-ctl>
+    {BTN.map(([id, t, v]) => <button type="button" class="button k-btn" data-want={v}><i class="hm-rot-ico" style={`--i:${id - 1}`} aria-hidden="true"></i>{t}</button>)}
+  </div>
+  <CodeStepper id="hm-rotate-code" title="HandyMenu.exe  turning the screen" asm={ASM} c={C} steps={steps} speed={0.6}>
+    <div slot="visual" class="hm-rot-vis">
+      <div class="hm-rot-dev" aria-hidden="true" data-dev style="transform: rotate(90deg) scale(0.82)">
+        <div class="hm-rot-frame">
+          <div class="hm-rot-c is-wide" data-content style="transform: rotate(-90deg)">
+            <p class="hm-rot-bar"><span>Start</span><span>9:41</span></p>
+            <p class="hm-rot-d">Thursday, October 22, 2026</p>
+            <p>No upcoming appointments</p>
+            <p>0 unread messages</p>
+            <p class="hm-rot-soft"><span>Calendar</span><span>Contacts</span></p>
+          </div>
+        </div>
+        <span class="hm-rot-btn"></span>
+      </div>
+      <p class="hm-rot-read" aria-live="polite" data-read>Rotate Screen (R), the first time: the screen goes to <b>90°</b>.</p>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hm-rot { display: grid; gap: 16px; margin-block: 32px; }
+  .hm-rot-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
+  .hm-rot-ico { display: inline-block; width: 24px; height: 24px; margin-right: 6px; vertical-align: -6px; background: var(--sprite) calc(var(--i) * -24px) 0 / 648px 24px no-repeat; }
+  .hm-rot-vis { display: grid; justify-items: center; gap: 14px; padding: 20px 16px; overflow: clip; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-rot-dev { position: relative; width: min(100%, 210px); padding: 20px 14px 42px; border-radius: 22px; background: linear-gradient(160deg, #5a5e66, #2a2c31); }
+  .hm-rot-btn { position: absolute; left: 50%; bottom: 12px; width: 44px; height: 18px; translate: -50% 0; border-radius: 9px; background: #1d1f23; }
+  .hm-rot-frame { position: relative; aspect-ratio: 240 / 320; overflow: hidden; background: #fff; container-type: size; }
+  .hm-rot-c { --p: calc(100cqw / 240); position: absolute; left: 50%; top: 50%; width: 100cqw; height: 100cqh; translate: -50% -50%; display: flex; flex-direction: column; background: linear-gradient(#fff, #e9f0fb); font: 11px/1.25 Tahoma, Verdana, sans-serif; }
+  .hm-rot-c.is-wide { width: 100cqh; height: 100cqw; }
+  .hm-rot-c p { margin: 0 !important; padding: 4px 8px; font-size: clamp(9px, 5cqmin, 12px) !important; line-height: 1.25 !important; color: #000 !important; max-width: none !important; }
+  .hm-rot-c .hm-rot-bar, .hm-rot-c .hm-rot-soft { display: flex; justify-content: space-between; color: #fff !important; font-weight: 700; background: linear-gradient(#3d6fd1, #16409a); }
+  .hm-rot-c .hm-rot-soft { margin-top: auto !important; }
+  .hm-rot-c .hm-rot-d { color: #00309c !important; font-weight: 700; border-bottom: 1px solid #a9b8d8; }
+  .hm-rot-read { margin: 0 !important; font-size: 1rem !important; line-height: 1.5 !important; color: var(--ink) !important; text-align: center; }
+  .hm-rot-read b { color: var(--accent); font-family: var(--font-code); }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { rotateSteps, DEG, reduce, type RotStep } from './hm.ts';
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-rotate]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: unknown[], at?: number): void } }>('[data-stepper]')!;
+    const content = root.querySelector<HTMLElement>('[data-content]')!, read = root.querySelector<HTMLElement>('[data-read]')!;
+    const dev = root.querySelector<HTMLElement>('[data-dev]')!;
+    let now = 1, first = false, shown = 0;
+    // You turn the device; once it lands, the system redraws the screen upright in its new shape
+    const turn = (v: number, how: string) => {
+      if (v === shown) return;
+      shown = v;
+      const wide = v === 1 || v === 4, deg = v === 4 ? -90 : DEG[v];
+      const land = () => { content.classList.toggle('is-wide', wide); gsap.set(content, { rotate: -deg }); };
+      gsap.killTweensOf([dev, content]);
+      if (how === 'jump' || reduce()) { gsap.set(dev, { rotate: deg, scale: wide ? 0.82 : 1 }); gsap.set(content, { opacity: 1 }); land(); return; }
+      gsap.timeline()
+        .to(dev, { rotate: deg, scale: wide ? 0.82 : 1, duration: 0.7, ease: 'power2.inOut' })
+        .to(content, { opacity: 0, duration: 0.12 })
+        .call(land)
+        .to(content, { opacity: 1, duration: 0.25 });
+    };
+    cs.addEventListener('stepper', e => { const d = (e as CustomEvent).detail; turn((d.step as RotStep).angle, d.how); });
+    root.querySelectorAll<HTMLButtonElement>('[data-want]').forEach(b => b.addEventListener('click', () => {
+      const want = +b.dataset.want!;
+      const st = rotateSteps(want, now, first);
+      first = false;
+      now = st[st.length - 1].angle;
+      read.innerHTML = `${b.textContent!.trim()}: the screen goes to <b>${DEG[now]}°</b>. Press Run or step to watch how.`;
+      cs.stepper?.load(st, 0);
+    }));
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+    turn(1, 'jump');
+  });
+</script>

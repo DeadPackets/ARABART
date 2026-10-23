@@ -1,0 +1,150 @@
+---
+// One of his pictures split into its four color layers (bit planes). Switch layers off and on; point at a pixel to read
+// its four bits. The pictures are decoded from NAMES.COM by his own format. Without JS: all four layers and the result.
+import BitField from '../../BitField.astro';
+import Window from '../../../shell/Window.astro';
+import { memSync, png } from '../ssr.ts';
+import { decodeNames, picPixels, NAMES_PICS, NAMES } from './rle.ts';
+import './rle.css';
+
+const PICK = ['c1', 'box', 'logo', 'title'] as const;
+const bin = memSync(NAMES);
+const m = NAMES_PICS.find(p => p.id === 'c1')!;
+const pic = decodeNames(bin, m.at, m.w);
+const px = picPixels(pic, m.rows, m.y0), W = pic.w * 8, H = m.rows;
+const LAYERS = [
+  { k: 3, name: 'bright', color: 0xffffff },
+  { k: 2, name: 'red', color: 0xaa0000 },
+  { k: 1, name: 'green', color: 0x00aa00 },
+  { k: 0, name: 'blue', color: 0x0000aa },
+];
+const plane = (k: number) => png(px.map(v => (v >> k) & 1), W, H, [0, LAYERS.find(l => l.k === k)!.color]);
+const full = png(px, W, H);
+---
+
+<div class="ky-pl" data-kyplanes>
+  <div class="g-chips g-js" role="group" aria-label="Picture">
+    {PICK.map(id => <button type="button" class="button k-btn" data-pic={id} aria-pressed={String(id === 'c1')}>{NAMES_PICS.find(p => p.id === id)!.name}</button>)}
+  </div>
+  <div class="ky-pl-main">
+    <Window title="4 layers in, 16 colors out" kind="screen" class="g-win ky-pl-win">
+      <div class="ky-pl-pic" style={`aspect-ratio: ${W} / ${H}`} data-box>
+        <img src={full} width={W} height={H} alt="The name card for Yasser Mohamed Ali: white letters on black, in a blue and cyan frame." />
+        <canvas width={W} height={H} hidden tabindex="0" aria-label="The picture. Use the arrow keys to move the pointer and read a pixel's bits."></canvas>
+        <span class="ky-pl-cur" hidden aria-hidden="true"></span>
+      </div>
+    </Window>
+    <div class="ky-pl-side">
+      <div class="ky-pl-layers" role="group" aria-label="Color layers">
+        {LAYERS.map(l => (
+          <button type="button" class="ky-pl-l" data-k={l.k} aria-pressed="true">
+            <img src={plane(l.k)} width={W} height={H} alt="" />
+            <span>Layer {l.k}: <b>{l.name}</b></span>
+          </button>
+        ))}
+      </div>
+      <div class="ky-pl-read">
+        <BitField label="The four bits of one pixel, one from each layer" bits={4} value={15} readonly size="lg" groups={[{ bits: 4, label: 'bright · red · green · blue' }]} />
+        <p class="g-note" data-px aria-live="polite">Point at the picture to read a pixel.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .ky-pl { display: grid; gap: 22px; }
+  .ky-pl-main { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .ky-pl-pic { position: relative; width: 100%; background: #000; }
+  .ky-pl-pic img, .ky-pl-pic canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  .ky-pl-pic canvas { cursor: crosshair; touch-action: none; }
+  .ky-pl-pic canvas:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .ky-pl-cur { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid var(--vga-14); box-shadow: 0 0 0 1px #000; pointer-events: none; }
+  .ky-pl-side { display: grid; gap: 18px; }
+  .ky-pl-layers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .ky-pl-l { display: grid; gap: 6px; padding: 8px; min-height: 44px; text-align: left; color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule), 4px 4px 0 var(--black); cursor: pointer; font: 500 0.8125rem/1.3 var(--font-code); transition: opacity 0.2s; }
+  .ky-pl-l img { width: 100%; height: auto; image-rendering: pixelated; background: #000; }
+  .ky-pl-l b { color: var(--accent); }
+  .ky-pl-l[aria-pressed='false'] { opacity: 0.4; }
+  .ky-pl-l[aria-pressed='false'] img { filter: grayscale(1) brightness(0.4); }
+  .ky-pl-l:hover { box-shadow: inset 0 0 0 2px var(--accent), 4px 4px 0 var(--black); }
+  .ky-pl-l:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .ky-pl-read { display: grid; gap: 8px; }
+  .ky-pl-read :global(.ky-pl-sw) { display: inline-block; width: 14px; height: 14px; margin-right: 8px; vertical-align: -2px; box-shadow: 0 0 0 1px var(--ink-2); }
+  @media (max-width: 860px) { .ky-pl-main { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 420px) { .ky-pl-layers { gap: 8px; } }
+  @media (prefers-reduced-motion: reduce) { .ky-pl-l { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { names, paint, reduce } from './view.ts';
+  import { picPixels, NAMES_PICS, type PicId } from './rle.ts';
+  import { EGA } from '../ega.ts';
+
+  const NAMES_OF = ['black', 'blue', 'green', 'cyan', 'red', 'magenta', 'brown', 'light gray', 'dark gray', 'light blue', 'light green', 'light cyan', 'light red', 'pink', 'yellow', 'white'];
+  const COLOR = [0x0000aa, 0x00aa00, 0xaa0000, 0xffffff];
+
+  document.querySelectorAll<HTMLElement>('[data-kyplanes]').forEach(async root => {
+    const k = await names();
+    const box = root.querySelector<HTMLElement>('[data-box]')!, cv = box.querySelector('canvas')!, img = box.querySelector('img')!;
+    const cur = box.querySelector<HTMLElement>('.ky-pl-cur')!, say = root.querySelector<HTMLElement>('[data-px]')!;
+    const bf = root.querySelector<HTMLElement & { bitfield: { set(v: number, q?: boolean): void } }>('[data-bitfield]')!;
+    const layers = [...root.querySelectorAll<HTMLButtonElement>('.ky-pl-l')];
+    let px = new Uint8Array(0), W = 0, H = 0, mask = 15, at: [number, number] | null = null;
+
+    const draw = () => paint(cv, px.map(v => v & mask), W, H);
+    const thumbs = () => layers.forEach(b => {
+      const kk = +b.dataset.k!, c = document.createElement('canvas');
+      paint(c, px.map(v => ((v >> kk) & 1) * 15), W, H);
+      // Recolor the layer: its bit in its own color
+      const ctx = c.getContext('2d')!, d = ctx.getImageData(0, 0, W, H), col = COLOR[kk];
+      for (let i = 0; i < d.data.length; i += 4) if (d.data[i]) { d.data[i] = col >> 16; d.data[i + 1] = (col >> 8) & 255; d.data[i + 2] = col & 255; }
+      ctx.putImageData(d, 0, 0);
+      b.querySelector('img')!.src = c.toDataURL();
+    });
+    const read = () => {
+      if (!at) return;
+      const [x, y] = at, v = px[y * W + x], shown = v & mask;
+      cur.hidden = false;
+      cur.style.left = `${((x + 0.5) / W) * 100}%`; cur.style.top = `${((y + 0.5) / H) * 100}%`;
+      bf.bitfield.set(shown, true);
+      say.innerHTML = `<i class="ky-pl-sw" style="background:#${EGA[shown].toString(16).padStart(6, '0')}"></i>Pixel ${x}, ${y}: bits <b>${shown.toString(2).padStart(4, '0')}</b> = color ${shown}, <b>${NAMES_OF[shown]}</b>` + (shown !== v ? ` (with every layer on: ${NAMES_OF[v]})` : '');
+    };
+    const load = (id: PicId) => {
+      const m = NAMES_PICS.find(p => p.id === id)!, pic = k.pics[id];
+      W = pic.w * 8; H = m.rows; px = picPixels(pic, m.rows, m.y0);
+      box.style.aspectRatio = `${W} / ${H}`;
+      draw(); thumbs();
+      at = [W >> 1, H >> 1]; read();
+      img.alt = '';
+    };
+    root.querySelectorAll<HTMLButtonElement>('[data-pic]').forEach((b, _, all) => b.addEventListener('click', () => {
+      all.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      load(b.dataset.pic as PicId);
+      if (!reduce()) gsap.fromTo(cv, { opacity: 0.3 }, { opacity: 1, duration: 0.35 });
+    }));
+    layers.forEach(b => b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      b.setAttribute('aria-pressed', String(on));
+      mask = on ? mask | (1 << +b.dataset.k!) : mask & ~(1 << +b.dataset.k!);
+      draw(); read();
+    }));
+    const pointAt = (e: PointerEvent) => {
+      const r = cv.getBoundingClientRect();
+      at = [Math.max(0, Math.min(W - 1, Math.floor(((e.clientX - r.left) / r.width) * W))), Math.max(0, Math.min(H - 1, Math.floor(((e.clientY - r.top) / r.height) * H)))];
+      read();
+    };
+    cv.addEventListener('pointermove', pointAt);
+    cv.addEventListener('pointerdown', pointAt);
+    cv.addEventListener('keydown', e => {
+      const d = ({ ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] } as Record<string, number[]>)[e.key];
+      if (!d || !at) return;
+      e.preventDefault();
+      const s = e.shiftKey ? 8 : 1;
+      at = [Math.max(0, Math.min(W - 1, at[0] + d[0] * s)), Math.max(0, Math.min(H - 1, at[1] + d[1] * s))];
+      read();
+    });
+    load('c1');
+    img.hidden = true; cv.hidden = false;
+  });
+</script>

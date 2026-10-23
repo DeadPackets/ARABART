@@ -1,0 +1,104 @@
+---
+// Three evenings in October 1993, from the time stamps in EDITOR.PRJ: every save the project recorded, the three source
+// files with their line counts, and the last build. Scrub through the days.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+
+interface Props { id?: string }
+const { id = 'edbuild' } = Astro.props;
+const EV = [
+  { d: 0, at: 'Thu 23:27:54', what: 'first file saved', say: 'Thursday night, half an hour before midnight: the first file of the project is saved.' },
+  { d: 0, at: 'Thu 23:44:40', what: 'a second file', say: 'Seventeen minutes later, a second one.' },
+  { d: 1, at: 'Fri 13:40:24', what: 'a file saved', say: 'Friday afternoon: another file of the project is saved.' },
+  { d: 1, at: 'Fri 18:02:06', what: 'WINGRAPH.CPP', f: 0, say: '<b>WINGRAPH.CPP</b>, 159 lines, is finished: the palette, the whole Windows 3 window and the File menu.' },
+  { d: 1, at: 'Fri 19:20:28', what: 'a file saved', say: 'Friday evening, more saves.' },
+  { d: 1, at: 'Fri 19:27:20', what: 'EDITOR.CPP', f: 1, say: '<b>EDITOR.CPP</b>, 119 lines, is finished: main and its switch of 22 keys.' },
+  { d: 2, at: 'Sat 20:47:24', what: 'a file saved', say: 'Saturday evening: one more file of the project is saved.' },
+  { d: 2, at: 'Sat 20:47:42', what: 'FUNCTION.CPP', f: 2, say: '<b>FUNCTION.CPP</b>, 560 lines, is saved for the last time: the line table, typing, the cursor, loading and saving.' },
+  { d: 2, at: 'Sat 20:47:48', what: 'EDITOR.EXE built', build: true, say: 'Six seconds later, the last build: <b>EDITOR.EXE</b>. 838 lines of C++ became 6,709 bytes of his code.' },
+];
+const FILES = [
+  { name: 'WINGRAPH.CPP', lines: 159, code: 1718, at: 'Fri 18:02' },
+  { name: 'EDITOR.CPP', lines: 119, code: 393, at: 'Fri 19:27' },
+  { name: 'FUNCTION.CPP', lines: 560, code: 4598, at: 'Sat 20:47' },
+];
+const DAYS = ['Thursday 7 October 1993', 'Friday 8 October', 'Saturday 9 October'];
+const last = EV.length - 1;
+const fmt = (n: number) => n.toLocaleString('en-US');
+---
+
+<div class="ed-bd" id={id} data-edbuild>
+  <ol class="ed-bd-days" aria-label="Every save EDITOR.PRJ recorded">
+    {DAYS.map((d, k) => (
+      <li><b>{d}</b><ol>
+        {EV.map((e, i) => e.d === k && <li data-i={i} class:list={{ file: e.f !== undefined, build: e.build, on: true, now: i === last }}><time>{e.at.slice(4)}</time><span>{e.what}</span></li>)}
+      </ol></li>
+    ))}
+  </ol>
+  <p class="ed-bd-at" data-when>{EV[last].at}</p>
+  <p class="ed-bd-say" aria-live="polite" data-say set:html={EV[last].say} />
+  <Scrubber n={EV.length} at={last} label="Scrub through the three evenings" />
+  <Window title={'D:\\EDITOR'} kind="panel" class="ed-bd-panel">
+    <table class="ed-bd-files">
+      <thead><tr><th scope="col">Name</th><th scope="col">Lines</th><th scope="col">Code</th><th scope="col">Last saved</th></tr></thead>
+      <tbody>
+        {FILES.map((f, i) => <tr data-f={i} class="done"><td>{f.name}</td><td>{f.lines}</td><td>{fmt(f.code)} B</td><td>{f.at}</td></tr>)}
+        <tr data-exe class="done exe"><td>EDITOR.EXE</td><td>838</td><td>6,709 B</td><td>Sat 20:47:48</td></tr>
+      </tbody>
+    </table>
+    <div class="ed-bd-bar" data-bar aria-hidden="true">
+      {FILES.map(f => <span style={`flex:${f.code}`}>{f.name.replace('.CPP', '')}</span>)}
+    </div>
+  </Window>
+  <script type="application/json" data-ev set:html={JSON.stringify(EV)} />
+</div>
+
+<style is:global>
+  .ed-bd { display: grid; gap: 14px; }
+  .ed-bd ol.ed-bd-days, .writeup .ed-bd ol.ed-bd-days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
+  .ed-bd-days > li { max-width: none !important; padding: 0 14px 0 0; border-top: 2px solid var(--rule); }
+  .ed-bd-days li::marker { content: none; }
+  .ed-bd-days > li > b { display: block; padding: 8px 0 10px; font: 600 0.875rem/1.3 var(--font-code); color: var(--accent-2); }
+  .ed-bd ol.ed-bd-days ol, .writeup .ed-bd ol.ed-bd-days ol { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .ed-bd-days ol li { display: grid; grid-template-columns: 8ch minmax(0, 1fr); gap: 1ch; align-items: baseline; padding: 4px 8px; max-width: none !important; font: 500 0.875rem/1.4 var(--font-code) !important; color: var(--ink-2); opacity: 0.35; transition: opacity 0.2s, background-color 0.2s; }
+  .ed-bd-days ol li.on { opacity: 1; }
+  .ed-bd-days ol li time { color: var(--accent-2); }
+  .ed-bd-days ol li.file span, .ed-bd-days ol li.build span { color: var(--accent); font-weight: 700; }
+  .ed-bd-days ol li.now { background: var(--accent); }
+  .ed-bd-days ol li.now :is(time, span) { color: var(--surface) !important; }
+  .ed-bd-at { margin: 0 !important; font: 700 1.25rem/1.2 var(--font-code) !important; color: var(--accent) !important; }
+  .ed-bd-say { margin: 0 !important; min-height: 3.2em; }
+  .ed-bd-say b { color: var(--accent); }
+  .ed-bd-files { width: 100%; border-collapse: collapse; font: 500 clamp(0.8125rem, 3.6vw, 0.9375rem)/1.4 var(--font-code); }
+  .ed-bd-files th { padding: 4px 10px 6px 0; text-align: left; font-weight: 600; color: var(--accent); border-bottom: 1px solid var(--rule); }
+  .ed-bd-files td { padding: 5px 10px 5px 0; color: var(--ink); transition: opacity 0.25s; }
+  .ed-bd-files tr:not(.done) td { opacity: 0.3; }
+  .ed-bd-files tr.exe td { color: var(--accent); font-weight: 700; }
+  .ed-bd-bar { display: flex; gap: 2px; margin-top: 14px; height: 28px; transition: opacity 0.3s; }
+  .ed-bd-bar span { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; text-align: center; font: 600 11px/28px var(--font-code); color: var(--black); background: var(--accent); white-space: nowrap; }
+  .ed-bd-bar.off { opacity: 0.15; }
+  @media (max-width: 760px) { .ed-bd ol.ed-bd-days, .writeup .ed-bd ol.ed-bd-days { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+  @media (max-width: 560px) { .ed-bd-files th:nth-child(3), .ed-bd-files td:nth-child(3), .ed-bd-bar span:nth-child(2) { font-size: 0; } .ed-bd-files th:nth-child(3), .ed-bd-files td:nth-child(3) { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .ed-bd-days ol li, .ed-bd-files td, .ed-bd-bar { transition: none; } }
+</style>
+
+<script>
+  import { scrubber } from '../scrubber';
+
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-edbuild]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const EV = JSON.parse(root.querySelector('[data-ev]')!.textContent!) as { at: string; say: string; f?: number; build?: boolean }[];
+    const dots = [...root.querySelectorAll<HTMLElement>('.ed-bd-days li[data-i]')];
+    const files = [...root.querySelectorAll<HTMLElement>('tr[data-f]')], exe = root.querySelector<HTMLElement>('tr[data-exe]')!;
+    const at = root.querySelector<HTMLElement>('[data-when]')!, say = root.querySelector<HTMLElement>('[data-say]')!, bar = root.querySelector<HTMLElement>('[data-bar]')!;
+    scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, i => {
+      dots.forEach(d => { const k = +d.dataset.i!; d.classList.toggle('on', k <= i); d.classList.toggle('now', k === i); });
+      files.forEach(f => f.classList.toggle('done', EV.slice(0, i + 1).some(e => e.f === +f.dataset.f!)));
+      exe.classList.toggle('done', !!EV[i].build);
+      bar.classList.toggle('off', !EV[i].build);
+      at.textContent = EV[i].at;
+      say.innerHTML = EV[i].say;
+    }, { speed: 1.4 });
+  });
+</script>

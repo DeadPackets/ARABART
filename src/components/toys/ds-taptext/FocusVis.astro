@@ -1,0 +1,65 @@
+---
+// The visual beside the focus-borrowing CodeStepper (0x1E250): TapText, the program in front, its window procedure
+// slot, and the box that has the cursor. Follows step.phase, 0 to 7. Without JS it shows the end state.
+---
+
+<div class="ttt-fv" data-fv data-phase="7">
+  <div class="ttt-fv-app ttt-fv-tt">
+    <b>TapText.exe</b>
+    <span class="ttt-fv-kept" data-kept>kept: Pocket Word’s procedure</span>
+    <span class="ttt-fv-got">types into: <i>the page</i></span>
+  </div>
+  <div class="ttt-fv-wire" aria-hidden="true">
+    <span class="ttt-fv-send">SpecialGetFocusMessage →</span>
+    <span class="ttt-fv-back">← the page</span>
+  </div>
+  <div class="ttt-fv-app ttt-fv-word">
+    <b>Pocket Word</b>
+    <span class="ttt-fv-proc">window procedure: <code data-proc>Pocket Word’s own</code></span>
+    <span class="ttt-fv-box ttt-fv-zoom">zoom list</span>
+    <span class="ttt-fv-box ttt-fv-page">the page<i aria-hidden="true">|</i></span>
+  </div>
+  <p class="ttt-fv-sr" aria-live="polite" data-sr>TapText found the page in Pocket Word and types into it.</p>
+</div>
+
+<style>
+  .ttt-fv { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.2fr); gap: 12px; align-items: stretch; padding: 16px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .ttt-fv-app { display: grid; gap: 8px; align-content: start; padding: 12px; border: 2px solid var(--rule); background: var(--surface-2, #fff); transition: border-color 0.2s, box-shadow 0.2s; }
+  .ttt-fv-app > b { font-size: 1rem; }
+  .ttt-fv-kept, .ttt-fv-got, .ttt-fv-proc { font-size: 0.875rem; line-height: 1.4; transition: opacity 0.2s; }
+  .ttt-fv-proc code { font: 700 0.875rem var(--font-code); }
+  .ttt-fv-box { display: block; padding: 6px 8px; border: 1px dashed var(--ink-2); font-size: 0.875rem; transition: background 0.2s, color 0.2s; }
+  .ttt-fv-page i { margin-left: 2px; font-style: normal; font-weight: 700; opacity: 0; }
+  .ttt-fv-wire { display: grid; align-content: center; gap: 18px; font: 600 0.75rem var(--font-code); color: var(--accent-2); }
+  .ttt-fv-send, .ttt-fv-back { opacity: 0; transition: opacity 0.2s; white-space: nowrap; }
+  .ttt-fv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+
+  .ttt-fv:not([data-phase='0']) .ttt-fv-word { border-color: var(--accent-2); }
+  .ttt-fv .ttt-fv-kept { opacity: 0; }
+  .ttt-fv:is([data-phase='2'], [data-phase='3'], [data-phase='4'], [data-phase='5']) .ttt-fv-kept { opacity: 1; }
+  .ttt-fv:is([data-phase='3'], [data-phase='4'], [data-phase='5']) .ttt-fv-proc { color: var(--accent); font-weight: 700; }
+  .ttt-fv:is([data-phase='4'], [data-phase='5']) .ttt-fv-send { opacity: 1; }
+  .ttt-fv:is([data-phase='5'], [data-phase='6'], [data-phase='7']) .ttt-fv-back { opacity: 1; }
+  .ttt-fv:is([data-phase='5'], [data-phase='6'], [data-phase='7']) .ttt-fv-page { background: var(--accent-2); color: var(--surface); border-style: solid; }
+  .ttt-fv:is([data-phase='5'], [data-phase='6'], [data-phase='7']) .ttt-fv-page i { opacity: 1; }
+  .ttt-fv .ttt-fv-got { opacity: 0; }
+  .ttt-fv[data-phase='7'] .ttt-fv-got { opacity: 1; }
+  .ttt-fv[data-phase='7'] .ttt-fv-tt { border-color: var(--accent); }
+  @media (max-width: 640px) { .ttt-fv { grid-template-columns: minmax(0, 1fr); } .ttt-fv-wire { grid-auto-flow: column; justify-content: space-between; } .ttt-fv-send, .ttt-fv-back { white-space: normal; } }
+  @media (prefers-reduced-motion: reduce) { .ttt-fv * { transition: none !important; } }
+</style>
+
+<script>
+  const PROC = ['Pocket Word’s own', 'Pocket Word’s own', 'Pocket Word’s own', 'TapText’s helper', 'TapText’s helper', 'TapText’s helper', 'Pocket Word’s own', 'Pocket Word’s own'];
+  const SR = [
+    'TapText has its own message number.', 'Pocket Word is in front.', 'TapText keeps Pocket Word’s window procedure.', 'TapText’s helper now receives Pocket Word’s messages.',
+    'TapText sends its message to Pocket Word.', 'Inside Pocket Word, the helper finds the page and answers.', 'Pocket Word’s own procedure is back.', 'TapText found the page in Pocket Word and types into it.',
+  ];
+  for (const root of document.querySelectorAll<HTMLElement>('[data-fv]')) {
+    const proc = root.querySelector('[data-proc]')!, sr = root.querySelector('[data-sr]')!;
+    root.closest('[data-stepper]')?.addEventListener('stepper', e => {
+      const p = ((e as CustomEvent).detail.step.phase ?? 7) as number;
+      root.dataset.phase = String(p); proc.textContent = PROC[p]; sr.textContent = SR[p];
+    });
+  }
+</script>

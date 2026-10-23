@@ -1,0 +1,252 @@
+---
+// The live demo: his own KVC.EXE against the harmless Koko double, in a PC that boots on a tap.
+// It drives js-dos's emulator engine directly (the page already loads js-dos for the player at the top), so it has
+// its own screen, keys and sound. Event 'kvc:ready' { ci, master } bubbles from the root once the PC runs.
+import Window from '../../shell/Window.astro';
+
+const base = import.meta.env.BASE_URL;
+// What the PC shows after the scan, row by row (read from the emulator's text screen), and right after it boots
+const DONE = [
+  '              *****    KEMYAM Virus Capture. (Ver 1.05)    *****', '', '', '',
+  '                   Found  --KoKo (1) virus--  active in  RAM',
+  '                           ##### Virus Freezed #####', '',
+  'Scanning >>  C:\\GREET.EXE',
+  'File is infected by  KoKo (1) virus   ********** >  Virus removed  < **********', '',
+  'Scanning >>  C:\\HELLO.COM',
+  'File is infected by  KoKo (1) virus   ********** >  Virus removed  < **********', '', '', '',
+  ' Total file(s) scanned  >>     4   File (s)',
+  ' Total virus(s) found   >>     2   Virus(s)',
+  ' Total virus(s) removed >>     2   virus(s)', '', '',
+  '                        <c>1993 KEMYAM Computer Group.', '',
+  '                 YASSER MOHAMED ALI.   -----   EBRAHIM EL-ETR', '', 'C:\\>',
+];
+const BOOT = [
+  "Koko double loaded. It only answers KVC's secret question.",
+  "HELLO.COM and GREET.EXE carry Koko's marks. Nothing here can spread.", '',
+  'Type SCAN and press Enter. SCAN runs KVC C: to check drive C.', 'C:\\>_',
+];
+---
+
+<div class="kxl" data-kvclive data-bundle={`${base}/bundles/kvc-live.jsdos`}>
+  <Window title="C:\  THE DEMO PC" kind="screen" active class="kxl-win">
+    <div class="kxl-screen" data-screen aria-label="The demo PC's screen" role="group">
+      <svg class="kxl-text kxl-done" viewBox="0 0 720 400" preserveAspectRatio="none" aria-hidden="true">{DONE.map((l, i) => l && <text x="0" y={i * 16 + 13} xml:space="preserve">{l}</text>)}</svg>
+      <svg class="kxl-text kxl-boot" viewBox="0 0 720 400" preserveAspectRatio="none" aria-hidden="true">{BOOT.map((l, i) => l && <text x="0" y={i * 16 + 13} xml:space="preserve">{l}</text>)}</svg>
+      <canvas width="640" height="400" data-canvas></canvas>
+      <div class="kxl-cover" data-cover hidden>
+        <button type="button" class="button button--primary kxl-boot-btn" data-boot>Start the demo PC</button>
+        <p class="kxl-cover-note" data-note>13 KB. It starts in a few seconds.</p>
+      </div>
+    </div>
+  </Window>
+  <div class="kxl-bar" data-bar hidden>
+    <div class="kxl-keys" role="group" aria-label="Type into the demo PC">
+      <button type="button" class="button button--primary k-btn kxl-scan" data-type="SCAN" disabled>Type <b>SCAN</b></button>
+      <button type="button" class="button k-btn" data-type="HELLO" disabled>Run HELLO</button>
+      <button type="button" class="button k-btn" data-type="GREET" disabled>Run GREET</button>
+      <button type="button" class="button k-btn" data-type="DIR" disabled>DIR</button>
+    </div>
+    <div class="kxl-keys">
+      <button type="button" class="button k-btn" data-sound aria-pressed="true" disabled>Sound</button>
+      <button type="button" class="button k-btn" data-full disabled hidden>Full screen</button>
+      <button type="button" class="button k-btn" data-restart disabled>Restart</button>
+    </div>
+  </div>
+  <p class="kxl-status" role="status" data-status>The screen shows what KVC prints when it is done: Koko found in memory and frozen, two files cleaned.</p>
+</div>
+
+<style>
+  .kxl { min-width: 0; }
+  .kxl-screen { position: relative; aspect-ratio: 640 / 400; overflow: hidden; background: var(--vga-0); outline: none; }
+  .kxl-screen:focus-visible { box-shadow: 0 0 0 3px var(--vga-14); }
+  .kxl-screen:fullscreen { aspect-ratio: auto; }
+  .kxl-screen:fullscreen canvas { object-fit: contain; }
+  .kxl-text { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .kxl-text text { font: 16px var(--font-dos); fill: var(--vga-7); }
+  .kxl-boot { display: none; }
+  .kxl.is-js .kxl-done { display: none; }
+  .kxl.is-js .kxl-boot { display: block; opacity: 0.35; }
+  .kxl canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; opacity: 0; transition: opacity 0.3s var(--expo); }
+  .kxl.is-on canvas { opacity: 1; }
+  .kxl.is-on .kxl-boot { display: none; }
+  .kxl-cover { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 16px; text-align: center; }
+  .kxl-cover[hidden] { display: none; }
+  .kxl-boot-btn { min-height: 56px; padding: 0 28px; font-size: 1.125rem; }
+  .kxl-cover-note { font: 400 16px/1.3 var(--font-dos); color: var(--vga-7); background: var(--vga-0); padding: 2px 8px; }
+  .kxl-bar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: 22px; }
+  .kxl-bar[hidden] { display: none; }
+  .kxl-keys { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kxl-scan b { font-family: var(--font-code); }
+  .kxl-status { margin-top: 14px; min-height: 1.6em; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  @media (max-width: 520px) {
+    .kxl-keys { width: 100%; }
+    .kxl-keys .k-btn { flex: 1 1 40%; }
+    .kxl-boot-btn { min-height: 48px; font-size: 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .kxl canvas { transition: none; } }
+</style>
+
+<script>
+  type CI = {
+    width(): number; height(): number; soundFrequency(): number;
+    events(): { onFrame(f: (rgb: Uint8Array | null, rgba: Uint8Array | null) => void): void; onSoundPush(f: (s: Float32Array) => void): void };
+    simulateKeyPress(...codes: number[]): void; sendKeyEvent(code: number, pressed: boolean): void;
+    pause(): void; resume(): void; mute?(): void; exit(): Promise<void>;
+  };
+  type W = { emulators?: { pathPrefix: string; dosboxWorker(b: Uint8Array): Promise<CI> } };
+
+  // js-dos key codes for the keys a visitor needs here
+  const KEYS: Record<string, number> = {
+    Enter: 257, NumpadEnter: 257, Backspace: 259, Space: 32, Escape: 256, Tab: 258, ShiftLeft: 340, ShiftRight: 344,
+    ControlLeft: 341, AltLeft: 342, Semicolon: 59, Period: 46, Slash: 47, Backslash: 92, Minus: 45, Equal: 61, Comma: 44, Quote: 39,
+    ArrowRight: 262, ArrowLeft: 263, ArrowDown: 264, ArrowUp: 265,
+  };
+  const codeOf = (c: string) => KEYS[c] ?? (/^Key[A-Z]$/.test(c) ? c.charCodeAt(3) : /^Digit\d$/.test(c) ? c.charCodeAt(5) : 0);
+  const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
+  let mainCi: CI | null = null;
+  document.addEventListener('dos:ready', e => { mainCi = (e as CustomEvent).detail.ci; });
+
+  document.querySelectorAll<HTMLElement>('[data-kvclive]').forEach(root => {
+    const screen = root.querySelector<HTMLElement>('[data-screen]')!;
+    const canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
+    const g = canvas.getContext('2d')!;
+    const cover = root.querySelector<HTMLElement>('[data-cover]')!, note = root.querySelector<HTMLElement>('[data-note]')!;
+    const bootBtn = root.querySelector<HTMLButtonElement>('[data-boot]')!;
+    const status = root.querySelector<HTMLElement>('[data-status]')!;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-bar] button')];
+    const soundBtn = root.querySelector<HTMLButtonElement>('[data-sound]')!;
+    let ci: CI | null = null, audio: AudioContext | null = null, master: GainNode | null = null, at = 0, busy = false, seen = true;
+
+    root.classList.add('is-js');
+    cover.hidden = false;
+    root.querySelector<HTMLElement>('[data-bar]')!.hidden = false;
+    status.textContent = 'This PC has the Koko double in memory and two files that wear its marks. Start it, then type SCAN.';
+
+    const say = (s: string) => (status.textContent = s);
+    const enable = (on: boolean) => btns.forEach(b => (b.disabled = !on));
+
+    function frame(rgb: Uint8Array | null, rgba: Uint8Array | null) {
+      const w = ci!.width(), h = ci!.height();
+      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+      const img = g.createImageData(w, h), d = img.data;
+      if (rgba) d.set(rgba.subarray(0, d.length));
+      else if (rgb) for (let i = 0, j = 0; j < d.length; i += 3, j += 4) { d[j] = rgb[i]; d[j + 1] = rgb[i + 1]; d[j + 2] = rgb[i + 2]; d[j + 3] = 255; }
+      g.putImageData(img, 0, 0);
+      if (!root.classList.contains('is-on')) {
+        // DOS draws a blank screen first; show the canvas once text is on it
+        let lit = 0;
+        for (let i = 0; i < d.length && lit < 40; i += 4 * 37) if (d[i] > 40) lit++;
+        if (lit >= 40) ready();
+      }
+    }
+
+    // The emulator hands over sound in small blocks; queue them back to back, a little ahead of the clock
+    function sound(s: Float32Array) {
+      if (!audio || !master || !ci) return;
+      const b = audio.createBuffer(1, s.length, ci.soundFrequency());
+      b.copyToChannel(s, 0);
+      const src = audio.createBufferSource();
+      src.buffer = b;
+      src.connect(master);
+      const now = audio.currentTime;
+      if (at < now + 0.01 || at > now + 0.3) at = now + 0.05;
+      src.start(at);
+      at += b.duration;
+    }
+
+    function ready() {
+      root.classList.add('is-on');
+      cover.hidden = true;
+      enable(true);
+      screen.tabIndex = 0;
+      screen.setAttribute('aria-label', "The demo PC's screen. Click it to type with your own keyboard.");
+      say('Running. Tap Type SCAN, or click the screen and type SCAN, then Enter.');
+      root.dispatchEvent(new CustomEvent('kvc:ready', { bubbles: true, detail: { ci, master } }));
+    }
+
+    async function boot() {
+      if (busy) return;
+      busy = true;
+      bootBtn.disabled = true;
+      note.textContent = 'Starting the demo PC';
+      say('Starting the demo PC.');
+      try {
+        audio ??= new AudioContext();
+        void audio.resume();
+        if (!master) {
+          master = audio.createGain();
+          (master as GainNode & { __kvcMaster?: boolean }).__kvcMaster = true;
+          master.gain.value = soundBtn.getAttribute('aria-pressed') === 'true' ? 0.7 : 0;
+          master.connect(audio.destination);
+        }
+        const w = window as unknown as W, prefix = document.querySelector<HTMLMetaElement>('meta[name="jsdos-path"]')!.content;
+        // On phones the player at the top has not loaded the emulator yet, so load it here
+        if (typeof w.emulators?.dosboxWorker !== 'function') {
+          await new Promise((ok, no) => document.head.append(Object.assign(document.createElement('script'), { src: prefix + 'emulators.js', onload: ok, onerror: no })));
+        }
+        if (!w.emulators!.pathPrefix) w.emulators!.pathPrefix = prefix;
+        // One PC at a time: the player at the top of the page waits while this one runs
+        mainCi?.pause();
+        const bundle = new Uint8Array(await (await fetch(root.dataset.bundle!)).arrayBuffer());
+        ci = await w.emulators!.dosboxWorker(bundle);
+        ci.events().onFrame(frame);
+        ci.events().onSoundPush(sound);
+        if (!seen) ci.pause();
+      } catch {
+        bootBtn.disabled = false;
+        bootBtn.textContent = 'Try again';
+        note.textContent = 'The demo PC did not start.';
+        say('The demo PC did not start. Check your connection and try again.');
+      }
+      busy = false;
+    }
+
+    async function type(word: string) {
+      if (!ci) return;
+      void audio?.resume();
+      for (const ch of word) { ci.simulateKeyPress(ch.charCodeAt(0)); await sleep(60); }
+      ci.simulateKeyPress(257);
+      if (word === 'SCAN') say('KVC is checking memory, then every file on drive C.');
+      else if (word === 'DIR') say('The files on drive C. After a scan, HELLO.COM is 61 bytes and GREET.EXE 96 again.');
+      else say(`${word} runs. Before a scan it says it wears Koko's marks. After a scan it only says hello.`);
+    }
+
+    bootBtn.addEventListener('click', boot);
+    root.querySelectorAll<HTMLButtonElement>('[data-type]').forEach(b => b.addEventListener('click', () => { type(b.dataset.type!); }));
+    soundBtn.addEventListener('click', () => {
+      const on = soundBtn.getAttribute('aria-pressed') !== 'true';
+      soundBtn.setAttribute('aria-pressed', String(on));
+      if (master && audio) master.gain.setTargetAtTime(on ? 0.7 : 0, audio.currentTime, 0.01);
+    });
+    const full = root.querySelector<HTMLButtonElement>('[data-full]')!;
+    full.hidden = !document.fullscreenEnabled;
+    full.addEventListener('click', () => { screen.requestFullscreen?.().then(() => screen.focus()).catch(() => {}); });
+    root.querySelector<HTMLButtonElement>('[data-restart]')!.addEventListener('click', async () => {
+      if (!ci || busy) return;
+      enable(false);
+      const old = ci;
+      ci = null;
+      root.classList.remove('is-on');
+      await old.exit().catch(() => {});
+      g.clearRect(0, 0, canvas.width, canvas.height);
+      await boot();
+    });
+
+    // Physical keys go to the PC while its screen has focus
+    for (const [ev, down] of [['keydown', true], ['keyup', false]] as const) {
+      screen.addEventListener(ev, e => {
+        const k = codeOf(e.code);
+        if (!ci || !k || e.metaKey) return;
+        e.preventDefault();
+        if (!(down && e.repeat)) ci.sendKeyEvent(k, down);
+      });
+    }
+    screen.addEventListener('pointerdown', () => { if (ci) { screen.focus(); void audio?.resume(); } });
+
+    // Off screen or in a hidden tab, the PC waits
+    const sync = () => { if (ci) (seen && !document.hidden ? ci.resume() : ci.pause()); };
+    new IntersectionObserver(([e]) => { seen = e.isIntersecting; sync(); }).observe(root);
+    document.addEventListener('visibilitychange', sync);
+  });
+</script>

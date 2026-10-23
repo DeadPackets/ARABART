@@ -1,0 +1,151 @@
+---
+// The problem as a picture: one node of a phone network, 4 shelves, 6 slots, one card in each slot, 4 ports on each card.
+// Cut the power to a shelf and every port inside it goes down; the tree on the right is what the network manager
+// must find at once. Server render: shelf 2 is already down, so the picture is complete without JS.
+import Window from '../../shell/Window.astro';
+
+const SH = 4, SL = 6, PT = 4, DOWN = 2;
+const shelfY = (i: number) => 14 + i * 98;
+const cardX = (j: number) => 16 + j * 50;
+---
+
+<div class="sd" data-shelfdown data-down={DOWN}>
+  <Window title="Node 5, front view" kind="panel" class="sd-rack">
+    <svg class="sd-svg" viewBox="0 0 320 406" aria-hidden="true">
+      <rect x="2" y="2" width="316" height="402" rx="4" class="sd-cab" />
+      {Array.from({ length: SH }, (_, i) => (
+        <g class="sd-shelf" data-sh={i + 1}>
+          <rect x="8" y={shelfY(i) - 6} width="304" height="92" class="sd-tray" />
+          <text x="14" y={shelfY(i) + 9} class="sd-t">Shelf {i + 1}</text>
+          {Array.from({ length: SL }, (_, j) => (
+            <g>
+              <rect x={cardX(j)} y={shelfY(i) + 16} width="42" height="62" rx="2" class="sd-card" />
+              {Array.from({ length: PT }, (_, k) => (
+                <circle cx={cardX(j) + 12 + (k % 2) * 18} cy={shelfY(i) + 32 + Math.floor(k / 2) * 26} r="6" class:list={['sd-led', { down: i + 1 === DOWN }]} />
+              ))}
+            </g>
+          ))}
+        </g>
+      ))}
+    </svg>
+    <div class="sd-ctl" role="group" aria-label="Cut the power to one shelf">
+      <span class="sd-ctl-l">Cut the power to</span>
+      {Array.from({ length: SH }, (_, i) => <button type="button" class="button k-btn" data-cut={i + 1} aria-pressed={String(i + 1 === DOWN)}>Shelf {i + 1}</button>)}
+      <button type="button" class="button k-btn" data-cut="0">Restore</button>
+    </div>
+  </Window>
+
+  <Window title="Exploring: Node 5" kind="panel" active class="sd-tree">
+    <ul class="tv" data-tree>
+      <li class="tv-root"><span class="tv-ic tv-ic--node" aria-hidden="true"></span>Node 5
+        <ul>
+          {Array.from({ length: SH }, (_, i) => (
+            <li data-tsh={i + 1} class:list={{ down: i + 1 === DOWN }}>
+              <span class="tv-ic tv-ic--shelf" aria-hidden="true"></span>Shelf {i + 1}
+              <ul hidden={i + 1 !== DOWN}>
+                {Array.from({ length: SL }, (_, j) => (
+                  <li><span class="tv-ic tv-ic--slot" aria-hidden="true"></span>Slot {j + 1} › Card 1 › <span class="tv-ports">{Array.from({ length: PT }, (_, k) => <i>port {k + 1}</i>)}</span></li>
+                ))}
+              </ul>
+            </li>
+          ))}
+        </ul>
+      </li>
+    </ul>
+    <p class="sd-say" aria-live="polite" data-say>Shelf {DOWN} lost power. <b>{SL * PT} ports</b> are down, and each one is an alarm. The network manager has to name every one of them, now.</p>
+  </Window>
+</div>
+
+<style>
+  .sd { display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 24px; align-items: start; }
+  .sd-svg { width: 100%; max-width: 420px; margin-inline: auto; height: auto; }
+  .sd-cab { fill: #2b2b2b; stroke: #000; stroke-width: 2; }
+  .sd-tray { fill: #4a4a4a; stroke: #6a6a6a; }
+  .sd-t { font: 600 11px var(--font-code); fill: #ddd; }
+  .sd-card { fill: #1b2a1b; stroke: #8a8a8a; }
+  .sd-led { fill: #22d44a; filter: drop-shadow(0 0 2px #22d44a); transition: fill 0.25s; }
+  .sd-led.down { fill: #ff3030; filter: drop-shadow(0 0 3px #ff3030); }
+  .sd-shelf { cursor: pointer; }
+  .sd-shelf:hover .sd-tray { fill: #5c5c5c; }
+  .sd-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+  .sd-ctl-l { width: 100%; font: 400 0.9375rem/1.3 var(--font-ui); color: var(--ink); }
+  .tv { list-style: none; margin: 0; padding: 0; font: 400 0.9375rem/1.9 var(--font-ui); color: var(--ink); }
+  .tv ul { list-style: none; margin: 0 0 0 9px; padding: 0 0 0 16px; border-left: 1px dotted var(--w-gray); }
+  .tv li { position: relative; }
+  .tv ul > li::before { content: ''; position: absolute; left: -16px; top: 0.95em; width: 12px; border-top: 1px dotted var(--w-gray); }
+  .tv-ic { display: inline-block; width: 16px; height: 13px; margin-right: 6px; vertical-align: -2px; border: 1px solid var(--w-black); }
+  .tv-ic--node { background: linear-gradient(var(--w-silver) 0 50%, var(--w-gray) 0); }
+  .tv-ic--shelf { background: #ffd966; border-radius: 0 3px 0 0; }
+  .tv-ic--slot { width: 10px; background: var(--w-white); }
+  .tv li.down > .tv-ic--shelf { background: #ff3030; }
+  .tv li.down { color: #b00000; font-weight: 700; }
+  .tv li.down li { font-weight: 400; }
+  .tv-ports { display: inline-flex; flex-wrap: wrap; gap: 0 8px; }
+  .tv-ports i { font-style: normal; white-space: nowrap; }
+  .tv-ports i::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 4px; border-radius: 50%; background: #ff3030; }
+  .sd-say { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); font: 500 1rem/1.5 var(--sans); color: var(--ink); min-height: 4.5em; }
+  .sd-say b { color: #b00000; }
+  @media (max-width: 900px) { .sd { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-shelfdown]').forEach(root => {
+    const shelves = [...root.querySelectorAll<SVGGElement>('.sd-shelf')];
+    const tree = [...root.querySelectorAll<HTMLElement>('[data-tsh]')];
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-cut]')];
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const per = shelves[0].querySelectorAll('.sd-led').length;
+    let tl: gsap.core.Timeline | null = null;
+
+    const set = (down: number, animate: boolean) => {
+      tl?.kill();
+      shelves.forEach((g, i) => {
+        const leds = [...g.querySelectorAll<SVGCircleElement>('.sd-led')];
+        const on = i + 1 === down;
+        if (on && animate && !reduce()) {
+          gsap.set(leds, { opacity: 1 });
+          leds.forEach(l => l.classList.remove('down'));
+          // The power drops slot by slot, then the dead ports blink
+          tl = gsap.timeline({ onComplete: () => { gsap.set(leds, { opacity: 1 }); } });
+          leds.forEach((l, k) => tl!.call(() => l.classList.add('down'), [], k * 0.035));
+          tl.to(leds, { opacity: 0.35, duration: 0.45, repeat: 7, yoyo: true, ease: 'steps(1)' });
+        } else {
+          gsap.set(leds, { opacity: 1 });
+          leds.forEach(l => l.classList.toggle('down', on));
+        }
+      });
+      tree.forEach((li, i) => {
+        const on = i + 1 === down;
+        li.classList.toggle('down', on);
+        li.querySelector('ul')!.hidden = !on;
+        if (on && animate && !reduce()) gsap.from(li.querySelectorAll('ul > li'), { opacity: 0, x: -10, stagger: 0.05, duration: 0.3 });
+      });
+      btns.forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.cut! === down && down > 0)));
+      say.innerHTML = down
+        ? `Shelf ${down} lost power. <b>${per} ports</b> are down, and each one is an alarm. The network manager has to name every one of them, now.`
+        : 'Every port is up. Cut the power to a shelf to see what the network manager must find.';
+    };
+
+    let touched = false;
+    const user = (n: number) => { touched = true; set(n, true); };
+    btns.forEach(b => b.addEventListener('click', () => user(+b.dataset.cut!)));
+    shelves.forEach((g, i) => g.addEventListener('click', () => user(i + 1)));
+    // First time it scrolls in: all green, then shelf 2 fails in front of you (unless the visitor got there first)
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (reduce() || touched) return;
+      set(0, false);
+      // the port list keeps its space while it is empty, so nothing below jumps while the visitor scrolls
+      const open = tree[+root.dataset.down! - 1].querySelector('ul')!;
+      open.hidden = false;
+      open.style.visibility = 'hidden';
+      gsap.delayedCall(0.7, () => { touched || set(+root.dataset.down!, true); open.style.visibility = ''; });
+    }, { threshold: 0.3 });
+    io.observe(root);
+  });
+</script>

@@ -1,0 +1,139 @@
+---
+// The keyboard is the alphabet: his 96-byte table (at 0682h) turns each key into one byte. Pick a key, then flip
+// the byte's bits: bits 7 and 6 are the letter's two hands, bits 5 to 0 say which letter. His engine draws the result.
+import Window from '../../shell/Window.astro';
+import BitField from '../BitField.astro';
+import Pix from './Pix.astro';
+import { draw, toUnicode, FORMS, hex } from './core.ts';
+import { ssrBin } from './ssr.ts';
+
+interface Props { id?: string; start?: string }
+const { id = 'letterbyte', start = 'f' } = Astro.props;
+const bin = ssrBin();
+const ROWS = ['`qwertyuiop[]', "asdfghjkl;'", 'zxcvbnm,./'];
+const code = (k: string) => bin[k.charCodeAt(0) - 0x20];
+const hands = (c: number) => (c >> 6 === 3 ? 'both' : c >> 6 === 1 ? 'right' : 'none');
+const c0 = code(start);
+const img = draw(bin, [c0], { font: 3, color: 14 });
+---
+
+<div class="lb" id={id} data-letterbyte data-start={start}>
+  <Window title="HIS KEY TABLE  one key, one byte" kind="panel" class="lb-kb-win">
+    <div class="lb-kb" role="group" aria-label="His keyboard table: pick a key">
+      {ROWS.map((row, r) => (
+        <div class="lb-row" style={`--r:${r}`}>
+          {[...row].map(k => (
+            <button type="button" class="lb-key" data-k={k} data-hands={hands(code(k))} aria-pressed={String(k === start)} aria-label={`Key ${k}: ${toUnicode(k)}, code ${hex(code(k))}h`}>
+              <span class="lb-us" aria-hidden="true">{k}</span>
+              <span class="lb-ar" lang="ar" aria-hidden="true">{toUnicode(k)}</span>
+              <span class="lb-hex" aria-hidden="true">{hex(code(k))}</span>
+            </button>
+          ))}
+        </div>
+      ))}
+    </div>
+    <p class="lb-legend" aria-hidden="true"><span data-hands="both">joins both sides</span><span data-hands="right">joins the letter before it only</span><span data-hands="none">never joins</span></p>
+  </Window>
+  <Window title="ONE BYTE" kind="editor" active class="lb-byte-win">
+    <div class="lb-byte">
+      <BitField label="The letter's byte" value={c0} groups={[{ bits: 2, label: 'join bits', tone: 'a' }, { bits: 6, label: 'which letter' }]} />
+      <div class="lb-out">
+        <div class="lb-glyph" data-glyph><Pix img={img} scale={4} /></div>
+        <p class="lb-form" aria-live="polite" data-form><b>{FORMS[c0 >> 6]}</b> {toUnicode(start)}, the shape used in the middle of a word</p>
+      </div>
+    </div>
+  </Window>
+</div>
+
+<style is:global>
+  .lb { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 22px 26px; align-items: start; }
+  .lb-kb { display: grid; gap: 6px; }
+  .lb-row { display: flex; gap: 5px; padding-left: calc(var(--r) * 22px); }
+  .lb-key {
+    flex: 1 1 0;
+    max-width: 52px;
+    min-width: 0;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    justify-items: center;
+    gap: 1px;
+    height: 70px;
+    padding: 4px 2px 3px;
+    color: var(--ink);
+    background: var(--surface-2);
+    border: 0;
+    box-shadow: inset 0 0 0 1px var(--accent-2);
+    cursor: pointer;
+    transition: background-color 0.15s var(--quart), translate 0.08s var(--quart);
+  }
+  .lb-key[data-hands='right'] { background: color-mix(in oklch, var(--ink) 18%, var(--surface-2)); }
+  .lb-key[data-hands='none'] { background: none; box-shadow: inset 0 0 0 1px var(--accent-2); outline: 1px dashed var(--accent-2); outline-offset: -5px; }
+  .lb-key:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+  .lb-key[aria-pressed='true'] { background: var(--accent); color: var(--surface); box-shadow: none; }
+  .lb-key:active { translate: 0 2px; }
+  .lb-key:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .lb-us { font: 600 11px/1 var(--font-code); color: var(--accent-2); }
+  .lb-key[aria-pressed='true'] .lb-us, .lb-key[aria-pressed='true'] .lb-hex { color: var(--surface); }
+  .lb-ar { font: 700 1.375rem/1.3 var(--font-ar); }
+  .lb-hex { font: 500 10px/1 var(--font-code); color: var(--ink); }
+  .lb-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .lb-legend span::before { content: ''; display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--accent-2); }
+  .lb-legend [data-hands='right']::before { background: color-mix(in oklch, var(--ink) 18%, var(--surface-2)); }
+  .lb-legend [data-hands='none']::before { background: none; outline: 1px dashed var(--accent-2); outline-offset: -4px; }
+  .lb-byte { display: grid; gap: 18px; }
+  .lb-out { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; }
+  .lb-glyph { position: relative; display: grid; place-items: center; width: 176px; height: 176px; background: var(--vga-0); }
+  .lb-glyph svg { max-width: 160px; height: auto; }
+  .lb-form { margin: 0; font-size: 1.0625rem; line-height: 1.5; color: var(--ink); }
+  .lb-form b { display: block; font: 800 1.75rem/1.1 var(--font-display); font-stretch: 85%; color: var(--accent); }
+  .lb-form [lang='ar'] { font-weight: 700; font-size: 1.25em; }
+  @media (max-width: 1023px) { .lb { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) {
+    .lb-row { flex-wrap: wrap; padding-left: 0; }
+    .lb-key { flex: 0 0 calc((100% - 6 * 5px) / 7); max-width: none; height: 64px; }
+    .lb-glyph { width: 128px; height: 128px; }
+    .lb-glyph svg { max-width: 112px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .lb-key { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, draw, toUnicode, svgMarkup, isStyle, FORMS, hex } from './core.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const WHERE = ['on its own', 'at the end of a word', 'at the start of a word', 'in the middle of a word'];
+
+  document.querySelectorAll<HTMLElement>('[data-letterbyte]').forEach(async root => {
+    const bin = await fonts();
+    const bf = root.querySelector<HTMLElement & { bitfield?: { value: number; set(v: number, q?: boolean): void } }>('[data-bitfield]')!;
+    const glyph = root.querySelector<HTMLElement>('[data-glyph]')!, form = root.querySelector<HTMLElement>('[data-form]')!;
+    const keys = [...root.querySelectorAll<HTMLButtonElement>('.lb-key')];
+    const code = (k: string) => bin[k.charCodeAt(0) - 0x20];
+
+    function show(c: number) {
+      // The key whose letter this is: same low 6 bits
+      const key = keys.find(b => (code(b.dataset.k!) & 0x3f) === (c & 0x3f));
+      keys.forEach(b => b.setAttribute('aria-pressed', String(b === key)));
+      const letter = key ? toUnicode(key.dataset.k!) : '';
+      const img = draw(bin, [c], { font: 3, color: 14 });
+      const old = glyph.firstElementChild;
+      glyph.insertAdjacentHTML('beforeend', svgMarkup(img, 4, ''));
+      const nu = glyph.lastElementChild!;
+      if (old) {
+        if (reduce()) old.remove();
+        else {
+          gsap.set(old, { position: 'absolute' });
+          gsap.to(old, { opacity: 0, scale: 0.9, duration: 0.3, onComplete: () => old.remove() });
+          gsap.fromTo(nu, { opacity: 0, scale: 1.15 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'expo.out' });
+        }
+      }
+      form.innerHTML = isStyle(c) ? `<b>a style key</b> ${hex(c)}h is not a letter: it switches bold, italic, underline or size. His joining loop steps over it.`
+        : !img.width ? `<b>no glyph</b> ${hex(c)}h draws nothing in this font.`
+        : `<b>${FORMS[c >> 6]}</b>${letter ? `<span lang="ar">${letter}</span>, ` : ''}the shape used ${WHERE[c >> 6]}.`;
+    }
+
+    bf.addEventListener('bitfield', e => show((e as CustomEvent).detail.value));
+    keys.forEach(b => b.addEventListener('click', () => bf.bitfield!.set(code(b.dataset.k!))));
+  });
+</script>

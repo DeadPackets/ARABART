@@ -1,0 +1,102 @@
+---
+// Reclaim RAM in the CodeStepper, with a linked view of the running programs: each one gets WM_HIBERNATE and lets go
+// of what it can rebuild later, and the free-RAM meter reads before and after. Programs and their memory are the ones
+// in DinarSoft's own MemMaid 2.0 screenshot; how much each lets go is a sample run.
+import Window from '../../shell/Window.astro';
+import CodeStepper from '../CodeStepper.astro';
+import { RECLAIM_ASM, RECLAIM_C, RECLAIM_STEPS, APPS } from './steps';
+
+const max = Math.max(...APPS.map(a => a.kb));
+const kb = (n: number) => `${n.toFixed(2)} KB`;
+---
+
+<CodeStepper id="mmcs-reclaim" title="MemMaid.exe  Reclaim RAM" asm={RECLAIM_ASM} c={RECLAIM_C} steps={RECLAIM_STEPS} speed={0.9}>
+  <div slot="visual" class="mrc" data-mm-reclaim>
+    <Window title="Running Programs  a sample run" kind="panel" active class="mrc-win">
+      <ol class="mrc-apps">
+        {APPS.map((a, i) => (
+          <li class="mrc-app is-hib" data-i={i} data-give={a.give}>
+            <span class="mrc-name">{a.name}</span>
+            <span class="mrc-mail" aria-hidden="true">3FFh</span>
+            <span class="mrc-bar" aria-hidden="true" style={`--w:${a.kb / max}`}>
+              <i class="mrc-keep" style={`--k:${1 - a.give}`}></i><i class="mrc-give" style={`--g:${a.give}`}></i>
+            </span>
+            <span class="mrc-kb" data-kb={a.kb}>{kb(a.kb * (1 - a.give))}</span>
+          </li>
+        ))}
+      </ol>
+      <p class="mrc-key"><i class="mrc-keep"></i> memory the program needs <i class="mrc-give"></i> what it can rebuild later</p>
+    </Window>
+    <Window title="Free RAM" kind="panel" class="mrc-meter">
+      <dl>
+        <div><dt>Before</dt><dd data-before>6.21 MB</dd></div>
+        <div><dt>After</dt><dd data-after>6.40 MB</dd></div>
+        <div class="mrc-got"><dt>Reclaimed</dt><dd data-got>0.19 MB</dd></div>
+      </dl>
+      <p class="mrc-wait" data-wait hidden>waiting 1,000 ms…</p>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .mrc { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .mrc-apps { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .mrc-app { display: grid; grid-template-columns: 9.5em auto minmax(0, 1fr) 7.5em; align-items: center; gap: 10px; min-height: 34px; padding: 4px 8px; border-radius: 3px; transition: background-color 0.25s; }
+  .mrc-app.is-on { background: color-mix(in oklch, var(--accent) 14%, transparent); }
+  .mrc-name { font-size: 0.9375rem; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .mrc-mail { font: 700 11px/1 var(--font-code); padding: 4px 5px; border-radius: 3px; color: var(--surface); background: var(--accent); opacity: 0; }
+  .mrc-app.is-mail .mrc-mail { opacity: 1; }
+  .mrc-bar { display: flex; height: 16px; width: calc(var(--w) * 100%); min-width: 6px; }
+  .mrc-bar i { display: block; height: 100%; }
+  .mrc-bar .mrc-keep { flex: var(--k) 0 0; }
+  .mrc-bar .mrc-give { flex: var(--g) 0 0; transform-origin: 0 50%; }
+  .mrc-app.is-hib .mrc-give { transform: scaleX(0); }
+  i.mrc-keep { background: var(--accent); }
+  i.mrc-give { background: repeating-linear-gradient(135deg, var(--accent-2) 0 4px, color-mix(in oklch, var(--accent-2) 35%, transparent) 4px 8px); }
+  .mrc-kb { font: 600 0.8125rem/1 var(--font-code); color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }
+  .mrc-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 14px !important; font-size: 0.875rem !important; color: var(--ink-2) !important; }
+  .mrc-key i { display: inline-block; width: 22px; height: 12px; }
+  .mrc-meter dl { display: grid; gap: 14px; margin: 0; }
+  .mrc-meter dt { font-size: 0.875rem; color: var(--ink-2); }
+  .mrc-meter dd { margin: 2px 0 0; font: 800 clamp(1.5rem, 1.2vw + 1rem, 2.25rem)/1 var(--font-display); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .mrc-got dd { color: var(--good); }
+  .mrc-wait { margin-top: 12px !important; font: 600 0.875rem/1 var(--font-code) !important; color: var(--accent) !important; }
+  @media (max-width: 1023px) { .mrc { grid-template-columns: minmax(0, 1fr); } .mrc-meter dl { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .mrc-app { grid-template-columns: 6.5em auto minmax(0, 1fr); } .mrc-kb { grid-column: 1 / -1; text-align: left; } .mrc-name { font-size: 0.875rem; } }
+  @media (prefers-reduced-motion: reduce) { .mrc-app { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-mm-reclaim]').forEach(root => {
+    const host = root.closest<HTMLElement>('[data-stepper]')!;
+    const apps = [...root.querySelectorAll<HTMLElement>('.mrc-app')];
+    const q = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const [before, after, got, wait] = ['[data-before]', '[data-after]', '[data-got]', '[data-wait]'].map(q);
+    const ORDER = ['measure', 'before', 'enum', 'hib', 'hibdone', 'wait', 'after', 'done'];
+    host.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail;
+      const ph = ORDER.indexOf(step.ph as string), app = (step.app as number) ?? -1;
+      const d = how === 'jump' || reduce() ? 0 : 0.6;
+      apps.forEach((li, i) => {
+        const hib = ph > 3 || (ph === 3 && (app === 5 ? true : i <= app && step.a !== 16));
+        li.classList.toggle('is-on', ph === 2 || (ph === 3 && (app === 5 || i === app)));
+        li.classList.toggle('is-mail', ph === 3 && (app === 5 || i === app));
+        const give = li.querySelector('.mrc-give')!, kbEl = li.querySelector<HTMLElement>('.mrc-kb')!;
+        const k = +kbEl.dataset.kb!, g = +li.dataset.give!;
+        if (li.classList.contains('is-hib') !== hib) {
+          li.classList.toggle('is-hib', hib);
+          gsap.fromTo(give, { scaleX: hib ? 1 : 0 }, { scaleX: hib ? 0 : 1, duration: d, ease: 'power2.inOut' });
+        }
+        kbEl.textContent = `${(k * (hib ? 1 - g : 1)).toFixed(2)} KB`;
+      });
+      before.textContent = ph >= 1 ? '6.21 MB' : '?';
+      after.textContent = ph >= 6 ? '6.40 MB' : '?';
+      got.textContent = ph >= 7 ? '0.19 MB' : '?';
+      wait.hidden = ph !== 5;
+      if (ph === 7 && d) gsap.fromTo(got, { scale: 1.25 }, { scale: 1, duration: 0.5, ease: 'back.out(3)' });
+    });
+  });
+</script>

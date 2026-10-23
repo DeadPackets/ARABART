@@ -1,0 +1,173 @@
+---
+// One line of his text as the keys he typed, right to left as ARABART reads them, above the line his engine draws
+// from them. Pick a key to see what it became; switch versions of the line and the keys that change flip.
+import Window from '../../shell/Window.astro';
+import { render, translate, shape, svgMarkup } from '../arabart/core.ts';
+import { ssrBin } from '../arabart/ssr.ts';
+import { explain, spans } from './keyline.ts';
+
+interface Line { label: string; keys: string; note?: string }
+interface Props { id: string; lines: Line[]; font?: number; fonts?: number[]; color?: number; title?: string; scale?: number }
+const { id, lines, font = 3, fonts: fontList = [], color = 14, title = 'THE STRING, one key per byte', scale = 3 } = Astro.props;
+const bin = ssrBin();
+const first = lines[0];
+const img = render(bin, first.keys, { font, color });
+const sp = spans(bin, first.keys, font);
+const show = (k: string) => (k === ' ' ? '·' : k);
+const isStyleKey = (k: string) => '@!#$*'.includes(k);
+const pick = Math.max(0, [...first.keys].findIndex(k => /[a-z~]/.test(k)));
+const json = JSON.stringify({ lines, font, color, scale }).replace(/</g, '\\u003c');
+---
+
+<div class="kl" id={id} data-keyline>
+  <script type="application/json" data-cfg set:html={json} />
+  {(lines.length > 1 || fontList.length > 0) && (
+    <div class="kl-bar">
+      {lines.length > 1 && (
+        <div class="kl-row" role="radiogroup" aria-label="Which string">
+          {lines.map((l, i) => <button type="button" role="radio" class="button k-btn" data-line={i} aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1}>{l.label}</button>)}
+        </div>
+      )}
+      {fontList.length > 0 && (
+        <div class="kl-row" role="radiogroup" aria-label="Font">
+          {fontList.map(n => <button type="button" role="radio" class="button k-btn" data-font={n} aria-checked={String(n === font)} tabindex={n === font ? 0 : -1}>Font {n}</button>)}
+        </div>
+      )}
+    </div>
+  )}
+  <Window title={title} kind="editor" class="kl-win">
+    <div class="kl-keys" dir="rtl" role="group" aria-label="Keys, in the order ARABART reads them: right to left" data-keys>
+      {[...first.keys].map((k, i) => (
+        <button type="button" class:list={['kl-k', { 'is-style': isStyleKey(k), 'is-space': k === ' ' }]} data-i={i} aria-pressed={String(i === pick)} tabindex={i === pick ? 0 : -1} aria-label={`Key ${i + 1}: ${k === ' ' ? 'space' : k}`}>
+          <span class="kl-c">{show(k)}</span><small>{i}</small>
+        </button>
+      ))}
+    </div>
+    <div class="kl-scr" data-scr>
+      <div class="kl-img" set:html={svgMarkup(img, scale, 'kl-svg')} data-img></div>
+      <span class="kl-mark" data-mark aria-hidden="true"></span>
+    </div>
+    <div class="kl-say" aria-live="polite" data-say set:html={explain(bin, first.keys, pick, shape(translate(bin, first.keys)))} />
+    {first.note && <div class="kl-note" data-note set:html={first.note} />}
+  </Window>
+</div>
+
+<style is:global>
+  .kl { display: grid; gap: 14px; min-width: 0; }
+  .kl-bar { display: flex; flex-wrap: wrap; gap: 10px 22px; }
+  .kl-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .kl:not(.is-live) .kl-bar { display: none; }
+  .kl-keys { display: flex; flex-wrap: wrap; gap: 4px; }
+  .kl-k { position: relative; display: grid; place-items: center; width: 40px; height: 48px; padding: 0 0 6px; font: 700 1.125rem/1 var(--font-code); color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; touch-action: manipulation; transform-style: preserve-3d; }
+  .kl-k small { position: absolute; bottom: 3px; right: 4px; font: 500 9px/1 var(--font-code); color: var(--ink-2); }
+  .kl-k.is-style { color: var(--surface); background: var(--accent-2); box-shadow: none; }
+  .kl-k.is-style small { color: var(--surface); }
+  .kl-k.is-space .kl-c { color: var(--ink-2); }
+  .kl-k[aria-pressed='true'] { outline: 3px solid var(--accent); outline-offset: -3px; }
+  .kl-k.was { background: var(--accent); color: var(--surface); }
+  .kl-k:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .kl-scr { position: relative; margin-top: 18px; padding: 18px 16px; background: var(--vga-0); overflow-x: auto; }
+  .kl-img { display: grid; justify-items: center; }
+  .kl-svg { display: block; max-width: 100%; height: auto; }
+  .kl-mark { position: absolute; top: 8px; bottom: 8px; left: 0; width: 0; border: 2px dashed var(--vga-11); pointer-events: none; opacity: 0; }
+  .kl.is-live .kl-mark { opacity: 1; }
+  .kl-say { margin-top: 14px; min-height: 3.2em; font: 400 1rem/1.55 var(--sans); color: var(--ink); }
+  .kl-say b { color: var(--accent); }
+  .kl-say [lang='ar'] { font: 700 1.2em/1 var(--font-ar); color: var(--accent); }
+  .kl-note { margin-top: 8px; font: 400 0.9375rem/1.55 var(--sans); color: var(--ink-2); }
+  .kl-note code { font: 500 0.9em var(--font-code); color: var(--accent); }
+  @media (max-width: 640px) { .kl-k { width: 36px; height: 44px; font-size: 1rem; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, render, translate, shape, svgMarkup } from '../arabart/core.ts';
+  import { explain, spans } from './keyline.ts';
+  import { reduce } from './vga.ts';
+
+  const esc = (t: string) => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  document.querySelectorAll<HTMLElement>('[data-keyline]').forEach(async root => {
+    const bin = await fonts();
+    const cfg = JSON.parse(root.querySelector('[data-cfg]')!.textContent!) as { lines: { label: string; keys: string; note?: string }[]; font: number; color: number; scale: number };
+    const list = root.querySelector<HTMLElement>('[data-keys]')!, imgBox = root.querySelector<HTMLElement>('[data-img]')!;
+    const mark = root.querySelector<HTMLElement>('[data-mark]')!, say = root.querySelector<HTMLElement>('[data-say]')!, note = root.querySelector<HTMLElement>('[data-note]');
+    const scr = root.querySelector<HTMLElement>('[data-scr]')!;
+    let line = 0, font = cfg.font, keys = cfg.lines[0].keys, sel = Math.max(0, [...keys].findIndex(k => /[a-z~]/.test(k)));
+    let sp: number[] = [], width = 1, penX = 0;
+
+    const cells = () => [...list.querySelectorAll<HTMLButtonElement>('.kl-k')];
+    const place = (how: string) => {
+      const svg = imgBox.firstElementChild as SVGSVGElement, box = svg.getBoundingClientRect(), k = box.width / width;
+      const s = scr.getBoundingClientRect();
+      const x = (penX - sp[sel + 1]) * k + (box.left - s.left) + scr.scrollLeft, w = Math.max(6, (sp[sel + 1] - sp[sel]) * k);
+      gsap.to(mark, { x, width: w, duration: how === 'jump' || reduce() ? 0 : 0.3, ease: 'power3.out', overwrite: true });
+      // Keep the picked letter in view when the line is wider than the window
+      const want = x + w / 2 - scr.clientWidth / 2;
+      if (scr.scrollWidth > scr.clientWidth + 2) scr.scrollTo({ left: want, behavior: how === 'jump' || reduce() ? 'auto' : 'smooth' });
+    };
+    const select = (i: number, how = 'step') => {
+      sel = i;
+      cells().forEach((c, j) => { c.setAttribute('aria-pressed', String(j === i)); c.tabIndex = j === i ? 0 : -1; });
+      say.innerHTML = explain(bin, keys, i, shape(translate(bin, keys)));
+      place(how);
+    };
+    const build = (next: string, how: string) => {
+      const old = keys;
+      keys = next;
+      if (cells().length !== keys.length) {
+        list.innerHTML = [...keys].map((k, i) => `<button type="button" class="kl-k${'@!#$*'.includes(k) ? ' is-style' : ''}${k === ' ' ? ' is-space' : ''}" data-i="${i}" aria-pressed="false" tabindex="-1" aria-label="Key ${i + 1}: ${k === ' ' ? 'space' : esc(k)}"><span class="kl-c">${k === ' ' ? '·' : esc(k)}</span><small>${i}</small></button>`).join('');
+      } else {
+        cells().forEach((c, i) => {
+          const k = keys[i];
+          if (k === old[i]) return;
+          c.className = `kl-k${'@!#$*'.includes(k) ? ' is-style' : ''}${k === ' ' ? ' is-space' : ''}`;
+          c.querySelector('.kl-c')!.textContent = k === ' ' ? '·' : k;
+          c.setAttribute('aria-label', `Key ${i + 1}: ${k === ' ' ? 'space' : k}`);
+          if (how !== 'jump' && !reduce()) {
+            c.classList.add('was');
+            gsap.fromTo(c, { rotationX: -180 }, { rotationX: 0, duration: 0.6, ease: 'expo.out', onComplete: () => c.classList.remove('was') });
+          }
+        });
+      }
+      const img = render(bin, keys, { font, color: cfg.color });
+      sp = spans(bin, keys, font); width = img.width; penX = img.x;
+      imgBox.innerHTML = svgMarkup(img, cfg.scale, 'kl-svg');
+      if (note) note.innerHTML = cfg.lines[line].note ?? '';
+      select(Math.min(sel, keys.length - 1), how);
+    };
+
+    list.addEventListener('click', e => {
+      const b = (e.target as Element).closest<HTMLButtonElement>('.kl-k');
+      if (b) select(+b.dataset.i!);
+    });
+    list.addEventListener('keydown', e => {
+      const b = (e.target as Element).closest<HTMLButtonElement>('.kl-k');
+      if (!b) return;
+      // The row runs right to left, like the text: ArrowLeft moves to the next key
+      const d = { ArrowLeft: 1, ArrowRight: -1, Home: -Infinity, End: Infinity }[e.key];
+      if (d === undefined) return;
+      e.preventDefault();
+      const i = Math.max(0, Math.min(keys.length - 1, Number.isFinite(d) ? +b.dataset.i! + d : d > 0 ? keys.length - 1 : 0));
+      select(i); cells()[i].focus();
+    });
+    const radios = (sel: string, on: (b: HTMLButtonElement) => void) => {
+      const bs = [...root.querySelectorAll<HTMLButtonElement>(sel)];
+      const pick = (b: HTMLButtonElement) => { bs.forEach(x => { x.setAttribute('aria-checked', String(x === b)); x.tabIndex = x === b ? 0 : -1; }); on(b); };
+      bs.forEach((b, i) => {
+        b.addEventListener('click', () => pick(b));
+        b.addEventListener('keydown', e => {
+          const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+          if (!d) return;
+          e.preventDefault();
+          const t = bs[(i + d + bs.length) % bs.length]; pick(t); t.focus();
+        });
+      });
+    };
+    radios('[data-line]', b => { line = +b.dataset.line!; build(cfg.lines[line].keys, 'step'); });
+    radios('[data-font]', b => { font = +b.dataset.font!; build(keys, 'jump'); });
+    new ResizeObserver(() => place('jump')).observe(scr);
+    root.classList.add('is-live');
+    build(keys, 'jump');
+  });
+</script>

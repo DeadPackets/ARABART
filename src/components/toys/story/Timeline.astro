@@ -1,0 +1,185 @@
+---
+// The career hero: drag through 1991 to 2009. The preview window redraws itself in the look of the year (DOS, then
+// Windows 3.1, Windows 95, then Visual Studio on Windows XP) and the screen gains colors as he moves on: 16, 256,
+// 65,536, then millions with smooth text. Lanes show where he was. Facts: research/career.md, research/programs.md.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+
+type Era = 'dos' | 'win31' | 'win9x' | 'vs2005';
+const Y0 = 1991, Y1 = 2009;
+const ERA = (y: number): Era => (y < 1993 ? 'dos' : y < 1996 ? 'win31' : y < 2002 ? 'win9x' : 'vs2005');
+const SCREEN: Record<Era, string> = { dos: '16 colors', win31: '256 colors', win9x: '65,536 colors', vs2005: 'Millions of colors, smooth text' };
+const LANES = [
+  { id: 'ps', name: 'Port Said', from: 1991, to: 1993.45, at: 1991 },
+  { id: 'sk', name: 'Sakhr, Cairo', from: 1993.45, to: 1996.75, at: 1993 },
+  { id: 'nb', name: 'Newbridge, then Alcatel, Kanata', from: 1996.78, to: 2006.9, at: 1996 },
+  { id: 'ds', name: 'DinarSoft, Kanata', from: 2002.85, to: 2008.6, at: 2002 },
+];
+const ROLE: Record<number, string> = {};
+for (let y = Y0; y <= Y1; y++) {
+  ROLE[y] = y < 1993 ? 'Writing his own programs in Port Said, Egypt'
+    : y < 1996 ? 'Project leader at Sakhr, the home of Arabic Windows'
+    : y < 2000 ? 'Senior designer at Newbridge Networks, Kanata, Canada'
+    : y < 2002 ? 'Alcatel, Kanata: architect of the 5620’s CORBA interface'
+    : y < 2007 ? 'Alcatel, and his own company, DinarSoft, beside it'
+    : 'DinarSoft, his own company';
+}
+const EVENTS: Record<number, string[]> = {
+  1991: ['ARABART, his Arabic engine, draws its first letters.', 'PESM draws the Basmallah sixteen times, with its own copy of the engine.', 'A screensaver for the Port Said Governorate, in 156 bytes of code.'],
+  1992: ['Formula Solver: exact 20-digit math in hand-written assembly, for a paid challenge.'],
+  1993: ['Digi-Test, the graduation project of his KEMYAM group, simulates real logic chips.', 'The Brave Sun takes 3rd place in the PC Middle East competition.', 'June: he joins Sakhr in Cairo as a project leader.'],
+  1994: ['At Sakhr he builds Arabic into Windows software: shared Arabic APIs, a bilingual text displayer, a printing core and an installer framework.'],
+  1995: ['At Sakhr he builds Arabic into Windows software: shared Arabic APIs, a bilingual text displayer, a printing core and an installer framework.'],
+  1996: ['October: he joins Newbridge Networks in Kanata, Canada, as a senior designer.'],
+  1997: ['May: JIDM publishes its rules for turning telecom models into CORBA, the standard his interface follows.'],
+  1998: ['Senior designer and team leader, building the software phone companies use to run their networks.'],
+  1999: ['Senior designer and team leader, building the software phone companies use to run their networks.'],
+  2000: ['Alcatel buys Newbridge Networks, and the 5620 Network Manager with it.'],
+  2001: ['Through these years he is the architect of the 5620’s CORBA interface: the door phone companies’ own systems use to drive the network.'],
+  2002: ['November: he founds DinarSoft, his own software company, in Kanata.'],
+  2003: ['MemMaid and HijriDate (June), HandyMenu (July), HandyLauncher (August), HandySwitcher (September).', 'The 5620 now manages up to 10,000 core and 500,000 edge nodes.'],
+  2004: ['Reviewers from the US to the UK, New Zealand and the UAE. eMobie calls MemMaid “the Swiss Army Knife of PPC utilities”.'],
+  2005: ['June: he files his patent for one number per network part.', 'December: a second filing. March: TapText 1.0.'],
+  2006: ['November: ten years at Newbridge and Alcatel come to a close.', 'DinarSoft gets its new red logo and a new website.'],
+  2007: ['Smartphone & Pocket PC names HandySwitcher Best Task Manager and TapText Best Misc. Utility.', 'MemMaid 2.0.'],
+  2008: ['HandySwitcher wins Best Task Manager again.', 'June: MemMaid 2.3.'],
+  2009: ['13 October: US patent 7,603,377 is granted, Yasser Awad first-named inventor.'],
+};
+const VGA = ['#000', '#0000aa', '#00aa00', '#00aaaa', '#aa0000', '#aa00aa', '#aa5500', '#aaaaaa', '#555', '#5555ff', '#55ff55', '#55ffff', '#ff5555', '#ff55ff', '#ffff55', '#fff'];
+const lv = [0, 51, 102, 153, 204, 255];
+const P256 = [...lv.flatMap(r => lv.flatMap(g => lv.map(b => `rgb(${r},${g},${b})`))), ...Array.from({ length: 40 }, (_, i) => `rgb(${i * 6 + 8},${i * 6 + 8},${i * 6 + 8})`)];
+const pct = (y: number) => ((y - Y0) / (Y1 + 1 - Y0)) * 100;
+const y = Y0;
+const data = JSON.stringify({ ROLE, EVENTS, SCREEN }).replace(/</g, '\\u003c');
+---
+
+<div class="tl" data-timeline data-y0={Y0}>
+  <script type="application/json" data-tl set:html={data} />
+  <div class="tl-lanes" aria-label="Where he worked, 1991 to 2009">
+    {LANES.map(l => (
+      <div class="tl-lane">
+        <button type="button" class="tl-bar" data-lane={l.id} data-at={l.at} style={`left:${pct(l.from)}%;width:${pct(l.to) - pct(l.from)}%`}><span>{l.name}</span></button>
+      </div>
+    ))}
+    <ol class="tl-ticks" aria-hidden="true">{[1991, 1993, 1996, 2000, 2002, 2005, 2009].map(t => <li style={`left:${pct(t + 0.5)}%`}>{t}</li>)}</ol>
+    <span class="tl-cur" style={`left:${pct(y + 0.5)}%`} aria-hidden="true"></span>
+  </div>
+
+  <div class="tl-prev" data-era={ERA(y)} data-prev>
+    <Window title={`${y}  ${ROLE[y]}`} kind="dialog" active class="tl-win">
+      <div class="tl-in">
+        <div class="tl-when">
+          <p class="tl-year" data-year>{y}</p>
+          <p class="tl-role" data-role>{ROLE[y]}</p>
+        </div>
+        <div class="tl-scr">
+          <div class="tl-pal" data-pal aria-hidden="true">
+            {VGA.map(c => <i style={`background:${c}`}></i>)}
+          </div>
+          <p class="tl-scr-l" data-scr>{SCREEN[ERA(y)]}</p>
+        </div>
+      </div>
+      <ul class="tl-ev" data-ev aria-live="polite">{EVENTS[y].map(e => <li>{e}</li>)}</ul>
+    </Window>
+  </div>
+  <template data-p256>{P256.map(c => <i style={`background:${c}`}></i>)}</template>
+  <template data-p16>{VGA.map(c => <i style={`background:${c}`}></i>)}</template>
+  <div class="tl-ctl"><Scrubber n={Y1 - Y0 + 1} at={0} label="Year, 1991 to 2009" /></div>
+</div>
+
+<style>
+  .tl { display: grid; gap: 18px; }
+  .tl-lanes { position: relative; display: grid; gap: 6px; padding-bottom: 26px; }
+  .tl-lane { position: relative; height: 44px; }
+  .tl-bar { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; min-width: 0; padding: 0 10px; border: 0; cursor: pointer; overflow: hidden; font: 400 16px/1 var(--font-dos); color: var(--vga-0); text-align: left; white-space: nowrap; }
+  .tl-bar span { overflow: hidden; text-overflow: ellipsis; }
+  .tl-bar[data-lane='ps'] { background: var(--vga-11); }
+  .tl-bar[data-lane='sk'] { background: var(--vga-7); }
+  .tl-bar[data-lane='nb'] { background: var(--w-teal); color: var(--vga-15); }
+  .tl-bar[data-lane='ds'] { background: linear-gradient(#fdfdfd, #d9d5c6); color: #003c74; }
+  .tl-bar:hover, .tl-bar:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 2px; }
+  .tl-ticks { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; margin: 0; padding: 0; list-style: none; }
+  .tl-ticks li { position: absolute; translate: -50% 0; font: 400 16px/22px var(--font-dos); color: var(--ink-2); }
+  .tl-cur { position: absolute; top: -6px; bottom: 22px; width: 3px; translate: -50% 0; background: var(--vga-14); box-shadow: 0 0 0 1px var(--vga-0); pointer-events: none; }
+  .tl-prev { background: transparent; min-width: 0; }
+  .tl-in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 28px; align-items: start; }
+  .tl-year { font: 400 48px/1 var(--font-dos); color: var(--accent); }
+  .tl-role { margin-top: 10px; font: 700 1.125rem/1.35 var(--sans); color: var(--ink); }
+  .tl-pal { display: grid; grid-template-columns: repeat(var(--cols, 16), 1fr); gap: 2px; min-height: 40px; align-content: start; }
+  .tl-pal i { display: block; aspect-ratio: 1; min-height: 6px; }
+  .tl-pal.is-grad { display: block; height: 64px; }
+  .tl-pal.is-grad i { display: none; }
+  .tl-prev[data-era='win9x'] .tl-pal.is-grad { background: linear-gradient(90deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
+  .tl-prev[data-era='vs2005'] .tl-pal.is-grad { background: linear-gradient(90deg, oklch(0.62 0.25 29), oklch(0.85 0.17 90), oklch(0.72 0.2 145), oklch(0.6 0.15 230), oklch(0.5 0.25 290)); border-radius: 6px; }
+  .tl-scr-l { margin-top: 8px; font: 400 0.9375rem/1.3 var(--font-ui); color: var(--ink-2); }
+  .tl-ev { margin: 18px 0 0; padding: 14px 0 0 1.2em; border-top: 1px solid var(--rule); display: grid; gap: 6px; min-height: 7.5em; }
+  .tl-ev li { font: 400 1rem/1.5 var(--sans); color: var(--ink); }
+  .tl-prev[data-era='dos'] .tl-ev li { font-family: var(--sans); }
+  /* Bars too short for their names: the name sits above the bar */
+  @media (max-width: 1000px) {
+    .tl-bar { top: 22px; padding: 0; overflow: visible; }
+    .tl-bar span { position: absolute; z-index: 1; left: 6px; bottom: 100%; padding-bottom: 4px; font: 600 13px/1 var(--sans); color: var(--ink); overflow: visible; }
+  }
+  @media (max-width: 760px) {
+    .tl-in { grid-template-columns: minmax(0, 1fr); }
+    .tl-ticks li:nth-child(even) { display: none; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ERA = (y: number) => (y < 1993 ? 'dos' : y < 1996 ? 'win31' : y < 2002 ? 'win9x' : 'vs2005');
+
+  document.querySelectorAll<HTMLElement>('[data-timeline]').forEach(root => {
+    const { ROLE, EVENTS, SCREEN } = JSON.parse(root.querySelector('[data-tl]')!.textContent!);
+    const y0 = +root.dataset.y0!;
+    const prev = root.querySelector<HTMLElement>('[data-prev]')!;
+    const pal = root.querySelector<HTMLElement>('[data-pal]')!;
+    const cur = root.querySelector<HTMLElement>('.tl-cur')!;
+    const title = prev.querySelector<HTMLElement>('.win-title')!;
+    const n = 2010 - y0;
+    let era = prev.dataset.era!;
+
+    const fill = (e: string) => {
+      pal.classList.toggle('is-grad', e === 'win9x' || e === 'vs2005');
+      const tpl = root.querySelector<HTMLTemplateElement>(e === 'win31' ? '[data-p256]' : '[data-p16]')!;
+      pal.innerHTML = tpl.innerHTML;
+      pal.style.setProperty('--cols', e === 'win31' ? '32' : '16');
+    };
+
+    const show = (i: number, how: How) => {
+      const y = y0 + i, e = ERA(y);
+      const moving = how !== 'jump' && !reduce();
+      root.querySelector('[data-year]')!.textContent = String(y);
+      root.querySelector('[data-role]')!.textContent = ROLE[y];
+      root.querySelector('[data-scr]')!.textContent = SCREEN[e];
+      title.textContent = `${y}  ${ROLE[y]}`;
+      const ev = root.querySelector<HTMLElement>('[data-ev]')!;
+      ev.innerHTML = EVENTS[y].map((t: string) => `<li>${t}</li>`).join('');
+      gsap.to(cur, { left: `${((y - y0 + 0.5) / n) * 100}%`, duration: moving ? 0.35 : 0, ease: 'power2.out' });
+      if (e !== era) {
+        era = e;
+        prev.dataset.era = e;
+        fill(e);
+        // The screen redraws in the new era: a quick wipe, then the new colors arrive
+        if (moving) {
+          gsap.fromTo(prev, { clipPath: 'inset(0 0 100% 0)' }, { clipPath: 'inset(0 0 0% 0)', duration: 0.45, ease: 'steps(8)' });
+          gsap.from(pal.children, { scale: 0, duration: 0.3, stagger: { each: e === 'win31' ? 0.002 : 0.02, from: 'random' }, ease: 'back.out(2)' });
+        }
+      }
+      if (moving) gsap.from(ev.children, { opacity: 0, x: -8, stagger: 0.06, duration: 0.25 });
+    };
+
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 0.9 });
+    root.querySelectorAll<HTMLButtonElement>('[data-lane]').forEach(b => b.addEventListener('click', () => { s.pause(); s.go(+b.dataset.at! - y0, 'step'); }));
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (!reduce()) gsap.delayedCall(0.8, () => s.i === 0 && !s.playing && s.play());
+    }, { threshold: 0.6 });
+    io.observe(root);
+  });
+</script>

@@ -1,0 +1,101 @@
+---
+// TAHER.COM's first 19 bytes of code unfold his signature: 65 stored bytes, each minus a key that starts at 4 and
+// grows by 1. The CodeStepper walks the loop; the linked strip shows each byte turn into a letter.
+import Window from '../../../shell/Window.astro';
+import CodeStepper from '../../CodeStepper.astro';
+import { memSync } from '../ssr.ts';
+import { hx } from './screen.ts';
+import './player.css';
+
+const t = memSync('TAHER_TAHER.COM');
+const stored = [...t.slice(0xab, 0xab + 65)];
+const plain = stored.map((v, i) => (v - 4 - i) & 255);
+const show = (c: number) => (c === 13 ? 'CR' : c === 10 ? 'LF' : c === 32 ? '·' : String.fromCharCode(c));
+const what = (c: number) => (c === 13 ? 'a carriage return' : c === 10 ? 'a new line' : c === 32 ? 'a space' : c === 0x24 ? '$, where DOS stops printing' : `<b>${String.fromCharCode(c).replace('<', '&lt;').replace('>', '&gt;')}</b>`);
+
+const ASM = [
+  { off: '0100', code: 'mov  si,01ABh', note: 'the folded name' },
+  { off: '0103', code: 'mov  al,4', note: 'the first key' },
+  { off: '0105', code: 'mov  cx,41h', note: '65 bytes' },
+  { off: '0108', label: 'next', code: 'mov  ah,[si]', note: 'a stored byte' },
+  { off: '010A', code: 'sub  ah,al', note: 'minus the key' },
+  { off: '010C', code: 'mov  [si],ah', note: 'the letter, in place' },
+  { off: '010E', code: 'inc  si', note: 'next byte' },
+  { off: '010F', code: 'inc  al', note: 'next key' },
+  { off: '0111', code: 'loop next', note: '65 times' },
+  { off: '0113', code: 'mov  si,01ECh', note: 'then the script' },
+];
+const C = [
+  { code: 'char *s = name;', note: 'folded' },
+  { code: 'char key = 4;' },
+  { code: 'for (int n = 65; n; n--) {' },
+  { code: '  *s -= key;', note: 'minus key' },
+  { code: '  s++;' },
+  { code: '  key++;' },
+  { code: '}' },
+];
+type Reg = { name: string; value: string; means: string; changed?: boolean };
+const steps: { a: number; c: number; say: string; regs: Reg[]; k: number; cur: number }[] = [];
+const regs = (i: number, ah: number, after: boolean): Reg[] => [
+  { name: 'SI', value: `${hx(1 + ((0xab + i) >> 8))}${hx((0xab + i) & 255)}h`, means: `byte ${i + 1} of 65` },
+  { name: 'AL', value: `${4 + i}`, means: 'the key' },
+  { name: 'AH', value: `${hx(ah)}h`, means: after ? 'now a letter' : 'the stored byte' },
+  { name: 'CX', value: `${65 - i}`, means: 'bytes left' },
+];
+steps.push({ a: 0, c: 0, say: `SI points at <b>01ABh</b>: 65 bytes that read as nonsense, <b>${stored.slice(0, 4).map(hx).join(' ')}</b>…`, regs: regs(0, 0, false), k: 0, cur: 0 });
+steps.push({ a: 1, c: 1, say: 'The key starts at <b>4</b>.', regs: regs(0, 0, false), k: 0, cur: 0 });
+steps.push({ a: 2, c: 2, say: 'CX = <b>65</b>: the loop runs once for every byte.', regs: regs(0, 0, false), k: 0, cur: 0 });
+steps.push({ a: 3, c: 3, say: `AH = <b>${hx(stored[0])}h</b>, the first stored byte.`, regs: regs(0, stored[0], false), k: 0, cur: 0 });
+steps.push({ a: 4, c: 3, say: `${hx(stored[0])}h − 4 = <b>${hx(plain[0])}h</b>: the letter ${what(plain[0])}.`, regs: regs(0, plain[0], true), k: 1, cur: 0 });
+steps.push({ a: 5, c: 3, say: 'Written back over the stored byte. The file on disk keeps the folded bytes; only memory holds the name.', regs: regs(0, plain[0], true), k: 1, cur: 0 });
+steps.push({ a: 7, c: 5, say: 'Next byte, and the key grows to <b>5</b>.', regs: regs(1, plain[0], true), k: 1, cur: 1 });
+for (let i = 1; i < 65; i++) {
+  steps.push({ a: 4, c: 3, say: `${hx(stored[i])}h − ${4 + i} = <b>${hx(plain[i])}h</b>: ${what(plain[i])}.`, regs: regs(i, plain[i], true), k: i + 1, cur: i });
+}
+steps.push({ a: 9, c: 6, say: 'Done: 65 bytes, one signature. It waits in memory until the show ends, then DOS prints it.', regs: regs(64, plain[64], true), k: 65, cur: -1 });
+---
+
+<div class="gp gpcr">
+  <CodeStepper id="th-credit" title="TAHER.COM  the first 19 bytes" asm={ASM} c={C} steps={steps} speed={0.12}>
+    <div slot="visual" class="gpcr-vis" data-gp-credit data-for="th-credit">
+      <Window title="MEMORY  65 bytes" kind="panel" num="4">
+        <ol class="gpcr-cells" aria-label="The 65 stored bytes and the letters they become">
+          {stored.map((v, i) => <li class="is-done"><span class="s">{hx(v)}</span><span class="k">−{4 + i}</span><span class="d">{show(plain[i])}</span></li>)}
+        </ol>
+      </Window>
+      <Window title="AT THE END  what DOS prints" kind="screen">
+        <pre class="gpcr-out" data-out>{String.fromCharCode(...plain.slice(0, 64)).replace(/\r/g, '')}</pre>
+      </Window>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .gpcr-vis { display: grid; gap: 22px; }
+  .gpcr-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 3px; }
+  .gpcr-cells > li { display: grid; justify-items: center; gap: 2px; padding: 5px 2px 4px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 0.2s; }
+  .gpcr-cells .s { font: 600 12px/1 var(--font-code); color: var(--ink-2); }
+  .gpcr-cells .k { font: 500 10px/1 var(--font-code); color: var(--accent-2); opacity: 0.8; }
+  .gpcr-cells .d { min-height: 16px; font: 400 16px/1 var(--font-dos); color: var(--accent); visibility: hidden; }
+  .gpcr-cells .is-done .d { visibility: visible; }
+  .gpcr-cells .is-cur { background: var(--accent-2); box-shadow: none; }
+  .gpcr-cells .is-cur :is(.s, .k, .d) { color: var(--surface); }
+  .gpcr-out { margin: 0; min-height: 4.5em; font: 400 16px/1.3 var(--font-dos); color: var(--vga-7); white-space: pre-wrap; overflow-wrap: anywhere; }
+  @media (prefers-reduced-motion: reduce) { .gpcr-cells > li { transition: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gp-credit]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!)!;
+    const cells = [...vis.querySelectorAll<HTMLElement>('.gpcr-cells > li')], out = vis.querySelector<HTMLElement>('[data-out]')!;
+    const plain = cells.map(c => c.querySelector('.d')!.textContent!);
+    const full = out.textContent!;
+    // Characters of the printed text that each byte adds (CR adds nothing on screen)
+    const upto = (k: number) => { let n = 0; for (let i = 0; i < k; i++) if (plain[i] !== 'CR' && i < 64) n++; return full.slice(0, n); };
+    root.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { k: number; cur: number };
+      cells.forEach((c, i) => { c.classList.toggle('is-done', i < s.k); c.classList.toggle('is-cur', i === s.cur); });
+      out.textContent = upto(s.k) + (s.k < 65 ? '_' : '');
+    });
+  });
+</script>

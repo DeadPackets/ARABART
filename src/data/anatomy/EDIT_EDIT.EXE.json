@@ -1,0 +1,284 @@
+{
+ "file": "EDIT/EDIT.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header: 1,322 relocations, initial stack at 1201:0080. Rebuilt by the museum unpacker after removing DIET.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 5320,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "1,322 far addresses that DOS adjusts for the load segment, 4 bytes each.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 5320,
+   "end": 5328,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Zero bytes that round the header up to 333 paragraphs.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 5328,
+   "end": 5863,
+   "kind": "startup",
+   "label": "Borland C++ start-up (c0)",
+   "note": "Sets up segments and the stack, clears the zero-filled data, calls main.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 5863,
+   "end": 16864,
+   "kind": "library",
+   "label": "Borland C++ runtime library",
+   "note": "C and C++ library code: operator new and delete, file I/O, memset, movmem and more.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "#eg-reuse"
+  },
+  {
+   "start": 16864,
+   "end": 23552,
+   "kind": "code",
+   "label": "TextEditor class (segment 02D1)",
+   "note": "The only new segment: 22 functions, 6,688 bytes, none of them in Digi-Test. Lines, typing, cursor moves, load and save.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-class"
+  },
+  {
+   "start": 23552,
+   "end": 24704,
+   "kind": "code",
+   "label": "Key loop and window helpers (0473)",
+   "note": "The key loop at 0473:01A9 is new; 3 of the 5 compared functions match Digi-Test.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-virtual"
+  },
+  {
+   "start": 24704,
+   "end": 26848,
+   "kind": "code",
+   "label": "Digi-Test code (04BB)",
+   "note": "7 of 8 compared functions match Digi-Test instruction for instruction.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-reuse"
+  },
+  {
+   "start": 26848,
+   "end": 42560,
+   "kind": "code",
+   "label": "main, menus and dialogs (0541)",
+   "note": "main at 0541:0003 is new; 40 of the other 42 compared functions match Digi-Test (14,384 of 15,709 bytes).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-reuse"
+  },
+  {
+   "start": 42560,
+   "end": 42864,
+   "kind": "code",
+   "label": "New helper (0917)",
+   "note": "One function, 303 bytes, not in Digi-Test.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 42864,
+   "end": 50944,
+   "kind": "code",
+   "label": "Digi-Test code (092A)",
+   "note": "9 of 10 compared functions match Digi-Test, including one of 2,138 instructions.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-reuse"
+  },
+  {
+   "start": 50944,
+   "end": 51104,
+   "kind": "code",
+   "label": "Keyboard helpers (0B23)",
+   "note": "3 small functions, all from Digi-Test; 0B23:000C reads a key.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-virtual"
+  },
+  {
+   "start": 51104,
+   "end": 59264,
+   "kind": "code",
+   "label": "Window classes (0B2D)",
+   "note": "The Digi-Test window base class and drawing helpers: 27 of 32 compared functions match.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#eg-class"
+  },
+  {
+   "start": 59264,
+   "end": 74736,
+   "kind": "library",
+   "label": "BGI graphics library",
+   "note": "Borland Graphics Interface, byte for byte the same as in EDITOR.EXE apart from one data segment value (15,472 bytes).",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 74736,
+   "end": 74826,
+   "kind": "data",
+   "label": "Runtime data",
+   "note": "Borland copyright string and runtime error messages.",
+   "by": "borland",
+   "evidence": "measured"
+  },
+  {
+   "start": 74826,
+   "end": 77029,
+   "kind": "text",
+   "label": "His strings and method tables",
+   "note": "NONAME.TXT, the TextEditor method table at 00ADh, menus and help lines, many shared with Digi-Test.",
+   "by": "yasser",
+   "evidence": "inferred",
+   "link": "#eg-reuse"
+  },
+  {
+   "start": 77029,
+   "end": 78898,
+   "kind": "data",
+   "label": "Runtime and BGI data",
+   "note": "Graphics card names, BGI error messages and runtime tables.",
+   "by": "borland",
+   "evidence": "inferred"
+  },
+  {
+   "start": 78898,
+   "end": 79072,
+   "kind": "data",
+   "label": "Zero-filled data",
+   "note": "Cleared at start-up (1042h to 10E6h). 1042h holds the application object that main runs.",
+   "by": "unknown",
+   "evidence": "inferred",
+   "link": "#eg-virtual"
+  },
+  {
+   "start": 79072,
+   "end": 79200,
+   "kind": "stack",
+   "label": "Initial stack",
+   "note": "128 bytes at 1201:0080, from the header.",
+   "by": "borland",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 16867,
+   "end": 17351,
+   "name": "TextEditor::TextEditor",
+   "note": "Constructor: allocates the 80-byte object if needed, calls the Digi-Test window constructor, sets the method table, makes the 500-slot line table and line 0.",
+   "link": "#eg-class",
+   "lines": [
+    {
+     "off": 16892,
+     "note": "operator new(50h) when this is null"
+    },
+    {
+     "off": 16947,
+     "note": "Base class constructor 0B2D:0004 (Digi-Test)"
+    },
+    {
+     "off": 16964,
+     "note": "Method table pointer = 00ADh"
+    },
+    {
+     "off": 17054,
+     "note": "Capacity = 500 lines"
+    }
+   ]
+  },
+  {
+   "start": 17901,
+   "end": 18258,
+   "name": "TextEditor::handle_key",
+   "note": "Method table slot 2: F10 opens the menu, other keys go to about a dozen editing methods.",
+   "link": "#eg-virtual",
+   "lines": []
+  },
+  {
+   "start": 20014,
+   "end": 20683,
+   "name": "TextEditor::insert",
+   "note": "Tab becomes 8 spaces; pads past the end of the text; movmem opens a gap of 255 - column bytes.",
+   "link": "#eg-insert",
+   "lines": [
+    {
+     "off": 20214,
+     "note": "Is the key a Tab?"
+    },
+    {
+     "off": 20246,
+     "note": "Refuse at column 255"
+    },
+    {
+     "off": 20387,
+     "note": "movmem(line+col, line+col+n, 255-col)"
+    },
+    {
+     "off": 20416,
+     "note": "memset writes the character"
+    }
+   ]
+  },
+  {
+   "start": 23977,
+   "end": 24616,
+   "name": "key_loop",
+   "note": "Starts as if F10 was pressed, reads keys, ends on Alt-X, and calls method slot 2 of the active window.",
+   "link": "#eg-virtual",
+   "lines": [
+    {
+     "off": 24014,
+     "note": "Pretend F10: the FILE menu opens at start"
+    },
+    {
+     "off": 24151,
+     "note": "Read a key"
+    },
+    {
+     "off": 24223,
+     "note": "call far [bx+8]: virtual call"
+    }
+   ]
+  },
+  {
+   "start": 26851,
+   "end": 27096,
+   "name": "main",
+   "note": "Creates the application object, runs the key loop, destroys it with flag 3, closes graphics.",
+   "link": "#eg-virtual",
+   "lines": [
+    {
+     "off": 27056,
+     "note": "Run the key loop"
+    },
+    {
+     "off": 27064,
+     "note": "Destructor flag 3: destroy and free"
+    }
+   ]
+  }
+ ]
+}

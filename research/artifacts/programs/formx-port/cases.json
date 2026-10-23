@@ -1,0 +1,2431 @@
+[
+ {
+  "id": "hand-1",
+  "group": "hand-picked formulas",
+  "keys": "(x-3)*(x+2)/7\r-1.5\r3\r",
+  "formula": "(x-3)*(x+2)/7",
+  "x0": "-1.5",
+  "x1": "3"
+ },
+ {
+  "id": "hand-2",
+  "group": "hand-picked formulas",
+  "keys": "1/6\r",
+  "formula": "1/6"
+ },
+ {
+  "id": "hand-3",
+  "group": "hand-picked formulas",
+  "keys": "x/0\r1\r10\r",
+  "formula": "x/0",
+  "x0": "1",
+  "x1": "10"
+ },
+ {
+  "id": "hand-4",
+  "group": "hand-picked formulas",
+  "keys": "x*x+1\r1\r10\r",
+  "formula": "x*x+1",
+  "x0": "1",
+  "x1": "10"
+ },
+ {
+  "id": "hand-5",
+  "group": "hand-picked formulas",
+  "keys": "x*x*x-2*x+1\r-5\r5\r",
+  "formula": "x*x*x-2*x+1",
+  "x0": "-5",
+  "x1": "5"
+ },
+ {
+  "id": "hand-6",
+  "group": "hand-picked formulas",
+  "keys": "-(1/3)\r",
+  "formula": "-(1/3)"
+ },
+ {
+  "id": "hand-7",
+  "group": "hand-picked formulas",
+  "keys": "-(x/3)\r0\r9\r",
+  "formula": "-(x/3)",
+  "x0": "0",
+  "x1": "9"
+ },
+ {
+  "id": "hand-8",
+  "group": "hand-picked formulas",
+  "keys": "-x\r-3\r3\r",
+  "formula": "-x",
+  "x0": "-3",
+  "x1": "3"
+ },
+ {
+  "id": "hand-9",
+  "group": "hand-picked formulas",
+  "keys": "-x*2\r-3\r3\r",
+  "formula": "-x*2",
+  "x0": "-3",
+  "x1": "3"
+ },
+ {
+  "id": "hand-10",
+  "group": "hand-picked formulas",
+  "keys": "(-x)*(-x)\r-4\r5\r",
+  "formula": "(-x)*(-x)",
+  "x0": "-4",
+  "x1": "5"
+ },
+ {
+  "id": "hand-11",
+  "group": "hand-picked formulas",
+  "keys": "-(-x)\r-2\r7\r",
+  "formula": "-(-x)",
+  "x0": "-2",
+  "x1": "7"
+ },
+ {
+  "id": "hand-12",
+  "group": "hand-picked formulas",
+  "keys": "-(-(-(x)))\r1\r2\r",
+  "formula": "-(-(-(x)))",
+  "x0": "1",
+  "x1": "2"
+ },
+ {
+  "id": "hand-13",
+  "group": "hand-picked formulas",
+  "keys": "((((x))))\r-7\r2\r",
+  "formula": "((((x))))",
+  "x0": "-7",
+  "x1": "2"
+ },
+ {
+  "id": "hand-14",
+  "group": "hand-picked formulas",
+  "keys": "((((((((((1/0))))))))))\r",
+  "formula": "((((((((((1/0))))))))))"
+ },
+ {
+  "id": "hand-15",
+  "group": "hand-picked formulas",
+  "keys": "((((((((((((((((((((1/0))))))))))))))))))))\r",
+  "formula": "((((((((((((((((((((1/0))))))))))))))))))))"
+ },
+ {
+  "id": "hand-16",
+  "group": "hand-picked formulas",
+  "keys": "((((((((x+1)*2)-3)/4)+5)*6)-7)/8)\r-100\r100\r",
+  "formula": "((((((((x+1)*2)-3)/4)+5)*6)-7)/8)",
+  "x0": "-100",
+  "x1": "100"
+ },
+ {
+  "id": "hand-17",
+  "group": "hand-picked formulas",
+  "keys": "1234567*x\r1000000\r9999999\r",
+  "formula": "1234567*x",
+  "x0": "1000000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-18",
+  "group": "hand-picked formulas",
+  "keys": "9999999*9999999\r",
+  "formula": "9999999*9999999"
+ },
+ {
+  "id": "hand-19",
+  "group": "hand-picked formulas",
+  "keys": "9999999*999999\r",
+  "formula": "9999999*999999"
+ },
+ {
+  "id": "hand-20",
+  "group": "hand-picked formulas",
+  "keys": "1.123456789+x\r0\r1\r",
+  "formula": "1.123456789+x",
+  "x0": "0",
+  "x1": "1"
+ },
+ {
+  "id": "hand-21",
+  "group": "hand-picked formulas",
+  "keys": "0.000001*x\r-9999999\r9999999\r",
+  "formula": "0.000001*x",
+  "x0": "-9999999",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-22",
+  "group": "hand-picked formulas",
+  "keys": "x/0.000001\r-9\r9\r",
+  "formula": "x/0.000001",
+  "x0": "-9",
+  "x1": "9"
+ },
+ {
+  "id": "hand-23",
+  "group": "hand-picked formulas",
+  "keys": "1/0.000007\r",
+  "formula": "1/0.000007"
+ },
+ {
+  "id": "hand-24",
+  "group": "hand-picked formulas",
+  "keys": "x/7\r-9999999\r9999999\r",
+  "formula": "x/7",
+  "x0": "-9999999",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-25",
+  "group": "hand-picked formulas",
+  "keys": "x-x\r-5\r5\r",
+  "formula": "x-x",
+  "x0": "-5",
+  "x1": "5"
+ },
+ {
+  "id": "hand-26",
+  "group": "hand-picked formulas",
+  "keys": "x+x+x+x\r-2.5\r2.5\r",
+  "formula": "x+x+x+x",
+  "x0": "-2.5",
+  "x1": "2.5"
+ },
+ {
+  "id": "hand-27",
+  "group": "hand-picked formulas",
+  "keys": "2*3+4*5-6/7\r",
+  "formula": "2*3+4*5-6/7"
+ },
+ {
+  "id": "hand-28",
+  "group": "hand-picked formulas",
+  "keys": "10-2-3\r",
+  "formula": "10-2-3"
+ },
+ {
+  "id": "hand-29",
+  "group": "hand-picked formulas",
+  "keys": "100/10/2\r",
+  "formula": "100/10/2"
+ },
+ {
+  "id": "hand-30",
+  "group": "hand-picked formulas",
+  "keys": "2-3*4+5\r",
+  "formula": "2-3*4+5"
+ },
+ {
+  "id": "hand-31",
+  "group": "hand-picked formulas",
+  "keys": "x*x-x*x\r-3\r3\r",
+  "formula": "x*x-x*x",
+  "x0": "-3",
+  "x1": "3"
+ },
+ {
+  "id": "hand-32",
+  "group": "hand-picked formulas",
+  "keys": "(x+1)/(x-1)\r0\r2\r",
+  "formula": "(x+1)/(x-1)",
+  "x0": "0",
+  "x1": "2"
+ },
+ {
+  "id": "hand-33",
+  "group": "hand-picked formulas",
+  "keys": "1/x\r-9\r9\r",
+  "formula": "1/x",
+  "x0": "-9",
+  "x1": "9"
+ },
+ {
+  "id": "hand-34",
+  "group": "hand-picked formulas",
+  "keys": "1/x\r0\r9\r",
+  "formula": "1/x",
+  "x0": "0",
+  "x1": "9"
+ },
+ {
+  "id": "hand-35",
+  "group": "hand-picked formulas",
+  "keys": "1/x\r1\r1\r",
+  "formula": "1/x",
+  "x0": "1",
+  "x1": "1"
+ },
+ {
+  "id": "hand-36",
+  "group": "hand-picked formulas",
+  "keys": "x\r9\r0\r",
+  "formula": "x",
+  "x0": "9",
+  "x1": "0"
+ },
+ {
+  "id": "hand-37",
+  "group": "hand-picked formulas",
+  "keys": "x\r0\r1\r",
+  "formula": "x",
+  "x0": "0",
+  "x1": "1"
+ },
+ {
+  "id": "hand-38",
+  "group": "hand-picked formulas",
+  "keys": "x\r-0.001\r0.001\r",
+  "formula": "x",
+  "x0": "-0.001",
+  "x1": "0.001"
+ },
+ {
+  "id": "hand-39",
+  "group": "hand-picked formulas",
+  "keys": "x\r-9999999.999\r9999999.999\r",
+  "formula": "x",
+  "x0": "-9999999.999",
+  "x1": "9999999.999"
+ },
+ {
+  "id": "hand-40",
+  "group": "hand-picked formulas",
+  "keys": "x*x\r9999999\r9999999\r",
+  "formula": "x*x",
+  "x0": "9999999",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-41",
+  "group": "hand-picked formulas",
+  "keys": "x*x\r3162277\r3162278\r",
+  "formula": "x*x",
+  "x0": "3162277",
+  "x1": "3162278"
+ },
+ {
+  "id": "hand-42",
+  "group": "hand-picked formulas",
+  "keys": "x/3*3\r-1\r1\r",
+  "formula": "x/3*3",
+  "x0": "-1",
+  "x1": "1"
+ },
+ {
+  "id": "hand-43",
+  "group": "hand-picked formulas",
+  "keys": "x*0.5\r-7\r7\r",
+  "formula": "x*0.5",
+  "x0": "-7",
+  "x1": "7"
+ },
+ {
+  "id": "hand-44",
+  "group": "hand-picked formulas",
+  "keys": "5000000*2000000\r",
+  "formula": "5000000*2000000"
+ },
+ {
+  "id": "hand-45",
+  "group": "hand-picked formulas",
+  "keys": "4000000*1000000\r",
+  "formula": "4000000*1000000"
+ },
+ {
+  "id": "hand-46",
+  "group": "hand-picked formulas",
+  "keys": "x*999999+x*999999+x*999999+x*999999+x*999999+x*999999\r1000000\r9999999\r",
+  "formula": "x*999999+x*999999+x*999999+x*999999+x*999999+x*999999",
+  "x0": "1000000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-47",
+  "group": "hand-picked formulas",
+  "keys": "-x*999999-x*999999-x*999999-x*999999-x*999999-x*999999\r1000000\r9999999\r",
+  "formula": "-x*999999-x*999999-x*999999-x*999999-x*999999-x*999999",
+  "x0": "1000000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-48",
+  "group": "hand-picked formulas",
+  "keys": "(x*999999+x*999999)/(x*999999+x*999999)\r1000000\r9999999\r",
+  "formula": "(x*999999+x*999999)/(x*999999+x*999999)",
+  "x0": "1000000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-49",
+  "group": "hand-picked formulas",
+  "keys": "x*999999+x*999999\r9999990\r9999999\r",
+  "formula": "x*999999+x*999999",
+  "x0": "9999990",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-50",
+  "group": "hand-picked formulas",
+  "keys": "2*(-x)\r-1\r1\r",
+  "formula": "2*(-x)",
+  "x0": "-1",
+  "x1": "1"
+ },
+ {
+  "id": "hand-51",
+  "group": "hand-picked formulas",
+  "keys": "(-3)*(-3)\r",
+  "formula": "(-3)*(-3)"
+ },
+ {
+  "id": "hand-52",
+  "group": "hand-picked formulas",
+  "keys": "(-0)\r",
+  "formula": "(-0)"
+ },
+ {
+  "id": "hand-53",
+  "group": "hand-picked formulas",
+  "keys": "-0\r",
+  "formula": "-0"
+ },
+ {
+  "id": "hand-54",
+  "group": "hand-picked formulas",
+  "keys": "0/x\r0\r0\r",
+  "formula": "0/x",
+  "x0": "0",
+  "x1": "0"
+ },
+ {
+  "id": "hand-55",
+  "group": "hand-picked formulas",
+  "keys": "x/x\r-4.5\r4.5\r",
+  "formula": "x/x",
+  "x0": "-4.5",
+  "x1": "4.5"
+ },
+ {
+  "id": "hand-56",
+  "group": "hand-picked formulas",
+  "keys": "000123.4500*x\r1\r2\r",
+  "formula": "000123.4500*x",
+  "x0": "1",
+  "x1": "2"
+ },
+ {
+  "id": "hand-57",
+  "group": "hand-picked formulas",
+  "keys": "1.5+2.25*x\r-1.25\r1.75\r",
+  "formula": "1.5+2.25*x",
+  "x0": "-1.25",
+  "x1": "1.75"
+ },
+ {
+  "id": "hand-58",
+  "group": "hand-picked formulas",
+  "keys": "X*X+x\r-2\r2\r",
+  "formula": "X*X+x",
+  "x0": "-2",
+  "x1": "2"
+ },
+ {
+  "id": "hand-59",
+  "group": "hand-picked formulas",
+  "keys": "x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x\r1\r9\r",
+  "formula": "x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x",
+  "x0": "1",
+  "x1": "9"
+ },
+ {
+  "id": "hand-60",
+  "group": "hand-picked formulas",
+  "keys": "x/3\r-1\r1\r",
+  "formula": "x/3",
+  "x0": "-1",
+  "x1": "1"
+ },
+ {
+  "id": "hand-61",
+  "group": "hand-picked formulas",
+  "keys": "-(x/3)+(x/3)\r-1\r1\r",
+  "formula": "-(x/3)+(x/3)",
+  "x0": "-1",
+  "x1": "1"
+ },
+ {
+  "id": "hand-62",
+  "group": "hand-picked formulas",
+  "keys": "1/3+1/3+1/3\r",
+  "formula": "1/3+1/3+1/3"
+ },
+ {
+  "id": "hand-63",
+  "group": "hand-picked formulas",
+  "keys": "2/3*3\r",
+  "formula": "2/3*3"
+ },
+ {
+  "id": "hand-64",
+  "group": "hand-picked formulas",
+  "keys": "x/0.001\r-9999\r9999\r",
+  "formula": "x/0.001",
+  "x0": "-9999",
+  "x1": "9999"
+ },
+ {
+  "id": "hand-65",
+  "group": "hand-picked formulas",
+  "keys": "x/1000000/1000000\r1\r9999999\r",
+  "formula": "x/1000000/1000000",
+  "x0": "1",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-66",
+  "group": "hand-picked formulas",
+  "keys": "9999999.999999*9999999.999999\r",
+  "formula": "9999999.999999*9999999.999999"
+ },
+ {
+  "id": "hand-67",
+  "group": "hand-picked formulas",
+  "keys": "0.999999*0.999999\r",
+  "formula": "0.999999*0.999999"
+ },
+ {
+  "id": "hand-68",
+  "group": "hand-picked formulas",
+  "keys": "-(0.000001)\r",
+  "formula": "-(0.000001)"
+ },
+ {
+  "id": "hand-69",
+  "group": "hand-picked formulas",
+  "keys": "-(x)*(x)\r-0.5\r0.5\r",
+  "formula": "-(x)*(x)",
+  "x0": "-0.5",
+  "x1": "0.5"
+ },
+ {
+  "id": "hand-70",
+  "group": "hand-picked formulas",
+  "keys": "(x-1)*(x-2)*(x-3)*(x-4)*(x-5)\r0\r6\r",
+  "formula": "(x-1)*(x-2)*(x-3)*(x-4)*(x-5)",
+  "x0": "0",
+  "x1": "6"
+ },
+ {
+  "id": "hand-71",
+  "group": "hand-picked formulas",
+  "keys": "x/(x-x)\r1\r2\r",
+  "formula": "x/(x-x)",
+  "x0": "1",
+  "x1": "2"
+ },
+ {
+  "id": "hand-72",
+  "group": "hand-picked formulas",
+  "keys": "(1+2)*(3+4)/(5+6)-(7-8)\r",
+  "formula": "(1+2)*(3+4)/(5+6)-(7-8)"
+ },
+ {
+  "id": "hand-73",
+  "group": "hand-picked formulas",
+  "keys": "-(x*x*x)/(x*x)\r-3\r3\r",
+  "formula": "-(x*x*x)/(x*x)",
+  "x0": "-3",
+  "x1": "3"
+ },
+ {
+  "id": "hand-74",
+  "group": "hand-picked formulas",
+  "keys": "(x/7)*7-x\r-9\r9\r",
+  "formula": "(x/7)*7-x",
+  "x0": "-9",
+  "x1": "9"
+ },
+ {
+  "id": "hand-75",
+  "group": "hand-picked formulas",
+  "keys": "1/7/7/7/7/7/7/7\r",
+  "formula": "1/7/7/7/7/7/7/7"
+ },
+ {
+  "id": "hand-76",
+  "group": "hand-picked formulas",
+  "keys": "7654321/1234567\r",
+  "formula": "7654321/1234567"
+ },
+ {
+  "id": "hand-77",
+  "group": "hand-picked formulas",
+  "keys": "9999999/0.000001\r",
+  "formula": "9999999/0.000001"
+ },
+ {
+  "id": "hand-78",
+  "group": "hand-picked formulas",
+  "keys": "0.000001/9999999\r",
+  "formula": "0.000001/9999999"
+ },
+ {
+  "id": "hand-79",
+  "group": "hand-picked formulas",
+  "keys": "-9999999-x\r-9999999\r9999999\r",
+  "formula": "-9999999-x",
+  "x0": "-9999999",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-80",
+  "group": "hand-picked formulas",
+  "keys": "0.000001*(x*999999+x*999999+x*999999+x*999999+x*999999)\r8100000\r9999999\r",
+  "formula": "0.000001*(x*999999+x*999999+x*999999+x*999999+x*999999)",
+  "x0": "8100000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-81",
+  "group": "hand-picked formulas",
+  "keys": "(x*999999+x*999999+x*999999+x*999999+x*999999)/1\r8100000\r9999999\r",
+  "formula": "(x*999999+x*999999+x*999999+x*999999+x*999999)/1",
+  "x0": "8100000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-82",
+  "group": "hand-picked formulas",
+  "keys": "(x*999999+x*999999)/0.1\r1000000\r9999999\r",
+  "formula": "(x*999999+x*999999)/0.1",
+  "x0": "1000000",
+  "x1": "9999999"
+ },
+ {
+  "id": "hand-83",
+  "group": "hand-picked formulas",
+  "keys": "x+3*x-10/x\r4\r13\r",
+  "formula": "x+3*x-10/x",
+  "x0": "4",
+  "x1": "13"
+ },
+ {
+  "id": "hand-84",
+  "group": "hand-picked formulas",
+  "keys": "-(x*(x+1)-6)/4+x\r2.5\r7\r",
+  "formula": "-(x*(x+1)-6)/4+x",
+  "x0": "2.5",
+  "x1": "7"
+ },
+ {
+  "id": "hand-85",
+  "group": "hand-picked formulas",
+  "keys": "0.1+0.2\r",
+  "formula": "0.1+0.2"
+ },
+ {
+  "id": "hand-86",
+  "group": "hand-picked formulas",
+  "keys": "(x)*(x)\r10\r100\r",
+  "formula": "(x)*(x)",
+  "x0": "10",
+  "x1": "100"
+ },
+ {
+  "id": "rand-1",
+  "group": "random formulas",
+  "keys": "6.017474\r",
+  "formula": "6.017474",
+  "x0": "-2.01",
+  "x1": "93.59"
+ },
+ {
+  "id": "rand-2",
+  "group": "random formulas",
+  "keys": "-13262.3275354+7.6868823+x\r-6\r57\r",
+  "formula": "-13262.3275354+7.6868823+x",
+  "x0": "-6",
+  "x1": "57"
+ },
+ {
+  "id": "rand-3",
+  "group": "random formulas",
+  "keys": "-234812.652-x\r7.71\r6.04\r",
+  "formula": "-234812.652-x",
+  "x0": "7.71",
+  "x1": "6.04"
+ },
+ {
+  "id": "rand-4",
+  "group": "random formulas",
+  "keys": "((9))/x\r1\r4\r",
+  "formula": "((9))/x",
+  "x0": "1",
+  "x1": "4"
+ },
+ {
+  "id": "rand-5",
+  "group": "random formulas",
+  "keys": "7+x\r0.136\r75\r",
+  "formula": "7+x",
+  "x0": "0.136",
+  "x1": "75"
+ },
+ {
+  "id": "rand-6",
+  "group": "random formulas",
+  "keys": "-(-x-40)+x\r2\r5.4\r",
+  "formula": "-(-x-40)+x",
+  "x0": "2",
+  "x1": "5.4"
+ },
+ {
+  "id": "rand-7",
+  "group": "random formulas",
+  "keys": "43\r",
+  "formula": "43",
+  "x0": "3",
+  "x1": "1.10"
+ },
+ {
+  "id": "rand-8",
+  "group": "random formulas",
+  "keys": "x\r-910164\r227610\r",
+  "formula": "x",
+  "x0": "-910164",
+  "x1": "227610"
+ },
+ {
+  "id": "rand-9",
+  "group": "random formulas",
+  "keys": "-1.2723576/x\r4810\r0\r",
+  "formula": "-1.2723576/x",
+  "x0": "4810",
+  "x1": "0"
+ },
+ {
+  "id": "rand-10",
+  "group": "random formulas",
+  "keys": "x-(7127398-(-((66.74-x/3))*x)/(X/x))\r-714160\r-1.548\r",
+  "formula": "x-(7127398-(-((66.74-x/3))*x)/(X/x))",
+  "x0": "-714160",
+  "x1": "-1.548"
+ },
+ {
+  "id": "rand-11",
+  "group": "random formulas",
+  "keys": "x+x-422752\r1\r-9.3\r",
+  "formula": "x+x-422752",
+  "x0": "1",
+  "x1": "-9.3"
+ },
+ {
+  "id": "rand-12",
+  "group": "random formulas",
+  "keys": "-x/6-x\r6.98\r7011381\r",
+  "formula": "-x/6-x",
+  "x0": "6.98",
+  "x1": "7011381"
+ },
+ {
+  "id": "rand-13",
+  "group": "random formulas",
+  "keys": "777870.79604629\r",
+  "formula": "777870.79604629",
+  "x0": "38.3",
+  "x1": "-1017053.89"
+ },
+ {
+  "id": "rand-14",
+  "group": "random formulas",
+  "keys": "x\r-1.3\r2\r",
+  "formula": "x",
+  "x0": "-1.3",
+  "x1": "2"
+ },
+ {
+  "id": "rand-15",
+  "group": "random formulas",
+  "keys": "(-(4507976*0.5646/81.9)/(x-7+724))\r1\r3.071\r",
+  "formula": "(-(4507976*0.5646/81.9)/(x-7+724))",
+  "x0": "1",
+  "x1": "3.071"
+ },
+ {
+  "id": "rand-16",
+  "group": "random formulas",
+  "keys": "(-4447016-(-x)/X)\r31.3\r58\r",
+  "formula": "(-4447016-(-x)/X)",
+  "x0": "31.3",
+  "x1": "58"
+ },
+ {
+  "id": "rand-17",
+  "group": "random formulas",
+  "keys": "-x\r3.03\r1.143\r",
+  "formula": "-x",
+  "x0": "3.03",
+  "x1": "1.143"
+ },
+ {
+  "id": "rand-18",
+  "group": "random formulas",
+  "keys": "2.61+x-293\r1\r-61\r",
+  "formula": "2.61+x-293",
+  "x0": "1",
+  "x1": "-61"
+ },
+ {
+  "id": "rand-19",
+  "group": "random formulas",
+  "keys": "(x)\r0\r4.293\r",
+  "formula": "(x)",
+  "x0": "0",
+  "x1": "4.293"
+ },
+ {
+  "id": "rand-20",
+  "group": "random formulas",
+  "keys": "x*22994*x\r97.4\r-7.5\r",
+  "formula": "x*22994*x",
+  "x0": "97.4",
+  "x1": "-7.5"
+ },
+ {
+  "id": "rand-21",
+  "group": "random formulas",
+  "keys": "x+0.16185014*x\r8\r38.5\r",
+  "formula": "x+0.16185014*x",
+  "x0": "8",
+  "x1": "38.5"
+ },
+ {
+  "id": "rand-22",
+  "group": "random formulas",
+  "keys": "572113*(0.41831749/(-2.87*x))\r-5\r-7.0\r",
+  "formula": "572113*(0.41831749/(-2.87*x))",
+  "x0": "-5",
+  "x1": "-7.0"
+ },
+ {
+  "id": "rand-23",
+  "group": "random formulas",
+  "keys": "x\r3295356.5\r-142.0\r",
+  "formula": "x",
+  "x0": "3295356.5",
+  "x1": "-142.0"
+ },
+ {
+  "id": "rand-24",
+  "group": "random formulas",
+  "keys": "x/6161.5343732*9.495\r1.5\r1\r",
+  "formula": "x/6161.5343732*9.495",
+  "x0": "1.5",
+  "x1": "1"
+ },
+ {
+  "id": "rand-25",
+  "group": "random formulas",
+  "keys": "(-(-3*6.83500405+x)-x)*8*619979\r70.315\r60.7\r",
+  "formula": "(-(-3*6.83500405+x)-x)*8*619979",
+  "x0": "70.315",
+  "x1": "60.7"
+ },
+ {
+  "id": "rand-26",
+  "group": "random formulas",
+  "keys": "(-(-X+8)+X)\r2\r1.86\r",
+  "formula": "(-(-X+8)+X)",
+  "x0": "2",
+  "x1": "1.86"
+ },
+ {
+  "id": "rand-27",
+  "group": "random formulas",
+  "keys": "x-(x)\r5.11\r63344.59\r",
+  "formula": "x-(x)",
+  "x0": "5.11",
+  "x1": "63344.59"
+ },
+ {
+  "id": "rand-28",
+  "group": "random formulas",
+  "keys": "((928))/53\r",
+  "formula": "((928))/53",
+  "x0": "9",
+  "x1": "85.104"
+ },
+ {
+  "id": "rand-29",
+  "group": "random formulas",
+  "keys": "-8+x\r82.0\r5\r",
+  "formula": "-8+x",
+  "x0": "82.0",
+  "x1": "5"
+ },
+ {
+  "id": "rand-30",
+  "group": "random formulas",
+  "keys": "-91.5\r",
+  "formula": "-91.5",
+  "x0": "8.492",
+  "x1": "3"
+ },
+ {
+  "id": "rand-31",
+  "group": "random formulas",
+  "keys": "(x+((-x*(-x-x/x))+((x*61.13)+5.3))+511)+(x*x)\r28.29\r4.11\r",
+  "formula": "(x+((-x*(-x-x/x))+((x*61.13)+5.3))+511)+(x*x)",
+  "x0": "28.29",
+  "x1": "4.11"
+ },
+ {
+  "id": "rand-32",
+  "group": "random formulas",
+  "keys": "x\r0\r-30.96\r",
+  "formula": "x",
+  "x0": "0",
+  "x1": "-30.96"
+ },
+ {
+  "id": "rand-33",
+  "group": "random formulas",
+  "keys": "(5.94825)\r",
+  "formula": "(5.94825)",
+  "x0": "6",
+  "x1": "99.62"
+ },
+ {
+  "id": "rand-34",
+  "group": "random formulas",
+  "keys": "x/x-x\r83.83\r680.702\r",
+  "formula": "x/x-x",
+  "x0": "83.83",
+  "x1": "680.702"
+ },
+ {
+  "id": "rand-35",
+  "group": "random formulas",
+  "keys": "X/((-x+(x*(x+1515048.7-x)/x)))-10\r-5\r5\r",
+  "formula": "X/((-x+(x*(x+1515048.7-x)/x)))-10",
+  "x0": "-5",
+  "x1": "5"
+ },
+ {
+  "id": "rand-36",
+  "group": "random formulas",
+  "keys": "-(-x+x/349)/x-X\r1538\r3\r",
+  "formula": "-(-x+x/349)/x-X",
+  "x0": "1538",
+  "x1": "3"
+ },
+ {
+  "id": "rand-37",
+  "group": "random formulas",
+  "keys": "x/(x/x)+x\r95600.838\r-28\r",
+  "formula": "x/(x/x)+x",
+  "x0": "95600.838",
+  "x1": "-28"
+ },
+ {
+  "id": "rand-38",
+  "group": "random formulas",
+  "keys": "7820.488\r",
+  "formula": "7820.488",
+  "x0": "9.04",
+  "x1": "-8.0"
+ },
+ {
+  "id": "rand-39",
+  "group": "random formulas",
+  "keys": "84344.138512\r",
+  "formula": "84344.138512",
+  "x0": "0.6",
+  "x1": "-0.98"
+ },
+ {
+  "id": "rand-40",
+  "group": "random formulas",
+  "keys": "-58.085/548.2406373+25294.18225718\r",
+  "formula": "-58.085/548.2406373+25294.18225718",
+  "x0": "4241",
+  "x1": "-14.433"
+ },
+ {
+  "id": "rand-41",
+  "group": "random formulas",
+  "keys": "x*944.288592+x\r3\r7\r",
+  "formula": "x*944.288592+x",
+  "x0": "3",
+  "x1": "7"
+ },
+ {
+  "id": "rand-42",
+  "group": "random formulas",
+  "keys": "-x\r72.888\r3\r",
+  "formula": "-x",
+  "x0": "72.888",
+  "x1": "3"
+ },
+ {
+  "id": "rand-43",
+  "group": "random formulas",
+  "keys": "(x)+x+64345\r1.1\r3\r",
+  "formula": "(x)+x+64345",
+  "x0": "1.1",
+  "x1": "3"
+ },
+ {
+  "id": "rand-44",
+  "group": "random formulas",
+  "keys": "(x)\r3\r-8.668\r",
+  "formula": "(x)",
+  "x0": "3",
+  "x1": "-8.668"
+ },
+ {
+  "id": "rand-45",
+  "group": "random formulas",
+  "keys": "((x))-(26/58+0.75544200)\r18.5\r4.666\r",
+  "formula": "((x))-(26/58+0.75544200)",
+  "x0": "18.5",
+  "x1": "4.666"
+ },
+ {
+  "id": "rand-46",
+  "group": "random formulas",
+  "keys": "x\r-59.304\r2\r",
+  "formula": "x",
+  "x0": "-59.304",
+  "x1": "2"
+ },
+ {
+  "id": "rand-47",
+  "group": "random formulas",
+  "keys": "-0*5.07656\r",
+  "formula": "-0*5.07656",
+  "x0": "8.4",
+  "x1": "4"
+ },
+ {
+  "id": "rand-48",
+  "group": "random formulas",
+  "keys": "-8-263\r",
+  "formula": "-8-263",
+  "x0": "25",
+  "x1": "-10761.8"
+ },
+ {
+  "id": "rand-49",
+  "group": "random formulas",
+  "keys": "-62099/(45/(5968301+X)*x)-x\r6\r-7.25\r",
+  "formula": "-62099/(45/(5968301+X)*x)-x",
+  "x0": "6",
+  "x1": "-7.25"
+ },
+ {
+  "id": "rand-50",
+  "group": "random formulas",
+  "keys": "3.5502+5426.81628257\r",
+  "formula": "3.5502+5426.81628257",
+  "x0": "4",
+  "x1": "-7"
+ },
+ {
+  "id": "rand-51",
+  "group": "random formulas",
+  "keys": "-x\r0\r58\r",
+  "formula": "-x",
+  "x0": "0",
+  "x1": "58"
+ },
+ {
+  "id": "rand-52",
+  "group": "random formulas",
+  "keys": "9627.9\r",
+  "formula": "9627.9",
+  "x0": "2.2",
+  "x1": "-7858"
+ },
+ {
+  "id": "rand-53",
+  "group": "random formulas",
+  "keys": "X+71134.62\r-3.0\r27549.00\r",
+  "formula": "X+71134.62",
+  "x0": "-3.0",
+  "x1": "27549.00"
+ },
+ {
+  "id": "rand-54",
+  "group": "random formulas",
+  "keys": "X\r41\r-61\r",
+  "formula": "X",
+  "x0": "41",
+  "x1": "-61"
+ },
+ {
+  "id": "rand-55",
+  "group": "random formulas",
+  "keys": "8+x/(92/X)\r2\r3\r",
+  "formula": "8+x/(92/X)",
+  "x0": "2",
+  "x1": "3"
+ },
+ {
+  "id": "rand-56",
+  "group": "random formulas",
+  "keys": "51201+198\r",
+  "formula": "51201+198",
+  "x0": "-46.6",
+  "x1": "-3618.246"
+ },
+ {
+  "id": "rand-57",
+  "group": "random formulas",
+  "keys": "x*(467588/(X)+((65.65646871*(-x-x/X))-170))\r29.54\r84.3\r",
+  "formula": "x*(467588/(X)+((65.65646871*(-x-x/X))-170))",
+  "x0": "29.54",
+  "x1": "84.3"
+ },
+ {
+  "id": "rand-58",
+  "group": "random formulas",
+  "keys": "17503\r",
+  "formula": "17503",
+  "x0": "6.50",
+  "x1": "7"
+ },
+ {
+  "id": "rand-59",
+  "group": "random formulas",
+  "keys": "-9\r",
+  "formula": "-9",
+  "x0": "18",
+  "x1": "-59.5"
+ },
+ {
+  "id": "rand-60",
+  "group": "random formulas",
+  "keys": "-811047-7365-x\r-59\r65\r",
+  "formula": "-811047-7365-x",
+  "x0": "-59",
+  "x1": "65"
+ },
+ {
+  "id": "rand-61",
+  "group": "random formulas",
+  "keys": "X*x+9\r-12\r16\r",
+  "formula": "X*x+9",
+  "x0": "-12",
+  "x1": "16"
+ },
+ {
+  "id": "rand-62",
+  "group": "random formulas",
+  "keys": "7-(-206624/61.219+(14))\r",
+  "formula": "7-(-206624/61.219+(14))",
+  "x0": "6",
+  "x1": "146.739"
+ },
+ {
+  "id": "rand-63",
+  "group": "random formulas",
+  "keys": "x\r-2556384\r5\r",
+  "formula": "x",
+  "x0": "-2556384",
+  "x1": "5"
+ },
+ {
+  "id": "rand-64",
+  "group": "random formulas",
+  "keys": "-x\r1.70\r86.8\r",
+  "formula": "-x",
+  "x0": "1.70",
+  "x1": "86.8"
+ },
+ {
+  "id": "rand-65",
+  "group": "random formulas",
+  "keys": "(96966.873234)*x+X\r-3\r49808.56\r",
+  "formula": "(96966.873234)*x+X",
+  "x0": "-3",
+  "x1": "49808.56"
+ },
+ {
+  "id": "rand-66",
+  "group": "random formulas",
+  "keys": "-2718224.0913/x+((((2*x*8)/x)*5.232+38))\r3.4\r29\r",
+  "formula": "-2718224.0913/x+((((2*x*8)/x)*5.232+38))",
+  "x0": "3.4",
+  "x1": "29"
+ },
+ {
+  "id": "rand-67",
+  "group": "random formulas",
+  "keys": "x*X\r-34.71\r214785.165\r",
+  "formula": "x*X",
+  "x0": "-34.71",
+  "x1": "214785.165"
+ },
+ {
+  "id": "rand-68",
+  "group": "random formulas",
+  "keys": "((3/X+x)+9.01768)-(-0-x/x)\r-8530686\r6\r",
+  "formula": "((3/X+x)+9.01768)-(-0-x/x)",
+  "x0": "-8530686",
+  "x1": "6"
+ },
+ {
+  "id": "rand-69",
+  "group": "random formulas",
+  "keys": "-x-x\r-24\r-5.066\r",
+  "formula": "-x-x",
+  "x0": "-24",
+  "x1": "-5.066"
+ },
+ {
+  "id": "rand-70",
+  "group": "random formulas",
+  "keys": "-x-(-9.02484/x)\r-7.1\r-11\r",
+  "formula": "-x-(-9.02484/x)",
+  "x0": "-7.1",
+  "x1": "-11"
+ },
+ {
+  "id": "rand-71",
+  "group": "random formulas",
+  "keys": "-7.32475-7.632496\r",
+  "formula": "-7.32475-7.632496",
+  "x0": "2",
+  "x1": "45"
+ },
+ {
+  "id": "rand-72",
+  "group": "random formulas",
+  "keys": "(6.817)\r",
+  "formula": "(6.817)",
+  "x0": "0.83",
+  "x1": "325"
+ },
+ {
+  "id": "rand-73",
+  "group": "random formulas",
+  "keys": "3.5118096-x\r38.3\r-7.6\r",
+  "formula": "3.5118096-x",
+  "x0": "38.3",
+  "x1": "-7.6"
+ },
+ {
+  "id": "rand-74",
+  "group": "random formulas",
+  "keys": "2407184/x\r98.91\r-6764\r",
+  "formula": "2407184/x",
+  "x0": "98.91",
+  "x1": "-6764"
+ },
+ {
+  "id": "rand-75",
+  "group": "random formulas",
+  "keys": "-x\r9100414.42\r84.35\r",
+  "formula": "-x",
+  "x0": "9100414.42",
+  "x1": "84.35"
+ },
+ {
+  "id": "rand-76",
+  "group": "random formulas",
+  "keys": "x/140244*x\r73\r6.46\r",
+  "formula": "x/140244*x",
+  "x0": "73",
+  "x1": "6.46"
+ },
+ {
+  "id": "rand-77",
+  "group": "random formulas",
+  "keys": "x\r4.33\r61\r",
+  "formula": "x",
+  "x0": "4.33",
+  "x1": "61"
+ },
+ {
+  "id": "rand-78",
+  "group": "random formulas",
+  "keys": "4773081.6653551/7050979.10849188\r",
+  "formula": "4773081.6653551/7050979.10849188",
+  "x0": "7.14",
+  "x1": "0"
+ },
+ {
+  "id": "rand-79",
+  "group": "random formulas",
+  "keys": "-49781+39.894/8321012.51764727\r",
+  "formula": "-49781+39.894/8321012.51764727",
+  "x0": "4",
+  "x1": "4.2"
+ },
+ {
+  "id": "rand-80",
+  "group": "random formulas",
+  "keys": "1.7522-95/x\r-8.99\r7\r",
+  "formula": "1.7522-95/x",
+  "x0": "-8.99",
+  "x1": "7"
+ },
+ {
+  "id": "rand-81",
+  "group": "random formulas",
+  "keys": "((x))\r-9.3\r61\r",
+  "formula": "((x))",
+  "x0": "-9.3",
+  "x1": "61"
+ },
+ {
+  "id": "rand-82",
+  "group": "random formulas",
+  "keys": "-650182.828-23+X\r-1.897\r45.10\r",
+  "formula": "-650182.828-23+X",
+  "x0": "-1.897",
+  "x1": "45.10"
+ },
+ {
+  "id": "rand-83",
+  "group": "random formulas",
+  "keys": "3521070/511\r",
+  "formula": "3521070/511",
+  "x0": "5",
+  "x1": "328601"
+ },
+ {
+  "id": "rand-84",
+  "group": "random formulas",
+  "keys": "6+X\r4.7\r8.830\r",
+  "formula": "6+X",
+  "x0": "4.7",
+  "x1": "8.830"
+ },
+ {
+  "id": "rand-85",
+  "group": "random formulas",
+  "keys": "X/x\r6574.3\r352355\r",
+  "formula": "X/x",
+  "x0": "6574.3",
+  "x1": "352355"
+ },
+ {
+  "id": "rand-86",
+  "group": "random formulas",
+  "keys": "x-x\r4.28\r7\r",
+  "formula": "x-x",
+  "x0": "4.28",
+  "x1": "7"
+ },
+ {
+  "id": "rand-88",
+  "group": "random formulas",
+  "keys": "-2*88.536006\r",
+  "formula": "-2*88.536006",
+  "x0": "8.265",
+  "x1": "9"
+ },
+ {
+  "id": "rand-89",
+  "group": "random formulas",
+  "keys": "36+x/x\r48\r-32\r",
+  "formula": "36+x/x",
+  "x0": "48",
+  "x1": "-32"
+ },
+ {
+  "id": "rand-90",
+  "group": "random formulas",
+  "keys": "x/(x+59731)\r22.90\r-0.1\r",
+  "formula": "x/(x+59731)",
+  "x0": "22.90",
+  "x1": "-0.1"
+ },
+ {
+  "id": "rand-91",
+  "group": "random formulas",
+  "keys": "-x*8/148304\r-84\r781417\r",
+  "formula": "-x*8/148304",
+  "x0": "-84",
+  "x1": "781417"
+ },
+ {
+  "id": "rand-92",
+  "group": "random formulas",
+  "keys": "-x\r2.4\r677.762\r",
+  "formula": "-x",
+  "x0": "2.4",
+  "x1": "677.762"
+ },
+ {
+  "id": "rand-93",
+  "group": "random formulas",
+  "keys": "956966+(x)\r7\r284957.6\r",
+  "formula": "956966+(x)",
+  "x0": "7",
+  "x1": "284957.6"
+ },
+ {
+  "id": "rand-94",
+  "group": "random formulas",
+  "keys": "-x\r-7\r257\r",
+  "formula": "-x",
+  "x0": "-7",
+  "x1": "257"
+ },
+ {
+  "id": "rand-95",
+  "group": "random formulas",
+  "keys": "x/4937730.2791\r3.61\r7247870\r",
+  "formula": "x/4937730.2791",
+  "x0": "3.61",
+  "x1": "7247870"
+ },
+ {
+  "id": "rand-96",
+  "group": "random formulas",
+  "keys": "3.3952349/7.76166357-((x/x)*x*73.2)\r-0.54\r-54\r",
+  "formula": "3.3952349/7.76166357-((x/x)*x*73.2)",
+  "x0": "-0.54",
+  "x1": "-54"
+ },
+ {
+  "id": "rand-97",
+  "group": "random formulas",
+  "keys": "x+(X+x-8019.44888648)-(x-(-(18*(346))*x*x))\r35.018\r559.417\r",
+  "formula": "x+(X+x-8019.44888648)-(x-(-(18*(346))*x*x))",
+  "x0": "35.018",
+  "x1": "559.417"
+ },
+ {
+  "id": "rand-98",
+  "group": "random formulas",
+  "keys": "96.14648\r",
+  "formula": "96.14648",
+  "x0": "73.2",
+  "x1": "9"
+ },
+ {
+  "id": "rand-99",
+  "group": "random formulas",
+  "keys": "976+7546009.999020/312\r",
+  "formula": "976+7546009.999020/312",
+  "x0": "801383.3",
+  "x1": "-88.878"
+ },
+ {
+  "id": "rand-100",
+  "group": "random formulas",
+  "keys": "-157.1*x\r84\r-7\r",
+  "formula": "-157.1*x",
+  "x0": "84",
+  "x1": "-7"
+ },
+ {
+  "id": "rand-101",
+  "group": "random formulas",
+  "keys": "-x\r9491.27\r4.7\r",
+  "formula": "-x",
+  "x0": "9491.27",
+  "x1": "4.7"
+ },
+ {
+  "id": "rand-102",
+  "group": "random formulas",
+  "keys": "-x/6.654+19146.46369778\r78\r6\r",
+  "formula": "-x/6.654+19146.46369778",
+  "x0": "78",
+  "x1": "6"
+ },
+ {
+  "id": "rand-103",
+  "group": "random formulas",
+  "keys": "x\r94\r11.05\r",
+  "formula": "x",
+  "x0": "94",
+  "x1": "11.05"
+ },
+ {
+  "id": "rand-104",
+  "group": "random formulas",
+  "keys": "(-X*X)+(19.27554587)+x\r0\r69.915\r",
+  "formula": "(-X*X)+(19.27554587)+x",
+  "x0": "0",
+  "x1": "69.915"
+ },
+ {
+  "id": "rand-105",
+  "group": "random formulas",
+  "keys": "-8-x\r9\r4349\r",
+  "formula": "-8-x",
+  "x0": "9",
+  "x1": "4349"
+ },
+ {
+  "id": "rand-106",
+  "group": "random formulas",
+  "keys": "8/x\r-9.9\r21.129\r",
+  "formula": "8/x",
+  "x0": "-9.9",
+  "x1": "21.129"
+ },
+ {
+  "id": "rand-107",
+  "group": "random formulas",
+  "keys": "-x+(-9-x+(-78.25694/(5.484/58691.397818/262)/4))\r5\r4\r",
+  "formula": "-x+(-9-x+(-78.25694/(5.484/58691.397818/262)/4))",
+  "x0": "5",
+  "x1": "4"
+ },
+ {
+  "id": "rand-108",
+  "group": "random formulas",
+  "keys": "3.9-(-X-x-x)\r8\r8.844\r",
+  "formula": "3.9-(-X-x-x)",
+  "x0": "8",
+  "x1": "8.844"
+ },
+ {
+  "id": "rand-109",
+  "group": "random formulas",
+  "keys": "-X+(2.540*188)/x\r6\r358871.128\r",
+  "formula": "-X+(2.540*188)/x",
+  "x0": "6",
+  "x1": "358871.128"
+ },
+ {
+  "id": "rand-110",
+  "group": "random formulas",
+  "keys": "-(781.754)/(-x*x+x)/1\r-95\r-7.573\r",
+  "formula": "-(781.754)/(-x*x+x)/1",
+  "x0": "-95",
+  "x1": "-7.573"
+ },
+ {
+  "id": "rand-111",
+  "group": "random formulas",
+  "keys": "221248+6.601\r",
+  "formula": "221248+6.601",
+  "x0": "5",
+  "x1": "775.990"
+ },
+ {
+  "id": "rand-112",
+  "group": "random formulas",
+  "keys": "-0\r",
+  "formula": "-0",
+  "x0": "8.4",
+  "x1": "6.33"
+ },
+ {
+  "id": "rand-113",
+  "group": "random formulas",
+  "keys": "0.9364964+X/((X+416.619270+7)*(178-x))\r37.62\r-9\r",
+  "formula": "0.9364964+X/((X+416.619270+7)*(178-x))",
+  "x0": "37.62",
+  "x1": "-9"
+ },
+ {
+  "id": "rand-114",
+  "group": "random formulas",
+  "keys": "x\r80\r7.6\r",
+  "formula": "x",
+  "x0": "80",
+  "x1": "7.6"
+ },
+ {
+  "id": "rand-115",
+  "group": "random formulas",
+  "keys": "3.69\r",
+  "formula": "3.69",
+  "x0": "4.37",
+  "x1": "0"
+ },
+ {
+  "id": "rand-116",
+  "group": "random formulas",
+  "keys": "(-X/x/x)-30638.7597\r-6.2\r7796\r",
+  "formula": "(-X/x/x)-30638.7597",
+  "x0": "-6.2",
+  "x1": "7796"
+ },
+ {
+  "id": "rand-117",
+  "group": "random formulas",
+  "keys": "56\r",
+  "formula": "56",
+  "x0": "-9",
+  "x1": "2"
+ },
+ {
+  "id": "rand-118",
+  "group": "random formulas",
+  "keys": "((-(96733+x+(6))/x+5.3863967)*x)\r0.183\r3.64\r",
+  "formula": "((-(96733+x+(6))/x+5.3863967)*x)",
+  "x0": "0.183",
+  "x1": "3.64"
+ },
+ {
+  "id": "rand-119",
+  "group": "random formulas",
+  "keys": "471048.06313254\r",
+  "formula": "471048.06313254",
+  "x0": "2.615",
+  "x1": "3"
+ },
+ {
+  "id": "rand-120",
+  "group": "random formulas",
+  "keys": "18.0749\r",
+  "formula": "18.0749",
+  "x0": "71.469",
+  "x1": "3.717"
+ },
+ {
+  "id": "rand-121",
+  "group": "random formulas",
+  "keys": "-1.2958\r",
+  "formula": "-1.2958",
+  "x0": "3422299.38",
+  "x1": "-4"
+ },
+ {
+  "id": "rand-122",
+  "group": "random formulas",
+  "keys": "-(X+x)+1671822\r8\r89\r",
+  "formula": "-(X+x)+1671822",
+  "x0": "8",
+  "x1": "89"
+ },
+ {
+  "id": "rand-123",
+  "group": "random formulas",
+  "keys": "63802*X*2.6961523\r99.110\r459259.28\r",
+  "formula": "63802*X*2.6961523",
+  "x0": "99.110",
+  "x1": "459259.28"
+ },
+ {
+  "id": "rand-124",
+  "group": "random formulas",
+  "keys": "648\r",
+  "formula": "648",
+  "x0": "5",
+  "x1": "920709"
+ },
+ {
+  "id": "rand-125",
+  "group": "random formulas",
+  "keys": "-(x)+1754+x\r4.736\r-6139.98\r",
+  "formula": "-(x)+1754+x",
+  "x0": "4.736",
+  "x1": "-6139.98"
+ },
+ {
+  "id": "rand-126",
+  "group": "random formulas",
+  "keys": "x-175185.910321\r4042509.534\r7.6\r",
+  "formula": "x-175185.910321",
+  "x0": "4042509.534",
+  "x1": "7.6"
+ },
+ {
+  "id": "rand-127",
+  "group": "random formulas",
+  "keys": "x+(x-537894)\r72\r9\r",
+  "formula": "x+(x-537894)",
+  "x0": "72",
+  "x1": "9"
+ },
+ {
+  "id": "rand-128",
+  "group": "random formulas",
+  "keys": "(-(x-(-500485.21381830))+((-50984.6+241644)-x+(823835))-x)/59.967\r15.501\r-1\r",
+  "formula": "(-(x-(-500485.21381830))+((-50984.6+241644)-x+(823835))-x)/59.967",
+  "x0": "15.501",
+  "x1": "-1"
+ },
+ {
+  "id": "rand-129",
+  "group": "random formulas",
+  "keys": "((((4261))/x-4177202)-(0.90610+4.82))-757846/205\r22.49\r338.56\r",
+  "formula": "((((4261))/x-4177202)-(0.90610+4.82))-757846/205",
+  "x0": "22.49",
+  "x1": "338.56"
+ },
+ {
+  "id": "rand-130",
+  "group": "random formulas",
+  "keys": "(9949.200+x)/(-x-x*524.2038246)\r86.9\r0.27\r",
+  "formula": "(9949.200+x)/(-x-x*524.2038246)",
+  "x0": "86.9",
+  "x1": "0.27"
+ },
+ {
+  "id": "rand-131",
+  "group": "random formulas",
+  "keys": "x+8103931*(-595-((x*9*x)))\r19.3\r92\r",
+  "formula": "x+8103931*(-595-((x*9*x)))",
+  "x0": "19.3",
+  "x1": "92"
+ },
+ {
+  "id": "rand-132",
+  "group": "random formulas",
+  "keys": "x+x\r-7\r90.55\r",
+  "formula": "x+x",
+  "x0": "-7",
+  "x1": "90.55"
+ },
+ {
+  "id": "rand-133",
+  "group": "random formulas",
+  "keys": "7.4/1.35384327-(8.5323541*x-(((-8055724)-x)))\r3.40\r7.9\r",
+  "formula": "7.4/1.35384327-(8.5323541*x-(((-8055724)-x)))",
+  "x0": "3.40",
+  "x1": "7.9"
+ },
+ {
+  "id": "rand-134",
+  "group": "random formulas",
+  "keys": "-((4012))*239-x\r0.6\r2.8\r",
+  "formula": "-((4012))*239-x",
+  "x0": "0.6",
+  "x1": "2.8"
+ },
+ {
+  "id": "rand-135",
+  "group": "random formulas",
+  "keys": "-((-x)+71140)/6\r1721752.17\r46\r",
+  "formula": "-((-x)+71140)/6",
+  "x0": "1721752.17",
+  "x1": "46"
+ },
+ {
+  "id": "rand-136",
+  "group": "random formulas",
+  "keys": "(-x)/x\r1\r99013\r",
+  "formula": "(-x)/x",
+  "x0": "1",
+  "x1": "99013"
+ },
+ {
+  "id": "rand-137",
+  "group": "random formulas",
+  "keys": "989*x\r-135\r-63.8\r",
+  "formula": "989*x",
+  "x0": "-135",
+  "x1": "-63.8"
+ },
+ {
+  "id": "rand-138",
+  "group": "random formulas",
+  "keys": "4.26865\r",
+  "formula": "4.26865",
+  "x0": "-75.4",
+  "x1": "-8"
+ },
+ {
+  "id": "rand-139",
+  "group": "random formulas",
+  "keys": "-6\r",
+  "formula": "-6",
+  "x0": "-7",
+  "x1": "4"
+ },
+ {
+  "id": "rand-140",
+  "group": "random formulas",
+  "keys": "(-(x/8335.905))/(-(-7+928.526134))\r1795.6\r8368.4\r",
+  "formula": "(-(x/8335.905))/(-(-7+928.526134))",
+  "x0": "1795.6",
+  "x1": "8368.4"
+ },
+ {
+  "id": "rand-141",
+  "group": "random formulas",
+  "keys": "x+4\r1.182\r3\r",
+  "formula": "x+4",
+  "x0": "1.182",
+  "x1": "3"
+ },
+ {
+  "id": "rand-142",
+  "group": "random formulas",
+  "keys": "((3-x/x)+(23925/x))+(-x)\r86.87\r797\r",
+  "formula": "((3-x/x)+(23925/x))+(-x)",
+  "x0": "86.87",
+  "x1": "797"
+ },
+ {
+  "id": "rand-143",
+  "group": "random formulas",
+  "keys": "-x-3/((78.89932/(X*x/65)))\r-7\r37.270\r",
+  "formula": "-x-3/((78.89932/(X*x/65)))",
+  "x0": "-7",
+  "x1": "37.270"
+ },
+ {
+  "id": "rand-144",
+  "group": "random formulas",
+  "keys": "(x-(x/6.739+(x))+(-(42.50511)*x-7))/6/X\r8\r-2\r",
+  "formula": "(x-(x/6.739+(x))+(-(42.50511)*x-7))/6/X",
+  "x0": "8",
+  "x1": "-2"
+ },
+ {
+  "id": "rand-145",
+  "group": "random formulas",
+  "keys": "-3*(-13.475527+1751316.700736)-(x/x)\r-3.023\r-4\r",
+  "formula": "-3*(-13.475527+1751316.700736)-(x/x)",
+  "x0": "-3.023",
+  "x1": "-4"
+ },
+ {
+  "id": "rand-146",
+  "group": "random formulas",
+  "keys": "(-(x*x)*7907023.50379382*(-7634.98224537+1))*x\r40\r9.17\r",
+  "formula": "(-(x*x)*7907023.50379382*(-7634.98224537+1))*x",
+  "x0": "40",
+  "x1": "9.17"
+ },
+ {
+  "id": "rand-147",
+  "group": "random formulas",
+  "keys": "(x)-(5)/(x+639/(x/((0-518.573867)-3)+764))\r2\r-8.500\r",
+  "formula": "(x)-(5)/(x+639/(x/((0-518.573867)-3)+764))",
+  "x0": "2",
+  "x1": "-8.500"
+ },
+ {
+  "id": "rand-148",
+  "group": "random formulas",
+  "keys": "((5.81))/x\r2\r-2933\r",
+  "formula": "((5.81))/x",
+  "x0": "2",
+  "x1": "-2933"
+ },
+ {
+  "id": "rand-149",
+  "group": "random formulas",
+  "keys": "-x-2\r2.26\r1\r",
+  "formula": "-x-2",
+  "x0": "2.26",
+  "x1": "1"
+ },
+ {
+  "id": "rand-150",
+  "group": "random formulas",
+  "keys": "(-X+x)\r889637\r93438.97\r",
+  "formula": "(-X+x)",
+  "x0": "889637",
+  "x1": "93438.97"
+ },
+ {
+  "id": "rand-151",
+  "group": "random formulas",
+  "keys": "87909/x\r5\r93\r",
+  "formula": "87909/x",
+  "x0": "5",
+  "x1": "93"
+ },
+ {
+  "id": "rand-152",
+  "group": "random formulas",
+  "keys": "x\r91.501\r70\r",
+  "formula": "x",
+  "x0": "91.501",
+  "x1": "70"
+ },
+ {
+  "id": "rand-153",
+  "group": "random formulas",
+  "keys": "((4.43)-x)/x*(x-x)\r5.2\r0\r",
+  "formula": "((4.43)-x)/x*(x-x)",
+  "x0": "5.2",
+  "x1": "0"
+ },
+ {
+  "id": "rand-154",
+  "group": "random formulas",
+  "keys": "(x+(x)/(x-((x)/x)))\r402606\r44\r",
+  "formula": "(x+(x)/(x-((x)/x)))",
+  "x0": "402606",
+  "x1": "44"
+ },
+ {
+  "id": "rand-155",
+  "group": "random formulas",
+  "keys": "9.8777\r",
+  "formula": "9.8777",
+  "x0": "-7.9",
+  "x1": "8"
+ },
+ {
+  "id": "rand-156",
+  "group": "random formulas",
+  "keys": "893.077965/x\r-9.524\r-97\r",
+  "formula": "893.077965/x",
+  "x0": "-9.524",
+  "x1": "-97"
+ },
+ {
+  "id": "rand-157",
+  "group": "random formulas",
+  "keys": "x/X*x\r8.071\r6.706\r",
+  "formula": "x/X*x",
+  "x0": "8.071",
+  "x1": "6.706"
+ },
+ {
+  "id": "rand-158",
+  "group": "random formulas",
+  "keys": "(1096.4*54196.24/((X)))+5\r-3191.0\r6\r",
+  "formula": "(1096.4*54196.24/((X)))+5",
+  "x0": "-3191.0",
+  "x1": "6"
+ },
+ {
+  "id": "rand-159",
+  "group": "random formulas",
+  "keys": "(76/86)-(0-(47)-((-x)/x))\r6\r0\r",
+  "formula": "(76/86)-(0-(47)-((-x)/x))",
+  "x0": "6",
+  "x1": "0"
+ },
+ {
+  "id": "rand-160",
+  "group": "random formulas",
+  "keys": "-x\r60\r-42.859\r",
+  "formula": "-x",
+  "x0": "60",
+  "x1": "-42.859"
+ },
+ {
+  "id": "rand-161",
+  "group": "random formulas",
+  "keys": "-(552.3)*X\r9\r59.1\r",
+  "formula": "-(552.3)*X",
+  "x0": "9",
+  "x1": "59.1"
+ },
+ {
+  "id": "keys-1",
+  "group": "error messages and editing",
+  "keys": "x+\r"
+ },
+ {
+  "id": "keys-2",
+  "group": "error messages and editing",
+  "keys": "(x\r"
+ },
+ {
+  "id": "keys-3",
+  "group": "error messages and editing",
+  "keys": "x)\r"
+ },
+ {
+  "id": "keys-4",
+  "group": "error messages and editing",
+  "keys": "12345678\r"
+ },
+ {
+  "id": "keys-5",
+  "group": "error messages and editing",
+  "keys": "x\r\r"
+ },
+ {
+  "id": "keys-6",
+  "group": "error messages and editing",
+  "keys": "x\r."
+ },
+ {
+  "id": "keys-7",
+  "group": "error messages and editing",
+  "keys": "x\r12345678"
+ },
+ {
+  "id": "keys-8",
+  "group": "error messages and editing",
+  "keys": "x\r1.2345"
+ },
+ {
+  "id": "keys-9",
+  "group": "error messages and editing",
+  "keys": "x\r-\r"
+ },
+ {
+  "id": "keys-10",
+  "group": "error messages and editing",
+  "keys": "x\r1.\r"
+ },
+ {
+  "id": "keys-11",
+  "group": "error messages and editing",
+  "keys": "\r"
+ },
+ {
+  "id": "keys-12",
+  "group": "error messages and editing",
+  "keys": "1/(2*(3\r"
+ },
+ {
+  "id": "keys-13",
+  "group": "error messages and editing",
+  "keys": "x\r5\r\r"
+ },
+ {
+  "id": "keys-14",
+  "group": "error messages and editing",
+  "keys": "x\r5\r9.9999"
+ },
+ {
+  "id": "keys-15",
+  "group": "error messages and editing",
+  "keys": "(((x))))\r"
+ },
+ {
+  "id": "keys-16",
+  "group": "error messages and editing",
+  "keys": "x\r12\b3\r4\r"
+ },
+ {
+  "id": "keys-17",
+  "group": "error messages and editing",
+  "keys": "x\r\u001b+1\r2\r3\r"
+ },
+ {
+  "id": "keys-18",
+  "group": "error messages and editing",
+  "keys": "x\r1\r\u001b5\r6\r"
+ },
+ {
+  "id": "keys-19",
+  "group": "error messages and editing",
+  "keys": "x\r-\b7\r8\r"
+ },
+ {
+  "id": "keys-20",
+  "group": "error messages and editing",
+  "keys": "x+(\b1\r1\r2\r"
+ },
+ {
+  "id": "keys-21",
+  "group": "error messages and editing",
+  "keys": "x**1\r1\r2\r"
+ },
+ {
+  "id": "keys-22",
+  "group": "error messages and editing",
+  "keys": "x1\r1\r2\r"
+ },
+ {
+  "id": "keys-23",
+  "group": "error messages and editing",
+  "keys": "1..5*x\r1\r2\r"
+ },
+ {
+  "id": "keys-24",
+  "group": "error messages and editing",
+  "keys": "(-(-1))\r"
+ },
+ {
+  "id": "keys-25",
+  "group": "error messages and editing",
+  "keys": "(-x)\r1\r"
+ },
+ {
+  "id": "keys-26",
+  "group": "error messages and editing",
+  "keys": "x/y\r2\r3\r"
+ },
+ {
+  "id": "keys-27",
+  "group": "error messages and editing",
+  "keys": "\u001b"
+ },
+ {
+  "id": "keys-28",
+  "group": "error messages and editing",
+  "keys": "x*-1\r2\r3\r"
+ },
+ {
+  "id": "keys-29",
+  "group": "error messages and editing",
+  "keys": "x--1\r2\r3\r"
+ },
+ {
+  "id": "keys-30",
+  "group": "error messages and editing",
+  "keys": "2x+1\r"
+ },
+ {
+  "id": "keys-limit-1",
+  "group": "error messages and editing",
+  "keys": "x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+(\r1\r2\r"
+ },
+ {
+  "id": "keys-limit-2",
+  "group": "error messages and editing",
+  "keys": "x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+\b\b-1\r1\r2\r"
+ },
+ {
+  "id": "keys-limit-3",
+  "group": "error messages and editing",
+  "keys": "x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x+x*\b\r3\r4\r"
+ },
+ {
+  "id": "fuzz-1",
+  "group": "random keystrokes",
+  "keys": "+15Xx.x\b(*0x=8X*x0 8/)\r-94.253\r-3.5\r"
+ },
+ {
+  "id": "fuzz-2",
+  "group": "random keystrokes",
+  "keys": "x\b\r405x.*x3\r"
+ },
+ {
+  "id": "fuzz-3",
+  "group": "random keystrokes",
+  "keys": "-(9^.1-0*457(8+*-*10+9\r-6\r65\r"
+ },
+ {
+  "id": "fuzz-4",
+  "group": "random keystrokes",
+  "keys": "^\b5400x\b110(0.^\r3.998\r"
+ },
+ {
+  "id": "fuzz-5",
+  "group": "random keystrokes",
+  "keys": ". a(8*0x2^+8^)10X(0X.( .x51X((xx=x-/0)499902/1 **\b\b/41x)/12.05^a1=0+\u001b"
+ },
+ {
+  "id": "fuzz-6",
+  "group": "random keystrokes",
+  "keys": "3.x(273000*^xX)60(-/1/ 183-0X(0-0.ax**68).(6*1\b(4+^1/30=0..045\r6\r-22.80\r"
+ },
+ {
+  "id": "fuzz-7",
+  "group": "random keystrokes",
+  "keys": " 1=(x()*116^/x1x.a(0  )x.(-0xx6180((. x)-**(0x1.X.9\r-2\r-60.8\r"
+ },
+ {
+  "id": "fuzz-8",
+  "group": "random keystrokes",
+  "keys": "00/^\r+33-1.)11317.=4\b00x\b1\b.5x1x-.+1/1.x01(a/2\b\b-8a(x)\rX*\r5.39\r72.747\r"
+ },
+ {
+  "id": "fuzz-9",
+  "group": "random keystrokes",
+  "keys": "())(30x\b71121(*\b)2+x.+a+1-*/11)8(X-X^)*=X)0-=(.7.\r6.466\r3\r"
+ },
+ {
+  "id": "fuzz-10",
+  "group": "random keystrokes",
+  "keys": "4\b+.0Xx^(96X4/1.+(1\r"
+ },
+ {
+  "id": "fuzz-11",
+  "group": "random keystrokes",
+  "keys": "1)=107.61\b((/7\b0(3.\r0x++XX.4=xx00\r"
+ },
+ {
+  "id": "fuzz-12",
+  "group": "random keystrokes",
+  "keys": "XX2*3.3585x.7x\bx(xX+03\r32.5\r9825344\r"
+ },
+ {
+  "id": "fuzz-13",
+  "group": "random keystrokes",
+  "keys": "/1\b260/\r.)0561*\bx\r"
+ },
+ {
+  "id": "fuzz-14",
+  "group": "random keystrokes",
+  "keys": "0-(9.01/)61941a+x2 //10 \u001b"
+ },
+ {
+  "id": "fuzz-15",
+  "group": "random keystrokes",
+  "keys": "0. 9*a 6=*.x.(+1/\r9.1\r-6.745\r"
+ },
+ {
+  "id": "fuzz-16",
+  "group": "random keystrokes",
+  "keys": "21(7/.-\b-.)\bx\r"
+ },
+ {
+  "id": "fuzz-17",
+  "group": "random keystrokes",
+  "keys": "/*=.0(x+x11(1x\b.0* ^((a*((67()/9\r*0.X86-a1)x176-x13./(x90758X.1x\r+\r9\r0\r"
+ },
+ {
+  "id": "fuzz-18",
+  "group": "random keystrokes",
+  "keys": "7=+.1*0^+315.((\bx4\r"
+ },
+ {
+  "id": "fuzz-19",
+  "group": "random keystrokes",
+  "keys": "(+)\b1\b 3/\b-(=.a1/\b111X10-/x\r x(.+a88.\b-/.x/^(2387124.+\b\b\r(68x1*1(5-\b0\r-5.8\r5\r"
+ },
+ {
+  "id": "fuzz-20",
+  "group": "random keystrokes",
+  "keys": "(((X=0\r0(xX1)2\r-1(\b5210(8+9+x.+9x5)\b(\bx.1X\r-1.314\r22\r"
+ },
+ {
+  "id": "fuzz-21",
+  "group": "random keystrokes",
+  "keys": "^59X1-3(\r"
+ },
+ {
+  "id": "fuzz-22",
+  "group": "random keystrokes",
+  "keys": "-\r.4)-3(/^xx9/00*=x5x10^X4(.x+0)*)1X*/405x.-(90)^)\r0-(011X.*5.9ax\r-19\r58\r"
+ },
+ {
+  "id": "fuzz-23",
+  "group": "random keystrokes",
+  "keys": "(305/(a.429((7-2*1=+(0.*(*\rX/.()0\b0.)0\r5617256\r-5704162.76\r"
+ },
+ {
+  "id": "fuzz-24",
+  "group": "random keystrokes",
+  "keys": "\rX=X\bx\b1 x=)6.428+140x4x*)+510*x-2.X)x47\b\b8/1 40\b\r81.50\r-9\r"
+ },
+ {
+  "id": "fuzz-25",
+  "group": "random keystrokes",
+  "keys": "1--(.1*00/1^\b\b\r/5Xxx.x1(1*.ax(*)-1*a(3\b\r)\b/a\u001b"
+ },
+ {
+  "id": "fuzz-26",
+  "group": "random keystrokes",
+  "keys": ")0\r"
+ },
+ {
+  "id": "fuzz-27",
+  "group": "random keystrokes",
+  "keys": ")+0+).(+-X^Xx\r*+ xx\r1(\r-8.46\r2.086\r"
+ },
+ {
+  "id": "fuzz-28",
+  "group": "random keystrokes",
+  "keys": "501\b\b(+\b\b)6x-x(-/a3-/(91/\b4*49(+x7\b01-02.((*8\b6x0)*(*-^\b)4*\b+.^\r40598.825\r59786\r"
+ },
+ {
+  "id": "fuzz-29",
+  "group": "random keystrokes",
+  "keys": ".+07()a5.1..-8(0+0X(\r43\r-8\r"
+ },
+ {
+  "id": "fuzz-30",
+  "group": "random keystrokes",
+  "keys": "9=(*\r/.3+(4\b.\r-5.1\r-93\r"
+ },
+ {
+  "id": "fuzz-31",
+  "group": "random keystrokes",
+  "keys": "05\r"
+ },
+ {
+  "id": "fuzz-32",
+  "group": "random keystrokes",
+  "keys": ")0(5X*.x-xa14*x0xa.*\b==0x*\b .1004\b-2*..14-/x*\r..xxa-*\b0*+x\b\b7*.).--a\r20896\r-5268141.84\r"
+ },
+ {
+  "id": "fuzz-33",
+  "group": "random keystrokes",
+  "keys": "0 0)0*=3.*0Xx/10\bx0x.*1+- .+x^\b.1+6x(((55 x0 *(\r44\r46\r-7\r"
+ },
+ {
+  "id": "fuzz-34",
+  "group": "random keystrokes",
+  "keys": ")/*)-7^(1)4a^.11/+^-./1\b1(.4021/a.( =(1*\u001b"
+ },
+ {
+  "id": "fuzz-35",
+  "group": "random keystrokes",
+  "keys": "*x0-21^ \r.)*(X(*0+01+xX-/-.*/*-(15(01x.\r51\r"
+ },
+ {
+  "id": "fuzz-36",
+  "group": "random keystrokes",
+  "keys": "51x4(.*1((\r"
+ },
+ {
+  "id": "fuzz-37",
+  "group": "random keystrokes",
+  "keys": "7(0=)05\b-/4-1X\b)x=1\r9.455\r89.1\r"
+ },
+ {
+  "id": "fuzz-38",
+  "group": "random keystrokes",
+  "keys": "x1)*-x/19/x^\b.\bx(\rx1.(xx/a+x1)0-0+530/- 1*((9)\r-6\r-3\r"
+ },
+ {
+  "id": "fuzz-39",
+  "group": "random keystrokes",
+  "keys": "+6x/\b1/1+9.(\r2\r0\r"
+ },
+ {
+  "id": "fuzz-40",
+  "group": "random keystrokes",
+  "keys": "\r*0*)4- 0x^0)0a.(11)1x\r0)\r7.7\r9.328\r"
+ },
+ {
+  "id": "fuzz-41",
+  "group": "random keystrokes",
+  "keys": "4(20=0\r"
+ },
+ {
+  "id": "fuzz-42",
+  "group": "random keystrokes",
+  "keys": ")/2/X+(0))1+0a75X\r0101X\r13.3\r3582300.189\r"
+ },
+ {
+  "id": "fuzz-43",
+  "group": "random keystrokes",
+  "keys": ".(+=x\b4(0(6-+\r*((*(xx1+\r39.002\r47\r"
+ },
+ {
+  "id": "fuzz-44",
+  "group": "random keystrokes",
+  "keys": "(x2-/961x1\b7*0(a-\b(x2^(()0 x0)x(-/-(- -.26 7x)11(-* x8a1.)^01.x\r*+120\r1.46\r1\r"
+ },
+ {
+  "id": "fuzz-45",
+  "group": "random keystrokes",
+  "keys": "9x/9*+00(2-x)/.(07-X(*0+)7xx8\r9.065\r0.1\r"
+ },
+ {
+  "id": "fuzz-46",
+  "group": "random keystrokes",
+  "keys": "/ax9-*Xx9=X.x8 X+4+.0x10(1X(+1\b2/(\b9-8..2.0 (x)1/x-1)59x71\r-32221\r6\r"
+ },
+ {
+  "id": "fuzz-47",
+  "group": "random keystrokes",
+  "keys": "1..X0((7x 3-.=0-X67- +-X-20\b\b17( ..00*/+*1\bx8x(1.(x(2(9.17*(/\b\r21.363\r24\r"
+ },
+ {
+  "id": "fuzz-48",
+  "group": "random keystrokes",
+  "keys": "2(x1..1./\b+\ba\r"
+ },
+ {
+  "id": "fuzz-49",
+  "group": "random keystrokes",
+  "keys": ".)\rX-/(00(x*+(^9.7+*=7-\r(1.x+9113..)7.0^X^*6621*1(**+78+(/(11+* x\r-55.39\r-7.21\r"
+ },
+ {
+  "id": "fuzz-50",
+  "group": "random keystrokes",
+  "keys": "a/\b(*/57xxx-(7/.x\b=04\r\rX331+90.(0.^x(581\r4.5\r-37229\r"
+ },
+ {
+  "id": "fuzz-51",
+  "group": "random keystrokes",
+  "keys": "-/((4a)0)x)1-\b/-1. x a+-=/^x/-.01*(Xa71*(a /10/=x^.(.\r2\r-10.9\r"
+ },
+ {
+  "id": "fuzz-52",
+  "group": "random keystrokes",
+  "keys": "-1\r"
+ },
+ {
+  "id": "fuzz-53",
+  "group": "random keystrokes",
+  "keys": " x+52*)\r3+5.7^a.+.x/\b.5^4*x(3)11-\b\b2/x+1/a0/0/-\u001b"
+ },
+ {
+  "id": "fuzz-54",
+  "group": "random keystrokes",
+  "keys": "\b.^8.(*(\r+.1+)*2.(0(45(1\b*\r/+20\r"
+ },
+ {
+  "id": "fuzz-55",
+  "group": "random keystrokes",
+  "keys": ")/\b/1x08-+\r-2154.1\r"
+ },
+ {
+  "id": "fuzz-56",
+  "group": "random keystrokes",
+  "keys": "7  4 0*x**5+=a - \r(\r1.781\r8430718\r"
+ },
+ {
+  "id": "fuzz-57",
+  "group": "random keystrokes",
+  "keys": "()x +=x//.1\b\b3(10^)((=.1\b\r42.007\r0.474\r"
+ },
+ {
+  "id": "fuzz-58",
+  "group": "random keystrokes",
+  "keys": "(8..\b. =/+2\r=0\r 9)1/80\bxx1x5/x7.8\r36.47\r52.02\r"
+ },
+ {
+  "id": "fuzz-59",
+  "group": "random keystrokes",
+  "keys": "-^1(X00)54*3(1)01 .xx x(a)1(\rx289.9 740./7/)1\b529+\b5(\b8\r6358.3\r56\r"
+ },
+ {
+  "id": "fuzz-60",
+  "group": "random keystrokes",
+  "keys": "/8051 -\b6a40x*5/05/0x=X(/+\b0\r"
+ },
+ {
+  "id": "fuzz-61",
+  "group": "random keystrokes",
+  "keys": "(566(xX*0-x 18-a-/9xx2+*-+5\r)x((6..xx\b-)a-x8.x1\b(.\r77757\r56\r"
+ },
+ {
+  "id": "fuzz-62",
+  "group": "random keystrokes",
+  "keys": "1./-\r^.xxx\b(6\r"
+ },
+ {
+  "id": "fuzz-63",
+  "group": "random keystrokes",
+  "keys": "xx)6/x\b\rx+^=\b.40(X-^.(9\r.(.\b(^0+-26(Xx5--(-02x01/4*)01.x0**--X\r180\r7.956\r"
+ },
+ {
+  "id": "fuzz-64",
+  "group": "random keystrokes",
+  "keys": "0)063.10+^19-.3 044..1x+-9.\b*0a90-1\b0X).(X5(3))(\b3(01a4-/(X5.(880\r4294.792\r1\r"
+ },
+ {
+  "id": "fuzz-65",
+  "group": "random keystrokes",
+  "keys": ".4(a00/\b/X\rx x*0^=Xx.1*1+((5/6105(x.3x01x1*x -0.20*\r-8.7\r"
+ },
+ {
+  "id": "fuzz-66",
+  "group": "random keystrokes",
+  "keys": "1+/X2x300*5\ba/\b5x4=(.x6-..\r-15.48\r5\r"
+ },
+ {
+  "id": "fuzz-67",
+  "group": "random keystrokes",
+  "keys": "5\ba)-89.-.(-\u001b"
+ },
+ {
+  "id": "fuzz-68",
+  "group": "random keystrokes",
+  "keys": "1x+\r.\b51(0Xx\r"
+ },
+ {
+  "id": "fuzz-69",
+  "group": "random keystrokes",
+  "keys": "\r-.+8140a(\r"
+ },
+ {
+  "id": "fuzz-70",
+  "group": "random keystrokes",
+  "keys": "44)x\b03(*X/\b09+) (=-7.0*-1+04/1)a((1\b90=x./(1x\r/)29 1x32)0(\r-8\r4\r"
+ }
+]

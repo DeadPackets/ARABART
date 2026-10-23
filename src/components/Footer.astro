@@ -2,75 +2,35 @@
 const base = import.meta.env.BASE_URL;
 ---
 
-<footer class="site-footer" role="contentinfo">
-  <div class="footer-inner container">
-    <div class="footer-separator" aria-hidden="true"></div>
-    <div class="footer-content">
-      <p class="footer-credit">
-        Written by <a href="https://github.com/DeadPackets" target="_blank" rel="noopener">Youssef Awad</a> for my father
-        <a href="https://www.linkedin.com/in/yasser-awad-0a88a35/" target="_blank" rel="noopener">Yasser Awad</a>
-      </p>
-      <p class="footer-links">
-        <a href="https://github.com/DeadPackets/DOSArchive" target="_blank" rel="noopener">Source on GitHub</a>
-        <span aria-hidden="true">|</span>
-        <span>MIT License</span>
-      </p>
-    </div>
+<footer class="foot" data-era="dos">
+  <div class="container foot-in">
+    <p class="foot-line">Built by <a href="https://github.com/DeadPackets" rel="noopener">Youssef Awad</a> for his father.</p>
+    <p class="foot-ar" lang="ar" dir="rtl" aria-hidden="true">الفن العربي</p>
+    <p class="foot-small">
+      <a href="https://github.com/DeadPackets/ARABART" rel="noopener">Source on GitHub</a> · MIT License ·
+      <a href={`${base}/about/`}>A note from his son</a>
+    </p>
+    <p class="foot-small">IBM VGA font from <a href="https://int10h.org/oldschool-pc-fonts/" rel="noopener">The Ultimate Oldschool PC Font Pack</a> by VileR (int10h.org), <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a>.</p>
   </div>
 </footer>
 
 <style>
-  .site-footer {
-    padding: 0 0 2rem;
+  .foot { margin-top: clamp(80px, 10vw, 140px); background: var(--night); }
+  .foot-in {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: baseline;
+    gap: 16px 48px;
+    padding-block: clamp(56px, 7vw, 96px) 40px;
   }
+  .foot-line { font-size: clamp(1.25rem, 1vw + 1rem, 1.625rem); font-weight: 600; }
+  .foot-line a { text-decoration: none; }
+  .foot-ar { grid-row: span 3; font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 700; line-height: 1.4; color: var(--yellow); }
+  .foot-small { font-size: 0.9375rem; color: var(--ink-2); }
+  .foot-small a { display: inline-block; padding-block: 10px; }
 
-  .footer-inner {
-    max-width: var(--max-width);
-  }
-
-  .footer-separator {
-    height: 1px;
-    background: var(--color-border);
-    margin-bottom: 1.5rem;
-  }
-
-  .footer-content {
-    text-align: center;
-  }
-
-  .footer-credit {
-    font-family: var(--font-body);
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
-    margin-bottom: 0.35rem;
-  }
-
-  .footer-credit a {
-    color: var(--color-text);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  .footer-credit a:hover {
-    color: var(--color-phosphor);
-  }
-
-  .footer-links {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .footer-links a {
-    color: var(--color-text-muted);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-
-  .footer-links a:hover {
-    color: var(--color-phosphor);
+  @media (max-width: 760px) {
+    .foot-in { grid-template-columns: 1fr; }
+    .foot-ar { grid-row: auto; order: -1; }
   }
 </style>

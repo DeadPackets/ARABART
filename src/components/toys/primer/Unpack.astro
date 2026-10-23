@@ -1,0 +1,210 @@
+---
+// A packer is zip for programs that unzips itself. Step a back-reference decoder (the LZ77 family DIET belongs to) over
+// the Basmallah as PESM stores it, and watch his engine draw the Arabic as it is rebuilt. Then every file of his, packed
+// and unpacked, to scale. Sizes: public/bytes/files.json.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { render, svgRuns, toUnicode } from '../arabart/core.ts';
+import { ssrBin } from '../arabart/ssr.ts';
+import { loadBytes } from '../../../scripts/bytes/data';
+import { programs } from '../../../data/programs';
+
+interface Props { id?: string; keys?: string }
+const { id = 'pr-unpack', keys = 'fsl hggi hgvplk hgvpdl' } = Astro.props;
+
+// Greedy LZ77, shortest useful copy 3 bytes
+type Tok = { lit: string } | { dist: number; len: number };
+const toks: Tok[] = [];
+for (let i = 0; i < keys.length;) {
+  let best = { dist: 0, len: 0 };
+  for (let j = 0; j < i; j++) {
+    let n = 0;
+    while (i + n < keys.length && keys[j + n] === keys[i + n]) n++;
+    if (n > best.len) best = { dist: i - j, len: n };
+  }
+  if (best.len >= 3) { toks.push(best); i += best.len; } else toks.push({ lit: keys[i++] });
+}
+const img = render(ssrBin(), keys, { font: 1, color: 14 });
+const lits = toks.filter(t => 'lit' in t).length;
+
+const { files } = loadBytes();
+const title = (f: (typeof files)[number]) => (f.id === 'arabart' ? 'ARABART' : programs.find(p => p.id === f.id)?.title.replace(' - ', ': ') ?? f.id);
+const rows = files.map(f => ({ name: f.path.split('/').pop()!, title: title(f), disk: f.disk.size, mem: f.mem.size })).sort((a, b) => b.mem - a.mem);
+const max = rows[0].mem;
+const sum = (k: 'disk' | 'mem') => rows.reduce((s, r) => s + r[k], 0);
+const n = (v: number) => v.toLocaleString('en-US');
+---
+
+<div class="pru" id={id} data-unpack data-keys={keys}>
+  <script type="application/json" data-toks set:html={JSON.stringify(toks)} />
+  <Window title="PACKED  what the file stores" kind="panel" num="1" class="pru-in">
+    <ol class="pru-toks">
+      {toks.map((t, i) => (
+        <li data-t={i} class:list={['lit' in t ? 'is-lit' : 'is-ref']}>
+          {'lit' in t ? <><code>{t.lit === ' ' ? '␣' : t.lit}</code><span>copy as is</span></> : <><code>←{t.dist} ×{t.len}</code><span>go back {t.dist}, copy {t.len}</span></>}
+        </li>
+      ))}
+    </ol>
+    <p class="pru-sum">{toks.length} instructions: {lits} letters stored as they are, and {toks.length - lits} copies of letters already rebuilt.</p>
+  </Window>
+
+  <Window title="UNPACKED  rebuilt in memory" kind="editor" num="2" active class="pru-out">
+    <ol class="pru-bytes" data-bytes aria-label={`Rebuilt keys: ${keys}`}>
+      {[...keys].map((k, i) => <li data-i={i}>{k === ' ' ? '␣' : k}</li>)}
+    </ol>
+    <div class="pru-ar" data-ar>
+      <svg viewBox={`0 0 ${img.width} ${img.height}`} shape-rendering="crispEdges" role="img" aria-label={`${toUnicode(keys)}, drawn by ARABART`}>{svgRuns(img).map(p => <path fill={p.fill} d={p.d} />)}</svg>
+    </div>
+    <p class="pru-say" data-say aria-live="polite">All {keys.length} keys are back: <span lang="ar" dir="rtl">{toUnicode(keys)}</span>. Notice the copy that rebuilt <code>hgvp</code>: <span lang="ar" dir="rtl">الرح</span>, shared by <span lang="ar" dir="rtl">الرحمن</span> and <span lang="ar" dir="rtl">الرحيم</span>.</p>
+  </Window>
+
+  <Window title="THE UNPACKER, IN JAVASCRIPT" kind="editor" class="pru-js">
+    <pre class="pru-code"><code><span data-l="0">for (const t of packed) {'{'}</span>
+<span data-l="1">  if (t.literal) out.push(t.byte);</span>
+<span data-l="2">  else for (let i = 0; i &lt; t.len; i++)</span>
+<span data-l="2">    out.push(out[out.length - t.dist]);</span>
+<span data-l="0">{'}'}</span>
+<span data-l="9">jumpTo(out);  <i>// then run the program it rebuilt</i></span></code></pre>
+  </Window>
+  <div class="pru-ctl"><Scrubber n={toks.length + 1} at={toks.length} label="Step through the unpacking" /></div>
+
+  <Window title={`HIS ${rows.length} FILES  packed, then unpacked`} kind="dialog" class="pru-files">
+    <p class="pru-key" aria-hidden="true"><span><i class="d"></i>On the disk</span><span><i class="m"></i>In memory, unpacked</span></p>
+    <ul class="pru-rows">
+      {rows.map(r => (
+        <li>
+          <span class="pru-name"><b>{r.name}</b><small>{r.title}</small></span>
+          <span class="pru-bars" role="img" aria-label={`${r.name}: ${n(r.disk)} bytes on disk, ${n(r.mem)} in memory`}>
+            <i class="m" style={`width:${(r.mem / max) * 100}%`}></i>
+            <i class="d" style={`width:${(r.disk / max) * 100}%`} data-d={(r.disk / max) * 100} data-m={(r.mem / max) * 100}></i>
+          </span>
+          <span class="pru-n">{n(r.disk)}<small>→ {n(r.mem)}</small></span>
+        </li>
+      ))}
+    </ul>
+    <p class="pru-tot">All together: <b>{n(sum('disk'))}</b> bytes on disk become <b>{n(sum('mem'))}</b> in memory.</p>
+    <button type="button" class="button button--primary k-btn" data-inflate hidden>Unpack them all</button>
+  </Window>
+</div>
+
+<style is:global>
+  .pru { display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); grid-template-areas: 'in out' 'in ctl' 'in js' 'files files'; gap: 26px; align-items: start; }
+  .pru > .pru-in { grid-area: in; } .pru > .pru-out { grid-area: out; } .pru-ctl { grid-area: ctl; } .pru > .pru-js { grid-area: js; }
+  .pru > .pru-files { grid-area: files; margin-top: 18px; }
+  .pru-toks { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .pru-toks li { display: grid; gap: 2px; padding: 6px 8px; background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 30%, transparent); transition: background-color 0.15s, opacity 0.2s; }
+  .pru-toks code { font: 700 1rem/1.2 var(--font-code); color: var(--ink); }
+  .pru-toks span { font: 500 0.6875rem/1.25 var(--font-code); color: var(--ink-2); }
+  .pru-toks .is-ref code { color: var(--accent); }
+  .pru-toks li.done { opacity: 0.55; }
+  .pru-toks li.now { opacity: 1; background: var(--vga-14); box-shadow: none; }
+  .pru-toks li.now :is(code, span) { color: var(--vga-0); }
+  .pru-sum { margin: 14px 0 0; font: 500 0.875rem/1.5 var(--sans); color: var(--ink); }
+  .pru-bytes { display: flex; flex-wrap: wrap; gap: 4px; min-height: 40px; margin: 0; padding: 0; list-style: none; }
+  .pru-bytes li { display: grid; place-items: center; width: 30px; height: 36px; font: 700 1rem var(--font-code); color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 40%, transparent); }
+  .pru-bytes li.off { visibility: hidden; }
+  .pru-bytes li.src { background: var(--accent-2); color: var(--surface); }
+  .pru-bytes li.new { background: var(--vga-14); color: var(--vga-0); }
+  .pru-ar { display: grid; place-items: center; min-height: 92px; margin-top: 16px; padding: 14px; background: var(--vga-0); }
+  .pru-ar svg { display: block; width: min(100%, 520px); height: auto; image-rendering: pixelated; }
+  .pru-say { margin: 14px 0 0; min-height: 3.1em; font: 500 1rem/1.55 var(--sans); color: var(--ink); }
+  .pru-say [lang='ar'] { font: 700 1.15em var(--font-ar); color: var(--accent); }
+  .pru-say code { font: 600 0.9em var(--font-code); color: var(--accent-2); }
+  .pru-code { margin: 0; white-space: pre-wrap; font: 500 clamp(11.5px, 0.25vw + 9.5px, 13px)/1.8 var(--font-code); color: var(--ink); }
+  .pru-code i { color: var(--ink-2); font-style: normal; }
+  .pru-code span.on, .pru-code span.on i { background: var(--accent-2); color: var(--surface); }
+  .pru-key { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0 0 14px; font: 500 0.8125rem var(--sans); color: var(--ink); }
+  .pru-key i { display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; }
+  .pru-key .d, .pru-bars .d { background: var(--vga-1); }
+  .pru-key .m, .pru-bars .m { background: var(--vga-10); }
+  .pru.is-live .pru-bars .m { background: none; box-shadow: inset 0 0 0 1px var(--vga-10); }
+  .pru-rows { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .pru-rows li { display: grid; grid-template-columns: minmax(150px, 0.8fr) minmax(0, 2fr) 9.5em; align-items: center; gap: 4px 14px; padding: 3px 0; }
+  .pru-name { display: grid; min-width: 0; }
+  .pru-name b { font: 700 0.875rem/1.2 var(--font-code); color: var(--ink); }
+  .pru-name small { font: 500 0.75rem/1.25 var(--sans); color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pru-bars { position: relative; height: 18px; }
+  .pru-bars i { position: absolute; left: 0; top: 0; bottom: 0; min-width: 2px; }
+  .pru-n { font: 600 0.8125rem/1.2 var(--font-code); color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+  .pru-n small { display: block; font-weight: 500; color: var(--ink-2); }
+  .pru-tot { margin: 16px 0 14px; font: 500 1rem/1.5 var(--sans); color: var(--ink); }
+  .pru-tot b { font-family: var(--font-code); color: var(--accent); }
+  @media (max-width: 1023px) { .pru { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'out' 'ctl' 'in' 'js' 'files'; } }
+  @media (max-width: 560px) {
+    .pru-rows li { grid-template-columns: minmax(0, 1fr) auto; }
+    .pru-bars { grid-column: 1 / -1; grid-row: 2; }
+    .pru-bytes li { width: 26px; height: 32px; font-size: 0.875rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .pru-toks li { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+  import { fonts, render, svgMarkup, toUnicode } from '../arabart/core.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type Tok = { lit: string } | { dist: number; len: number };
+  document.querySelectorAll<HTMLElement>('[data-unpack]').forEach(async root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const toks: Tok[] = JSON.parse($('[data-toks]').textContent!), keys = root.dataset.keys!;
+    const tl = [...root.querySelectorAll<HTMLElement>('.pru-toks li')], bytes = [...root.querySelectorAll<HTMLElement>('.pru-bytes li')];
+    const lines = [...root.querySelectorAll<HTMLElement>('.pru-code [data-l]')], ar = $('[data-ar]'), say = $('[data-say]');
+    // Where each token's output starts
+    const at: number[] = []; let p = 0;
+    for (const t of toks) { at.push(p); p += 'lit' in t ? 1 : t.len; }
+    const bin = await fonts().catch(() => null);
+    let lastAr = '';
+
+    const drawAr = (k: string) => {
+      if (!bin || k === lastAr) return;
+      lastAr = k;
+      ar.innerHTML = k.trim() ? svgMarkup(render(bin, k, { font: 1, color: 14 }), 3, '') : '';
+      const svg = ar.querySelector('svg');
+      if (svg) { svg.removeAttribute('width'); svg.removeAttribute('height'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', toUnicode(k)); svg.removeAttribute('aria-hidden'); }
+    };
+    function show(i: number, how: How) {
+      // i = number of tokens applied
+      const end = i < toks.length ? at[i] : keys.length, t = toks[i - 1];
+      tl.forEach((li, k) => { li.classList.toggle('done', k < i - 1); li.classList.toggle('now', k === i - 1); });
+      bytes.forEach((b, k) => { b.classList.toggle('off', k >= end); b.classList.remove('src', 'new'); });
+      lines.forEach(l => l.classList.toggle('on', !!t && (l.dataset.l === ('lit' in t ? '1' : '2')) || (i === toks.length && l.dataset.l === '9')));
+      if (t) {
+        const s = at[i - 1], len = 'lit' in t ? 1 : t.len;
+        for (let k = s; k < s + len; k++) bytes[k].classList.add('new');
+        if (!('lit' in t)) for (let k = s - t.dist; k < s - t.dist + t.len; k++) bytes[k].classList.add('src');
+        if (how !== 'jump' && !reduce()) {
+          if ('lit' in t) gsap.fromTo(bytes[s], { y: -14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: 'back.out(2)' });
+          else for (let k = 0; k < t.len; k++) {
+            const from = bytes[s - t.dist + k].getBoundingClientRect(), to = bytes[s + k].getBoundingClientRect();
+            gsap.fromTo(bytes[s + k], { x: from.left - to.left, y: from.top - to.top }, { x: 0, y: 0, duration: 0.55, delay: k * 0.06, ease: 'power3.inOut' });
+          }
+        }
+        const u = (q: string) => `<code>${q.replace(/ /g, '␣')}</code>`;
+        say.innerHTML = 'lit' in t
+          ? `Stored as is: ${u(t.lit)}.${i < toks.length ? ` ${end} of ${keys.length} keys rebuilt.` : ''}`
+          : `A copy: go back ${t.dist} and copy ${t.len}, ${u(keys.slice(s, s + t.len))}. ${t.len} bytes of output from one small instruction.`;
+      } else say.textContent = 'Nothing rebuilt yet. The unpacker reads the first instruction.';
+      if (i === toks.length) say.innerHTML += ` All ${keys.length} keys are back, and the program can run.`;
+      drawAr(keys.slice(0, end));
+    }
+    root.classList.add('is-live');
+    const s = scrubber($('[data-scrub]'), show, { speed: 0.55 });
+    s.go(toks.length, 'jump');
+
+    // The bars: start packed, unpack on demand
+    const inflate = $<HTMLButtonElement>('[data-inflate]'), ds = [...root.querySelectorAll<HTMLElement>('.pru-bars .d')];
+    let open = true;
+    inflate.hidden = false;
+    inflate.textContent = 'Pack them again';
+    inflate.addEventListener('click', () => {
+      open = !open;
+      ds.forEach((d, k) => gsap.to(d, { width: `${open ? d.dataset.m : d.dataset.d}%`, background: open ? 'rgb(85 255 85)' : 'rgb(0 0 170)', duration: reduce() ? 0 : 0.9, delay: reduce() ? 0 : k * 0.03, ease: 'power3.inOut' }));
+      inflate.textContent = open ? 'Pack them again' : 'Unpack them all';
+    });
+    // Start packed; unpack the first time the list scrolls into view
+    ds.forEach(d => { d.style.width = `${d.dataset.d}%`; });
+    open = false; inflate.textContent = 'Unpack them all';
+    if (!reduce()) new IntersectionObserver((es, io) => { if (es[0].isIntersecting) { io.disconnect(); gsap.delayedCall(0.4, () => { if (!open) inflate.click(); }); } }, { threshold: 0.4 }).observe($('.pru-rows'));
+  });
+</script>

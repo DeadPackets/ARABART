@@ -1,0 +1,232 @@
+{
+  "file": "NAMES/NAMES.COM",
+  "regions": [
+    {
+      "start": 0,
+      "end": 3,
+      "kind": "code",
+      "label": "Jump to the start",
+      "note": "jmp 056Fh: straight over his data block to the first instruction.",
+      "by": "yasser",
+      "evidence": "measured"
+    },
+    {
+      "start": 3,
+      "end": 1027,
+      "kind": "stack",
+      "label": "Stack and scratch space",
+      "note": "A block of zeros. The program points its own stack at 0500h inside it.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-planes"
+    },
+    {
+      "start": 1027,
+      "end": 1051,
+      "kind": "data",
+      "label": "Variables",
+      "note": "Picture pointer, buffer segment, layer size and strip sizes for the plane copy.",
+      "by": "yasser",
+      "evidence": "measured"
+    },
+    {
+      "start": 1051,
+      "end": 1135,
+      "kind": "table",
+      "label": "Spiral order table",
+      "note": "40 screen positions, typed in by hand, that the spiral effect stamps in turn, from the middle out.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-effects"
+    },
+    {
+      "start": 1135,
+      "end": 1550,
+      "kind": "code",
+      "label": "The show",
+      "note": "Mode 0Dh, then each picture with its effect and a 64-refresh pause, then the key wait and the sign-off.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    },
+    {
+      "start": 1550,
+      "end": 1604,
+      "kind": "text",
+      "label": "Sign-off text",
+      "note": "\"YASSER DOT DESIGN.\" and \"<c>1993 YASSER MOHAMED ALI\", printed with INT 21h AH=09h.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-sign"
+    },
+    {
+      "start": 1604,
+      "end": 1607,
+      "kind": "code",
+      "label": "Page byte",
+      "note": "The display page the sign-off writes to, then two closing bytes.",
+      "by": "yasser",
+      "evidence": "measured"
+    },
+    {
+      "start": 1607,
+      "end": 2232,
+      "kind": "code",
+      "label": "Effects, decoder, plane copy, refresh wait",
+      "note": "Five wipe effects, the run-length decoder at 0899h, the plane copy at 0981h and the refresh wait at 0885h.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-format"
+    },
+    {
+      "start": 2232,
+      "end": 2844,
+      "kind": "image",
+      "label": "Background tile",
+      "note": "Packed picture: 612 bytes become 800, four color layers of 200.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-format"
+    },
+    {
+      "start": 2844,
+      "end": 12774,
+      "kind": "image",
+      "label": "KEMYAM title",
+      "note": "Packed picture: 9,930 bytes become 9,920, four color layers of 2,480.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-effects"
+    },
+    {
+      "start": 12774,
+      "end": 18698,
+      "kind": "image",
+      "label": "\"Computer Group\" banner",
+      "note": "Packed picture: 5,924 bytes become 5,920.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-effects"
+    },
+    {
+      "start": 18698,
+      "end": 23970,
+      "kind": "image",
+      "label": "Logo and signature",
+      "note": "The three arcs and the green KemYam signature: 5,272 bytes become 5,264.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-effects"
+    },
+    {
+      "start": 23970,
+      "end": 33962,
+      "kind": "image",
+      "label": "Blue signature box",
+      "note": "Shown between the member cards: 9,992 bytes become 9,984.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    },
+    {
+      "start": 33962,
+      "end": 39050,
+      "kind": "image",
+      "label": "Member card 1",
+      "note": "YASSER MOHAMED ALI: 5,088 bytes become 9,984, half the size.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    },
+    {
+      "start": 39050,
+      "end": 44138,
+      "kind": "image",
+      "label": "Member card 2",
+      "note": "MOHAMED ASAAD FOUDA: 5,088 bytes become 9,984, half the size.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    },
+    {
+      "start": 44138,
+      "end": 49226,
+      "kind": "image",
+      "label": "Member card 3",
+      "note": "KHALID ZAKARIA MOUSTAFA: 5,088 bytes become 9,984, half the size.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    },
+    {
+      "start": 49226,
+      "end": 54314,
+      "kind": "image",
+      "label": "Member card 4",
+      "note": "HATEM MOHAMED MOUSTAFA: 5,088 bytes become 9,984, half the size.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    },
+    {
+      "start": 54314,
+      "end": 59402,
+      "kind": "image",
+      "label": "Member card 5",
+      "note": "EBRAHEM EL-SYED EL-ETR: 5,088 bytes become 9,984, half the size.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ks-show"
+    }
+  ],
+  "routines": [
+    {
+      "start": 1135,
+      "end": 1550,
+      "name": "main",
+      "note": "His own stack, mode 0Dh, the show, the key wait and the sign-off.",
+      "link": "#ks-show"
+    },
+    {
+      "start": 1925,
+      "end": 1945,
+      "name": "wait_retrace",
+      "note": "Waits CX screen refreshes on bit 3 of port 3DAh, so the show runs at the same speed on every PC.",
+      "link": "#ks-time"
+    },
+    {
+      "start": 1945,
+      "end": 1988,
+      "name": "rle_decode",
+      "note": "Copies bytes; 37h n v means n copies of v; 37h 00 ends the picture.",
+      "link": "#ks-format",
+      "lines": [
+        {
+          "off": 1956,
+          "note": "cmp al,37h: his marker byte"
+        },
+        {
+          "off": 1973,
+          "note": "rep stosb: write the run"
+        }
+      ]
+    },
+    {
+      "start": 2177,
+      "end": 2232,
+      "name": "plane_copy",
+      "note": "Copies one strip into color layers 1, 2, 4 and 8 through the Map Mask register.",
+      "link": "#ks-planes",
+      "lines": [
+        {
+          "off": 2198,
+          "note": "Port 3C4h index 2: the Map Mask"
+        },
+        {
+          "off": 2221,
+          "note": "shl al,1: the next color layer"
+        }
+      ]
+    }
+  ]
+}

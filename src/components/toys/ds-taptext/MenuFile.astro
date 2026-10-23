@@ -1,0 +1,123 @@
+---
+// His menu editor's tree (dialog 101) beside the file it saves, TapText.dmd, written by dmdParts() exactly as
+// TapText writes it. Pick an entry to find its lines; switch it off or fold it and watch its flag digits change.
+import { MENU, dmdParts, type Node, type Group } from './tt.ts';
+import strip from './icons.png';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const AT = '0.2.1';
+const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+const fileHtml = (root: Group, at: string) =>
+  dmdParts(root).map(p => `<span class="ttt-mf-rec${p.path === at ? ' is-on' : ''}" data-path="${p.path}">` +
+    p.s.split('\r\n').slice(0, -1).map(l => `<span class="ttt-mf-ln">${esc(l).replace(/X\d{5}/g, '<b>$&</b>') || ' '}</span>`).join('') + '</span>').join('');
+const rows: string[] = [];
+const walk = (n: Node, path: string, level: number) => {
+  if (n.type === 'separator') { rows.push(`<li class="ttt-mf-sep" style="--l:${level}" aria-hidden="true"></li>`); return; }
+  const g = n.type === 'group';
+  rows.push(`<li style="--l:${level}" data-row="${path}"${g && n.flags[1] === '0' ? ' data-folded' : ''}>` +
+    (g ? `<button type="button" class="ttt-mf-fold" data-fold="${path}" aria-expanded="${n.flags[1] === '1'}" aria-label="Fold or open ${esc(n.title)}">${n.flags[1] === '1' ? '−' : '+'}</button>` : '<span class="ttt-mf-fold"></span>') +
+    `<label class="ttt-mf-on"><input type="checkbox" ${n.flags[0] === '1' ? 'checked' : ''} data-on="${path}" aria-label="Show ${esc(n.title)} in the menu" /></label>` +
+    `<button type="button" class="ttt-mf-pick" data-pick="${path}" aria-pressed="${path === AT}"><i style="background-image:url(${strip.src});background-position:${-16 * n.icon}px 0" aria-hidden="true"></i>${esc(n.title)}</button></li>`);
+  if (g) n.children.forEach((c, i) => walk(c, path ? `${path}.${i}` : String(i), level + 1));
+};
+MENU.children.forEach((c, i) => walk(c, String(i), 0));
+---
+
+<div class="ttt-mf" id={id} data-mf data-at={AT}>
+  <figure class="ttt-mf-tree">
+    <figcaption>Menu Items</figcaption>
+    <ul data-tree set:html={rows.join('')} />
+  </figure>
+  <figure class="ttt-mf-file">
+    <figcaption>TapText.dmd <span data-size>{dmdParts().reduce((n, p) => n + p.s.length, 0) * 2} bytes</span></figcaption>
+    <pre data-file tabindex="0" aria-label="The file TapText.dmd" set:html={fileHtml(MENU, AT)} />
+  </figure>
+  <p class="ttt-mf-say" aria-live="polite" data-say>“Business Card” is one record: I for item, its flag and icon number, then its title and text, each after X and its length.</p>
+</div>
+
+<style>
+  .ttt-mf { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 16px; align-items: start; }
+  .ttt-mf figure { margin: 0; min-width: 0; }
+  .ttt-mf figcaption { margin-bottom: 6px; font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
+  .ttt-mf figcaption span { font-weight: 500; text-transform: none; letter-spacing: 0; }
+  .ttt-mf-tree ul { height: 360px; margin: 0; padding: 4px 0; overflow: auto; list-style: none; background: #fff; color: #000; border: 1px solid #000; font: 12px/1 Tahoma, Verdana, sans-serif; }
+  .ttt-mf-tree :global(li) { display: flex; align-items: center; gap: 0; min-height: 44px; padding-left: calc(2px + var(--l) * 18px); }
+  .ttt-mf-tree :global(li[hidden]) { display: none; }
+  .ttt-mf-tree :global(.ttt-mf-sep) { min-height: 12px; }
+  .ttt-mf-tree :global(.ttt-mf-sep)::after { content: ''; flex: 1; max-width: 120px; margin-left: 76px; border-top: 1px solid #000; }
+  .ttt-mf-tree :global(.ttt-mf-fold) { display: grid; place-items: center; width: 32px; height: 44px; flex: none; padding: 0; border: 0; background: none; color: #000; font: 700 12px/1 Tahoma, sans-serif; cursor: pointer; }
+  .ttt-mf-tree :global(button.ttt-mf-fold)::before { content: ''; position: absolute; width: 13px; height: 13px; border: 1px solid #888; }
+  .ttt-mf-tree :global(button.ttt-mf-fold) { position: relative; }
+  .ttt-mf-tree :global(.ttt-mf-on) { display: grid; place-items: center; width: 34px; height: 44px; flex: none; cursor: pointer; }
+  .ttt-mf-tree :global(input) { width: 18px; height: 18px; margin: 0; accent-color: #0a246a; }
+  .ttt-mf-tree :global(.ttt-mf-pick) { display: flex; align-items: center; gap: 5px; min-height: 44px; padding: 0 5px; border: 1px solid transparent; background: none; color: #000; font: inherit; white-space: nowrap; cursor: pointer; }
+  .ttt-mf-tree :global(.ttt-mf-pick i) { width: 16px; height: 16px; image-rendering: pixelated; }
+  .ttt-mf-tree :global(.ttt-mf-pick[aria-pressed='true']) > :global(*), .ttt-mf-tree :global(.ttt-mf-pick[aria-pressed='true']) { color: #fff; }
+  .ttt-mf-tree :global(.ttt-mf-pick[aria-pressed='true']) { background: linear-gradient(#0a246a 0 0) center / 100% 20px no-repeat; }
+  .ttt-mf-file pre { height: 360px; margin: 0; padding: 8px 10px; overflow: auto; background: var(--surface-2, #f4f4f4); border: 1px solid var(--rule); font: 12px/1.45 var(--font-code); white-space: pre; }
+  .ttt-mf-file :global(.ttt-mf-ln) { display: block; }
+  .ttt-mf-file :global(.ttt-mf-ln b) { font-weight: 400; color: var(--accent-2); }
+  .ttt-mf-file :global(.is-on .ttt-mf-ln b) { color: #00470b; } /* the highlighted record's gray-blue needs a deeper green */
+  .ttt-mf-file :global(.ttt-mf-rec.is-on) { display: block; background: color-mix(in oklch, var(--accent) 22%, transparent); outline: 1px solid var(--accent); }
+  .ttt-mf-file :global(.ttt-mf-rec.is-new .ttt-mf-ln:nth-child(2)) { animation: ttt-mf-flash 0.8s; }
+  @keyframes ttt-mf-flash { from { background: #ffd75e; } }
+  .ttt-mf-say { grid-column: 1 / -1; margin: 0; font-weight: 600; line-height: 1.5; }
+  @media (max-width: 760px) { .ttt-mf { grid-template-columns: minmax(0, 1fr); } .ttt-mf-tree ul, .ttt-mf-file pre { height: 300px; } }
+  @media (prefers-reduced-motion: reduce) { .ttt-mf-file :global(.ttt-mf-rec.is-new .ttt-mf-ln) { animation: none; } }
+</style>
+
+<script>
+  import { MENU, dmdParts, type Group, type Node } from './tt.ts';
+  const esc = (s: string) => s.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-mf]')) {
+    const menu = structuredClone(MENU) as Group;
+    const file = root.querySelector<HTMLElement>('[data-file]')!, say = root.querySelector('[data-say]')!, tree = root.querySelector<HTMLElement>('[data-tree]')!;
+    let at = root.dataset.at!;
+    const node = (path: string) => path.split('.').reduce<Node>((n, i) => (n as Group).children[+i], menu) as Exclude<Node, { type: 'separator' }>;
+    const render = (changed?: string) => {
+      file.innerHTML = dmdParts(menu).map(p => `<span class="ttt-mf-rec${p.path === at ? ' is-on' : ''}${p.path === changed ? ' is-new' : ''}" data-path="${p.path}">` +
+        p.s.split('\r\n').slice(0, -1).map(l => `<span class="ttt-mf-ln">${esc(l).replace(/X\d{5}/g, '<b>$&</b>') || ' '}</span>`).join('') + '</span>').join('');
+      const rec = file.querySelector<HTMLElement>('.is-on');
+      if (rec) file.scrollTop = rec.offsetTop - 40;
+    };
+    const folded = () => {
+      const hide = new Set<string>();
+      tree.querySelectorAll<HTMLElement>('[data-row]').forEach(li => {
+        const p = li.dataset.row!, g = node(p);
+        li.hidden = [...hide].some(h => p.startsWith(h + '.'));
+        if (g.type === 'group' && g.flags[1] === '0') hide.add(p);
+      });
+    };
+    tree.addEventListener('click', e => {
+      const t = e.target as HTMLElement;
+      const pick = t.closest<HTMLElement>('[data-pick]'), fold = t.closest<HTMLElement>('[data-fold]'), on = t.closest<HTMLInputElement>('[data-on]');
+      if (pick) {
+        at = pick.dataset.pick!;
+        tree.querySelectorAll('[data-pick]').forEach(b => b.setAttribute('aria-pressed', String(b === pick)));
+        const n = node(at);
+        say.textContent = n.type === 'group'
+          ? `“${n.title}” is a group: G, three flag digits (shown, open in the tree, menu style), its icon, its title, then how many entries follow: ${n.children.length}.`
+          : `“${n.title}” is one record: I for item, its flag and icon number, then its title and its ${n.text.length}-character text, each after X and its length.`;
+        render();
+      }
+      if (fold) {
+        const g = node(fold.dataset.fold!) as Group, open = g.flags[1] === '1';
+        g.flags = g.flags[0] + (open ? '0' : '1') + g.flags.slice(2);
+        fold.textContent = open ? '+' : '−'; fold.setAttribute('aria-expanded', String(!open));
+        at = fold.dataset.fold!;
+        say.textContent = `The tree remembers that “${g.title}” is ${open ? 'folded' : 'open'}: its second flag digit is now ${g.flags[1]}.`;
+        folded(); render(at);
+      }
+      if (on) {
+        const n = node(on.dataset.on!);
+        n.flags = (on.checked ? '1' : '0') + n.flags.slice(1);
+        at = on.dataset.on!;
+        say.textContent = `“${n.title}” is ${on.checked ? 'back in' : 'hidden from'} the menu: its first flag digit is now ${n.flags[0]}.`;
+        render(at);
+      }
+    });
+    folded();
+  }
+</script>

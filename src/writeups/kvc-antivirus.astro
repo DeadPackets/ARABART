@@ -1,0 +1,197 @@
+---
+// KVC, the KEMYAM Virus Capture (1993), by Yasser Awad and Ebrahim El-Etr. Facts: research/artifacts/koko/HOW.md,
+// README.md, e2e-report.md, research/programs.md section 2, and KVC.EXE itself (unpacked image offsets).
+import Steps from '../components/explain/Steps.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import KvcLive from '../components/toys/kvc-formx/KvcLive.astro';
+import Siren from '../components/toys/kvc-formx/Siren.astro';
+import Ping from '../components/toys/kvc-formx/Ping.astro';
+import Freeze from '../components/toys/kvc-formx/Freeze.astro';
+import FileRebuild from '../components/toys/kvc-formx/FileRebuild.astro';
+
+const PROGS = [['GAME.COM', 330], ['WP.EXE', 430], ['SHEET.EXE', 530]] as const;
+---
+
+<section id="kvc-koko" class="kv">
+  <h2>The virus no scanner could see</h2>
+  <p class="lead">In 1993 a virus called Koko was spreading across PCs in Egypt, and it could wipe a hard disk. No antivirus on the market could find it. So Yasser and Ebrahim El-Etr took it apart by hand, learned its secrets, and turned them against it.</p>
+  <p>Koko lived in memory. Run one infected program and Koko stayed behind, like a background service that never stops. From then on it slipped a copy of itself into every program the PC ran. It signed each one with its name, <code>KoKo (1)</code>. Most days it did nothing else you could see. Two days a year, it struck.</p>
+  <Steps
+    title="How Koko took over a PC"
+    steps={[
+      `A clean PC. Every program asks DOS, the system, for everything through one door: <b><a class="term" href="${import.meta.env.BASE_URL}/glossary/#int-21h" data-term="int-21h">slot 21h</a></b>. Think of one API endpoint that every app on the machine calls.`,
+      'Someone runs a program that carries Koko. <b>Koko moves into memory and stays there</b>, even after that program ends.',
+      'Koko writes its own address into slot 21h, so every request reaches Koko first. It keeps the real DOS address for itself, in <b>slot 3</b>, a slot normal programs never use.',
+      'Now every program that starts gets a copy of Koko, signed <code>KoKo (1)</code>.',
+      'On <b>February 17</b>, Koko shows its warning on the screen.',
+      'On <b>July 29</b>, the warning comes again, and the data on the hard disk is lost. So is the data on any floppy used that day.',
+    ]}
+  >
+    <svg class="dg" viewBox="0 0 640 330" role="img" aria-labelledby="kv-pc-t">
+      <title id="kv-pc-t">A PC's memory with slot 21h, slot 3, Koko and DOS, and a disk with three programs. Koko takes over slot 21h, stamps every program, and on July 29 the disk loses its data.</title>
+      <text class="t-cy" x="10" y="20">MEMORY</text>
+      <rect class="box" x="10" y="30" width="270" height="290" />
+      <rect class="box-bk" x="26" y="48" width="112" height="46" /><text class="t-yl" x="38" y="70">slot 21h</text>
+      <text class="t-sm kv-x kv-pre" x="38" y="86" data-s="1-2">→ DOS</text><text class="t-sm kv-x" x="38" y="86" data-s="3+">→ Koko</text>
+      <rect class="box-bk" x="152" y="48" width="112" height="46" /><text class="t-yl" x="164" y="70">slot 3</text>
+      <text class="t-sm kv-x kv-pre" x="164" y="86" data-s="1-2">unused</text><text class="t-sm kv-x" x="164" y="86" data-s="3+">→ DOS</text>
+      <rect class="box" x="26" y="250" width="238" height="54" /><text x="145" y="282" text-anchor="middle">DOS</text>
+      <path class="wire arrow kv-x kv-pre" data-s="1-2" d="M82 94 V242" />
+      <g data-s="2+"><rect class="box-ink" x="26" y="130" width="238" height="64" /><text class="t-bk t-lg" x="145" y="160" text-anchor="middle">Koko</text><text class="t-bk" x="145" y="182" text-anchor="middle">stays in memory</text></g>
+      <g data-s="3+"><path class="wire-hi arrow" d="M82 94 V122" /><path class="wire dash arrow" d="M208 194 V242" /><path class="wire-hi" d="M208 94 V110" /></g>
+      <text class="t-cy" x="300" y="20">DISK</text>
+      <rect class="box" x="300" y="30" width="330" height="200" />
+      {PROGS.map(([n, x], i) => (
+        <g>
+          <rect class="box-bk" x={x - 40} y="52" width="80" height="110" data-s={i === 0 ? '1-5' : '1-5'} />
+          <text x={x} y="182" text-anchor="middle" class="t-sm" data-s="1-5">{n}</text>
+          <g data-s={i === 0 ? '2-5' : '4-5'} class="kv-x"><rect class="box-hi" x={x - 36} y="118" width="72" height="40" /><text class="t-bk" x={x} y="135" text-anchor="middle">KoKo</text><text class="t-bk" x={x} y="152" text-anchor="middle">(1)</text></g>
+        </g>
+      ))}
+      <text class="t-sm kv-x kv-pre" x="330" y="215" data-s="2">the infected one</text>
+      <path class="wire-hi arrow" data-s="4" d="M280 160 C300 160 300 140 318 140" />
+      <g data-s="6" class="kv-x"><rect class="box-bk" x="310" y="46" width="310" height="150" /><text class="t-yl t-lg" x="465" y="128" text-anchor="middle">data lost</text></g>
+      <g data-s="5"><rect class="box-hi" x="300" y="248" width="150" height="64" /><text class="t-bk t-lg" x="375" y="278" text-anchor="middle">FEB 17</text><text class="t-bk" x="375" y="300" text-anchor="middle">the warning</text></g>
+      <g data-s="6"><rect class="box-hi" x="470" y="248" width="160" height="64" /><text class="t-bk t-lg" x="550" y="278" text-anchor="middle">JUL 29</text><text class="t-bk" x="550" y="300" text-anchor="middle">disk wiped</text></g>
+    </svg>
+    <svg slot="narrow" class="dg" viewBox="0 0 360 430" role="img" aria-labelledby="kv-pc-tn">
+      <title id="kv-pc-tn">Koko takes over slot 21h in memory, stamps every program on the disk, and wipes the disk on July 29.</title>
+      <text class="t-cy" x="6" y="16">MEMORY</text>
+      <rect class="box" x="6" y="24" width="348" height="196" />
+      <rect class="box-bk" x="18" y="38" width="156" height="46" /><text class="t-yl" x="30" y="58">slot 21h</text>
+      <text class="t-sm kv-x kv-pre" x="30" y="76" data-s="1-2">→ DOS</text><text class="t-sm kv-x" x="30" y="76" data-s="3+">→ Koko</text>
+      <rect class="box-bk" x="186" y="38" width="156" height="46" /><text class="t-yl" x="198" y="58">slot 3</text>
+      <text class="t-sm kv-x kv-pre" x="198" y="76" data-s="1-2">unused</text><text class="t-sm kv-x" x="198" y="76" data-s="3+">→ DOS</text>
+      <g data-s="2+"><rect class="box-ink" x="18" y="98" width="324" height="48" /><text class="t-bk t-lg" x="180" y="129" text-anchor="middle">Koko</text></g>
+      <rect class="box" x="18" y="160" width="324" height="46" /><text x="180" y="188" text-anchor="middle">DOS</text>
+      <text class="t-cy" x="6" y="246">DISK</text>
+      <rect class="box" x="6" y="254" width="348" height="96" />
+      {PROGS.map(([n], i) => (
+        <g>
+          <rect class="box-bk" x={18 + i * 112} y="266" width="100" height="72" data-s="1-5" />
+          <text class="t-sm" x={68 + i * 112} y="286" text-anchor="middle" data-s="1-5">{n}</text>
+          <g data-s={i === 0 ? '2-5' : '4-5'} class="kv-x"><rect class="box-hi" x={26 + i * 112} y="298" width="84" height="30" /><text class="t-bk" x={68 + i * 112} y="318" text-anchor="middle">KoKo (1)</text></g>
+        </g>
+      ))}
+      <g data-s="6" class="kv-x"><rect class="box-bk" x="12" y="262" width="336" height="82" /><text class="t-yl t-lg" x="180" y="310" text-anchor="middle">data lost</text></g>
+      <g data-s="5"><rect class="box-hi" x="6" y="364" width="170" height="58" /><text class="t-bk t-lg" x="91" y="392" text-anchor="middle">FEB 17</text><text class="t-bk" x="91" y="412" text-anchor="middle">the warning</text></g>
+      <g data-s="6"><rect class="box-hi" x="184" y="364" width="170" height="58" /><text class="t-bk t-lg" x="269" y="392" text-anchor="middle">JUL 29</text><text class="t-bk" x="269" y="412" text-anchor="middle">disk wiped</text></g>
+    </svg>
+  </Steps>
+  <p>Yasser and Ebrahim, of the KEMYAM Computer Group in Port Said, studied its code byte by byte until they knew every trick it had. Yasser’s verdict sits in KVC’s help screen: <q>It is a funny virus, all its tricks are untricky.</q></p>
+</section>
+
+<section id="kvc-live" class="kv">
+  <h2>Watch KVC catch it</h2>
+  <p class="lead">This PC runs in your browser, with Koko in its memory and two programs that wear its marks. Type SCAN and watch Yasser’s own KVC.EXE find Koko, sound the alarm, freeze it, and repair both files.</p>
+  <aside class="kv-safe" aria-label="Safe by design">
+    <p><b>Safe by design.</b> The real Koko is never on this site. What runs here is a harmless double built from KVC’s own checks. A 128-byte program answers KVC’s secret question and does nothing else. Two little programs carry Koko’s marks in every place KVC looks. Even those marks are stored scrambled, so no antivirus will flag this page as the virus. A 96-byte helper puts them back when the PC starts.</p>
+  </aside>
+  <KvcLive />
+  <p>KVC.EXE here is his 1993 program, byte for byte. When it is done, HELLO.COM and GREET.EXE are identical to their clean originals, down to the last byte. Type DIR to see their sizes shrink back to 61 and 96 bytes, or run them: all they do now is say hello.</p>
+</section>
+
+<section id="kvc-alarm" class="kv">
+  <h2>Hear the alarm</h2>
+  <p class="lead">When KVC finds Koko in memory, it sounds a siren on the PC’s little speaker. A high tone and a low one, twenty times in a row, with no gap.</p>
+  <p>A PC speaker can only push its cone out or pull it back in. A timer chip in the PC ticks 1,193,182 times a second. KVC tells it how many ticks make one wave: <strong>1,000</strong> for the high tone, <strong>1,600</strong> for the low one. So the pitch comes out exact on every PC. Play his alarm, then drag the number and hear what the chip makes of it.</p>
+  <Siren />
+  <Deep title="For engineers: the siren, line by line">
+    <Listing
+      title="KVC.EXE 080C-083E, the alarm"
+      lines={[
+        { off: '080C', code: 'mov  cx,14h', note: '20 tones' },
+        { off: '080F', code: 'cmp  ax,3E8h', note: 'was the last tone the high one?' },
+        { off: '0814', code: 'mov  ax,3E8h', note: 'high: the clock divided by 1,000', hi: true },
+        { off: '081A', code: 'mov  ax,640h', note: 'low: divided by 1,600', hi: true },
+        { off: '081F', code: 'mov  al,0B6h / out 43h,al', note: 'timer channel 2: make a square wave' },
+        { off: '0824', code: 'out  42h,al / mov al,ah / out 42h,al', note: 'the divisor, low byte then high byte' },
+        { off: '082A', code: 'in   al,61h / or al,3 / out 61h,al', note: 'connect the timer to the speaker' },
+        { off: '0832', code: 'mov  cx,0FF00h / loop $', note: 'hold the tone: 65,280 turns of the loop', hi: true },
+        { off: '0838', code: 'loop 080F', note: 'next tone' },
+        { off: '083A', code: 'in   al,61h / and al,0FCh / out 61h,al', note: 'speaker off' },
+      ]}
+      foot="The pitch comes from the timer chip, so it never changes. The length comes from the waiting loop: 65 ms a tone on a 10 MHz 286, the speed the site’s emulator gives his programs."
+    />
+  </Deep>
+</section>
+
+<section id="kvc-ask" class="kv">
+  <h2>One secret question</h2>
+  <p class="lead">A virus that lives in memory needs a way to ask, am I already here? Koko’s question was a number, <code>FF0Ch</code>, and its answer was <code>C0C1h</code>. Yasser and Ebrahim found that handshake and turned it into a detector.</p>
+  <p>It works like finding a hidden service on a machine: send a request that only that service understands, and see if its handshake comes back. A clean PC has never heard the question. A PC with Koko answers it every time. Flip Koko on and off, and send a few requests.</p>
+  <Ping />
+  <p>KVC asks this question first, every time it runs, before it looks at a single file. The same number marks Koko’s EXE files too. Koko writes <code>C0C1h</code> into their headers, and that is the first thing KVC checks in every EXE it opens.</p>
+</section>
+
+<section id="kvc-freeze" class="kv">
+  <h2>Switched off with its own hiding place</h2>
+  <p class="lead">DOS had no task manager. You could not stop a program that sat in memory. So KVC did something smarter: it used the back door Koko had built for itself.</p>
+  <div class="kv-cols">
+    <p>Koko kept the real DOS address in slot 3 so it could still reach DOS itself. KVC talks to DOS through that same slot, so its calls skip Koko completely. Then it copies slot 3 into slot 21h. Every program now reaches DOS directly, and Koko’s code sits in memory with nothing pointing at it. Frozen.</p>
+    <p>In JavaScript terms, Koko had monkey-patched the system call and kept the original in a spare variable. KVC found the spare and put the original back:</p>
+  </div>
+  <pre class="kv-js"><code>slots[0x21] = slots[0x03];   // every program reaches DOS directly again</code></pre>
+  <Freeze />
+  <p>Koko could load itself into memory more than once. KVC was ready for that as well. After freezing, it asks the question again. If a second copy still answers, KVC sounds the alarm again and tells the user plainly what to do. Once the files are clean, turn the PC off and start it from a clean system disk.</p>
+  <Deep title="For engineers: why slot 3">
+    <p>Slot 3 is the breakpoint interrupt, <code>INT 3</code>, which only debuggers use. Its instruction is a single byte, <code>CCh</code>. Koko copied the DOS entry point there, so <code>INT 3</code> became a private line to DOS. KVC makes three calls on that line: <code>AH = 09h</code> to print, <code>AX = 3503h</code> to read vector 3 (DOS hands back its own address in ES:BX), and <code>AX = 2521h</code> to write that address into vector 21h. None of them passes through Koko’s handler.</p>
+  </Deep>
+</section>
+
+<section id="kvc-clean" class="kv">
+  <h2>Every file rebuilt, byte for byte</h2>
+  <p class="lead">Koko had to keep each program working, or people would notice. So it carried the original bytes inside its own body. KVC needed no backup: it rebuilt every file from what Koko carried.</p>
+  <p>KVC walks every folder on the disk and opens every program. There are two kinds. A COM program is a plain run of code that starts at its first byte, like a script. An EXE starts with a header, a small manifest that tells DOS where to begin. Koko had a trick for each, and KVC undid each one. Step through both repairs on the real bytes of the demo’s two files.</p>
+  <FileRebuild />
+  <p>Before it writes a single byte, KVC checks two of Koko’s marks in a COM file and four in an EXE. If a file shows only some of them, KVC leaves it alone and asks the user to contact the KEMYAM Computer Group. It unlocks read-only files before repairing them, so protected programs get cleaned too. Two switches shape a scan: <code>/NS</code> checks one folder only, and <code>/NC</code> reports without cleaning.</p>
+  <Deep title="For engineers: the COM check and repair">
+    <Listing
+      title="KVC.EXE 0D76-0EF0, condensed"
+      lines={[
+        { off: '0D76', code: 'mov  cx,1Ah / mov ah,3Fh', note: 'read the first 26 bytes' },
+        { off: '0D88', code: 'mov  di,059Fh / mov cx,15h', note: "his copy of Koko's start and name, 21 bytes" },
+        { off: '0D8F', code: 'repe cmpsb', note: 'mark 1', hi: true },
+        { off: '0D99', code: 'mov  dl,[0514h] / mov dh,[0515h]', note: 'bytes 3 and 4: where the body starts' },
+        { off: '0DA1', code: 'shl  dx,1   (4 times)', note: 'blocks of 16 bytes into a byte count' },
+        { off: '0DD8', code: 'add  dx,127h', note: 'body + 295' },
+        { off: '0E12', code: 'repe cmpsb', note: 'mark 2: BF 00 01 BE 22 01', hi: true },
+        { off: '0E8D', code: 'mov  ax,5700h / int 21h', note: 'keep the date and time' },
+        { off: '0EC3', code: 'call 07A0h', note: 'reopen for writing, read-only cleared' },
+        { off: '0EEC', code: 'int  21h', note: 'AH = 40h: write the 26 saved bytes at the start', hi: true },
+        { off: '0EF0', code: 'mov  ax,5701h / int 21h', note: 'date and time back' },
+      ]}
+      foot="His C code then cuts the file to the size saved at body + 24 with chsize(). KVC is C for the walk through the folders and assembly for everything that touches the virus."
+    />
+  </Deep>
+  <ThenNow
+    rows={[
+      { then: 'Fixed bytes at fixed places: <code>KoKo (1)</code>, Koko’s repair code, a stack value of C0C1h', now: 'Antivirus signatures and YARA rules', why: 'The fastest, surest way to name a known family.' },
+      { then: 'Asking the virus its own “are you there?” question', now: 'Using malware’s own markers, like the WannaCry kill-switch domain in 2017', why: 'The attacker’s own check becomes the defender’s tool.' },
+      { then: 'Pointing slot 21h back at DOS', now: 'Isolating a process so nothing can reach it', why: 'Stop it first, clean up second.' },
+      { then: 'Rebuilding each file from the bytes Koko carried', now: 'An EDR rollback that restores changed files', why: 'Undo exactly what was done, no more.' },
+    ]}
+  />
+</section>
+
+<style>
+  .kv :global(.k-fig) { margin-block: 32px; }
+  /* The code stepper's line lists are lists of code, not prose: keep them out of the writeup's list type */
+  .kv :global(ol.k-code) { display: block; margin-top: 0; padding-left: 0; }
+  .kv :global(.k-code li) { font-size: inherit; line-height: inherit; max-width: none; }
+  :global(.steps.is-live) .kv-x:not(.on) { opacity: 0 !important; }
+  :global(.steps:not(.is-live)) .kv-pre { display: none; }
+  .kv q { quotes: '“' '”'; font-style: italic; color: var(--accent); }
+  .kv-safe { margin: 24px 0 8px; max-width: 72ch; padding: 16px 20px; background: var(--cyan-dk); color: var(--black); box-shadow: 8px 8px 0 var(--black); }
+  .kv-safe p { color: var(--black) !important; font-size: 1rem !important; line-height: 1.6 !important; }
+  .kv-safe b { color: var(--black); }
+  .kv :global([data-kvclive]), .kv :global([data-siren]), .kv :global([data-ping]), .kv :global(.k-cs), .kv :global([data-rebuild]) { margin-block: 32px; }
+  .kv-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(24px, 4vw, 48px); margin-top: 14px; }
+  .kv-cols p { margin: 0 !important; }
+  .kv-js { margin: 16px 0 0; padding: 14px 16px; white-space: pre-wrap; background: var(--surface-2); font: 500 0.9375rem/1.6 var(--font-code); color: var(--ink); }
+  .kv-js code { color: var(--accent); }
+  @media (max-width: 760px) { .kv-cols { grid-template-columns: minmax(0, 1fr); } .kv-cols p + p { margin-top: 1em !important; } }
+</style>
+

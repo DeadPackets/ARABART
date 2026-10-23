@@ -1,0 +1,107 @@
+---
+// PRINT > TRUTH TABLE: Digi-Test counts through every row of inputs like an odometer (MAIN.EXE 048B:25F4) and prints
+// the circuit's answer for each one. Here: KEMYAM's 8 inputs, 256 rows, simulated with his own gate rules.
+import Scrubber from '../Scrubber.astro';
+import { circuit } from './dt-data';
+import { simulate, O, Z } from './dt-sim';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const C = circuit();
+const IN = C.primes.filter(p => p.kind === 0x20);
+const OUT = C.primes.find(p => p.kind === 0x40)!;
+const rows = Array.from({ length: 1 << IN.length }, (_, r) => {
+  const f: Record<number, number> = {};
+  for (const p of C.primes) if (p.kind === 0x02) f[p.net] = O; else if (p.kind === 0x10) f[p.net] = Z;
+  IN.forEach((p, j) => (f[p.net] = (r >> j) & 1 ? O : Z));
+  return simulate(C.gates, C.nets, f)[OUT.net] === O ? 1 : 0;
+});
+const bits = (r: number) => IN.map((_, j) => (r >> j) & 1);
+const lit = rows.map((v, r) => (v ? r : -1)).filter(r => r >= 0);
+const last = rows.length - 1;
+const shown = [...new Set([...lit, last - 2, last - 1, last])].sort((a, b) => a - b);
+---
+
+<div class="dtt" id={id} data-dttruth data-rows={rows.join('')}>
+  <div class="dtt-wheels" aria-hidden="true">
+    {IN.map((p, j) => <span class="dtt-wheel" data-w={j}><b>{bits(last)[j]}</b><i>P{p.num}</i></span>)}
+    <span class="dtt-arrow">→</span>
+    <span class="dtt-wheel dtt-wheel--out"><b data-o>{rows[last]}</b><i>P8</i></span>
+  </div>
+  <div class="dtt-paper" aria-label="The printed truth table">
+    <p class="dtt-title">Circuit truth table.</p>
+    <p class="dtt-head" aria-hidden="true"><span>row</span>{IN.map(p => <span>P{p.num}</span>)}<span>|</span><span>P8</span></p>
+    <ol class="dtt-rows" data-list>
+      {shown.map(r => <li class:list={{ lit: rows[r] }}><span class="n">{r + 1}</span>{bits(r).map(b => <span>{b}</span>)}<span>|</span><span>{rows[r]}</span></li>)}
+    </ol>
+  </div>
+  <p class="dtt-say" aria-live="polite" data-say>Row 256 of 256. P8 lights in <b>{lit.length}</b> of 256 rows.</p>
+  <Scrubber n={rows.length} at={last} label="Rows of the truth table" />
+</div>
+
+<style is:global>
+  .dtt { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 18px 24px; align-items: start; }
+  .dtt .k-scrub, .dtt-say { grid-column: 1 / -1; }
+  .dtt-wheels { display: flex; flex-wrap: wrap; gap: 6px; align-self: center; }
+  .dtt-wheel { display: grid; justify-items: center; gap: 4px; }
+  .dtt-wheel b { display: grid; place-items: center; width: 40px; height: 52px; font: 700 26px/1 var(--font-code); color: #000; background: linear-gradient(#bbb, #fff 30%, #fff 70%, #bbb); box-shadow: inset 0 0 0 1px #555; }
+  .dtt-wheel b.turn { background: linear-gradient(#cc9, #ffff55 30%, #ffff55 70%, #cc9); }
+  .dtt-wheel i { font: 600 11px/1 var(--font-code); font-style: normal; color: var(--accent-2); }
+  .dtt-wheel--out b { color: #ffff55; background: #000; box-shadow: inset 0 0 0 2px #aa00aa; }
+  .dtt-arrow { align-self: center; padding: 0 2px 16px; font: 700 20px/1 var(--font-code); color: var(--accent-2); }
+  .dtt-paper { position: relative; padding: 12px 34px; color: #222; background: #f4f1e6; box-shadow: 8px 8px 0 var(--black); overflow: hidden;
+    -webkit-mask: radial-gradient(circle 5px at 14px 12px, transparent 98%, #000) 0 0 / 100% 22px repeat-y; }
+  .dtt-paper::after { content: ''; position: absolute; inset: 0 auto 0 auto; right: 9px; width: 10px; background: radial-gradient(circle 5px at 50% 11px, var(--surface) 98%, transparent) 0 0 / 10px 22px repeat-y; }
+  .dtt-title { margin: 0 0 6px !important; font: 700 13px/1.4 var(--font-code) !important; color: #222 !important; }
+  .dtt-head, .dtt-rows li { display: grid; grid-template-columns: 4.5ch repeat(8, 3ch) 2ch 3ch; font: 600 13px/1.6 var(--font-code) !important; color: #222 !important; max-width: none !important; }
+  .dtt-head { margin: 0 !important; border-bottom: 1px dashed #888; font-size: 11px !important; color: #555 !important; }
+  .dtt-rows { margin: 0 !important; padding: 0 !important; list-style: none !important; min-height: calc(7 * 1.6 * 13px); }
+  .dtt-rows li::marker { content: none; }
+  .dtt-rows .n { color: #777; font-weight: 500; }
+  .dtt-rows li.lit { background: #ffff55; }
+  .dtt-rows li.new { animation: dtt-in 0.35s ease-out; }
+  @keyframes dtt-in { from { transform: translateY(8px); opacity: 0; } }
+  .dtt-say { margin: 0 !important; }
+  .dtt-say b { color: var(--accent); }
+  @media (max-width: 760px) {
+    .dtt { grid-template-columns: minmax(0, 1fr); }
+    .dtt-wheels { gap: 4px; }
+    .dtt-wheel b { width: 29px; height: 42px; font-size: 21px; }
+    .dtt-arrow { padding: 0 0 16px; }
+    .dtt-paper { padding: 10px 26px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .dtt-rows li.new { animation: none; } }
+</style>
+
+<script>
+  import { scrubber } from '../scrubber';
+
+  document.querySelectorAll<HTMLElement & { dtt?: boolean }>('[data-dttruth]').forEach(root => {
+    if (root.dtt) return;
+    root.dtt = true;
+    const rows = root.dataset.rows!.split('').map(Number);
+    const wheels = [...root.querySelectorAll<HTMLElement>('.dtt-wheel[data-w] b')], out = root.querySelector<HTMLElement>('[data-o]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-list]')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const n = wheels.length, lit = rows.filter(Boolean).length;
+    let prev = rows.length - 1;
+    const line = (r: number) => {
+      const li = document.createElement('li');
+      if (rows[r]) li.className = 'lit';
+      li.innerHTML = `<span class="n">${r + 1}</span>` + Array.from({ length: n }, (_, j) => `<span>${(r >> j) & 1}</span>`).join('') + `<span>|</span><span>${rows[r]}</span>`;
+      return li;
+    };
+    const show = (i: number) => {
+      // The wheels that turned on this row: the first one always, the next ones while they carry
+      const turned = i ? (i ^ (i - 1)) : 0;
+      wheels.forEach((w, j) => { w.textContent = String((i >> j) & 1); w.classList.toggle('turn', !!((turned >> j) & 1)); });
+      out.textContent = String(rows[i]);
+      const seen = rows.slice(0, i + 1).filter(Boolean).length;
+      const keep = Math.max(0, i - 6);
+      const want = [...new Set([...rows.map((v, r) => (v && r < keep ? r : -1)).filter(r => r >= 0), ...Array.from({ length: i - keep + 1 }, (_, k) => keep + k)])];
+      list.replaceChildren(...want.map(r => { const li = line(r); if (r === i && i === prev + 1) li.classList.add('new'); return li; }));
+      say.innerHTML = i === rows.length - 1 ? `Row ${rows.length} of ${rows.length}. P8 lights in <b>${lit}</b> of ${rows.length} rows.` : `Row ${i + 1} of ${rows.length}. P8 has lit in <b>${seen}</b> ${seen === 1 ? 'row' : 'rows'} so far.`;
+      prev = i;
+    };
+    scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 0.03 });
+  });
+</script>

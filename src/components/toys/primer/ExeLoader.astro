@@ -1,0 +1,165 @@
+---
+// An EXE is a manifest, the code, and a list of fix-ups. Step through DOS loading KVC.EXE (unpacked), and drag where it
+// lands: the seven places that hold KVC's data segment, 0378h, are patched with the real address as you drag.
+// Facts: research/artifacts/programs/unpacked/KVC_KVC.EXE (header at 0, 7 relocations, all pointing at a word 0378h).
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+
+interface Props { id?: string; load?: number }
+const { id = 'pr-exeload', load = 0x1000 } = Astro.props;
+const h4 = (n: number) => n.toString(16).toUpperCase().padStart(4, '0');
+const FIX = [
+  { off: 0x0000, word: 0x0001, op: 'mov  dx' }, { off: 0x005a, word: 0x005b, op: 'mov  di' }, { off: 0x009f, word: 0x00a0, op: 'mov  ax' },
+  { off: 0x00c9, word: 0x00ca, op: 'mov  ax' }, { off: 0x0103, word: 0x0104, op: 'mov  ax' }, { off: 0x0d31, word: 0x0d32, op: 'mov  ax' },
+  { off: 0x0fd3, word: 0x0fd4, op: 'mov  ax' },
+];
+const IMAGE = 16864, DATA = 0x0378;
+const STEPS = [
+  'DOS reads the header first, the way npm reads <code>package.json</code>: it says where to start, where the stack goes, and lists 7 fix-ups.',
+  'DOS copies the code and data into free memory. Where exactly depends on what is loaded already. Drag the slider: it could be anywhere.',
+  'Now the fix-ups. Seven places in KVC say “my data is 0378h paragraphs after my start”. DOS adds the real start to each one.',
+  'Last, DOS points the stack where the header said and jumps to the start, counted from the same load address. KVC runs, sure of where its data is.',
+];
+---
+
+<div class="prx" id={id} data-exeload data-load={load}>
+  <Window title="KVC.EXE  the manifest" kind="panel" num="1" active class="prx-file">
+    <pre class="prx-json" data-part="1"><code>{'{'}
+  <b>"magic"</b>:  "MZ",         <i>// I am an EXE</i>
+  <b>"fixups"</b>: 7,            <i>// listed after this header</i>
+  <b>"start"</b>:  "0000:0000",  <i>// counted from my load address</i>
+  <b>"stack"</b>:  "0406:0100",  <i>// counted from it too</i>
+  <b>"memory"</b>: "all of it"   <i>// as much as DOS can give</i>
+{'}'}</code></pre>
+    <div class="prx-img" data-part="2" aria-hidden="true">
+      <span class="prx-img-l">Code and data, {IMAGE.toLocaleString('en-US')} bytes</span>
+      <div class="prx-img-bar">{FIX.map(f => <i style={`left:${(f.word / IMAGE) * 100}%`}></i>)}</div>
+      <span class="prx-img-s">7 fix-ups, marked</span>
+    </div>
+  </Window>
+
+  <Window title="MEMORY  where DOS puts it" kind="editor" num="2" class="prx-mem">
+    <label class="prx-sl">
+      <span>Load address <b data-seg>{h4(load)}h</b> <small data-kb>({(load * 16 / 1024).toLocaleString('en-US')} KB in)</small></span>
+      <input type="range" min="256" max="32768" step="16" value={load} aria-label="Load segment" aria-valuetext={`${h4(load)}h`} />
+    </label>
+    <div class="prx-bar" aria-hidden="true"><i class="prx-blk" data-blk style={`left:${(load * 16 / 524288) * 100}%`}><span>KVC</span></i><span>0</span><span>512 KB</span></div>
+    <ol class="prx-fix" data-part="3">
+      {FIX.map(f => (
+        <li><span class="o">{h4(f.off)}</span><code>{f.op}, <s>0378h</s> <b data-v>{h4(DATA + load)}h</b></code></li>
+      ))}
+    </ol>
+    <p class="prx-run" data-part="4">Starts at <b data-cs>{h4(load)}:0000</b>, stack at <b data-ss>{h4(0x406 + load)}:0100</b></p>
+  </Window>
+
+  <Window title="HELP" kind="help" class="prx-help">
+    <p class="prx-say" data-say aria-live="polite" set:html={STEPS[3]} />
+  </Window>
+  <Window title="THE SAME IDEA IN JAVASCRIPT" kind="editor" class="prx-js">
+    <pre class="prx-code"><code><i>// Only the loader knows the start, so it patches each listed spot:</i>
+<span data-l="3">for (const at of header.fixups)</span>
+<span data-l="3">  image.setUint16(at, image.getUint16(at, true) + loadSegment, true);</span>
+<i>// Today the same job: a URL resolved against where the code loaded</i>
+new URL('./data.json', import.meta.url);</code></pre>
+  </Window>
+  <div class="prx-ctl"><Scrubber n={4} at={3} label="Step through loading KVC.EXE" /></div>
+  <script type="application/json" data-steps set:html={JSON.stringify(STEPS)} />
+</div>
+
+<style is:global>
+  .prx { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+  .prx-ctl { grid-column: 1 / -1; }
+  .prx-json { margin: 0; white-space: pre; overflow-x: auto; font: 500 clamp(11.5px, 0.3vw + 9px, 13.5px)/1.75 var(--font-code); color: var(--ink); }
+  .prx-json b { color: var(--accent); font-weight: 600; }
+  .prx-json i { color: var(--ink-2); font-style: normal; }
+  .prx-img { display: grid; gap: 6px; margin-top: 18px; }
+  .prx-img-l, .prx-img-s { font: 500 0.75rem/1.3 var(--font-code); color: var(--ink-2); }
+  .prx-img-bar { position: relative; height: 34px; background: var(--vga-10); }
+  .prx-img-bar i { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1px; background: var(--vga-12); box-shadow: 0 0 0 1px var(--vga-0); }
+  .prx-sl { display: grid; gap: 4px; font: 500 0.9375rem/1.3 var(--sans); color: var(--ink); }
+  .prx-sl b { font: 700 1rem var(--font-code); color: var(--accent); }
+  .prx-sl small { font: 500 0.75rem var(--font-code); color: var(--ink-2); }
+  .prx-sl input { width: 100%; min-height: 44px; margin: 0; accent-color: var(--vga-14); }
+  .prx-bar { position: relative; height: 30px; margin: 4px 0 20px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .prx-bar > span { position: absolute; top: 100%; font: 500 10px/1.6 var(--font-code); color: var(--ink-2); }
+  .prx-bar > span:last-child { right: 0; }
+  .prx-blk { position: absolute; top: 0; bottom: 0; width: 3.3%; min-width: 6px; background: var(--vga-14); }
+  .prx-blk span { position: absolute; bottom: 100%; left: 0; font: 700 10px/1.6 var(--font-code); color: var(--accent); white-space: nowrap; }
+  .prx-fix { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; font: 500 clamp(12px, 0.25vw + 10px, 13.5px)/1.75 var(--font-code); }
+  .prx-fix li { display: grid; grid-template-columns: 5ch 1fr; gap: 1ch; padding: 0 8px; color: var(--ink); }
+  .prx-fix .o { color: var(--ink-2); }
+  .prx-fix code { font: inherit; color: inherit; }
+  .prx-fix s { color: var(--ink-2); text-decoration-thickness: 2px; }
+  .prx-fix b { color: var(--accent); }
+  .prx-fix li.on { background: var(--accent-2); }
+  .prx-fix li.on :is(.o, code, s, b) { color: var(--surface); }
+  .prx-run { margin: 16px 0 0; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink); }
+  .prx-run b { font-family: var(--font-code); color: var(--accent); }
+  .prx-say { margin: 0; min-height: 4.8em; font: 500 1rem/1.55 var(--sans); color: var(--ink); text-wrap: pretty; }
+  .prx-code { margin: 0; white-space: pre-wrap; font: 500 clamp(11.5px, 0.25vw + 9.5px, 13px)/1.8 var(--font-code); color: var(--ink); }
+  .prx-code i { color: var(--ink-2); font-style: normal; }
+  .prx-code span.on { background: var(--accent-2); color: var(--surface); }
+  .prx.is-live [data-part] { transition: opacity 0.3s; }
+  .prx.is-live [data-part].dim { opacity: 0.25; }
+  .prx.is-live [data-part].lit { outline: 2px solid var(--vga-14); outline-offset: 4px; }
+  @media (max-width: 1023px) { .prx { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) { .prx-json i { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .prx.is-live [data-part] { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber, type How } from '../scrubber';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const h4 = (n: number) => n.toString(16).toUpperCase().padStart(4, '0');
+  document.querySelectorAll<HTMLElement>('[data-exeload]').forEach(root => {
+    const $ = <T extends Element = HTMLElement>(s: string) => root.querySelector(s) as T;
+    const STEPS: string[] = JSON.parse($('[data-steps]').textContent!);
+    const parts = [...root.querySelectorAll<HTMLElement>('[data-part]')];
+    const fixes = [...root.querySelectorAll<HTMLElement>('.prx-fix li')];
+    const range = $<HTMLInputElement>('.prx-sl input'), blk = $('[data-blk]');
+    let load = +root.dataset.load!, step = 3;
+
+    const values = (patched: boolean) => fixes.forEach(li => {
+      li.querySelector('s')!.style.display = patched ? '' : 'none';
+      li.querySelector('[data-v]')!.textContent = patched ? `${h4(0x378 + load)}h` : '0378h';
+    });
+    function paint() {
+      $('[data-seg]').textContent = `${h4(load)}h`;
+      $('[data-kb]').textContent = `(${(load * 16 / 1024).toLocaleString('en-US')} KB in)`;
+      range.setAttribute('aria-valuetext', `${h4(load)}h`);
+      blk.style.left = `${(load * 16 / 524288) * 100}%`;
+      $('[data-cs]').textContent = step >= 3 ? `${h4(load)}:0000` : '?';
+      $('[data-ss]').textContent = step >= 3 ? `${h4(0x406 + load)}:0100` : '?';
+      if (step >= 2) values(true);
+    }
+    function show(i: number, how: How) {
+      step = i;
+      $('[data-say]').innerHTML = STEPS[i];
+      parts.forEach(p => { const k = +p.dataset.part! - 1; p.classList.toggle('dim', k > i); p.classList.toggle('lit', k === i); });
+      root.querySelectorAll('.prx-code [data-l]').forEach(s => s.classList.toggle('on', i === 2));
+      gsap.set(blk, { opacity: i >= 1 ? 1 : 0 });
+      fixes.forEach(f => f.classList.remove('on'));
+      if (i < 2) values(false);
+      if (i === 2 && how !== 'jump' && !reduce()) {
+        values(false);
+        // One fix-up at a time, like the loader's loop
+        fixes.forEach((li, k) => gsap.delayedCall(0.18 * k + 0.1, () => {
+          if (step !== 2) return;
+          fixes.forEach(f => f.classList.toggle('on', f === li));
+          li.querySelector('s')!.style.display = '';
+          const v = li.querySelector('[data-v]')!; v.textContent = `${h4(0x378 + load)}h`;
+          gsap.fromTo(v, { y: -8, opacity: 0 }, { y: 0, opacity: 1, duration: 0.25 });
+          if (k === fixes.length - 1) gsap.delayedCall(0.4, () => fixes.forEach(f => f.classList.remove('on')));
+        }));
+      }
+      if (i === 1 && how !== 'jump' && !reduce()) gsap.fromTo(blk, { scaleY: 0 }, { scaleY: 1, duration: 0.4, ease: 'back.out(2)' });
+      paint();
+    }
+    range.addEventListener('input', () => { load = +range.value; paint(); });
+    const s = scrubber($('[data-scrub]'), show, { speed: 2.2 });
+    root.classList.add('is-live');
+    s.go(3, 'jump');
+  });
+</script>

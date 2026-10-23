@@ -1,0 +1,4 @@
+/* Shared by the four tools writeups. .writeup styles every ol and li; keep them off the shared code toys. */
+.writeup .k-cs ol.k-code { display: block; margin: 0; padding: 0; list-style: none; }
+.writeup .k-cs .k-code li { max-width: none; font-size: inherit; line-height: inherit; }
+.writeup .k-cs .k-code li::marker { content: none; }

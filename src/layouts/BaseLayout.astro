@@ -1,44 +1,52 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Explain from '../components/explain/Explain.astro';
+import { ERAS, type Era } from '../lib/eras/eras';
+import '../styles/fonts.css';
 import '../styles/global.css';
-import '../styles/crt.css';
 
 interface Props {
   title: string;
   description: string;
   image?: string;
   hasEmulator?: boolean;
+  keys?: { k: string; label: string; href?: string; act?: string }[];
+  era?: Era;
+  when?: [string, string];
 }
 
 const {
   title,
   description,
-  image = '/DOSArchive/images/arabart-demo.png',
+  image = '/ARABART/images/arabart-demo.png',
   hasEmulator = false,
+  keys,
+  era = 'dos',
+  when,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const imageURL = new URL(image, Astro.site);
+const JSDOS = 'https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist';
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-era={era}>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content={ERAS[era].theme} />
   <title>{title}</title>
   <meta name="description" content={description} />
 
-  <!-- Open Graph -->
   <meta property="og:type" content="website" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={imageURL} />
   <meta property="og:url" content={canonicalURL} />
-  <meta property="og:site_name" content="DOSArchive" />
-
-  <!-- Twitter -->
+  <meta property="og:site_name" content="ARABART" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
@@ -47,29 +55,24 @@ const imageURL = new URL(image, Astro.site);
   <link rel="canonical" href={canonicalURL} />
   <link rel="icon" type="image/x-icon" href={`${import.meta.env.BASE_URL}/favicon.ico`} />
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=VT323&display=swap" rel="stylesheet" />
+  {/* JS is on: toys that fill in later can reserve their space from the first paint */}
+  <script is:inline>document.documentElement.classList.add('js')</script>
+  <slot name="head" />
 
-  <!-- js-dos v8 (only on emulator pages) -->
+  {/* js-dos ships Tailwind preflight + daisyUI globals; a layer keeps every page rule above them. DosPlayer loads it when the program starts */}
   {hasEmulator && (
-    <link rel="stylesheet" href="https://v8.js-dos.com/latest/js-dos.css" />
-    <script is:inline src="https://v8.js-dos.com/latest/js-dos.js"></script>
+    <style is:inline set:html={`@layer reset, jsdos;`} />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <meta name="jsdos-path" content={`${JSDOS}/emulators/`} />
   )}
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
-
-  <Header />
-
-  <main id="main-content" class="page-content">
+  <Header era={era} keys={keys} when={when} />
+  <main id="main-content">
     <slot />
   </main>
-
   <Footer />
-
-  <!-- CRT Scanline Overlay -->
-  <div class="crt-overlay" aria-hidden="true"></div>
+  <Explain />
 </body>
 </html>

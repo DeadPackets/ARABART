@@ -1,0 +1,195 @@
+---
+// Screen Capture, HandyMenu.exe 3.7 0x149E8: step his code while the 54 header bytes of the .bmp fill in, then press the
+// button to capture this page's Pocket PC into a real .bmp built the same way (hm.ts bmp()).
+import CodeStepper from '../CodeStepper.astro';
+import { captureSteps, BMP_FIELDS, bmp, hex } from './hm.ts';
+import tray from './icon-101-16.png';
+
+const W = 240, H = 320;
+const steps = captureSteps(W, H);
+const head = [...bmp(W, H, new Uint8ClampedArray(W * H * 4)).slice(0, 54)];
+let at = 0;
+const fields = BMP_FIELDS.map(([name, size, means]) => { const f = { name, size, means, at, bytes: head.slice(at, at + size) }; at += size; return f; });
+const ASM = [
+  { off: '14A04', code: 'bl   MessageBeep', note: 'a beep' },
+  { off: '14A14', code: 'mul  r0,r3,r2 / bl Sleep', note: 'wait: delay × 500 ms' },
+  { off: '14A20', code: 'bl   GetDC', note: 'r0 = 0: the whole screen' },
+  { off: '14A50', code: 'bl   CreateCompatibleBitmap', note: 'a blank picture, screen size' },
+  { off: '14AA4', code: 'bl   BitBlt', note: 'copy every pixel: the shot' },
+  { off: '14AB4', code: 'bl   InvalidateRect', note: 'repaint the screen' },
+  { off: '14B04', code: 'bl   1497C', note: 'GetSaveFileName: where to?' },
+  { off: '14B54', code: 'mul  r3,r5,r4', note: 'width × height' },
+  { off: '14B5C', code: 'add  r3,r3,r3,lsl #1', note: '× 3: blue, green, red' },
+  { off: '14B74', code: 'str  r2,[sp,#44]', note: 'biSize = 40' },
+  { off: '14B84', code: 'strh lr,[sp,#58]', note: 'biBitCount = 24' },
+  { off: '14BAC', code: 'bl   CreateDIBSection', note: 'pixels as a plain array' },
+  { off: '14BE4', code: 'bl   BitBlt', note: 'copy the shot into it' },
+  { off: '14C40', code: 'add  r5,r3,#54', note: 'file size' },
+  { off: '14C64', code: 'strh sb,[sp,#38]', note: 'pixels start at 54' },
+  { off: '14C70', code: 'strh r4,[sp,#28]', note: 'r4 = 4D42h: "BM"' },
+  { off: '14C78', code: 'bl   WriteFile', note: '14 bytes: file header' },
+  { off: '14C90', code: 'bl   WriteFile', note: '40 bytes: picture header' },
+  { off: '14CA8', code: 'bl   WriteFile', note: 'every pixel' },
+];
+const C = [
+  { code: 'MessageBeep(0);' },
+  { code: 'Sleep(delay * 500);' },
+  { code: 'HDC scr = GetDC(NULL);' },
+  { code: 'bmp = CreateCompatibleBitmap(scr,w,h);' },
+  { code: 'BitBlt(mem,0,0,w,h, scr,0,0, SRCCOPY);' },
+  { code: 'InvalidateRect(NULL, NULL, FALSE);' },
+  { code: 'if (!GetSaveFileName(&ofn)) return;' },
+  { code: 'BITMAPINFOHEADER bi = {40,w,h,1,24};' },
+  { code: 'size = bi.biSizeImage = w * h * 3;' },
+  { code: 'CreateDIBSection(mem,&bi,0,&bits,0,0);' },
+  { code: 'BitBlt(dib,0,0,w,h, mem,0,0, SRCCOPY);' },
+  { code: "bf = { 'BM', 54 + size, 0, 0, 54 };" },
+  { code: 'WriteFile(f, &bf, 14, &n, NULL);' },
+  { code: 'WriteFile(f, &bi, 40, &n, NULL);' },
+  { code: 'WriteFile(f, bits, size, &n, NULL);' },
+];
+---
+
+<div class="hm-cap" data-hm-capture data-tray={tray.src}>
+  <CodeStepper id="hm-capture-code" title="HandyMenu.exe  Screen Capture" asm={ASM} c={C} steps={steps} speed={0.55}>
+    <div slot="visual" class="hm-cap-vis">
+      <div class="hm-cap-shot">
+        <div class="hm-cap-bezel">
+          <div class="hm-cap-html" aria-hidden="true"><p class="hm-cap-b"><span>Start</span><span>9:41</span></p><p class="hm-cap-d">Thursday, October 22, 2026</p><p>No upcoming appointments</p><p>0 unread messages</p><p>No active tasks</p><p class="hm-cap-b hm-cap-s"><span>Calendar</span><span>Contacts</span></p></div>
+          <canvas width={W} height={H} data-canvas aria-label="The Pocket PC screen being captured" role="img"></canvas>
+          <p class="hm-cap-flash" data-flash aria-hidden="true"></p>
+          <p class="hm-cap-save" data-save aria-hidden="true"><b>Save As</b><span>Name: <u>Capture.bmp</u></span><span>Type: Bitmap Files (*.bmp)</span></p>
+        </div>
+        <div class="hm-cap-act" hidden data-act-row>
+          <button type="button" class="button button--primary k-btn" data-shoot>Capture this Pocket PC</button>
+          <a class="button k-btn" data-dl hidden download="HandyMenu-capture.bmp">Download the .bmp</a>
+        </div>
+      </div>
+      <div class="hm-cap-file">
+        <p class="hm-cap-cap">The first 54 bytes of the file. Gray is not known yet, blue is known, green is written.</p>
+        <ol class="hm-cap-fields" data-fields>
+          {fields.map(f => (
+            <li data-at={f.at} data-size={f.size}>
+              <span class="hm-cap-bytes">{f.bytes.map(b => <i>{hex(b, 2)}</i>)}</span>
+              <span class="hm-cap-name"><b>{f.name}</b> {f.means}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="hm-cap-px"><span class="hm-cap-bar"><i data-bar></i></span><span data-pxlabel>Then {(W * H * 3).toLocaleString('en-US')} bytes of pixels, bottom row first.</span></p>
+      </div>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hm-cap { margin-block: 32px; }
+  :is(.hm-cap, .hm-rot, .hm-tr, .hm-sw, .hm-pw) .k-code-box { overflow-x: auto; }
+  .hm-cap-vis { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 20px 28px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-cap-shot { display: grid; gap: 12px; align-content: start; }
+  .hm-cap-bezel { position: relative; padding: 12px; border-radius: 18px; background: linear-gradient(160deg, #5a5e66, #2a2c31); }
+  .hm-cap-bezel canvas { position: relative; display: block; width: 100%; height: auto; }
+  .hm-cap-html { position: absolute; inset: 12px; display: flex; flex-direction: column; background: linear-gradient(#fff, #e9f0fb); }
+  .hm-cap-html p { margin: 0 !important; padding: 4px 6px; font: 10px/1.3 Tahoma, Verdana, sans-serif !important; color: #000 !important; max-width: none !important; }
+  .hm-cap-html .hm-cap-b { display: flex; justify-content: space-between; font-weight: 700 !important; color: #fff !important; background: linear-gradient(#3d6fd1, #16409a); }
+  .hm-cap-html .hm-cap-d { font-weight: 700 !important; color: #00309c !important; border-bottom: 1px solid #a9b8d8; }
+  .hm-cap-html .hm-cap-s { margin-top: auto !important; }
+  .hm-cap-flash { position: absolute; inset: 12px; margin: 0 !important; background: #fff; opacity: 0; pointer-events: none; }
+  .hm-cap-save { position: absolute; left: 22px; right: 22px; bottom: 40%; display: none; flex-direction: column; gap: 4px; margin: 0 !important; padding: 8px; font: 12px/1.3 Tahoma, sans-serif !important; color: #000 !important; background: #fff; border: 1px solid #000; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.4); max-width: none !important; }
+  .hm-cap-save b { color: #fff; margin: -8px -8px 2px; padding: 4px 8px; background: #1f4ba8; }
+  .hm-cap[data-shot='save'] .hm-cap-save { display: flex; }
+  .hm-cap-act { display: grid; gap: 8px; }
+  .hm-cap-act .k-btn { justify-content: center; white-space: normal; min-height: 44px; }
+  .hm-cap-cap, .hm-cap-px { margin: 0 0 10px !important; font-size: 0.9375rem !important; line-height: 1.45 !important; color: var(--ink-2) !important; max-width: none !important; }
+  .hm-cap-fields { list-style: none !important; margin: 0 !important; padding: 0 !important; display: grid !important; gap: 3px !important; }
+  .hm-cap-fields li { display: grid; grid-template-columns: 13ch minmax(0, 1fr); align-items: center; gap: 10px; margin: 0; max-width: none !important; }
+  .hm-cap-fields li:nth-child(5) { margin-top: 8px; }
+  .hm-cap-bytes { display: flex; gap: 2px; }
+  .hm-cap-bytes i { width: 3ch; padding: 2px 0; font: 600 12px/1.2 var(--font-code); font-style: normal; text-align: center; color: var(--ink-2); background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 0.25s, color 0.25s; }
+  .hm-cap-bytes i.k { color: #fff; background: var(--accent); }
+  .hm-cap-bytes i.w { color: #fff; background: var(--good); }
+  .hm-cap-name { font: 500 13px/1.3 var(--sans); color: var(--ink-2); min-width: 0; }
+  .hm-cap-name b { font: 700 12px var(--font-code); color: var(--ink); margin-right: 4px; }
+  .hm-cap-px { display: grid; gap: 6px; margin-top: 12px !important; }
+  .hm-cap-bar { display: block; height: 14px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-cap-bar i { display: block; width: 0; height: 100%; background: var(--good); transition: width 0.6s; }
+  @media (max-width: 700px) { .hm-cap-vis { grid-template-columns: minmax(0, 1fr); } .hm-cap-shot { max-width: 240px; justify-self: center; width: 100%; } }
+  @media (max-width: 420px) { .hm-cap-fields li { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+  @media (prefers-reduced-motion: reduce) { .hm-cap-bytes i, .hm-cap-bar i { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { bmp, hex, reduce, type CapStep } from './hm.ts';
+
+  // The Today screen with HandyMenu's menu open, drawn the way the device would show it
+  function paint(c: HTMLCanvasElement, icon: HTMLImageElement, menu: boolean) {
+    const g = c.getContext('2d', { willReadFrequently: true })!, W = c.width, H = c.height;
+    const bar = (y: number, h: number) => { const gr = g.createLinearGradient(0, y, 0, y + h); gr.addColorStop(0, '#3d6fd1'); gr.addColorStop(1, '#16409a'); g.fillStyle = gr; g.fillRect(0, y, W, h); };
+    let gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#ffffff'); gr.addColorStop(1, '#e9f0fb'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    bar(0, 26); bar(H - 26, 26);
+    g.fillStyle = '#fff'; g.font = 'bold 12px Tahoma, Verdana, sans-serif'; g.textBaseline = 'middle';
+    g.fillText('Start', 24, 13); g.fillText('9:41', W - 34, 13); g.fillText('Calendar', 10, H - 13); g.fillText('Contacts', W - 62, H - 13);
+    const flag = [['#3a3', 0, 0], ['#e94', 6, 0], ['#36d', 0, 6], ['#d33', 6, 6]] as const;
+    for (const [col, x, y] of flag) { g.fillStyle = col; g.fillRect(6 + x, 7 + y, 5, 5); }
+    g.fillStyle = '#00309c'; g.font = 'bold 11px Tahoma, Verdana, sans-serif'; g.fillText('Thursday, October 22, 2026', 8, 40);
+    g.fillStyle = '#a9b8d8'; g.fillRect(8, 50, W - 16, 1);
+    g.fillStyle = '#000'; g.font = '11px Tahoma, Verdana, sans-serif';
+    ['No upcoming appointments', '0 unread messages', 'No active tasks'].forEach((t, i) => g.fillText(t, 8, 66 + i * 20));
+    gr = g.createLinearGradient(0, H - 48, 0, H - 26); gr.addColorStop(0, '#f4f6fb'); gr.addColorStop(1, '#d8dfee'); g.fillStyle = gr; g.fillRect(0, H - 48, W, 22);
+    if (icon.complete) g.drawImage(icon, W - 22, H - 45, 16, 16);
+    if (menu) {
+      const x = W - 132, y = H - 48 - 5 * 20 - 4;
+      g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(x + 2, y + 2, 128, 5 * 20 + 2);
+      g.fillStyle = '#fff'; g.fillRect(x, y, 128, 5 * 20 + 2); g.strokeStyle = '#000'; g.strokeRect(x + 0.5, y + 0.5, 127, 5 * 20 + 1);
+      g.fillStyle = '#dbe5f5'; g.fillRect(x + 1, y + 1, 22, 5 * 20);
+      ['Soft Reset', 'Power Off', 'Rotate Screen (R)', 'IP Helper', 'Screen Capture'].forEach((t, i) => {
+        if (i === 4) { g.fillStyle = '#316ac5'; g.fillRect(x + 1, y + 1 + i * 20, 126, 20); }
+        g.fillStyle = i === 4 ? '#fff' : '#000'; g.fillText(t, x + 28, y + 11 + i * 20);
+      });
+    }
+  }
+
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-capture]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const cs = root.querySelector<HTMLElement>('[data-stepper]')!, canvas = root.querySelector<HTMLCanvasElement>('[data-canvas]')!;
+    const cells = [...root.querySelectorAll<HTMLElement>('.hm-cap-bytes i')], bar = root.querySelector<HTMLElement>('[data-bar]')!;
+    const flash = root.querySelector<HTMLElement>('[data-flash]')!, dl = root.querySelector<HTMLAnchorElement>('[data-dl]')!;
+    const icon = new Image();
+    icon.src = root.dataset.tray!;
+    let shot = 'menu', url = '';
+    const draw = () => paint(canvas, icon, shot === 'menu');
+    icon.onload = draw;
+    draw();
+
+    const show = (s: CapStep, how: string) => {
+      cells.forEach((c, i) => { c.classList.toggle('k', i >= s.kfrom && i >= s.written); c.classList.toggle('w', i < s.written); });
+      bar.style.width = s.written > 54 ? '100%' : '0';
+      const was = shot;
+      shot = s.shot;
+      root.dataset.shot = s.shot;
+      if (was !== shot) draw();
+      if (s.shot === 'taken' && was !== 'taken' && how !== 'jump' && !reduce()) gsap.fromTo(flash, { opacity: 0.9 }, { opacity: 0, duration: 0.5 });
+    };
+    cs.addEventListener('stepper', e => { const d = (e as CustomEvent).detail; show(d.step as CapStep, d.how); });
+
+    // The real thing: read this canvas back and write a .bmp exactly as his three WriteFile calls do
+    root.querySelector('[data-shoot]')!.addEventListener('click', () => {
+      shot = 'menu';
+      draw();
+      const px = canvas.getContext('2d')!.getImageData(0, 0, canvas.width, canvas.height).data;
+      const file = bmp(canvas.width, canvas.height, px);
+      cells.forEach((c, i) => { c.textContent = hex(file[i], 2); c.classList.remove('k'); c.classList.add('w'); });
+      bar.style.width = '100%';
+      root.querySelector('[data-pxlabel]')!.textContent = `Then ${(file.length - 54).toLocaleString('en-US')} bytes of pixels. The whole file: ${file.length.toLocaleString('en-US')} bytes.`;
+      if (url) URL.revokeObjectURL(url);
+      url = URL.createObjectURL(new Blob([file], { type: 'image/bmp' }));
+      dl.href = url;
+      dl.hidden = false;
+      if (!reduce()) gsap.fromTo(flash, { opacity: 0.9 }, { opacity: 0, duration: 0.5 });
+    });
+    root.querySelector<HTMLElement>('[data-act-row]')!.hidden = false;
+    const st0 = cs as unknown as { stepper?: { i: number; go(i: number): void } };
+    st0.stepper?.go(st0.stepper.i);
+  });
+</script>

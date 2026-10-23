@@ -1,0 +1,240 @@
+{
+  "file": "PORTSAID/PORTSAID.EXE",
+  "regions": [
+    {
+      "start": 0,
+      "end": 32,
+      "kind": "header",
+      "label": "MZ header",
+      "note": "DOS EXE header; entry 0000:0100 and no stack, as a tiny-model program has.",
+      "by": "dos",
+      "evidence": "measured"
+    },
+    {
+      "start": 32,
+      "end": 72,
+      "kind": "reloc",
+      "label": "Relocation table",
+      "note": "10 addresses inside Borland's math library that DOS fills in at load time.",
+      "by": "borland",
+      "evidence": "measured",
+      "link": "#ps-fly"
+    },
+    {
+      "start": 72,
+      "end": 80,
+      "kind": "unused",
+      "label": "Header padding",
+      "note": "Fills the header to a 16-byte boundary.",
+      "by": "dos",
+      "evidence": "measured"
+    },
+    {
+      "start": 80,
+      "end": 336,
+      "kind": "unused",
+      "label": "Program prefix space",
+      "note": "Tiny-model programs start at offset 100h; DOS puts the program prefix here at load time.",
+      "by": "dos",
+      "evidence": "measured"
+    },
+    {
+      "start": 336,
+      "end": 865,
+      "kind": "startup",
+      "label": "Turbo C++ startup (c0t)",
+      "note": "Tiny-model start-up: code, data and stack share one segment, then main() is called.",
+      "by": "borland",
+      "evidence": "measured"
+    },
+    {
+      "start": 865,
+      "end": 2648,
+      "kind": "code",
+      "label": "His drawing routines",
+      "note": "Refresh wait, DOS memory, run-length decoder, plane copy, curtain and fly-in: C functions with inline assembly.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-twins"
+    },
+    {
+      "start": 2648,
+      "end": 12049,
+      "kind": "image",
+      "label": "Arabic name picture",
+      "note": "Packed picture, 640 by 58 pixels: بورسعيد للحاسبات, 9,400 bytes.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-inside"
+    },
+    {
+      "start": 12049,
+      "end": 12119,
+      "kind": "code",
+      "label": "Show the English name",
+      "note": "Points at the next picture through CS and draws it.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-inside"
+    },
+    {
+      "start": 12119,
+      "end": 17694,
+      "kind": "image",
+      "label": "English name picture",
+      "note": "Packed picture, 448 by 33 pixels: PORT-SAID COMPUTER SYSTEMS, 5,574 bytes.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-inside"
+    },
+    {
+      "start": 17694,
+      "end": 17936,
+      "kind": "code",
+      "label": "Fly in the logo",
+      "note": "Turns four code addresses into far pointers and flies the four logo tiles in.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-fly"
+    },
+    {
+      "start": 17936,
+      "end": 20471,
+      "kind": "image",
+      "label": "Logo tile 1",
+      "note": "Run-length picture, 64 by 79 pixels, 2,535 bytes.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-images"
+    },
+    {
+      "start": 20471,
+      "end": 23006,
+      "kind": "image",
+      "label": "Logo tile 2",
+      "note": "Run-length picture, 64 by 79 pixels, 2,535 bytes.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-images"
+    },
+    {
+      "start": 23006,
+      "end": 25541,
+      "kind": "image",
+      "label": "Logo tile 3",
+      "note": "Run-length picture, 64 by 79 pixels, 2,535 bytes.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-images"
+    },
+    {
+      "start": 25541,
+      "end": 27959,
+      "kind": "image",
+      "label": "Logo tile 4",
+      "note": "Run-length picture, 64 by 79 pixels, 2,418 bytes.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-images"
+    },
+    {
+      "start": 27959,
+      "end": 28182,
+      "kind": "code",
+      "label": "main() and the sign-off",
+      "note": "Sets EGA mode 10h, plays the three scenes, waits for a key, then the YASSER DOT DESIGN sign-off from NAMES.COM.",
+      "by": "yasser",
+      "evidence": "measured",
+      "link": "#ps-boot"
+    },
+    {
+      "start": 28182,
+      "end": 28236,
+      "kind": "data",
+      "label": "Math library vectors",
+      "note": "Room for the 11 interrupt vectors Borland's math library uses (34h to 3Eh).",
+      "by": "borland",
+      "evidence": "measured"
+    },
+    {
+      "start": 28236,
+      "end": 45856,
+      "kind": "library",
+      "label": "Floating-point emulator and Turbo C runtime",
+      "note": "Borland's decimal math for the fly-in's straight lines, done in software on PCs without a math chip, plus the C runtime.",
+      "by": "borland",
+      "evidence": "measured",
+      "link": "#ps-fly"
+    },
+    {
+      "start": 45856,
+      "end": 47232,
+      "kind": "data",
+      "label": "Runtime data",
+      "note": "Turbo C++ copyright, floating-point error messages and runtime tables.",
+      "by": "borland",
+      "evidence": "measured"
+    }
+  ],
+  "routines": [
+    {
+      "start": 865,
+      "end": 904,
+      "name": "retrace_delay",
+      "note": "Waits n screen refreshes by reading port 3DAh.",
+      "link": "#ps-twins"
+    },
+    {
+      "start": 918,
+      "end": 944,
+      "name": "dos_alloc",
+      "note": "Asks DOS for memory to unpack a picture into (INT 21h AH=48h).",
+      "link": "#ps-inside"
+    },
+    {
+      "start": 944,
+      "end": 1004,
+      "name": "rle_decode",
+      "note": "The NAMES.COM run-length loop, byte for byte, inside a C function.",
+      "link": "#ps-twins",
+      "lines": [
+        {
+          "off": 962,
+          "note": "add si,4: skips the new width and height header"
+        },
+        {
+          "off": 968,
+          "note": "From here on, identical to NAMES.COM 08A3"
+        }
+      ]
+    },
+    {
+      "start": 1004,
+      "end": 1062,
+      "name": "plane_copy",
+      "note": "Copies a strip into each of the four color layers in turn (Map Mask 1, 2, 4, 8).",
+      "link": "#ps-twins"
+    },
+    {
+      "start": 1506,
+      "end": 1734,
+      "name": "fly_in",
+      "note": "Moves a picture on a straight line in 100 steps, with decimal math.",
+      "link": "#ps-fly"
+    },
+    {
+      "start": 27959,
+      "end": 28000,
+      "name": "main",
+      "note": "Mode 10h, the logo, ten refreshes, the two names, a key, text mode, the sign-off.",
+      "link": "#ps-boot"
+    },
+    {
+      "start": 28000,
+      "end": 28182,
+      "name": "sign_off",
+      "note": "The NAMES.COM signature and spark, rewritten in C with inline assembly.",
+      "link": "#ps-twins"
+    }
+  ]
+}

@@ -1,0 +1,95 @@
+---
+// The Port Said Computer Systems boot screen, every draw of it, played by a port of PORTSAID.EXE on its own pictures:
+// four logo tiles fly in, then the Arabic name opens like a curtain, drops and bounces, then the English name.
+// Without JS: the finished screen.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { memSync, png } from '../ssr.ts';
+import { portsaid, bootScreen, PORTSAID } from './rle.ts';
+import './rle.css';
+
+const ps = portsaid(memSync(PORTSAID));
+const n = ps.frames.length;
+const done = png(bootScreen(ps, n - 1).pixels(), 640, 350);
+const start = (ph: string) => ps.frames.findIndex(f => f.phase === ph);
+const CHAPTERS = [
+  { label: 'The logo flies in', at: 0 },
+  { label: 'The Arabic name', at: start('curtain') },
+  { label: 'The drop and the bounce', at: start('drop') },
+  { label: 'The English name', at: start('english') },
+];
+---
+
+<div class="ps-boot" data-psboot data-chapters={JSON.stringify(CHAPTERS)}>
+  <Window title="PORTSAID.EXE   640 x 350, 16 colors" kind="screen" class="g-win">
+    <div class="g-crt">
+      <img src={done} width="640" height="350" alt="The Port Said Computer Systems boot screen: the red PCS logo with a computer drawn in white lines, the Arabic name بورسعيد للحاسبات in green outline letters, and PORT-SAID COMPUTER SYSTEMS in yellow, on black." />
+      <canvas width="640" height="350" aria-hidden="true" hidden></canvas>
+    </div>
+  </Window>
+  <div class="ps-boot-bar">
+    <div class="g-chips g-js" role="group" aria-label="Jump to a part of the boot screen">
+      {CHAPTERS.map((c, i) => <button type="button" class="button k-btn" data-at={c.at} aria-pressed={String(i === 3)}>{c.label}</button>)}
+    </div>
+    <p class="g-say" aria-live="polite" data-say>Draw {n} of {n}: the boot screen is complete.</p>
+  </div>
+  <Scrubber n={n} at={n - 1} label="Every draw of the boot screen" />
+</div>
+
+<style>
+  .ps-boot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .ps-boot-bar { display: grid; gap: 12px; }
+</style>
+
+<script>
+  import { scrubber, type How } from '../../scrubber.ts';
+  import { boot, paint, reduce } from './view.ts';
+  import { Screen } from './rle.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-psboot]').forEach(async root => {
+    const ps = await boot();
+    const F = ps.frames, n = F.length, chapters: { label: string; at: number }[] = JSON.parse(root.dataset.chapters!);
+    const cv = root.querySelector('canvas')!, img = root.querySelector('img')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const chips = [...root.querySelectorAll<HTMLButtonElement>('button[data-at]')];
+    // Screens after every 64th draw, so any point is at most 63 draws away
+    const marks = new Map<number, Screen>();
+    let cur = new Screen(80, 350), at = -1;
+    const apply = (s: Screen, i: number) => { const f = F[i]; if (f.pic) for (const [a, b, c] of f.ops) s.blit(ps.pics[f.pic], a, b, c); };
+    const seek = (k: number) => {
+      if (k < at || k - at > 64) {
+        let m = Math.floor(k / 64) * 64 - 1;
+        while (m >= 0 && !marks.has(m)) m -= 64;
+        cur = m >= 0 ? new Screen(80, 350, marks.get(m)) : new Screen(80, 350);
+        at = m;
+      }
+      while (at < k) { apply(cur, ++at); if ((at + 1) % 64 === 0 && !marks.has(at)) marks.set(at, new Screen(80, 350, cur)); }
+    };
+    const TELL: Record<string, (i: number) => string> = {
+      logo: i => `Logo tile ${F[i].tile! + 1} of 4 flies in: x = ${F[i].x}, y = ${F[i].y}.`,
+      pause: () => 'A pause of ten screen refreshes.',
+      curtain: () => 'The Arabic name opens like a curtain: every other row slides in from the left, the rows between from the right.',
+      drop: i => `The Arabic name falls, then bounces: its top is at row ${F[i].y}.`,
+      english: () => 'PORT-SAID COMPUTER SYSTEMS appears under it.',
+    };
+    const show = (i: number, how: How) => {
+      seek(i);
+      paint(cv, cur);
+      say.textContent = i === n - 1 && how !== 'step' ? `Draw ${n} of ${n}: the boot screen is complete.` : `Draw ${i + 1} of ${n}. ${TELL[F[i].phase](i)}`;
+      let c = 0;
+      chapters.forEach((ch, j) => { if (i >= ch.at) c = j; });
+      chips.forEach((b, j) => b.setAttribute('aria-pressed', String(j === c)));
+    };
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 1 / 60 });
+    chips.forEach(b => b.addEventListener('click', () => { scrub.pause(); scrub.go(+b.dataset.at!, 'step'); if (!reduce()) scrub.play(); }));
+    show(n - 1, 'jump');
+    img.hidden = true; cv.hidden = false;
+    if (!reduce()) {
+      const io = new IntersectionObserver(([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        if (scrub.i === n - 1 && !scrub.playing) { scrub.go(0, 'step'); scrub.play(); }
+      }, { threshold: 0.6 });
+      io.observe(cv);
+    }
+  });
+</script>

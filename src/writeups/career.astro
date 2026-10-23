@@ -1,0 +1,228 @@
+---
+// The career page: one story, four eras. Each section carries its own data-era, and the page's era follows the
+// section in the middle of the screen. Facts: research/career.md, research/programs.md, research/dinarsoft/, and the
+// family's account, stated as fact.
+import Window from '../components/shell/Window.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import Timeline from '../components/toys/story/Timeline.astro';
+import NameFonts from '../components/toys/story/NameFonts.astro';
+import BidiLine from '../components/toys/story/BidiLine.astro';
+import PrintThread from '../components/toys/story/PrintThread.astro';
+import CallNetwork from '../components/toys/story/CallNetwork.astro';
+import DinarApps from '../components/toys/story/DinarApps.astro';
+import logo from '../assets/dinarsoft/press/logo_name_50.png';
+
+const base = import.meta.env.BASE_URL;
+const SAKHR = [
+  ['Arabic APIs', 'One set of Arabic functions that any program could call, on Arabic Windows and on English Windows alike. Like a shared package every app imports, so no team writes Arabic support twice.'],
+  ['A bilingual text displayer', 'Object-oriented, and used in the Al-Ustaz word processor. It put Arabic and English on one line, each in its own direction. Your browser does this for you today; in 1993 someone had to write it.'],
+  ['A printing core', 'Multi-threaded: Arabic pages went to the printer in the background while you kept working.'],
+  ['Arabic office applications', 'The programs people used to write, print and publish in Arabic.'],
+  ['An installer framework', 'The company’s first multimedia installer framework: one tool that set up each new title on a PC, the way every app’s setup program does today.'],
+];
+---
+
+<article class="cr">
+  <section class="cr-sec cr-hero" data-era="dos" id="top" aria-labelledby="cr-h1">
+    <div class="cr-in">
+      <h1 id="cr-h1">From Port Said to Kanata</h1>
+      <p class="cr-lead">Yasser Awad taught a PC to write Arabic in Port Said. Then he brought Arabic to Windows in Cairo, built the public door into phone companies’ networks in Canada, and ran his own award-winning software company. Drag through the years: the screen grows up with him.</p>
+      <Timeline />
+    </div>
+  </section>
+
+  <section class="cr-sec cr-ps" data-era="dos" id="port-said" aria-labelledby="h-ps">
+    <div class="cr-in cr-pair">
+      <div class="cr-text">
+        <h2 id="h-ps">Port Said, 1991 to 1993</h2>
+        <p class="cr-big">It started on the Mediterranean, with a few books, Borland’s tools and no internet.</p>
+        <p>In Port Said he wrote fifteen programs and <a href={`${base}/arabart/`}>ARABART</a>, the engine that joins Arabic letters on a DOS screen. A screensaver for the governorate. A boot screen for every PC that Port Said Computer Systems sold, paid for with his first mouse. An antivirus. A circuit simulator for his graduation project with the KEMYAM group. And The Brave Sun, which took 3rd place in the PC Middle East competition for Arabic educational software.</p>
+        <p>Every one of them runs in your browser. The name on the right is drawn by his own engine, from his own font bytes: pick a font and a style.</p>
+        <p><a class="button k-btn" href={`${base}/#programs`}>Run his programs</a></p>
+      </div>
+      <NameFonts />
+    </div>
+  </section>
+
+  <section class="cr-sec cr-sk" data-era="win31" id="sakhr" aria-labelledby="h-sk">
+    <div class="cr-in">
+      <div class="cr-text cr-text--wide">
+        <h2 id="h-sk">Cairo, 1993: Arabic comes to Windows</h2>
+        <p class="cr-big">In June 1993 he joined Sakhr in Cairo as a project leader, and stayed until September 1996.</p>
+      </div>
+      <div class="cr-cols">
+        <p>Sakhr was founded in Kuwait in 1982 and moved to Cairo in 1990. It made Arabic MSX home computers and the first Arabic version of Windows 3.x. Windows was built for English: text runs left to right, and every letter has one shape. Arabic needs both rules turned around, often on the same line.</p>
+        <p>The problem he had solved alone on DOS with ARABART now had to work inside every Windows program. At Sakhr he built these parts of its Arabic software:</p>
+      </div>
+      <ol class="cr-built">
+        {SAKHR.map(([h, t], i) => <li><span class="cr-num" aria-hidden="true">{i + 1}</span><div><h3>{h}</h3><p>{t}</p></div></li>)}
+      </ol>
+      <div class="cr-toys">
+        <div>
+          <h3 class="cr-h3">Two directions, one line</h3>
+          <p class="cr-p">Memory keeps words in the order you typed them. The screen must show them in reading order: Arabic from the right, and English inside it from the left. That reordering is the heart of a <Term id="bidi">bilingual text displayer</Term>. Type a line word by word and watch each word find its place.</p>
+          <BidiLine />
+        </div>
+        <div>
+          <h3 class="cr-h3">Print, and keep typing</h3>
+          <p class="cr-p">A <Term id="thread">thread</Term> is a separate line of work inside one program. With printing on its own thread, a long Arabic document goes to the printer while you keep writing. Try it both ways.</p>
+          <PrintThread />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cr-sec cr-ka" data-era="win9x" id="kanata" aria-labelledby="h-ka">
+    <div class="cr-in">
+      <div class="cr-pair cr-pair--top">
+        <div class="cr-text">
+          <h2 id="h-ka">Kanata, 1996: the door into the network</h2>
+          <p class="cr-big">In October 1996 he moved to Canada and joined Newbridge Networks in Kanata. For ten years he was a senior designer and team leader there.</p>
+          <p>Alcatel bought Newbridge in 2000, and with it the 5620 Network Manager: the <Term id="nms">control room</Term> for a phone company’s whole network of switches and routers. In 2003 one 5620 managed up to 10,000 core nodes and 500,000 edge nodes.</p>
+        </div>
+        <Window title="Architect" kind="dialog" active class="cr-arch">
+          <p>Yasser Awad was the architect of the <b>5620 CORBA interface</b>. It is the door through which a phone company’s own systems read alarms and inventory, and order new connections.</p>
+          <p>Today you would call it <b>the network’s public API</b>.</p>
+        </Window>
+      </div>
+      <div class="cr-cols">
+        <p>A phone company runs on its own back-office software, its <Term id="oss">OSS</Term>: orders, billing, trouble tickets. Those systems need the network’s data, and they need to change the network. His interface let them call the 5620 directly, with no person in between. When a customer ordered a line, the order system could set up the connection by itself.</p>
+        <p>It was built on <Term id="corba" />, the 1990s way to call code on another machine, much like gRPC today. One interface file describes every call, and each side gets code generated from it. Alarms flowed the other way through an <Term id="event-channel">event channel</Term>, like a Kafka topic: one alarm in, a copy to every system that listens. He built his own event channel, twice as fast as the standard one, and a test tool for the interface, jidmTester.</p>
+      </div>
+      <CallNetwork />
+      <ThenNow
+        title="Then and now"
+        era="1996 to 2006"
+        rows={[
+          { then: 'The 5620 CORBA interface', now: 'A public REST or gRPC API with a published spec', why: 'A documented door that outside systems use to read the network and change it.' },
+          { then: 'A CORBA <code>IDL</code> file', now: 'A gRPC <code>.proto</code> file', why: 'One interface file becomes typed client and server code in many languages.' },
+          { then: 'An event channel', now: 'A Kafka topic or a cloud pub/sub topic', why: 'Senders and receivers never need to know each other; one event reaches every subscriber.' },
+          { then: 'JIDM translation rules', now: 'Code generated from a schema, and gateways such as grpc-gateway', why: 'Turn one interface into another, and translate calls while the system runs.' },
+        ]}
+      />
+      <Deep title="For engineers: CORBA, JIDM and the standards around his interface">
+        <ul>
+          <li><strong>CORBA in 2026 terms.</strong> You write an <Term id="idl" /> interface; the IDL compiler makes a client stub and a server skeleton; the <Term id="orb" /> packs each call and sends it over IIOP, a protocol on TCP. Unlike gRPC, the client holds a reference to one remote object, and that object keeps its state between calls.</li>
+          <li><strong>Telecom’s own models.</strong> Telecom standards describe equipment as <Term id="managed-object">managed objects</Term> in <Term id="gdmo" />, reached over <Term id="cmip" />. The 5620 had both doors: a CMIP interface and his CORBA interface.</li>
+          <li><strong><Term id="jidm" />, part 1: Specification Translation</strong> (X/Open, May 1997) turns a GDMO model into IDL: each managed object class becomes an IDL interface, attributes become get and set operations, actions become operations, and notifications become events. His interface followed these rules, so a CORBA client saw the same objects as a CMIP client.</li>
+          <li><strong>JIDM, part 2: Interaction Translation.</strong> A gateway that turns CORBA calls into CMIP or SNMP operations, and their events back into CORBA events. The Open Group published both parts as C802 in 2000. OMG’s “Interworking Between CORBA and TMN Systems” followed in August 2000, and ITU-T’s X.780 and Q.816 in January 2001.</li>
+          <li>The 2003 figures come from Gartner’s product report on the 5620 Network Manager family: version 6.1 on Solaris 8 with an Informix database, managing Alcatel 7770, 7670, 7470 and 7300 equipment.</li>
+        </ul>
+      </Deep>
+      <Window title="Two patent filings" kind="dialog" active class="cr-pat" as="aside" aria-labelledby="h-pat">
+        <div class="cr-pat-in">
+          <div>
+            <h3 id="h-pat">One number for every port</h3>
+            <p>From these years come his two patent filings with Alcatel. The first became US patent 7,603,377, granted in 2009, with Yasser Awad as first-named inventor. Its idea: every part of the network gets one 32-bit number that spells out where it sits.</p>
+          </div>
+          <a class="button button--primary k-btn" href={`${base}/patents/`}>See the patents, explained</a>
+        </div>
+      </Window>
+    </div>
+  </section>
+
+  <section class="cr-sec cr-ds" data-era="vs2005" id="dinarsoft" aria-labelledby="h-ds">
+    <div class="cr-in">
+      <div class="cr-pair cr-pair--top">
+        <div class="cr-text">
+          <img class="cr-logo" src={logo.src} width="220" height="50" alt="DinarSoft" />
+          <h2 id="h-ds">Kanata, 2002: his own company</h2>
+          <p class="cr-big">In November 2002 he founded DinarSoft and wrote six apps for Pocket PC and Windows Mobile, the smartphones of their day.</p>
+          <p>Each one fixed something people met every day on their phones: memory that ran out, programs that never really closed, settings buried deep in menus. Reviewers from the US, the UK, New Zealand and the UAE wrote about them, on about 20 sites in all. Russia’s CHIP magazine put MemMaid and HandySwitcher on its cover discs.</p>
+        </div>
+        <Window title="Awards" kind="help" active class="cr-aw">
+          <p><i>Smartphone &amp; Pocket PC</i> magazine named <b>HandySwitcher</b> the best Task Manager in <b>2007</b> and again in <b>2008</b>, and <b>TapText</b> the best Misc. Utility of <b>2007</b>.</p>
+          <p>From 2003 to 2008 his apps earned <b>22 nominations</b>, and MemMaid was a finalist four years running.</p>
+        </Window>
+      </div>
+      <DinarApps />
+      <div class="cr-cols cr-end">
+        <p>All six were shareware: a 15-day trial, then a 16-letter unlock key. MemMaid went from 1.0 on 16 June 2003 to 2.3 on 16 June 2008, five years to the day. <a href={`${base}/dinarsoft/`}>Visit DinarSoft</a> for every app, every review and every screen.</p>
+        <p>Look at the HijriDate screen: the Islamic date in Arabic, on a phone built for English. <a href={`${base}/arabart/`}>ARABART</a> put Arabic on DOS screens in 1991, Sakhr put it into Windows, and HijriDate put it in his customers’ pockets. The same thread, all the way through.</p>
+      </div>
+    </div>
+  </section>
+</article>
+
+<style>
+  .cr-sec { padding-block: clamp(80px, 10vw, 150px); }
+  .cr-sec[data-era='dos'] { background: var(--blue) radial-gradient(var(--blue-deep) 1px, transparent 1.5px) 0 0 / 4px 4px; }
+  .cr-sec[data-era='win31'] { background: linear-gradient(#00009e, #000014); }
+  .cr-sec[data-era='win9x'] { background: #007070; }
+  .cr-sec[data-era='vs2005'] { background: linear-gradient(oklch(0.86 0.04 250), oklch(0.96 0.012 250) 40%); }
+  .cr-hero { padding-top: clamp(32px, 5vw, 72px); }
+  .cr-ps { padding-top: 0; }
+  .cr-in { width: 100%; max-width: 1360px; margin-inline: auto; padding-inline: var(--gut); min-width: 0; }
+  .cr h1 { font-size: clamp(3rem, 5vw + 1rem, 6.25rem); font-stretch: 72%; line-height: 0.9; letter-spacing: -0.02em; color: var(--accent); max-width: 12ch; }
+  .cr h2 { font-size: clamp(2.25rem, 2.6vw + 1rem, 3.75rem); font-stretch: 78%; color: var(--ink); max-width: 18ch; }
+  .cr h3 { font-size: clamp(1.375rem, 0.8vw + 1rem, 1.75rem); font-stretch: 85%; color: var(--ink); }
+  .cr p, .cr li { font-size: 1.0625rem; line-height: 1.7; color: var(--ink); text-wrap: pretty; }
+  .cr strong { color: var(--accent); }
+  .cr a:not(.button):not(.term) { color: var(--accent); text-underline-offset: 3px; }
+  .cr code { font: 500 0.9em var(--font-code); color: var(--accent); }
+  .cr-lead { margin: 24px 0 clamp(32px, 4vw, 56px); max-width: 56ch; font-size: clamp(1.1875rem, 0.5vw + 1rem, 1.375rem) !important; line-height: 1.5 !important; font-weight: 500; }
+  .cr-text { display: grid; gap: 14px; align-content: start; }
+  .cr-text p { max-width: 62ch; }
+  .cr-text--wide { margin-bottom: 28px; }
+  .cr-big { font-size: clamp(1.1875rem, 0.5vw + 1rem, 1.4375rem) !important; line-height: 1.5 !important; font-weight: 500; max-width: 50ch !important; }
+  .cr-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px clamp(28px, 4vw, 64px); align-items: center; }
+  .cr-pair--top { align-items: start; margin-bottom: 36px; }
+  .cr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 56px); margin-bottom: 32px; }
+  .cr-cols p { max-width: 62ch; }
+  .cr-end { margin: 36px 0 0; }
+  .cr-h3 { margin-bottom: 10px; }
+  .cr-p { margin-bottom: 18px; max-width: 60ch; }
+
+  .cr-built { list-style: none; margin: 0 0 clamp(48px, 6vw, 80px); padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 14px; }
+  .cr-built li { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 14px; background: var(--w-silver); border: 1px solid var(--w-black); box-shadow: inset -2px -2px var(--w-gray), inset 2px 2px var(--w-white); }
+  .cr-built h3 { font: 700 1rem/1.3 var(--font-pixel); color: var(--w-black); }
+  .cr-built p { margin-top: 4px; font-size: 0.9375rem; line-height: 1.5; color: var(--w-black); }
+  .cr-num { display: grid; place-items: center; width: 40px; height: 40px; background: var(--w-navy); color: var(--w-white); font: 700 1.25rem/1 var(--font-pixel); }
+  .cr-toys { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 32px clamp(28px, 4vw, 56px); align-items: start; }
+
+  .cr-arch p { font-size: 1.0625rem; }
+  .cr-arch p + p { margin-top: 10px; }
+  .cr-arch b { color: var(--w-navy); }
+  .cr-ka :global(.tn), .cr-ka :global(.deep) { margin-top: 40px; }
+  .cr-pat { margin-top: 48px; }
+  .cr-pat-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 32px; }
+  .cr-pat-in > div { max-width: 70ch; }
+  .cr-pat h3 { color: var(--w-black); }
+  .cr-pat p { margin-top: 6px; font-size: 1rem; }
+
+  .cr-logo { width: 220px; height: auto; margin-bottom: 10px; }
+  .cr-aw p { font-size: 1.0625rem; }
+  .cr-aw p + p { margin-top: 10px; }
+  .cr-aw b { color: #b3261e; }
+
+  @media (max-width: 1000px) {
+    .cr-pair, .cr-toys { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .cr-cols { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>
+
+<script>
+  // The page moves through his eras: the section under the middle of the screen sets the era of the menu and taskbar
+  import { ERAS, type Era } from '../lib/eras/eras';
+
+  const root = document.documentElement;
+  const sh = document.querySelector<HTMLElement>('[data-sh]');
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  let cur = root.dataset.era as Era;
+  const setEra = (e: Era) => {
+    if (e === cur) return;
+    cur = e;
+    root.dataset.era = e;
+    const [place, year] = ERAS[e].when;
+    document.querySelectorAll('[data-when-place]').forEach(el => (el.textContent = place));
+    document.querySelectorAll('[data-when-year]').forEach(el => (el.textContent = year));
+    if (meta) meta.content = ERAS[e].theme;
+    if (sh) { sh.classList.remove('redraw'); void sh.offsetWidth; sh.classList.add('redraw'); }
+  };
+  const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && setEra((e.target as HTMLElement).dataset.era as Era)), { rootMargin: '-48% 0px -51% 0px' });
+  document.querySelectorAll<HTMLElement>('.cr-sec[data-era]').forEach(s => io.observe(s));
+</script>

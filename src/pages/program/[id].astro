@@ -1,241 +1,145 @@
 ---
+// One program: it runs first, in a DOS screen window; its label sits beside it; then the story and the writeup in a calm
+// reading column; then Norton Commander's panels to move to the next one.
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import Toc from '../../layouts/Toc.astro';
 import DosPlayer from '../../components/DosPlayer.astro';
 import ControlsTable from '../../components/ControlsTable.astro';
+import Writeup from '../../components/explain/Writeup.astro';
+import BytesMap from '../../components/BytesMap.astro';
+import Programs from '../../components/shell/Programs.astro';
 import { programs } from '../../data/programs';
+import { exeSize, bundleSize, bytes } from '../../data/files';
+import { glance, shelf } from '../../layouts/glance';
 import type { GetStaticPaths } from 'astro';
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return programs.map((program, index) => ({
-    params: { id: program.id },
-    props: {
-      program,
-      prev: index > 0 ? programs[index - 1] : null,
-      next: index < programs.length - 1 ? programs[index + 1] : null,
-    },
-  }));
-};
+export const getStaticPaths: GetStaticPaths = () => programs.map(program => ({ params: { id: program.id }, props: { program } }));
 
-const { program, prev, next } = Astro.props;
+const { program } = Astro.props as { program: (typeof programs)[number] };
 const base = import.meta.env.BASE_URL;
 const bundleUrl = `${base}/bundles/${program.id}.jsdos?v=${Date.now()}`;
+const title = program.title.replace(' - ', ': ');
+const path = `C:\\${program.folder}\\${program.executable}`;
+// Programs that start at a DOS prompt and want a command typed: one tap types it on a phone
+const LINES: Record<string, string> = { 'kvc-antivirus': 'KVC C:' };
+const next = shelf[(shelf.findIndex(p => p.id === program.id) + 1) % shelf.length];
+// only the program writeups, so a program page does not carry the CSS of the DinarSoft, career and other pages
+const writeups = import.meta.glob(['../../writeups/*.astro', '!../../writeups/{dinarsoft-*,arabart,career,patents,primer}.astro']);
 ---
 
 <BaseLayout
-  title={`${program.title} - DOSArchive`}
-  description={program.description}
-  image={`/DOSArchive/images/${program.image}`}
+  title={`${title} (${program.year}) · Yasser Awad`}
+  description={glance[program.id] ?? program.description}
+  image={`/ARABART/images/${program.image}`}
   hasEmulator={true}
+  keys={[{ k: '►', label: `Next: ${next.title.replace(' - ', ': ')}`, href: `${base}/program/${next.id}/` }]}
 >
-  <div class="container">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href={base}>Archive</a>
-      <span aria-hidden="true">/</span>
-      <span aria-current="page">{program.title}</span>
-    </nav>
-
-    <article class="program-detail">
-      <!-- Header -->
-      <header class="detail-header">
-        <div class="detail-badges">
-          <span class="badge badge-year">{program.year}</span>
-          <span class="badge badge-lang">{program.language}</span>
-          <span class="badge badge-category">{program.category}</span>
-        </div>
-        <h1 class="detail-title">{program.title}</h1>
-        <p class="detail-subtitle">{program.subtitle}</p>
+  <article class="program">
+    <div class="container top">
+      <header class="ph">
+        <a class="crumb" href={`${base}/#programs`}>← All fifteen programs</a>
+        <h1>{title}</h1>
+        <p class="when">{program.year} · {path}</p>
       </header>
 
-      <!-- Emulator -->
-      <section class="detail-emulator" aria-label="DOS Emulator">
-        <DosPlayer bundleUrl={bundleUrl} programId={program.id} />
+      <section class="run" aria-label={`${title}, running in DOS`}>
+        <DosPlayer
+          bundleUrl={bundleUrl}
+          name={program.executable}
+          title={path}
+          image={`${base}/images/${program.image}`}
+          alt={`${title} running in DOS`}
+          bundleBytes={bundleSize(program.id)}
+          controls={program.controls}
+          line={LINES[program.id]}
+        />
       </section>
 
-      <!-- Controls -->
-      {program.controls.length > 0 && (
-        <section class="detail-section">
-          <h2>Controls</h2>
-          <ControlsTable controls={program.controls} />
+      <p class="lead">{glance[program.id] ?? program.subtitle}</p>
+
+      <aside class="side" aria-label="About this program">
+        {program.launchNotes && <p class="notes">{program.launchNotes}</p>}
+        {program.controls.length > 0 && (
+          <section aria-labelledby="keys-h">
+            <h2 id="keys-h">Keys</h2>
+            <ControlsTable controls={program.controls} />
+          </section>
+        )}
+        <dl class="facts">
+          <div><dt>Year</dt><dd>{program.year}</dd></div>
+          <div><dt>Size</dt><dd>{bytes(exeSize(program))} bytes</dd></div>
+          <div class="wide"><dt>Written in</dt><dd>{program.language}</dd></div>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="container body">
+      <div class="read">
+        <section class="story" id="story" aria-labelledby="story-h">
+          <h2 id="story-h" data-toc>The story</h2>
+          <p>{program.story}</p>
         </section>
-      )}
+        <Writeup id={program.id} mods={writeups} />
+        <BytesMap id={program.id} />
+      </div>
+      <Toc />
+    </div>
 
-      <!-- Launch Notes -->
-      {program.launchNotes && (
-        <section class="detail-section">
-          <h2>Notes</h2>
-          <p class="detail-notes">{program.launchNotes}</p>
-        </section>
-      )}
-
-      <!-- Story -->
-      <section class="detail-section">
-        <h2>The Story</h2>
-        <p class="detail-story">{program.story}</p>
-      </section>
-
-      <!-- Tags -->
-      <section class="detail-section">
-        <h2>Tags</h2>
-        <div class="detail-tags">
-          {program.tags.map(tag => (
-            <span class="tag">{tag}</span>
-          ))}
-        </div>
-      </section>
-
-      <!-- Navigation -->
-      <nav class="detail-nav" aria-label="Program navigation">
-        {prev ? (
-          <a href={`${base}/program/${prev.id}`} class="detail-nav-link detail-nav-prev">
-            <span class="detail-nav-dir">&lt; prev</span>
-            <span class="detail-nav-name">{prev.title}</span>
-          </a>
-        ) : <div />}
-        {next ? (
-          <a href={`${base}/program/${next.id}`} class="detail-nav-link detail-nav-next">
-            <span class="detail-nav-dir">next &gt;</span>
-            <span class="detail-nav-name">{next.title}</span>
-          </a>
-        ) : <div />}
-      </nav>
-    </article>
-  </div>
+    <Programs current={program.id} />
+  </article>
 </BaseLayout>
 
 <style>
-  .breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    color: var(--color-text-muted);
-    margin-bottom: 1.5rem;
-    letter-spacing: 0.04em;
+  /* Desktop: the program runs on the left at the largest size that fits the screen; its label sits on the right */
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: 'run ph' 'run lead' 'run side';
+    gap: 0 clamp(32px, 3.5vw, 56px);
+    padding-top: 16px;
   }
+  .ph { grid-area: ph; }
+  .run { grid-area: run; min-width: 0; }
+  .lead { grid-area: lead; margin-top: 14px; font-size: 1.125rem; line-height: 1.55; }
+  .side { grid-area: side; display: grid; align-content: start; gap: 28px; margin-top: 28px; }
 
-  .breadcrumb a {
-    color: var(--color-text-muted);
-  }
+  .crumb { margin-bottom: 4px; }
+  h1 { font-size: clamp(2rem, 1.4vw + 1.25rem, 2.75rem); line-height: 1.02; text-wrap: balance; }
+  .when { margin-top: 10px; font: 400 16px/1.4 var(--font-dos); color: var(--accent-2); overflow-wrap: anywhere; }
 
-  .breadcrumb a:hover {
-    color: var(--color-phosphor);
-  }
+  .notes { padding: 14px 16px; font-size: 1rem; line-height: 1.55; color: var(--vga-0); background: var(--vga-3); box-shadow: 6px 6px 0 var(--vga-0); }
+  .side h2 { margin-bottom: 14px; font: 400 16px/1 var(--font-dos); color: var(--accent); }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--rule); }
+  .facts > div { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .facts .wide { grid-column: 1 / -1; }
+  .facts dt { font: 400 16px/1.4 var(--font-dos); color: var(--accent-2); }
+  .facts dd { margin-top: 2px; font-size: 1rem; font-variant-numeric: tabular-nums; }
 
-  .breadcrumb span[aria-current] {
-    color: var(--color-text);
-  }
-
-  /* ── Header ──── */
-  .detail-header {
-    margin-bottom: 2rem;
-  }
-
-  .detail-badges {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-    flex-wrap: wrap;
-  }
-
-  .detail-title {
-    font-size: clamp(2rem, 5vw, 3rem);
-    margin-bottom: 0.25rem;
-  }
-
-  .detail-subtitle {
-    font-size: 1rem;
-    color: var(--color-text-muted);
-  }
-
-  /* ── Emulator ──── */
-  .detail-emulator {
-    margin-bottom: 2.5rem;
-  }
-
-  /* ── Sections ──── */
-  .detail-section {
-    margin-bottom: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .detail-section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .detail-story {
-    font-size: 0.9rem;
-    color: var(--color-text);
-    line-height: 1.75;
-    max-width: 720px;
-  }
-
-  .detail-notes {
-    font-size: 0.85rem;
-    color: var(--color-amber);
-    background: rgba(255, 176, 0, 0.04);
-    border: 1px solid var(--color-amber-dim);
-    padding: 0.75rem 1rem;
-  }
-
-  /* ── Tags ──── */
-  .detail-tags {
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-  }
-
-  .tag {
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    color: var(--color-text-muted);
-    border: 1px solid var(--color-border);
-    padding: 0.1rem 0.5rem;
-    letter-spacing: 0.03em;
-  }
-
-  /* ── Navigation ──── */
-  .detail-nav {
-    display: flex;
+  /* The reading column: wide enough for his code and the toys, calm type, the outline on the right */
+  .body {
+    display: grid;
+    grid-template-columns: minmax(0, 980px) 240px;
     justify-content: space-between;
-    gap: 1rem;
-    margin-top: 3rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border);
+    gap: clamp(40px, 5vw, 88px);
+    align-items: start;
+    margin-top: clamp(80px, 10vw, 140px);
+    padding-top: clamp(48px, 6vw, 72px);
+    border-top: 1px solid var(--rule);
   }
+  .read > :global(* + *) { margin-top: clamp(72px, 9vw, 120px); }
+  .story h2 { font: 800 clamp(2rem, 2.4vw + 1rem, 3.25rem)/1.05 var(--font-display); font-stretch: 80%; }
+  .story p { max-width: 68ch; margin-top: 18px; font-size: clamp(1.125rem, 0.3vw + 1.05rem, 1.25rem); line-height: 1.7; }
+  .program :global(.progs) { margin-top: clamp(80px, 10vw, 140px); border-top: 1px solid var(--rule); }
 
-  .detail-nav-link {
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    padding: 0.5rem 0;
-    transition: color 0.2s ease;
+  @media (max-width: 1199px) {
+    .body { grid-template-columns: minmax(0, 1fr); }
   }
-
-  .detail-nav-link:hover .detail-nav-name {
-    color: var(--color-phosphor);
-    text-shadow: var(--glow-sm);
-  }
-
-  .detail-nav-dir {
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    color: var(--color-text-muted);
-    letter-spacing: 0.08em;
-  }
-
-  .detail-nav-name {
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    color: var(--color-text);
-    transition: color 0.2s ease, text-shadow 0.2s ease;
-  }
-
-  .detail-nav-next {
-    text-align: right;
-    margin-left: auto;
+  /* Tablet and phone: name, then the running program, then the rest */
+  @media (max-width: 1000px) {
+    .top { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: 'ph' 'run' 'lead' 'side'; }
+    .run { margin-top: 18px; }
+    .lead { margin-top: 20px; max-width: 62ch; }
+    .side { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px 40px; }
   }
 </style>

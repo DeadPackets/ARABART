@@ -1,0 +1,85 @@
+---
+// Mask and paint (sub_105160 + sub_105384): how a black-on-white word picture lands on any wallpaper in the Today
+// screen's text color. Four BitBlt calls with three raster operations: XOR, AND, OR. Pick a color and a wallpaper.
+// In a CodeStepper it follows step.phase (0 to 3: the last of the four pictures to show).
+import { svgPath } from './ar.ts';
+interface Props { id: string; word?: number }
+const { id, word = 155 } = Astro.props;
+const p = svgPath([word]);
+const panes = [
+  ['1', 'The word as stored', 'Black ink on white paper, one bit a pixel.'],
+  ['2', 'The colored copy', 'Flip it against white, then AND it with the color: color on the ink, black elsewhere.'],
+  ['3', 'Screen AND word', 'Where the word is white, the wallpaper stays. Where it is black, a black hole.'],
+  ['4', 'Screen OR copy', 'The color fills the holes. Black adds nothing anywhere else.'],
+];
+const box = `0 0 ${p.width} 16`;
+---
+
+<div class="hdt-ink" id={id} data-ink data-phase="3" style="--hdt-ink:#ffffff">
+  <div class="hdt-ink-ctl">
+    <div class="hdt-ink-sw" role="radiogroup" aria-label="Text color of the Today theme">
+      {[['#ffffff', 'White'], ['#ffd75e', 'Yellow'], ['#ff7ab8', 'Pink'], ['#000000', 'Black']].map(([c, n], i) => (
+        <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-color={c}><i style={`background:${c}`}></i>{n}</button>
+      ))}
+    </div>
+    <div class="hdt-ink-sw" role="radiogroup" aria-label="Wallpaper">
+      {['Blue waves', 'Stripes', 'Sunset'].map((n, i) => (
+        <button type="button" role="radio" aria-checked={i === 0 ? 'true' : 'false'} data-wall={i}>{n}</button>
+      ))}
+    </div>
+  </div>
+  <svg class="hdt-ink-defs" width="0" height="0" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${id}-w0`} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5aa6ee" /><stop offset="0.45" stop-color="#1f5fb8" /><stop offset="0.7" stop-color="#3f86da" /><stop offset="1" stop-color="#164a98" /></linearGradient>
+      <pattern id={`${id}-w1`} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#2c8c5a" /><rect width="4" height="8" fill="#e8782a" /></pattern>
+      <linearGradient id={`${id}-w2`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b1a55" /><stop offset="0.55" stop-color="#c2456e" /><stop offset="1" stop-color="#f6b04a" /></linearGradient>
+    </defs>
+  </svg>
+  <div class="hdt-ink-grid">
+    {panes.map(([n, t, d], i) => (
+      <figure class="hdt-ink-pane" data-pane={i}>
+        <svg viewBox={box} shape-rendering="crispEdges" role="img" aria-label={`${t}: ${d}`}>
+          {i === 0 && <><rect width={p.width} height="16" fill="#fff" /><path d={p.d} fill="#000" /></>}
+          {i === 1 && <><rect width={p.width} height="16" fill="#000" /><path d={p.d} class="hdt-ink-color" /></>}
+          {i === 2 && <><rect width={p.width} height="16" class="hdt-ink-wall" fill={`url(#${id}-w0)`} /><path d={p.d} fill="#000" /></>}
+          {i === 3 && <><rect width={p.width} height="16" class="hdt-ink-wall" fill={`url(#${id}-w0)`} /><path d={p.d} class="hdt-ink-color" /></>}
+        </svg>
+        <figcaption><b>{n}. {t}</b> {d}</figcaption>
+      </figure>
+    ))}
+  </div>
+</div>
+
+<style>
+  .hdt-ink { display: grid; gap: 16px; min-width: 0; }
+  .hdt-ink-defs { position: absolute; }
+  .hdt-ink-ctl { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+  .hdt-ink-sw { display: flex; flex-wrap: wrap; gap: 8px; }
+  .hdt-ink-sw button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 12px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+  .hdt-ink-sw button[aria-checked='true'] { outline: 3px solid var(--accent); outline-offset: -1px; font-weight: 700; }
+  .hdt-ink-sw i { width: 18px; height: 18px; border: 1px solid #0006; }
+  .hdt-ink-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 16px; }
+  .hdt-ink-pane { margin: 0; transition: opacity 0.25s; }
+  .hdt-ink-pane svg { display: block; width: 100%; height: auto; box-shadow: 0 0 0 1px var(--rule); }
+  .hdt-ink-pane :global(.hdt-ink-color) { fill: var(--hdt-ink); }
+  .hdt-ink-pane figcaption { margin-top: 8px; font-size: 0.875rem; line-height: 1.45; color: var(--ink-2); }
+  .hdt-ink-pane figcaption b { color: var(--ink); }
+  .hdt-ink[data-phase='0'] [data-pane='1'], .hdt-ink[data-phase='0'] [data-pane='2'], .hdt-ink[data-phase='0'] [data-pane='3'],
+  .hdt-ink[data-phase='1'] [data-pane='2'], .hdt-ink[data-phase='1'] [data-pane='3'],
+  .hdt-ink[data-phase='2'] [data-pane='3'] { opacity: 0.15; }
+  @media (prefers-reduced-motion: reduce) { .hdt-ink-pane { transition: none; } }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-ink]')) {
+    root.querySelectorAll<HTMLElement>('[data-color]').forEach(b => b.addEventListener('click', () => {
+      root.style.setProperty('--hdt-ink', b.dataset.color!);
+      root.querySelectorAll('[data-color]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+    }));
+    root.querySelectorAll<HTMLElement>('[data-wall]').forEach(b => b.addEventListener('click', () => {
+      root.querySelectorAll('.hdt-ink-wall').forEach(r => r.setAttribute('fill', `url(#${root.id}-w${b.dataset.wall})`));
+      root.querySelectorAll('[data-wall]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+    }));
+    root.closest('[data-stepper]')?.addEventListener('stepper', e => { root.dataset.phase = String((e as CustomEvent).detail.step.phase ?? 3); });
+  }
+</script>

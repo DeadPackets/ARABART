@@ -1,0 +1,1393 @@
+{
+ "images": {
+  "logo": {
+   "src": "dinarsoft/logo.svg",
+   "w": 2640,
+   "h": 600,
+   "from": "site/images/press/logo_name_50.png (mark rebuilt from circles, wordmark traced)"
+  },
+  "mark": {
+   "src": "dinarsoft/mark.svg",
+   "w": 1200,
+   "h": 1200,
+   "from": "site/images/press/logo_100.png (rebuilt from 5 fitted circles)"
+  },
+  "icon-memmaid": {
+   "src": "dinarsoft/icons/memmaid.webp",
+   "w": 100,
+   "h": 100,
+   "bytes": 6214,
+   "from": "site/images/press/MemMaid_100.png"
+  },
+  "icon-handyswitcher": {
+   "src": "dinarsoft/icons/handyswitcher.webp",
+   "w": 100,
+   "h": 100,
+   "bytes": 6422,
+   "from": "site/images/press/HandySwitcher_100.png"
+  },
+  "icon-handymenu": {
+   "src": "dinarsoft/icons/handymenu.webp",
+   "w": 100,
+   "h": 100,
+   "bytes": 5204,
+   "from": "site/images/press/HandyMenu_100.png"
+  },
+  "icon-handylauncher": {
+   "src": "dinarsoft/icons/handylauncher.webp",
+   "w": 100,
+   "h": 100,
+   "bytes": 6886,
+   "from": "site/images/press/HandyLauncher_100.png"
+  },
+  "icon-taptext": {
+   "src": "dinarsoft/icons/taptext.webp",
+   "w": 100,
+   "h": 100,
+   "bytes": 9408,
+   "from": "site/images/press/TapText_100.png"
+  },
+  "icon-hijridate": {
+   "src": "dinarsoft/icons/hijridate.webp",
+   "w": 100,
+   "h": 100,
+   "bytes": 5966,
+   "from": "site/images/press/HijriDate_100.png"
+  },
+  "screen-mm2-1": {
+   "src": "dinarsoft/screens/mm2-1.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 11984,
+   "from": "site/images/mm2-1.gif"
+  },
+  "screen-mm2-6": {
+   "src": "dinarsoft/screens/mm2-6.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 12428,
+   "from": "site/images/mm2-6.gif"
+  },
+  "screen-mm2-5": {
+   "src": "dinarsoft/screens/mm2-5.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 7940,
+   "from": "site/images/mm2-5.gif"
+  },
+  "screen-mm2-4": {
+   "src": "dinarsoft/screens/mm2-4.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 11946,
+   "from": "site/images/mm2-4.gif"
+  },
+  "screen-mm2-sc": {
+   "src": "dinarsoft/screens/mm2-sc.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 7540,
+   "from": "site/images/mm2-sc.gif"
+  },
+  "screen-mm2-2": {
+   "src": "dinarsoft/screens/mm2-2.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 12288,
+   "from": "site/images/mm2-2.gif"
+  },
+  "screen-mm2-3": {
+   "src": "dinarsoft/screens/mm2-3.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 11188,
+   "from": "site/images/mm2-3.gif"
+  },
+  "screen-mm2-lf": {
+   "src": "dinarsoft/screens/mm2-lf.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 7752,
+   "from": "site/images/mm2-lf.gif"
+  },
+  "screen-hs3-6": {
+   "src": "dinarsoft/screens/hs3-6.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 26042,
+   "from": "site/images/HS3-6.gif"
+  },
+  "screen-hs3-1": {
+   "src": "dinarsoft/screens/hs3-1.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 12412,
+   "from": "site/images/HS3-1.gif"
+  },
+  "screen-hs3-3": {
+   "src": "dinarsoft/screens/hs3-3.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 10512,
+   "from": "site/images/HS3-3.gif"
+  },
+  "screen-hs3-4": {
+   "src": "dinarsoft/screens/hs3-4.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 10842,
+   "from": "site/images/HS3-4.gif"
+  },
+  "screen-hm": {
+   "src": "dinarsoft/screens/hm.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 11936,
+   "from": "site/images/HM.gif"
+  },
+  "screen-hmcolors": {
+   "src": "dinarsoft/screens/hmcolors.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 11368,
+   "from": "site/images/hmcolors.gif"
+  },
+  "screen-hmenuscreen": {
+   "src": "dinarsoft/screens/hmenuscreen.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 16596,
+   "from": "site/images/hmenuscreen.gif"
+  },
+  "screen-hlauncherscreen": {
+   "src": "dinarsoft/screens/hlauncherscreen.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 12864,
+   "from": "site/images/hlauncherscreen.gif"
+  },
+  "screen-taptextscreen": {
+   "src": "dinarsoft/screens/taptextscreen.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 30766,
+   "from": "site/images/taptextscreen.gif"
+  },
+  "screen-hijriscreen": {
+   "src": "dinarsoft/screens/hijriscreen.webp",
+   "w": 480,
+   "h": 640,
+   "bytes": 20056,
+   "from": "site/images/hijriscreen.gif"
+  },
+  "screen-ttmc": {
+   "src": "dinarsoft/screens/ttmc.webp",
+   "w": 270,
+   "h": 338,
+   "bytes": 2486,
+   "from": "site/images/ttmc.gif"
+  },
+  "screen-tto": {
+   "src": "dinarsoft/screens/tto.webp",
+   "w": 444,
+   "h": 412,
+   "bytes": 3554,
+   "from": "site/images/tto.gif"
+  },
+  "tp-2003-ppcmag-nominations--handymenu": {
+   "src": "dinarsoft/press/tp-2003-ppcmag-nominations--handymenu.webp",
+   "w": 491,
+   "h": 127,
+   "bytes": 10532,
+   "from": "captures/tp-2003-ppcmag-nominations--handymenu.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandyMenu only. Page: Best Software Awards 2003 nominations, Utilities: HandyMenu nominated (Today-screen Plug-in)",
+   "wayback": "https://web.archive.org/web/20031121173312/http://www.pocketpcmag.com/Awards/category.asp?catid=45",
+   "timestamp": "20031121173312",
+   "edits": [
+    "contact email line blurred (rows 91 to 107)"
+   ]
+  },
+  "tp-2004-ppcmag-nominations--memmaid": {
+   "src": "dinarsoft/press/tp-2004-ppcmag-nominations--memmaid.webp",
+   "w": 491,
+   "h": 140,
+   "bytes": 9632,
+   "from": "captures/tp-2004-ppcmag-nominations--memmaid.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2004 nominations, Utilities: MemMaid, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20040810215241/http://www.pocketpcmag.com/awards/category_2004.asp?catid=45",
+   "timestamp": "20040810215241",
+   "edits": [
+    "contact email line blurred (rows 104 to 120)"
+   ]
+  },
+  "tp-2004-ppcmag-nominations--handymenu": {
+   "src": "dinarsoft/press/tp-2004-ppcmag-nominations--handymenu.webp",
+   "w": 491,
+   "h": 127,
+   "bytes": 9238,
+   "from": "captures/tp-2004-ppcmag-nominations--handymenu.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandyMenu only. Page: Best Software Awards 2004 nominations, Utilities: MemMaid, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20040810215241/http://www.pocketpcmag.com/awards/category_2004.asp?catid=45",
+   "timestamp": "20040810215241",
+   "edits": [
+    "contact email line blurred (rows 91 to 107)"
+   ]
+  },
+  "tp-2004-ppcmag-nominations--handyswitcher": {
+   "src": "dinarsoft/press/tp-2004-ppcmag-nominations--handyswitcher.webp",
+   "w": 491,
+   "h": 140,
+   "bytes": 10678,
+   "from": "captures/tp-2004-ppcmag-nominations--handyswitcher.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandySwitcher only. Page: Best Software Awards 2004 nominations, Utilities: MemMaid, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20040810215241/http://www.pocketpcmag.com/awards/category_2004.asp?catid=45",
+   "timestamp": "20040810215241",
+   "edits": [
+    "contact email line blurred (rows 104 to 120)"
+   ]
+  },
+  "tp-2005-ppcmag-nominations--memmaid": {
+   "src": "dinarsoft/press/tp-2005-ppcmag-nominations--memmaid.webp",
+   "w": 492,
+   "h": 140,
+   "bytes": 10100,
+   "from": "captures/tp-2005-ppcmag-nominations--memmaid.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2005 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20051105095814/http://pocketpcmag.com/awards/category_2005.asp?catid=45",
+   "timestamp": "20051105095814",
+   "edits": [
+    "contact email line blurred (rows 104 to 120)"
+   ]
+  },
+  "tp-2005-ppcmag-nominations--handymenu": {
+   "src": "dinarsoft/press/tp-2005-ppcmag-nominations--handymenu.webp",
+   "w": 492,
+   "h": 127,
+   "bytes": 9300,
+   "from": "captures/tp-2005-ppcmag-nominations--handymenu.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandyMenu only. Page: Best Software Awards 2005 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20051105095814/http://pocketpcmag.com/awards/category_2005.asp?catid=45",
+   "timestamp": "20051105095814",
+   "edits": [
+    "contact email line blurred (rows 91 to 107)"
+   ]
+  },
+  "tp-2005-ppcmag-nominations--handyswitcher": {
+   "src": "dinarsoft/press/tp-2005-ppcmag-nominations--handyswitcher.webp",
+   "w": 492,
+   "h": 140,
+   "bytes": 10830,
+   "from": "captures/tp-2005-ppcmag-nominations--handyswitcher.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandySwitcher only. Page: Best Software Awards 2005 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20051105095814/http://pocketpcmag.com/awards/category_2005.asp?catid=45",
+   "timestamp": "20051105095814",
+   "edits": [
+    "contact email line blurred (rows 104 to 120)"
+   ]
+  },
+  "tp-2005-ppcmag-nominations--taptext": {
+   "src": "dinarsoft/press/tp-2005-ppcmag-nominations--taptext.webp",
+   "w": 492,
+   "h": 153,
+   "bytes": 11624,
+   "from": "captures/tp-2005-ppcmag-nominations--taptext.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "TapText only. Page: Best Software Awards 2005 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20051105095814/http://pocketpcmag.com/awards/category_2005.asp?catid=45",
+   "timestamp": "20051105095814",
+   "edits": [
+    "contact email line blurred (rows 117 to 133)"
+   ]
+  },
+  "tp-2005-smartphonemag-winners--memmaid": {
+   "src": "dinarsoft/press/tp-2005-smartphonemag-winners--memmaid.webp",
+   "w": 1280,
+   "h": 110,
+   "bytes": 7788,
+   "from": "captures/tp-2005-smartphonemag-winners--memmaid.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2005 winners and finalists: MemMaid finalist, Utilities: Maintenance",
+   "wayback": "https://web.archive.org/web/20110716095947/http://www.smartphonemag.com/awards/winners_ppc_2005.html",
+   "timestamp": "20110716095947",
+   "edits": []
+  },
+  "tp-2006-smartphonemag-winners--memmaid": {
+   "src": "dinarsoft/press/tp-2006-smartphonemag-winners--memmaid.webp",
+   "w": 1280,
+   "h": 42,
+   "bytes": 1828,
+   "from": "captures/tp-2006-smartphonemag-winners--memmaid.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2006 winners, finalists and nominees: MemMaid finalist, Maintenance",
+   "wayback": "https://web.archive.org/web/20111005155856/http://www.smartphonemag.com/awards/winners_ppc_2006.html",
+   "timestamp": "20111005155856",
+   "edits": []
+  },
+  "tp-2006-ppcmag-nominations--memmaid": {
+   "src": "dinarsoft/press/tp-2006-ppcmag-nominations--memmaid.webp",
+   "w": 492,
+   "h": 140,
+   "bytes": 7484,
+   "from": "captures/tp-2006-ppcmag-nominations--memmaid.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2006 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20060901003358/http://www.pocketpcmag.com/awards/category_2006.asp?catid=45",
+   "timestamp": "20060901003358",
+   "edits": []
+  },
+  "tp-2006-ppcmag-nominations--handymenu": {
+   "src": "dinarsoft/press/tp-2006-ppcmag-nominations--handymenu.webp",
+   "w": 492,
+   "h": 127,
+   "bytes": 6720,
+   "from": "captures/tp-2006-ppcmag-nominations--handymenu.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandyMenu only. Page: Best Software Awards 2006 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20060901003358/http://www.pocketpcmag.com/awards/category_2006.asp?catid=45",
+   "timestamp": "20060901003358",
+   "edits": []
+  },
+  "tp-2006-ppcmag-nominations--handyswitcher": {
+   "src": "dinarsoft/press/tp-2006-ppcmag-nominations--handyswitcher.webp",
+   "w": 492,
+   "h": 140,
+   "bytes": 8430,
+   "from": "captures/tp-2006-ppcmag-nominations--handyswitcher.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandySwitcher only. Page: Best Software Awards 2006 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20060901003358/http://www.pocketpcmag.com/awards/category_2006.asp?catid=45",
+   "timestamp": "20060901003358",
+   "edits": []
+  },
+  "tp-2006-ppcmag-nominations--taptext": {
+   "src": "dinarsoft/press/tp-2006-ppcmag-nominations--taptext.webp",
+   "w": 492,
+   "h": 153,
+   "bytes": 8970,
+   "from": "captures/tp-2006-ppcmag-nominations--taptext.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "TapText only. Page: Best Software Awards 2006 nominations, Utilities: MemMaid, TapText, HandyMenu, HandySwitcher",
+   "wayback": "https://web.archive.org/web/20060901003358/http://www.pocketpcmag.com/awards/category_2006.asp?catid=45",
+   "timestamp": "20060901003358",
+   "edits": []
+  },
+  "tp-2007-ppcmag-nominations--memmaid": {
+   "src": "dinarsoft/press/tp-2007-ppcmag-nominations--memmaid.webp",
+   "w": 495,
+   "h": 166,
+   "bytes": 9388,
+   "from": "captures/tp-2007-ppcmag-nominations--memmaid.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2007 nominations, Utilities: MemMaid, TapText, HandySwitcher, HandyMenu, HandyLauncher",
+   "wayback": "https://web.archive.org/web/20070901005121/http://www.pocketpcmag.com/awards_2007/category.asp?catid=45",
+   "timestamp": "20070901005121",
+   "edits": []
+  },
+  "tp-2007-ppcmag-nominations--handymenu": {
+   "src": "dinarsoft/press/tp-2007-ppcmag-nominations--handymenu.webp",
+   "w": 495,
+   "h": 127,
+   "bytes": 6826,
+   "from": "captures/tp-2007-ppcmag-nominations--handymenu.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandyMenu only. Page: Best Software Awards 2007 nominations, Utilities: MemMaid, TapText, HandySwitcher, HandyMenu, HandyLauncher",
+   "wayback": "https://web.archive.org/web/20070901005121/http://www.pocketpcmag.com/awards_2007/category.asp?catid=45",
+   "timestamp": "20070901005121",
+   "edits": []
+  },
+  "tp-2007-ppcmag-nominations--handyswitcher": {
+   "src": "dinarsoft/press/tp-2007-ppcmag-nominations--handyswitcher.webp",
+   "w": 495,
+   "h": 140,
+   "bytes": 8512,
+   "from": "captures/tp-2007-ppcmag-nominations--handyswitcher.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandySwitcher only. Page: Best Software Awards 2007 nominations, Utilities: MemMaid, TapText, HandySwitcher, HandyMenu, HandyLauncher",
+   "wayback": "https://web.archive.org/web/20070901005121/http://www.pocketpcmag.com/awards_2007/category.asp?catid=45",
+   "timestamp": "20070901005121",
+   "edits": []
+  },
+  "tp-2007-ppcmag-nominations--taptext": {
+   "src": "dinarsoft/press/tp-2007-ppcmag-nominations--taptext.webp",
+   "w": 495,
+   "h": 153,
+   "bytes": 9042,
+   "from": "captures/tp-2007-ppcmag-nominations--taptext.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "TapText only. Page: Best Software Awards 2007 nominations, Utilities: MemMaid, TapText, HandySwitcher, HandyMenu, HandyLauncher",
+   "wayback": "https://web.archive.org/web/20070901005121/http://www.pocketpcmag.com/awards_2007/category.asp?catid=45",
+   "timestamp": "20070901005121",
+   "edits": []
+  },
+  "tp-2007-ppcmag-nominations--handylauncher": {
+   "src": "dinarsoft/press/tp-2007-ppcmag-nominations--handylauncher.webp",
+   "w": 495,
+   "h": 127,
+   "bytes": 7090,
+   "from": "captures/tp-2007-ppcmag-nominations--handylauncher.png",
+   "owner": "third party (Pocket PC Magazine)",
+   "shows": "HandyLauncher only. Page: Best Software Awards 2007 nominations, Utilities: MemMaid, TapText, HandySwitcher, HandyMenu, HandyLauncher",
+   "wayback": "https://web.archive.org/web/20070901005121/http://www.pocketpcmag.com/awards_2007/category.asp?catid=45",
+   "timestamp": "20070901005121",
+   "edits": []
+  },
+  "tp-2007-smartphonemag-winners--memmaid": {
+   "src": "dinarsoft/press/tp-2007-smartphonemag-winners--memmaid.webp",
+   "w": 1280,
+   "h": 42,
+   "bytes": 2396,
+   "from": "captures/tp-2007-smartphonemag-winners--memmaid.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2007: TapText and HandySwitcher winners, MemMaid finalist",
+   "wayback": "https://web.archive.org/web/20111009044045/http://www.smartphonemag.com/awards/winners_ppc_2007.html",
+   "timestamp": "20111009044045",
+   "edits": []
+  },
+  "tp-2007-smartphonemag-winners--handyswitcher": {
+   "src": "dinarsoft/press/tp-2007-smartphonemag-winners--handyswitcher.webp",
+   "w": 1280,
+   "h": 42,
+   "bytes": 2674,
+   "from": "captures/tp-2007-smartphonemag-winners--handyswitcher.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "HandySwitcher only. Page: Best Software Awards 2007: TapText and HandySwitcher winners, MemMaid finalist",
+   "wayback": "https://web.archive.org/web/20111009044045/http://www.smartphonemag.com/awards/winners_ppc_2007.html",
+   "timestamp": "20111009044045",
+   "edits": []
+  },
+  "tp-2007-smartphonemag-winners--taptext": {
+   "src": "dinarsoft/press/tp-2007-smartphonemag-winners--taptext.webp",
+   "w": 1280,
+   "h": 42,
+   "bytes": 2464,
+   "from": "captures/tp-2007-smartphonemag-winners--taptext.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "TapText only. Page: Best Software Awards 2007: TapText and HandySwitcher winners, MemMaid finalist",
+   "wayback": "https://web.archive.org/web/20111009044045/http://www.smartphonemag.com/awards/winners_ppc_2007.html",
+   "timestamp": "20111009044045",
+   "edits": []
+  },
+  "tp-2008-smartphonemag-winners-p2--memmaid": {
+   "src": "dinarsoft/press/tp-2008-smartphonemag-winners-p2--memmaid.webp",
+   "w": 520,
+   "h": 50,
+   "bytes": 3210,
+   "from": "captures/tp-2008-smartphonemag-winners-p2--memmaid.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "MemMaid only. Page: Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+   "wayback": "https://web.archive.org/web/20111103115143/http://www.smartphonemag.com/cms/awards/2008/winners_ppc_apps/page2",
+   "timestamp": "20111103115143",
+   "edits": []
+  },
+  "tp-2008-smartphonemag-winners-p2--handymenu": {
+   "src": "dinarsoft/press/tp-2008-smartphonemag-winners-p2--handymenu.webp",
+   "w": 520,
+   "h": 50,
+   "bytes": 3238,
+   "from": "captures/tp-2008-smartphonemag-winners-p2--handymenu.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "HandyMenu only. Page: Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+   "wayback": "https://web.archive.org/web/20111103115143/http://www.smartphonemag.com/cms/awards/2008/winners_ppc_apps/page2",
+   "timestamp": "20111103115143",
+   "edits": []
+  },
+  "tp-2008-smartphonemag-winners-p2--handyswitcher": {
+   "src": "dinarsoft/press/tp-2008-smartphonemag-winners-p2--handyswitcher.webp",
+   "w": 520,
+   "h": 50,
+   "bytes": 2754,
+   "from": "captures/tp-2008-smartphonemag-winners-p2--handyswitcher.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "HandySwitcher only. Page: Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+   "wayback": "https://web.archive.org/web/20111103115143/http://www.smartphonemag.com/cms/awards/2008/winners_ppc_apps/page2",
+   "timestamp": "20111103115143",
+   "edits": []
+  },
+  "tp-2008-smartphonemag-winners-p2--taptext": {
+   "src": "dinarsoft/press/tp-2008-smartphonemag-winners-p2--taptext.webp",
+   "w": 520,
+   "h": 50,
+   "bytes": 3148,
+   "from": "captures/tp-2008-smartphonemag-winners-p2--taptext.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "TapText only. Page: Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+   "wayback": "https://web.archive.org/web/20111103115143/http://www.smartphonemag.com/cms/awards/2008/winners_ppc_apps/page2",
+   "timestamp": "20111103115143",
+   "edits": []
+  },
+  "tp-2008-smartphonemag-winners-p2--handylauncher": {
+   "src": "dinarsoft/press/tp-2008-smartphonemag-winners-p2--handylauncher.webp",
+   "w": 520,
+   "h": 35,
+   "bytes": 2288,
+   "from": "captures/tp-2008-smartphonemag-winners-p2--handylauncher.png",
+   "owner": "third party (Smartphone & Pocket PC magazine)",
+   "shows": "HandyLauncher only. Page: Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+   "wayback": "https://web.archive.org/web/20111103115143/http://www.smartphonemag.com/cms/awards/2008/winners_ppc_apps/page2",
+   "timestamp": "20111103115143",
+   "edits": []
+  },
+  "tp-2006-10-tucows-favorite--headline": {
+   "src": "dinarsoft/press/tp-2006-10-tucows-favorite--headline.webp",
+   "w": 620,
+   "h": 425,
+   "bytes": 25738,
+   "from": "captures/tp-2006-10-tucows-favorite--headline.png",
+   "owner": "third party (Tucows)",
+   "shows": "Favorite - MemMaid: a Dr. File Finder Favorite, version 1.72",
+   "wayback": "https://web.archive.org/web/20071212153437/http://www.tucows.com/article/1128",
+   "timestamp": "20071212153437",
+   "edits": []
+  },
+  "tp-2004-07-geekzone-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2004-07-geekzone-memmaid--headline.webp",
+   "w": 1167,
+   "h": 41,
+   "bytes": 2150,
+   "from": "captures/tp-2004-07-geekzone-memmaid--headline.png",
+   "owner": "third party (Geekzone)",
+   "shows": "Headline only. Page: MemMaid for Pocket PC review by M Freitas",
+   "wayback": "https://web.archive.org/web/20040804041154/http://www.geekzone.co.nz/content.asp?contentid=2977",
+   "timestamp": "20040804041154",
+   "edits": []
+  },
+  "tp-2004-07-pocketpcdubai-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2004-07-pocketpcdubai-memmaid--headline.webp",
+   "w": 766,
+   "h": 57,
+   "bytes": 1650,
+   "from": "captures/tp-2004-07-pocketpcdubai-memmaid--headline.png",
+   "owner": "third party (Pocket PC Dubai)",
+   "shows": "Headline only. Page: MemMaid 1.2 review by Mabini",
+   "wayback": "https://web.archive.org/web/20040806143825/http://www.pocketpcdubai.com/DinarSoft/memmaid_review.html",
+   "timestamp": "20040806143825",
+   "edits": []
+  },
+  "tp-2004-09-emobie-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2004-09-emobie-memmaid--headline.webp",
+   "w": 968,
+   "h": 128,
+   "bytes": 8522,
+   "from": "captures/tp-2004-09-emobie-memmaid--headline.png",
+   "owner": "third party (eMobie)",
+   "shows": "Headline only. Page: Dinar Soft's MemMaid Reviewed, by Russ Terrell, 5 of 5 stars",
+   "wayback": "https://web.archive.org/web/20041221174606/http://www.emobie.com/featureddetails.asp?article=589",
+   "timestamp": "20041221174606",
+   "edits": []
+  },
+  "tp-2004-09-emobie-memmaid--verdict": {
+   "src": "dinarsoft/press/tp-2004-09-emobie-memmaid--verdict.webp",
+   "w": 962,
+   "h": 101,
+   "bytes": 7182,
+   "from": "captures/tp-2004-09-emobie-memmaid--verdict.png",
+   "owner": "third party (eMobie)",
+   "shows": "Star rating and verdict: \"MemMaid is the Swiss Army Knife of PPC utilities\"",
+   "wayback": "https://web.archive.org/web/20041221174606/http://www.emobie.com/featureddetails.asp?article=589",
+   "timestamp": "20041221174606",
+   "edits": []
+  },
+  "tp-2004-11-pocketpcreviews-memmaid--verdict": {
+   "src": "dinarsoft/press/tp-2004-11-pocketpcreviews-memmaid--verdict.webp",
+   "w": 1282,
+   "h": 56,
+   "bytes": 4558,
+   "from": "captures/tp-2004-11-pocketpcreviews-memmaid--verdict.png",
+   "owner": "third party (PocketPC Reviews)",
+   "shows": "Conclusion: \"MemMaid is a godsend!\"",
+   "wayback": "https://web.archive.org/web/20041109070117/http://www.pocketpcreviews.net/reviews/112004/memmaid.htm",
+   "timestamp": "20041109070117",
+   "edits": []
+  },
+  "tp-2005-01-pocketnow-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2005-01-pocketnow-memmaid--headline.webp",
+   "w": 1145,
+   "h": 83,
+   "bytes": 5756,
+   "from": "captures/tp-2005-01-pocketnow-memmaid--headline.png",
+   "owner": "third party (Pocketnow)",
+   "shows": "Headline only. Page: Dinarsoft's MemMaid v1.4 review by Tim Adams",
+   "wayback": "https://web.archive.org/web/20050207042826/http://www.pocketnow.com/index.php?a=portal_detail&t=reviews&id=547",
+   "timestamp": "20050207042826",
+   "edits": []
+  },
+  "tp-2005-06-pda247-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2005-06-pda247-memmaid--headline.webp",
+   "w": 1086,
+   "h": 41,
+   "bytes": 3276,
+   "from": "captures/tp-2005-06-pda247-memmaid--headline.png",
+   "owner": "third party (PDA247)",
+   "shows": "Headline only. Page: MemMaid review by Neil Brown",
+   "wayback": "https://web.archive.org/web/20060406134223/http://www.clieuk.co.uk/memmaid.shtml",
+   "timestamp": "20060406134223",
+   "edits": []
+  },
+  "tp-2006-07-jamm-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2006-07-jamm-memmaid--headline.webp",
+   "w": 1280,
+   "h": 57,
+   "bytes": 3304,
+   "from": "captures/tp-2006-07-jamm-memmaid--headline.png",
+   "owner": "third party (Just Another Mobile Monday)",
+   "shows": "Headline only. Page: Review - Short Take on MemMaid 1.72, by PatrickJ",
+   "wayback": "https://web.archive.org/web/20061101030035/http://justanothermobilemonday.com/Wordpress/2006/07/30/review-short-take-on-memmaid-172/",
+   "timestamp": "20061101030035",
+   "edits": []
+  },
+  "tp-2006-09-tucows-memmaid--verdict": {
+   "src": "dinarsoft/press/tp-2006-09-tucows-memmaid--verdict.webp",
+   "w": 460,
+   "h": 110,
+   "bytes": 7766,
+   "from": "captures/tp-2006-09-tucows-memmaid--verdict.png",
+   "owner": "third party (Tucows)",
+   "shows": "Verdict paragraph",
+   "wayback": "https://web.archive.org/web/20060917031341/http://www.tucows.com/article/1127",
+   "timestamp": "20060917031341",
+   "edits": []
+  },
+  "tp-2007-01-pocketland-net-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-01-pocketland-net-memmaid--headline.webp",
+   "w": 496,
+   "h": 38,
+   "bytes": 1066,
+   "from": "captures/tp-2007-01-pocketland-net-memmaid--headline.png",
+   "owner": "third party (Pocketland.net)",
+   "shows": "Headline only. Page: MemMaid Cleans House (MemMaid review, English)",
+   "wayback": "https://web.archive.org/web/20120301210538/http://www.pocketland.net/showstory.php?id=329&index=1",
+   "timestamp": "20120301210538",
+   "edits": []
+  },
+  "tp-2007-01-technologyatplay-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-01-technologyatplay-memmaid--headline.webp",
+   "w": 1038,
+   "h": 44,
+   "bytes": 874,
+   "from": "captures/tp-2007-01-technologyatplay-memmaid--headline.png",
+   "owner": "third party (Technology at Play)",
+   "shows": "Headline only. Page: MemMaid by Dinarsoft review",
+   "wayback": "https://web.archive.org/web/20070128232324/http://www.technologyatplay.com/main/tap/reviews/memmaid/review-memmaid.asp",
+   "timestamp": "20070128232324",
+   "edits": []
+  },
+  "tp-2007-gadgetmix-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-gadgetmix-memmaid--headline.webp",
+   "w": 818,
+   "h": 94,
+   "bytes": 5318,
+   "from": "captures/tp-2007-gadgetmix-memmaid--headline.png",
+   "owner": "third party (GadgetMix)",
+   "shows": "Headline only. Page: Dinarsoft Memmaid Reviewed!",
+   "wayback": "https://web.archive.org/web/20080105104156/http://gadgetmix.com/reviews/memmaid/memmaid.htm",
+   "timestamp": "20080105104156",
+   "edits": []
+  },
+  "tp-2007-05-clintonfitch-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-05-clintonfitch-memmaid--headline.webp",
+   "w": 900,
+   "h": 36,
+   "bytes": 900,
+   "from": "captures/tp-2007-05-clintonfitch-memmaid--headline.png",
+   "owner": "third party (ClintonFitch.com)",
+   "shows": "Headline: DinarSoft MemMaid 1.73 (review by Judie Hughes)",
+   "wayback": "https://web.archive.org/web/20070519052643/http://www.clintonfitch.com/reviews/dinarsoft/memmaid/default.asp",
+   "timestamp": "20070519052643",
+   "edits": []
+  },
+  "tp-2007-07-mobileview-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-07-mobileview-memmaid--headline.webp",
+   "w": 1280,
+   "h": 74,
+   "bytes": 1792,
+   "from": "captures/tp-2007-07-mobileview-memmaid--headline.png",
+   "owner": "third party (Mobile-View)",
+   "shows": "Headline: DinarSoft's MemMaid 2.0 Reviewed!",
+   "wayback": "https://web.archive.org/web/20071013202109/http://mobile-view.org/index.php?option=com_content&task=view&id=63&Itemid=1",
+   "timestamp": "20071013202109",
+   "edits": []
+  },
+  "tp-2007-09-jamm-memmaid2-vs-sktools--headline": {
+   "src": "dinarsoft/press/tp-2007-09-jamm-memmaid2-vs-sktools--headline.webp",
+   "w": 611,
+   "h": 50,
+   "bytes": 3116,
+   "from": "captures/tp-2007-09-jamm-memmaid2-vs-sktools--headline.png",
+   "owner": "third party (Just Another Mobile Monday)",
+   "shows": "Headline only. Page: Review: MemMaid 2.0 and/vs SKTools 3.19",
+   "wayback": "https://web.archive.org/web/20090814140049/http://justanothermobilemonday.com:80/Wordpress/2007/09/03/review-memmaid-20-andvs-sktools-319/",
+   "timestamp": "20090814140049",
+   "edits": []
+  },
+  "tp-2007-09-etenblog-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-09-etenblog-memmaid--headline.webp",
+   "w": 554,
+   "h": 45,
+   "bytes": 3534,
+   "from": "captures/tp-2007-09-etenblog-memmaid--headline.png",
+   "owner": "third party (Eten Blog dot Com)",
+   "shows": "Headline only. Page: Spring Cleaning With DinarSoft's MemMaid, by Tariq Bamadhaj",
+   "wayback": "https://web.archive.org/web/20071203204158/http://www.etenblog.com/2007/09/12/spring-cleaning-with-dinarsofts-memmaid/",
+   "timestamp": "20071203204158",
+   "edits": []
+  },
+  "tp-2007-09-etenblog-memmaid--verdict": {
+   "src": "dinarsoft/press/tp-2007-09-etenblog-memmaid--verdict.webp",
+   "w": 541,
+   "h": 129,
+   "bytes": 7758,
+   "from": "captures/tp-2007-09-etenblog-memmaid--verdict.png",
+   "owner": "third party (Eten Blog dot Com)",
+   "shows": "What the reviewer likes about MemMaid",
+   "wayback": "https://web.archive.org/web/20071203204158/http://www.etenblog.com/2007/09/12/spring-cleaning-with-dinarsofts-memmaid/",
+   "timestamp": "20071203204158",
+   "edits": []
+  },
+  "tp-2007-10-aximsite-memmaid2--headline": {
+   "src": "dinarsoft/press/tp-2007-10-aximsite-memmaid2--headline.webp",
+   "w": 705,
+   "h": 44,
+   "bytes": 2430,
+   "from": "captures/tp-2007-10-aximsite-memmaid2--headline.png",
+   "owner": "third party (AximSite)",
+   "shows": "Headline only. Page: MemMaid 2.0 review by Bryan Eley, 5 out of 5",
+   "wayback": "https://web.archive.org/web/20071012112936/http://www.aximsite.com/boards/vbarticles.php?do=article&articleid=423",
+   "timestamp": "20071012112936",
+   "edits": []
+  },
+  "tp-2007-10-aximsite-memmaid2--rating": {
+   "src": "dinarsoft/press/tp-2007-10-aximsite-memmaid2--rating.webp",
+   "w": 705,
+   "h": 36,
+   "bytes": 748,
+   "from": "captures/tp-2007-10-aximsite-memmaid2--rating.png",
+   "owner": "third party (AximSite)",
+   "shows": "Rating: 5 out of 5",
+   "wayback": "https://web.archive.org/web/20071012112936/http://www.aximsite.com/boards/vbarticles.php?do=article&articleid=423",
+   "timestamp": "20071012112936",
+   "edits": []
+  },
+  "tp-2007-mypdacafe-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2007-mypdacafe-memmaid--headline.webp",
+   "w": 1280,
+   "h": 68,
+   "bytes": 3566,
+   "from": "captures/tp-2007-mypdacafe-memmaid--headline.png",
+   "owner": "third party (MyPDACafe)",
+   "shows": "Headline only. Page: MyPDACafe article on MemMaid",
+   "wayback": "https://web.archive.org/web/20071013163100/http://mypdacafe.com/articles.php?id=163",
+   "timestamp": "20071013163100",
+   "edits": []
+  },
+  "tp-2009-01-windowscentral-memmaid--headline": {
+   "src": "dinarsoft/press/tp-2009-01-windowscentral-memmaid--headline.webp",
+   "w": 622,
+   "h": 88,
+   "bytes": 4596,
+   "from": "captures/tp-2009-01-windowscentral-memmaid--headline.png",
+   "owner": "third party (Windows Central)",
+   "shows": "Headline only. Page: Review: MemMaid Memory Management Utility (2009-01-03), Wayback copy from 2024",
+   "wayback": "https://web.archive.org/web/20241104112136/https://www.windowscentral.com/review-memmaid-memory-management-utility",
+   "timestamp": "20241104112136",
+   "edits": []
+  },
+  "tp-2004-04-pocketpclife-handymenu--headline": {
+   "src": "dinarsoft/press/tp-2004-04-pocketpclife-handymenu--headline.webp",
+   "w": 979,
+   "h": 131,
+   "bytes": 16600,
+   "from": "captures/tp-2004-04-pocketpclife-handymenu--headline.png",
+   "owner": "third party (Pocket PC Life)",
+   "shows": "Headline only. Page: HandyMenu V.2.0 review by Tim Hillebrand, 5 of 5 stars",
+   "wayback": "https://web.archive.org/web/20040525130844/http://www.pocketpclife.co.uk/featureddetails.asp?article=508",
+   "timestamp": "20040525130844",
+   "edits": []
+  },
+  "tp-2004-04-pocketpclife-handymenu--rating": {
+   "src": "dinarsoft/press/tp-2004-04-pocketpclife-handymenu--rating.webp",
+   "w": 417,
+   "h": 138,
+   "bytes": 3898,
+   "from": "captures/tp-2004-04-pocketpclife-handymenu--rating.png",
+   "owner": "third party (Pocket PC Life)",
+   "shows": "Review box: developer DinarSoft, HandyMenu 2.0, star rating (5 of 5)",
+   "wayback": "https://web.archive.org/web/20040525130844/http://www.pocketpclife.co.uk/featureddetails.asp?article=508",
+   "timestamp": "20040525130844",
+   "edits": []
+  },
+  "tp-2004-07-geekzone-handymenu--headline": {
+   "src": "dinarsoft/press/tp-2004-07-geekzone-handymenu--headline.webp",
+   "w": 1167,
+   "h": 41,
+   "bytes": 1674,
+   "from": "captures/tp-2004-07-geekzone-handymenu--headline.png",
+   "owner": "third party (Geekzone)",
+   "shows": "Headline only. Page: HandyMenu review by M Freitas",
+   "wayback": "https://web.archive.org/web/20040803112847/http://www.geekzone.co.nz/content.asp?contentid=3052",
+   "timestamp": "20040803112847",
+   "edits": []
+  },
+  "tp-2004-09-ppcthoughts-handymenu--headline": {
+   "src": "dinarsoft/press/tp-2004-09-ppcthoughts-handymenu--headline.webp",
+   "w": 1280,
+   "h": 70,
+   "bytes": 4108,
+   "from": "captures/tp-2004-09-ppcthoughts-handymenu--headline.png",
+   "owner": "third party (Pocket PC Thoughts)",
+   "shows": "Headline only. Page: All Tapped Out? DinarSoft's HandyMenu v2.5 Reviewed, by Doug Raeburn",
+   "wayback": "https://web.archive.org/web/20050309212034/http://www.pocketpcthoughts.com/forums/viewtopic.php?t=31227",
+   "timestamp": "20050309212034",
+   "edits": []
+  },
+  "tp-2007-gadgetmix-handymenu--headline": {
+   "src": "dinarsoft/press/tp-2007-gadgetmix-handymenu--headline.webp",
+   "w": 819,
+   "h": 50,
+   "bytes": 4992,
+   "from": "captures/tp-2007-gadgetmix-handymenu--headline.png",
+   "owner": "third party (GadgetMix)",
+   "shows": "Opening line of the HandyMenu review",
+   "wayback": "https://web.archive.org/web/20070922203027/http://gadgetmix.com/reviews/handymenu/hmenu.htm",
+   "timestamp": "20070922203027",
+   "edits": []
+  },
+  "tp-2007-gadgetmix-handymenu--verdict": {
+   "src": "dinarsoft/press/tp-2007-gadgetmix-handymenu--verdict.webp",
+   "w": 308,
+   "h": 112,
+   "bytes": 3388,
+   "from": "captures/tp-2007-gadgetmix-handymenu--verdict.png",
+   "owner": "third party (GadgetMix)",
+   "shows": "Pros: easy to use, customisable, user friendly, cheap, light on memory",
+   "wayback": "https://web.archive.org/web/20070922203027/http://gadgetmix.com/reviews/handymenu/hmenu.htm",
+   "timestamp": "20070922203027",
+   "edits": [
+    "trimmed to 308x112"
+   ]
+  },
+  "tp-2004-04-pocketpclife-handyswitcher--headline": {
+   "src": "dinarsoft/press/tp-2004-04-pocketpclife-handyswitcher--headline.webp",
+   "w": 981,
+   "h": 70,
+   "bytes": 6920,
+   "from": "captures/tp-2004-04-pocketpclife-handyswitcher--headline.png",
+   "owner": "third party (Pocket PC Life)",
+   "shows": "Headline only. Page: Handy Switcher V 2.0 review by Tim Hillebrand, 4 of 5 stars",
+   "wayback": "https://web.archive.org/web/20040926050629/http://www.pocketpclife.co.uk/featureddetails.asp?article=509",
+   "timestamp": "20040926050629",
+   "edits": []
+  },
+  "tp-2004-04-pocketpclife-handyswitcher--rating": {
+   "src": "dinarsoft/press/tp-2004-04-pocketpclife-handyswitcher--rating.webp",
+   "w": 417,
+   "h": 138,
+   "bytes": 4022,
+   "from": "captures/tp-2004-04-pocketpclife-handyswitcher--rating.png",
+   "owner": "third party (Pocket PC Life)",
+   "shows": "Review box: developer DinarSoft, HandySwitcher 2.0, star rating (4 of 5)",
+   "wayback": "https://web.archive.org/web/20040926050629/http://www.pocketpclife.co.uk/featureddetails.asp?article=509",
+   "timestamp": "20040926050629",
+   "edits": []
+  },
+  "tp-2006-03-pdablast-handyswitcher--headline": {
+   "src": "dinarsoft/press/tp-2006-03-pdablast-handyswitcher--headline.webp",
+   "w": 936,
+   "h": 110,
+   "bytes": 5750,
+   "from": "captures/tp-2006-03-pdablast-handyswitcher--headline.png",
+   "owner": "third party (pdaBlast)",
+   "shows": "Headline: HandySwitcher Task Management for Your Pocket PC (pdaBlast! Staff, 2006-03-27)",
+   "wayback": "https://web.archive.org/web/20060418020419/http://treo.pdablast.com/articles/2006/3/2006327-HandySwitcher-Task-Management-for.html",
+   "timestamp": "20060418020419",
+   "edits": []
+  },
+  "tp-2006-06-treocentral-shootout--headline": {
+   "src": "dinarsoft/press/tp-2006-06-treocentral-shootout--headline.webp",
+   "w": 920,
+   "h": 120,
+   "bytes": 7524,
+   "from": "captures/tp-2006-06-treocentral-shootout--headline.png",
+   "owner": "third party (TreoCentral)",
+   "shows": "Headline: Task Manager Shoot-Out for the 700W (Tim Hillebrand, 2006-06-19)",
+   "wayback": "https://web.archive.org/web/20060703010455/http://treocentral.com/content/Stories/839-2.htm",
+   "timestamp": "20060703010455",
+   "edits": []
+  },
+  "tp-2006-06-treocentral-shootout--dinarsoft": {
+   "src": "dinarsoft/press/tp-2006-06-treocentral-shootout--dinarsoft.webp",
+   "w": 920,
+   "h": 274,
+   "bytes": 95798,
+   "from": "captures/tp-2006-06-treocentral-shootout--dinarsoft.png",
+   "owner": "third party (TreoCentral)",
+   "shows": "The HandySwitcher, HandyLauncher and HandyMenu sections of the shoot-out",
+   "wayback": "https://web.archive.org/web/20060703010455/http://treocentral.com/content/Stories/839-2.htm",
+   "timestamp": "20060703010455",
+   "edits": [
+    "trimmed to 920x274"
+   ]
+  },
+  "tp-2007-gadgetmix-handyswitcher--headline": {
+   "src": "dinarsoft/press/tp-2007-gadgetmix-handyswitcher--headline.webp",
+   "w": 818,
+   "h": 50,
+   "bytes": 4270,
+   "from": "captures/tp-2007-gadgetmix-handyswitcher--headline.png",
+   "owner": "third party (GadgetMix)",
+   "shows": "Headline only. Page: Dinarysoft HandySwitcher Reviewed!",
+   "wayback": "https://web.archive.org/web/20071006205357/http://gadgetmix.com/reviews/handyswitcher/hswitcher.htm",
+   "timestamp": "20071006205357",
+   "edits": []
+  },
+  "tp-2007-gadgetmix-handyswitcher--verdict": {
+   "src": "dinarsoft/press/tp-2007-gadgetmix-handyswitcher--verdict.webp",
+   "w": 1282,
+   "h": 35,
+   "bytes": 2544,
+   "from": "captures/tp-2007-gadgetmix-handyswitcher--verdict.png",
+   "owner": "third party (GadgetMix)",
+   "shows": "Verdict: \"functional and must have on every Pocket PC\"",
+   "wayback": "https://web.archive.org/web/20071006205357/http://gadgetmix.com/reviews/handyswitcher/hswitcher.htm",
+   "timestamp": "20071006205357",
+   "edits": []
+  },
+  "tp-2007-06-gadgetmix-handyswitcher3--verdict": {
+   "src": "dinarsoft/press/tp-2007-06-gadgetmix-handyswitcher3--verdict.webp",
+   "w": 819,
+   "h": 35,
+   "bytes": 1490,
+   "from": "captures/tp-2007-06-gadgetmix-handyswitcher3--verdict.png",
+   "owner": "third party (GadgetMix)",
+   "shows": "Verdict: \"So, in the end, do I recommend it? YES, go get it!\"",
+   "wayback": "https://web.archive.org/web/20070627171617/http://www.gadgetmix.com/reviews/hswitcher3/handyswitcher3.htm",
+   "timestamp": "20070627171617",
+   "edits": []
+  },
+  "tp-2005-03-aximsite-taptext--headline": {
+   "src": "dinarsoft/press/tp-2005-03-aximsite-taptext--headline.webp",
+   "w": 1091,
+   "h": 232,
+   "bytes": 9120,
+   "from": "captures/tp-2005-03-aximsite-taptext--headline.png",
+   "owner": "third party (AximSite)",
+   "shows": "Headline, reviewer, developer DinarSoft and star rating (4 of 5)",
+   "wayback": "https://web.archive.org/web/20050307020422/http://www.aximsite.com/articles/link.php?id=228",
+   "timestamp": "20050307020422",
+   "edits": []
+  },
+  "tp-2005-04-ppcthoughts-taptext--headline": {
+   "src": "dinarsoft/press/tp-2005-04-ppcthoughts-taptext--headline.webp",
+   "w": 1280,
+   "h": 70,
+   "bytes": 3062,
+   "from": "captures/tp-2005-04-ppcthoughts-taptext--headline.png",
+   "owner": "third party (Pocket PC Thoughts)",
+   "shows": "Headline only. Page: DinarSoft TapText 1.0: Repetitive Text Entry is Less Repetitive, by John Walkosak",
+   "wayback": "https://web.archive.org/web/20050430072152/http://www.pocketpcthoughts.com/forums/viewtopic.php?t=38753",
+   "timestamp": "20050430072152",
+   "edits": []
+  },
+  "tp-2006-08-ppcthoughts-taptext--headline": {
+   "src": "dinarsoft/press/tp-2006-08-ppcthoughts-taptext--headline.webp",
+   "w": 1155,
+   "h": 70,
+   "bytes": 3164,
+   "from": "captures/tp-2006-08-ppcthoughts-taptext--headline.png",
+   "owner": "third party (Pocket PC Thoughts)",
+   "shows": "Headline only. Page: Speed Up Text Entry With TapText, by Brad Adrian",
+   "wayback": "https://web.archive.org/web/20061118233130/http://www.pocketpcthoughts.com/forums/viewtopic.php?t=49767",
+   "timestamp": "20061118233130",
+   "edits": []
+  },
+  "tp-2007-08-gadgeteer-taptext--headline": {
+   "src": "dinarsoft/press/tp-2007-08-gadgeteer-taptext--headline.webp",
+   "w": 878,
+   "h": 44,
+   "bytes": 2770,
+   "from": "captures/tp-2007-08-gadgeteer-taptext--headline.png",
+   "owner": "third party (The Gadgeteer)",
+   "shows": "Headline: DinarSoft TapText - Windows Mobile Utility",
+   "wayback": "https://web.archive.org/web/20070911045854/http://the-gadgeteer.com/review/dinarsoft_taptext_windows_mobile_utility",
+   "timestamp": "20070911045854",
+   "edits": []
+  },
+  "tp-2007-08-gadgeteer-taptext--verdict": {
+   "src": "dinarsoft/press/tp-2007-08-gadgeteer-taptext--verdict.webp",
+   "w": 877,
+   "h": 78,
+   "bytes": 4484,
+   "from": "captures/tp-2007-08-gadgeteer-taptext--verdict.png",
+   "owner": "third party (The Gadgeteer)",
+   "shows": "Conclusion: \"I really cannot see any problems with DinarSoft's TapText\"",
+   "wayback": "https://web.archive.org/web/20070911045854/http://the-gadgeteer.com/review/dinarsoft_taptext_windows_mobile_utility",
+   "timestamp": "20070911045854",
+   "edits": [
+    "trimmed to 877x78"
+   ]
+  },
+  "tp-2007-12-etenblog-taptext--headline": {
+   "src": "dinarsoft/press/tp-2007-12-etenblog-taptext--headline.webp",
+   "w": 554,
+   "h": 45,
+   "bytes": 2366,
+   "from": "captures/tp-2007-12-etenblog-taptext--headline.png",
+   "owner": "third party (Eten Blog dot Com)",
+   "shows": "Headline only. Page: TapText Data With Ease, by Tariq Bamadhaj",
+   "wayback": "https://web.archive.org/web/20071213193925/http://www.etenblog.com/2007/12/12/dinarsoft-taptext/",
+   "timestamp": "20071213193925",
+   "edits": []
+  },
+  "tp-chip-2006-06--entry": {
+   "src": "dinarsoft/press/tp-chip-2006-06--entry.webp",
+   "w": 1280,
+   "h": 318,
+   "bytes": 50400,
+   "from": "captures/tp-chip-2006-06--entry.png",
+   "owner": "third party (CHIP magazine, Russia)",
+   "shows": "DinarSoft entry only. Page: CHIP DVD 06/2006 (Russia) cover-disc page: MemMaid 1.6; rendered from the disc file, OS badge icons omitted",
+   "wayback": "https://archive.org/details/chip-dvd-ru-2006-06 (file data/data_htm/special/memmaid.htm inside the ISO)",
+   "timestamp": null,
+   "edits": []
+  },
+  "tp-chip-2007-05--entry": {
+   "src": "dinarsoft/press/tp-chip-2007-05--entry.webp",
+   "w": 1280,
+   "h": 331,
+   "bytes": 35834,
+   "from": "captures/tp-chip-2007-05--entry.png",
+   "owner": "third party (CHIP magazine, Russia)",
+   "shows": "DinarSoft entry only. Page: CHIP DVD 05/2007 (Russia) cover-disc page: HandySwitcher 2.7; rendered from the disc file, OS badge icons omitted",
+   "wayback": "https://archive.org/details/chip-dvd-ru-2007-05 (file data/data_htm/pda/handy.htm inside the ISO)",
+   "timestamp": null,
+   "edits": []
+  },
+  "tp-chip-2008-06--entry": {
+   "src": "dinarsoft/press/tp-chip-2008-06--entry.webp",
+   "w": 1280,
+   "h": 318,
+   "bytes": 41496,
+   "from": "captures/tp-chip-2008-06--entry.png",
+   "owner": "third party (CHIP magazine, Russia)",
+   "shows": "DinarSoft entry only. Page: CHIP DVD 06/2008 (Russia) cover-disc page: HandySwitcher 3.1 (same page on the CHIP CD 06/2008); rendered from the disc file, OS badge icons omitted",
+   "wayback": "https://archive.org/details/chip-dvd-ru-2008-06 (file data/data_htm/pda/HandySwitcher.htm inside the ISO)",
+   "timestamp": null,
+   "edits": []
+  },
+  "tp-chip-2008-09--entry": {
+   "src": "dinarsoft/press/tp-chip-2008-09--entry.webp",
+   "w": 1280,
+   "h": 368,
+   "bytes": 55588,
+   "from": "captures/tp-chip-2008-09--entry.png",
+   "owner": "third party (CHIP magazine, Russia)",
+   "shows": "DinarSoft entry only. Page: CHIP DVD 09/2008 (Russia) cover-disc page: MemMaid 2.3; rendered from the disc file, OS badge icons omitted",
+   "wayback": "https://archive.org/details/chip-dvd-ru-2008-09 (file data/data_htm/pda/DinarSoftMemMaid.htm inside the ISO)",
+   "timestamp": null,
+   "edits": []
+  },
+  "ds-2006-05-home-frames": {
+   "src": "dinarsoft/site/ds-2006-05-home-frames.webp",
+   "w": 1280,
+   "h": 900,
+   "bytes": 75700,
+   "from": "captures/ds-2006-05-home-frames.png",
+   "owner": "DinarSoft",
+   "shows": "Frames site as it looked in May 2006 (frameset from Aug 2006; first archived inner pages). Header art never archived.",
+   "wayback": "https://web.archive.org/web/20060508132501/http://www.dinarsoft.com/",
+   "timestamp": "20060508132501",
+   "edits": [
+    "none (checked: no address, phone or email on the page)"
+   ]
+  },
+  "ds-2006-home-relaunch": {
+   "src": "dinarsoft/site/ds-2006-home-relaunch.webp",
+   "w": 1280,
+   "h": 900,
+   "bytes": 103964,
+   "from": "captures/ds-2006-home-relaunch.png",
+   "owner": "DinarSoft",
+   "shows": "Relaunched site with online store (Dec 2006)",
+   "wayback": "https://web.archive.org/web/20061206211940/http://www.dinarsoft.com/",
+   "timestamp": "20061206211940",
+   "edits": [
+    "none (checked: no address, phone or email on the page)"
+   ]
+  },
+  "banner": {
+   "src": "dinarsoft/site/banner.webp",
+   "w": 755,
+   "h": 123,
+   "bytes": 33142,
+   "from": "site/images/banners/banneri84.jpg"
+  },
+  "logo-2005": {
+   "src": "dinarsoft/logo-2005.webp",
+   "w": 116,
+   "h": 53,
+   "bytes": 5128,
+   "from": "downloads/DinarSoftHijriDate15.CAB, HIJRIP~1.001 (the Today plug-in), bitmap 162, 24-bit",
+   "edits": [
+    "none, lossless WebP"
+   ]
+  },
+  "logo-2005-ar": {
+   "src": "dinarsoft/logo-2005-ar.webp",
+   "w": 92,
+   "h": 54,
+   "bytes": 4516,
+   "from": "downloads/DinarSoftHijriDate15.CAB, HIJRIP~1.001 (the Today plug-in), bitmap 157, 24-bit",
+   "edits": [
+    "none, lossless WebP"
+   ]
+  }
+ },
+ "downloads": [
+  {
+   "file": "DinarSoftMemMaid172.exe",
+   "version": "1.72",
+   "bytes": 643072,
+   "sha256": "6f2ad46398be233634343a3991e8bfe5f68d1ff2698bc84b3f3681063075265b",
+   "timestamp": "20070129002024",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftMemMaid172.exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid172.CAB",
+   "version": "1.72",
+   "bytes": 508734,
+   "sha256": "4103d7945fe40020ad162049d7a9926b7e0394b2f2ad45690604cca4267dfd18",
+   "timestamp": "20070129001847",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftMemMaid172.CAB",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid_en.CAB",
+   "version": "2.3 (Build 230), English",
+   "bytes": 989440,
+   "sha256": "5db295336fdc912e017f7413f8f24f3b635caa8472e1ab84d30d79b41f9dc284",
+   "timestamp": "20170902151714",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=mm&t=cab",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid_en_Setup.exe",
+   "version": "2.3 (Build 230), English",
+   "bytes": 461312,
+   "sha256": "f43515caab0d12975d0ab88a413e46482fbe67ec7bbc299d3037aefe4a1f0e0c",
+   "timestamp": "20170902151903",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=mm&t=exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid.CAB",
+   "version": "2.3 (Build 230), multilingual",
+   "bytes": 1303812,
+   "sha256": "0f2b92154e955a0e56135439b0d2cd98ae991812897899cb6ade8389b9869997",
+   "timestamp": "20170902151816",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=mm&t=cab&l=m",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid_Setup.exe",
+   "version": "2.3 (Build 230), multilingual",
+   "bytes": 539136,
+   "sha256": "3f2babff01895d89aa8a1ed726206968a568c8c119d7881b9829a7b133553645",
+   "timestamp": "20170902151908",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=mm&t=exe&l=m",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid_1_73.CAB",
+   "version": "1.73",
+   "bytes": 454630,
+   "sha256": "b3c914255cf18a7a5e2f83022c2a0ceab6f7d8ff53d292e1e4ba029c375835fa",
+   "timestamp": "20170902151858",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=mm&t=cab&v=o",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftMemMaid_1_73_Setup.exe",
+   "version": "1.73",
+   "bytes": 264704,
+   "sha256": "58e28b0243c22ecd3305bfe8200d8e571215086dcd4b0010ce4b4bc13a49026d",
+   "timestamp": "20170902151913",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=mm&t=exe&v=o",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandySwitcher27.exe",
+   "version": "2.7",
+   "bytes": 163328,
+   "sha256": "ec094f4e83b8ad82ec2b9e78c729cbf5b80c7bbc9a18e26546e07ded4f6df69a",
+   "timestamp": "20070306075025",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHandySwitcher27.exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandySwitcher_Demo.CAB",
+   "version": "3.1 (Build 78)",
+   "bytes": 252489,
+   "sha256": "d7f2b1caada19d022800984fa21041e8af925275483d8fcb4bcc04f26d8bafa3",
+   "timestamp": "20090301222736",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=hs&t=cab",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandySwitcher_Setup.exe",
+   "version": "3.1 (Build 78)",
+   "bytes": 207872,
+   "sha256": "92fcc8093362e3902147daa1fc04e534750f081ae930efb80b67c431be2f4ec2",
+   "timestamp": "20090301222741",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=hs&t=exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandyMenu36.CAB",
+   "version": "3.6",
+   "bytes": 213014,
+   "sha256": "8f58a741ffe34658a18991701c79323bcb963e0890aefdb8be26bb73cae39660",
+   "timestamp": "20061223230453",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHandyMenu36.CAB",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandyMenu.CAB",
+   "version": "3.7 (Build 40), multilingual",
+   "bytes": 195112,
+   "sha256": "2162029f1d2c81c4fc6f3f92ce77bfff0ab3281664a150e7b707e46f9e0bd460",
+   "timestamp": "20101218111541",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=hm&t=cab",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandyMenu_Setup.exe",
+   "version": "3.7 (Build 40), multilingual",
+   "bytes": 201728,
+   "sha256": "b01af14ffeefe405aab18d661654bba5c025de1bcaa1231ddbf3f6d0d391b630",
+   "timestamp": "20101218111333",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=hm&t=exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandyLauncher34.CAB",
+   "version": "3.4",
+   "bytes": 105402,
+   "sha256": "1f7be507d2dccfd06a1e86ca7bea95183c2809696f0b67fc0c526d524c3dcb96",
+   "timestamp": "20061222045948",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHandyLauncher34.CAB",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandyLauncher34.exe",
+   "version": "3.4",
+   "bytes": 208896,
+   "sha256": "431dbe604331b81c7654ea388fcb7c814d53e0212a9310b37d078c8b5904e3a3",
+   "timestamp": "20061216210743",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHandyLauncher34.exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandyLauncher34_Setup.exe",
+   "version": "3.4",
+   "bytes": 156672,
+   "sha256": "3224c50bbe72687325ff0ebab65733ccbddf6b4f35d3d26fee57d9be51a9ee6e",
+   "timestamp": "20070713235349",
+   "original_url": "http://www.dinarsoft.com/scripts/downloadtrial.php?p=hl&t=exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftTapText13.CAB",
+   "version": "1.3",
+   "bytes": 182869,
+   "sha256": "38dcaf0b243094b5c00ee54bea8e3e69802719b4485f70076b33e7aa6d7c7d1a",
+   "timestamp": "20070117073946",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftTapText13.CAB",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftTapText13.exe",
+   "version": "1.3",
+   "bytes": 286720,
+   "sha256": "fb8bdfede6795ac253eca3e976b3767c24756ba684c9ed31b4afd53de3702c31",
+   "timestamp": "20061229072411",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftTapText13.exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHijriDate15.CAB",
+   "version": "1.5",
+   "bytes": 190841,
+   "sha256": "5c0e955b80c01e6f4f76d80ae700ecbb39b63f77aff24b26adaabc128243202e",
+   "timestamp": "20070116214648",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHijriDate15.CAB",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHijriDate15.exe",
+   "version": "1.5",
+   "bytes": 352256,
+   "sha256": "91611e8cd8faba5d1dcbf5aabf340b989137ec5bc8f29031fa49026c757d0e82",
+   "timestamp": "20061224171150",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHijriDate15.exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "DinarSoftHandySwitcher27_20061223.exe",
+   "version": "2.7 (same device files as the 2007 setup; older self-extracting installer)",
+   "bytes": 270336,
+   "sha256": "b1d6c761478c182bba17e958a08c1db4a8a37140e8b064c5dc9644eed653a555",
+   "timestamp": "20061223074350",
+   "original_url": "http://www.dinarsoft.com/trials/DinarSoftHandySwitcher27.exe",
+   "archive_item": null,
+   "date_in_iso": null
+  },
+  {
+   "file": "CHIP-2006-06_DinarSoftMemMaidPG15a.exe",
+   "version": "1.5a (device files 2006-03-23; the CHIP disc calls it 1.6)",
+   "bytes": 524288,
+   "sha256": "bd01d928d4738eb5ba4360ac6fdadc60257bcfc13156cd5f49c74be9d5088767",
+   "timestamp": null,
+   "original_url": null,
+   "archive_item": "https://archive.org/details/chip-dvd-ru-2006-06",
+   "date_in_iso": "2006-04-14"
+  },
+  {
+   "file": "CHIP-2008-06_DinarSoftHandySwitcher_Setup.exe",
+   "version": "3.1, first build (device files 2008-04-15)",
+   "bytes": 207360,
+   "sha256": "2f947f7d1d914a110918c16336c2d94e84485321c6de4fb36ab00e7721d96fcd",
+   "timestamp": null,
+   "original_url": null,
+   "archive_item": "https://archive.org/details/chip-dvd-ru-2008-06",
+   "date_in_iso": "2008-04-18"
+  }
+ ]
+}

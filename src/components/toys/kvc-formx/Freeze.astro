@@ -1,0 +1,162 @@
+---
+// KVC switching Koko off, on his real code (KVC.EXE 07ED-0873, the unpacked image), beside the same logic in C.
+// The linked view shows the two slots, who each one points at, which door each call goes through, and the screen.
+import Window from '../../shell/Window.astro';
+import CodeStepper from '../CodeStepper.astro';
+
+const ASM = [
+  { off: '07ED', label: 'ask', code: 'push cs / pop ds' },
+  { off: '07EF', code: 'mov  ax,0FF0Ch', note: 'the secret question' },
+  { off: '07F2', code: 'int  21h', note: 'through slot 21h' },
+  { off: '07F4', code: 'cmp  ax,0C0C1h', note: "Koko's answer?" },
+  { off: '07F7', code: 'jne  clean', note: 'no: nobody is there' },
+  { off: '07F9', code: 'mov  ah,9 / mov dx,found', note: 'Found...' },
+  { off: '080B', code: 'int  3', note: 'print, via slot 3' },
+  { off: '080C', code: 'mov  cx,20', note: 'the alarm: 20 tones' },
+  { off: '083A', code: 'out  61h,al', note: 'speaker off' },
+  { off: '0840', code: 'mov  ax,3503h', note: 'what is in slot 3?' },
+  { off: '0843', code: 'int  3', note: 'answer: the real DOS' },
+  { off: '0846', code: 'mov  dx,bx', note: 'keep that address' },
+  { off: '0848', code: 'mov  ax,2521h', note: 'into slot 21h' },
+  { off: '084B', code: 'int  3' },
+  { off: '085C', code: 'mov  again,1', note: 'second look' },
+  { off: '0862', code: 'jmp  ask' },
+  { off: '0864', label: 'clean', code: 'cmp  again,0' },
+  { off: '086C', code: 'mov  ah,9 / mov dx,freezed', note: 'Freezed' },
+  { off: '0871', code: 'int  21h', note: 'slot 21h is safe' },
+  { off: '0873', code: 'ret', note: 'on to the files' },
+];
+const C = [
+  { code: 'int again = 0;' },
+  { code: 'ask:' },
+  { code: 'if (dos(0xFF0C) == 0xC0C1) {', note: 'Koko answered' },
+  { code: '  puts3(again ? REBOOT : FOUND);', note: 'print through slot 3' },
+  { code: '  siren(20);' },
+  { code: '  real = getvect3(0x03);' },
+  { code: '  setvect3(0x21, real);', note: 'slot 21h = DOS' },
+  { code: '  if (again) return;', note: 'a second copy: reboot' },
+  { code: '  again = 1;' },
+  { code: '  goto ask;' },
+  { code: '}' },
+  { code: 'if (again) puts(FREEZED);' },
+];
+type R = { name: string; value: string; means: string; changed?: boolean };
+const regs = (ax: string, axm: string, s21: 'Koko' | 'DOS', again: boolean, ch: string[] = []): R[] => [
+  { name: 'AX', value: ax, means: axm, changed: ch.includes('AX') },
+  { name: '21h', value: `→ ${s21}`, means: 'slot 21h, the door every program uses', changed: ch.includes('21h') },
+  { name: '03h', value: '→ DOS', means: 'slot 3, where Koko parked the real DOS' },
+  { name: '2nd', value: again ? 'yes' : 'no', means: 'is this the second look?', changed: ch.includes('2nd') },
+];
+const FOUND = 'Found  --KoKo (1) virus--  active in  RAM', FREEZED = '##### Virus Freezed #####';
+const STEPS = [
+  { a: 0, c: 1, say: 'KVC starts its memory check. Koko is in memory, standing in slot 21h.', regs: regs('----', '', 'Koko', false), s21: 'koko', via: '', out: [] },
+  { a: 1, c: 2, say: 'It loads the secret question, <b>FF0Ch</b>.', regs: regs('FF0C', 'the question', 'Koko', false, ['AX']), s21: 'koko', via: '', out: [] },
+  { a: 2, c: 2, say: 'It asks through <b>slot 21h</b>, the door every program uses. Koko stands in that door, so Koko gets the question.', regs: regs('C0C1', "Koko's answer", 'Koko', false, ['AX']), s21: 'koko', via: '21', out: [] },
+  { a: 3, c: 2, say: 'The answer is <b>C0C1h</b>, Koko’s own. Koko is in memory.', regs: regs('C0C1', "Koko's answer", 'Koko', false), s21: 'koko', via: '', out: [] },
+  { a: 6, c: 3, say: 'KVC prints its warning through <b>slot 3</b>. Koko parked the real DOS address there, so this call goes straight to DOS and never passes Koko.', regs: regs('0900', 'print', 'Koko', false, ['AX']), s21: 'koko', via: '3', out: [FOUND] },
+  { a: 7, c: 4, say: 'The alarm: <b>20 tones</b> on the PC speaker. You can hear it below.', regs: regs('03E8', 'first tone: clock ÷ 1,000', 'Koko', false, ['AX']), s21: 'koko', via: '', out: [FOUND], siren: true },
+  { a: 10, c: 5, say: 'Through slot 3 again, KVC asks DOS: <b>what address is in slot 3?</b> DOS answers with its own address.', regs: regs('3503', 'read slot 3', 'Koko', false, ['AX']), s21: 'koko', via: '3', out: [FOUND] },
+  { a: 13, c: 6, say: 'Through slot 3, KVC tells DOS: <b>put that address into slot 21h.</b> The door now opens straight onto DOS.', regs: regs('2521', 'write slot 21h', 'DOS', false, ['AX', '21h']), s21: 'dos', via: '3', out: [FOUND] },
+  { a: 14, c: 8, say: 'KVC remembers that this is its second look…', regs: regs('2521', '', 'DOS', true, ['2nd']), s21: 'dos', via: '', out: [FOUND] },
+  { a: 15, c: 9, say: '…and asks the same question again.', regs: regs('2521', '', 'DOS', true), s21: 'dos', via: '', out: [FOUND] },
+  { a: 2, c: 2, say: '<b>FF0Ch</b> goes through slot 21h, and now it reaches DOS. DOS has no such request.', regs: regs('FF0C', 'the question', 'DOS', true, ['AX']), s21: 'dos', via: '21', out: [FOUND] },
+  { a: 4, c: 2, say: 'No C0C1h. <b>Nobody answers.</b>', regs: regs('----', 'no answer', 'DOS', true, ['AX']), s21: 'dos', via: '', out: [FOUND] },
+  { a: 18, c: 11, say: 'KVC prints <b>Virus Freezed</b>, through the normal door this time: it is safe again.', regs: regs('0900', 'print', 'DOS', true, ['AX']), s21: 'dos', via: '21', out: [FOUND, FREEZED] },
+  { a: 19, c: 11, say: 'Koko’s code is still in memory, but no program can reach it. <b>Frozen.</b> KVC goes on to clean the disk. Had a second copy still answered, KVC would have sounded the alarm again and told the user to restart from a clean disk after cleaning.', regs: regs('0900', '', 'DOS', true), s21: 'dos', via: '', out: [FOUND, FREEZED] },
+];
+const last = STEPS[STEPS.length - 1];
+---
+
+<CodeStepper id="kvc-freeze-cs" title="KVC.EXE  freezing Koko" asm={ASM} c={C} steps={STEPS}>
+  <div slot="visual" class="kxz" data-freeze data-for="kvc-freeze-cs" data-s21={last.s21}>
+    <Window title="MEMORY  the two slots" kind="panel" num="4" class="kxz-win">
+      <svg class="dg kxz-svg kxz-wide" viewBox="0 0 560 250" role="img" aria-labelledby="kxz-t">
+        <title id="kxz-t">Slot 21h first points at Koko and slot 3 at DOS. KVC copies slot 3 into slot 21h, so every request reaches DOS and Koko is cut off.</title>
+        <rect class="box" x="10" y="98" width="110" height="54" /><text x="65" y="130" text-anchor="middle">KVC</text>
+        <g class="kxz-slot" data-slot="21"><rect class="box-bk" x="170" y="60" width="150" height="50" /><text class="t-yl" x="184" y="84">slot 21h</text><text class="t-sm" x="184" y="101" data-s21-t>→ {last.s21 === 'dos' ? 'DOS' : 'Koko'}</text></g>
+        <g class="kxz-slot" data-slot="3"><rect class="box-bk" x="170" y="140" width="150" height="50" /><text class="t-yl" x="184" y="164">slot 3</text><text class="t-sm" x="184" y="181">→ DOS</text></g>
+        <path class="wire kxz-k21" d="M120 116 H168" /><path class="wire kxz-k3" d="M120 134 C144 134 146 165 168 165" />
+        <g class="kxz-koko"><rect class="box-ink" x="400" y="20" width="150" height="54" /><text class="t-bk t-lg" x="475" y="54" text-anchor="middle">Koko</text></g>
+        <rect class="box" x="400" y="170" width="150" height="54" /><text x="475" y="202" text-anchor="middle">DOS</text>
+        <path class="wire kxz-w21k" d="M320 78 C360 78 360 47 398 47" />
+        <path class="wire kxz-w21d" d="M320 92 C366 92 360 190 398 190" />
+        <path class="wire kxz-w3d" d="M320 165 C356 165 362 206 398 206" />
+        <path class="wire dash kxz-wkd" d="M475 74 V168" />
+        <text class="t-sm kxz-cut" x="490" y="124">cut off</text>
+        <g class="kxz-spk" aria-hidden="true"><path d="M20 196 h14 l16 -12 v40 l-16 -12 h-14 z" class="box-hi" /><path class="wire-hi" d="M58 192 q8 12 0 24 M64 186 q14 18 0 36" /></g>
+      </svg>
+      <svg class="dg kxz-svg kxz-narrow" viewBox="0 0 360 320" role="img" aria-labelledby="kxz-tn">
+        <title id="kxz-tn">Slot 21h first points at Koko and slot 3 at DOS. KVC copies slot 3 into slot 21h, and Koko is cut off.</title>
+        <rect class="box" x="110" y="6" width="140" height="44" /><text x="180" y="33" text-anchor="middle">KVC</text>
+        <g class="kxz-slot" data-slot="21"><rect class="box-bk" x="10" y="72" width="160" height="52" /><text class="t-yl" x="22" y="95">slot 21h</text><text class="t-sm" x="22" y="114" data-s21-t>→ {last.s21 === 'dos' ? 'DOS' : 'Koko'}</text></g>
+        <g class="kxz-slot" data-slot="3"><rect class="box-bk" x="190" y="72" width="160" height="52" /><text class="t-yl" x="202" y="95">slot 3</text><text class="t-sm" x="202" y="114">→ DOS</text></g>
+        <path class="wire kxz-k21" d="M150 50 C150 62 90 58 90 70" /><path class="wire kxz-k3" d="M210 50 C210 62 270 58 270 70" />
+        <g class="kxz-koko"><rect class="box-ink" x="10" y="176" width="160" height="50" /><text class="t-bk t-lg" x="90" y="208" text-anchor="middle">Koko</text></g>
+        <rect class="box" x="190" y="256" width="160" height="50" /><text x="270" y="287" text-anchor="middle">DOS</text>
+        <path class="wire kxz-w21k" d="M90 124 V174" />
+        <path class="wire kxz-w21d" d="M130 124 C130 200 230 200 230 254" />
+        <path class="wire kxz-w3d" d="M270 124 V254" />
+        <path class="wire dash kxz-wkd" d="M170 210 C200 210 205 236 212 254" />
+        <text class="t-sm kxz-cut" x="20" y="250">cut off</text>
+        <g class="kxz-spk" aria-hidden="true" transform="translate(-10 70)"><path d="M20 196 h14 l16 -12 v40 l-16 -12 h-14 z" class="box-hi" /><path class="wire-hi" d="M58 192 q8 12 0 24 M64 186 q14 18 0 36" /></g>
+      </svg>
+    </Window>
+    <Window title="SCREEN" kind="screen" class="kxz-scr">
+      <pre class="kxz-out" data-out>{last.out.join('\n')}</pre>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .kxz-narrow { display: none; }
+  @media (max-width: 640px) { .kxz-wide { display: none; } .kxz-narrow { display: block; } }
+  .kxz { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .kxz-svg .kxz-slot rect { transition: stroke 0.2s, stroke-width 0.2s; }
+  .kxz-svg .kxz-slot.on rect { stroke: var(--accent); stroke-width: 3; }
+  .kxz-svg .kxz-w21k, .kxz-svg .kxz-w21d, .kxz-svg .kxz-cut, .kxz-svg .kxz-koko, .kxz-svg .kxz-wkd { transition: opacity 0.35s var(--quart); }
+  .kxz[data-s21='koko'] .kxz-w21d, .kxz[data-s21='koko'] .kxz-cut { opacity: 0; }
+  .kxz[data-s21='dos'] .kxz-w21k, .kxz[data-s21='dos'] .kxz-wkd { opacity: 0; }
+  .kxz[data-s21='dos'] .kxz-koko { opacity: 0.45; }
+  .kxz-svg .kxz-spk { opacity: 0; transition: opacity 0.2s; }
+  .kxz.is-siren .kxz-spk { opacity: 1; }
+  .kxz-svg path.go { stroke: var(--accent); stroke-width: 3; }
+  .kxz-out { margin: 0; min-height: 5em; padding: 10px; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); white-space: pre-wrap; background: var(--vga-0); }
+  @media (max-width: 1023px) { .kxz { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .kxz-svg * { transition: none !important; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+
+  gsap.registerPlugin(DrawSVGPlugin);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type Step = { s21: string; via: string; out: string[]; siren?: boolean };
+
+  document.querySelectorAll<HTMLElement>('[data-freeze]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!)!;
+    const out = vis.querySelector<HTMLElement>('[data-out]')!, s21t = vis.querySelectorAll('[data-s21-t]');
+    const all = (c: string) => [...vis.querySelectorAll(c)];
+    const wires = { '21koko': all('.kxz-k21, .kxz-w21k'), '21dos': all('.kxz-k21, .kxz-w21d'), '3dos': all('.kxz-k3, .kxz-w3d') } as Record<string, Element[]>;
+    root.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail as { step: Step; how: string };
+      const was = vis.dataset.s21;
+      vis.dataset.s21 = step.s21;
+      s21t.forEach(t => (t.textContent = `→ ${step.s21 === 'dos' ? 'DOS' : 'Koko'}`));
+      vis.classList.toggle('is-siren', !!step.siren);
+      all('[data-slot]').forEach(el => el.classList.toggle('on', step.via === (el as HTMLElement).dataset.slot));
+      Object.values(wires).flat().forEach(w => w.classList.remove('go'));
+      const w = step.via === '3' ? wires['3dos'] : step.via === '21' ? wires[`21${step.s21}`] : null;
+      if (w) {
+        w.forEach(x => x.classList.add('go'));
+        // kvc-to-slot wires first, then slot-to-target
+        if (how !== 'jump' && !reduce()) {
+          const first = w.filter(x => /kxz-k/.test(x.getAttribute('class')!)), second = w.filter(x => !first.includes(x));
+          gsap.timeline().fromTo(first, { drawSVG: '0%' }, { drawSVG: '100%', duration: 0.3, ease: 'none' }).fromTo(second, { drawSVG: '0%' }, { drawSVG: '100%', duration: 0.4, ease: 'power2.out', clearProps: 'strokeDasharray,strokeDashoffset' });
+        }
+      }
+      if (was !== step.s21 && step.s21 === 'dos' && how !== 'jump' && !reduce()) gsap.fromTo(s21t, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.5, ease: 'expo.out' });
+      out.textContent = step.out.join('\n');
+    });
+  });
+</script>

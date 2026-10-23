@@ -1,0 +1,160 @@
+---
+// Startup Items: put the shortcuts in your order and MemMaid writes them again, one by one, through a folder of its
+// own (2.3: 4D7CC). Switch one off and its shortcut stays in place but runs MemMaidLauncher.exe -noop (4EB40).
+import Window from '../../shell/Window.astro';
+
+const ITEMS = [
+  { name: 'poutlook.lnk', cmd: '\\Windows\\poutlook.exe' },
+  { name: 'HandyLauncher.lnk', cmd: '"\\Program Files\\HandyLauncher\\HandyLauncher.exe"' },
+  { name: 'HandyMenu.lnk', cmd: '"\\Program Files\\HandyMenu\\HandyMenu.exe"' },
+  { name: 'HandySwitcher.lnk', cmd: '"\\Program Files\\HandySwitcher\\HandySwitcher.exe"' },
+];
+const NOOP = '"\\Windows\\MemMaidLauncher.exe" -noop';
+const lnk = (cmd: string) => `${cmd.length}#${cmd}`;
+---
+
+<div class="mst" data-mm-startup data-noop={NOOP}>
+  <Window title="Startup Items" kind="dialog" active class="mst-ctl">
+    <ol class="mst-order" data-order>
+      {ITEMS.map((it, i) => (
+        <li data-name={it.name} data-cmd={it.cmd}>
+          <span class="mst-n">{i + 1}</span>
+          <span class="mst-name">{it.name}</span>
+          <button type="button" class="mst-ib" data-act="up" aria-label={`Move ${it.name} up`} disabled={i === 0}>▲</button>
+          <button type="button" class="mst-ib" data-act="down" aria-label={`Move ${it.name} down`} disabled={i === ITEMS.length - 1}>▼</button>
+          <button type="button" class="mst-on" data-act="on" aria-pressed="true" aria-label={`Start ${it.name} with the device`}>On</button>
+        </li>
+      ))}
+    </ol>
+    <button type="button" class="button k-btn mst-go" data-act="apply">Save this order</button>
+  </Window>
+
+  <div class="mst-fs" aria-live="polite">
+    <Window title={String.raw`\Windows\StartUp`} kind="panel" class="mst-dir">
+      <ol class="mst-files" data-dir="start">
+        {ITEMS.map((it, i) => <li class="mst-f" data-f={it.name}><b>{it.name}</b><code>{lnk(it.cmd)}</code><small data-made>written {i + 1}</small></li>)}
+      </ol>
+    </Window>
+    <Window title={String.raw`\Windows\MEMMAID.TEMP`} kind="panel" class="mst-dir mst-tmp" data-tmpwin>
+      <ol class="mst-files" data-dir="temp"></ol>
+      <p class="mst-gone" data-gone>Not there. MemMaid makes it only while it works, then removes it.</p>
+    </Window>
+    <Window title={String.raw`\Windows\StartUp.Disabled`} kind="panel" class="mst-dir">
+      <ol class="mst-files" data-dir="off"></ol>
+      <p class="mst-gone" data-offnone>Empty. Switch an item off to see where it goes.</p>
+    </Window>
+    <p class="mst-say" data-say>At every start, Windows Mobile runs each shortcut in the StartUp folder.</p>
+  </div>
+</div>
+
+<style is:global>
+  .mst { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 22px; align-items: start; }
+  .mst-order { display: grid; gap: 4px; margin: 0 0 14px; padding: 0; list-style: none; }
+  .mst-order li { display: grid; grid-template-columns: 1.6em minmax(0, 1fr) 44px 44px 52px; align-items: center; gap: 4px; padding: 2px 4px; border-radius: 3px; background: var(--surface-2); }
+  .mst-n { font: 700 0.875rem var(--font-code); color: var(--accent); text-align: center; }
+  .mst-name { font: 600 0.8125rem/1.25 var(--font-code); color: var(--ink); overflow-wrap: anywhere; }
+  .mst-order li.is-off .mst-name { color: var(--ink-2); text-decoration: line-through; }
+  .mst-ib, .mst-on { min-height: 44px; font: 700 0.875rem var(--font-ui); color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 3px; cursor: pointer; }
+  .mst-ib:disabled { opacity: 0.3; cursor: default; }
+  .mst-on[aria-pressed='true'] { color: #fff; background: var(--good); border-color: transparent; }
+  .mst-ib:focus-visible, .mst-on:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .mst-fs { display: grid; gap: 12px; }
+  .mst-files { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; min-height: 8px; }
+  .mst-f { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 6px 8px; border-radius: 3px; background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+  .mst-f b { font: 700 0.8125rem var(--font-code); color: var(--ink); }
+  .mst-f small { font-size: 0.75rem; color: var(--ink-2); text-align: right; }
+  .mst-f code { grid-column: 1 / -1; font: 500 0.75rem/1.35 var(--font-code); color: var(--ink-2); overflow-wrap: anywhere; }
+  .mst-f.is-noop { box-shadow: inset 3px 0 0 var(--hot); }
+  .mst-f.is-noop code { color: var(--hot); }
+  .mst-gone { margin: 0 !important; font-size: 0.875rem !important; color: var(--ink-2) !important; }
+  .mst-files:not(:empty) + .mst-gone { display: none; }
+  .mst-say { margin: 0 !important; min-height: 3em; font-size: 0.9375rem !important; color: var(--ink) !important; }
+  .mst-tmp.is-live { outline: 2px dashed var(--accent); outline-offset: 2px; }
+  @media (max-width: 1023px) { .mst { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { Flip } from 'gsap/Flip';
+  gsap.registerPlugin(Flip);
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const lnk = (cmd: string) => `${cmd.length}#${cmd}`;
+  document.querySelectorAll<HTMLElement>('[data-mm-startup]').forEach(root => {
+    const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const order = $('[data-order]'), start = $('[data-dir="start"]'), temp = $('[data-dir="temp"]'), off = $('[data-dir="off"]');
+    const say = $('[data-say]'), tmpWin = root.querySelector<HTMLElement>('.mst-tmp')!, apply = $('[data-act="apply"]') as HTMLButtonElement;
+    const NOOP = root.dataset.noop!;
+    let busy = false;
+    const rows = () => [...order.children] as HTMLElement[];
+    const file = (name: string, dir: HTMLElement) => dir.querySelector<HTMLElement>(`[data-f="${name}"]`);
+    const make = (name: string, cmd: string, made = '') => {
+      const li = document.createElement('li');
+      li.className = 'mst-f'; li.dataset.f = name;
+      li.innerHTML = '<b></b><code></code><small data-made></small>';
+      li.querySelector('b')!.textContent = name;
+      li.querySelector('code')!.textContent = lnk(cmd);
+      li.querySelector('small')!.textContent = made;
+      return li;
+    };
+    const renum = () => rows().forEach((r, i, all) => {
+      r.querySelector('.mst-n')!.textContent = String(i + 1);
+      (r.querySelector('[data-act="up"]') as HTMLButtonElement).disabled = i === 0;
+      (r.querySelector('[data-act="down"]') as HTMLButtonElement).disabled = i === all.length - 1;
+    });
+
+    // Switch off: copy the real shortcut aside, then overwrite it in place with one that does nothing
+    const toggle = (row: HTMLElement, btn: HTMLElement) => {
+      const on = btn.getAttribute('aria-pressed') !== 'true', name = row.dataset.name!, cmd = row.dataset.cmd!;
+      btn.setAttribute('aria-pressed', String(on));
+      btn.textContent = on ? 'On' : 'Off';
+      row.classList.toggle('is-off', !on);
+      const f = file(name, start)!;
+      f.classList.toggle('is-noop', !on);
+      f.querySelector('code')!.textContent = lnk(on ? cmd : NOOP);
+      if (on) file(name, off)?.remove();
+      else off.appendChild(make(name, cmd));
+      say.textContent = on
+        ? `${name} is back: its real shortcut returns to StartUp, and the copy in StartUp.Disabled goes.`
+        : `${name} stays in StartUp, in its place, but now it runs MemMaidLauncher.exe -noop, which does nothing. The real shortcut waits in StartUp.Disabled.`;
+      if (!reduce()) gsap.fromTo(f, { backgroundColor: 'color-mix(in oklch, var(--hot) 25%, var(--surface-2))' }, { backgroundColor: 'var(--surface-2)', duration: 0.8, clearProps: 'backgroundColor' });
+    };
+
+    // Save: copy all into MEMMAID.TEMP, delete them from StartUp, copy them back in the new order, remove the folder
+    const save = () => {
+      if (busy) return;
+      busy = true; apply.disabled = true;
+      const names = rows().map(r => r.dataset.name!);
+      const d = reduce() ? 0 : 0.45;
+      const tl = gsap.timeline({ onComplete: () => { busy = false; apply.disabled = false; } });
+      const flip = (fn: () => void) => () => { const st = Flip.getState(root.querySelectorAll('.mst-f')); fn(); if (d) Flip.from(st, { duration: d, ease: 'power2.inOut', absolute: true, onEnter: e => gsap.fromTo(e, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: d }), onLeave: e => gsap.to(e, { opacity: 0, duration: d }) }); };
+      const step = (text: string, fn: () => void) => tl.call(() => { say.textContent = text; fn(); }).to({}, { duration: d * 2.2 });
+      step('MemMaid makes a folder of its own: \\Windows\\MEMMAID.TEMP.', () => tmpWin.classList.add('is-live'));
+      const files = [...start.children] as HTMLElement[];
+      files.forEach(f => step(`Copy ${f.dataset.f} into it.`, flip(() => { const c = f.cloneNode(true) as HTMLElement; c.querySelector('small')!.textContent = 'a copy'; temp.appendChild(c); })));
+      step('Delete every shortcut from StartUp. The folder is empty now.', flip(() => (start.innerHTML = '')));
+      names.forEach((n, i) => step(`Copy ${n} back: written ${i + 1}${i === 0 ? ', first' : ''}.`, flip(() => {
+        const c = file(n, temp)!; c.querySelector('small')!.textContent = `written ${i + 1}`; start.appendChild(c);
+      })));
+      step('Empty MEMMAID.TEMP and remove it.', () => tmpWin.classList.remove('is-live'));
+      step(`Done. The StartUp folder lists them in the order they were written, so at the next start ${names[0]} runs first.`, () => {});
+    };
+
+    root.addEventListener('click', e => {
+      const btn = (e.target as Element).closest<HTMLElement>('[data-act]');
+      if (!btn || busy) return;
+      const row = btn.closest<HTMLElement>('li');
+      const a = btn.dataset.act;
+      if (a === 'apply') return save();
+      if (!row) return;
+      if (a === 'on') return toggle(row, btn);
+      const st = Flip.getState(rows());
+      if (a === 'up' && row.previousElementSibling) order.insertBefore(row, row.previousElementSibling);
+      if (a === 'down' && row.nextElementSibling) order.insertBefore(row.nextElementSibling, row);
+      renum();
+      if (!reduce()) Flip.from(st, { duration: 0.3, ease: 'power2.out' });
+      ((btn as HTMLButtonElement).disabled ? row.querySelector<HTMLButtonElement>('.mst-ib:not(:disabled)') : btn)?.focus();
+      say.textContent = 'Your order is only on screen so far. Save it, and watch how MemMaid writes it.';
+    });
+  });
+</script>

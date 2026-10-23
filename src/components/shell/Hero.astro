@@ -1,0 +1,222 @@
+---
+// The home hero: his ARABART engine draws giant pixel Arabic; type to change it; scroll to play the film, which lands on
+// Norton Commander's two panels with his real files. Without JS: the headline, the Arabic in a web font, and the film as a list.
+import { readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import Window from './Window.astro';
+import { programs } from '../../data/programs';
+
+const base = import.meta.env.BASE_URL;
+const dir = join(process.cwd(), 'programs');
+const size = (folder: string, file: string) => statSync(join(dir, folder, file)).size;
+const [nm, ext] = [(f: string) => f.split('.')[0], (f: string) => f.split('.')[1] ?? ''];
+const lib = (id: string) => id === 'arabart-demo' || id === 'arabart-editor';
+const page = (id: string) => `${base}/program/${id}/`;
+
+// Left panel: every program he left, with its real file size; the year comes from the archive's records
+const mine = programs
+  .map((p, i) => ({ p, i }))
+  .sort((a, b) => +lib(b.p.id) - +lib(a.p.id) || a.p.year - b.p.year || a.i - b.i)
+  .map(({ p }) => ({ name: nm(p.executable), ext: ext(p.executable), size: size(p.folder, p.executable), year: String(p.year), title: p.title.replace(' - ', ' '), path: `C:\\${p.folder}\\${p.executable}`, href: page(p.id) }));
+
+// Right panel: the ARABART folder exactly as it is on disk
+const inFolder: Record<string, { title: string; year: string; href: string }> = {
+  'ARABART.EXE': { title: 'The ARABART library itself', year: '1991', href: `${base}/arabart/` },
+  'DEMO.EXE': { title: 'ARABART Demo', year: '1991', href: page('arabart-demo') },
+  'EDITOR.EXE': { title: 'ARABART Editor', year: '1991', href: page('arabart-editor') },
+  'EGAVGA.BGI': { title: 'Borland’s VGA graphics driver', year: '', href: page('arabart-demo') },
+  'README.TXT': { title: 'Notes on the folder', year: '', href: page('arabart-demo') },
+};
+const folder = readdirSync(join(dir, 'ARABART')).sort().map(f => ({
+  name: nm(f), ext: ext(f), size: size('ARABART', f), path: `C:\\ARABART\\${f}`,
+  ...(inFolder[f] ?? { title: f, year: '', href: page('arabart-demo') }),
+}));
+const panels = [{ title: 'His programs', rows: mine }, { title: 'C:\\ARABART', rows: folder }];
+const pad = (s: string, n: number) => s.padEnd(n, ' ');
+---
+
+<section class="hero era-sec" data-era="dos" id="top" aria-labelledby="hero-h" data-hero>
+  {/* The film's layout from the first frame on devices that will run it (the test in tier.ts canGL), so nothing jumps when it starts */}
+  <script is:inline>
+    (function (n, m) {
+      if (window.WebGL2RenderingContext && !matchMedia('(prefers-reduced-motion: reduce)').matches && !(m < 4) && !(n.hardwareConcurrency <= 2))
+        document.currentScript.parentElement.classList.add('is-film');
+    })(navigator, navigator.deviceMemory);
+  </script>
+  <div class="hero-pin">
+    <canvas class="hero-gl" aria-hidden="true"></canvas>
+
+    <div class="stage" data-stage>
+      <p class="stage-static" lang="ar" dir="rtl" aria-hidden="true">الفن العربي</p>
+      <canvas class="stage-2d" aria-hidden="true" hidden></canvas>
+      <span class="stage-caret" aria-hidden="true"></span>
+      <label class="sr-only" for="hero-in">Type Arabic here. English keys type the Arabic letter at the same spot on an Arabic keyboard.</label>
+      <input id="hero-in" class="stage-in" type="text" lang="ar" dir="rtl" value="الفن العربي" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" />
+      <p class="sr-only" aria-live="polite" lang="ar" dir="rtl" data-said></p>
+      <p class="meaning" data-meaning data-fade><span lang="ar" dir="rtl">الفن العربي</span> means “Arabic Art”. It is the name of ARABART, his engine for writing Arabic.</p>
+    </div>
+
+    <div class="hero-foot" data-fade>
+      <div class="intro">
+        <h1 id="hero-h">Yasser Awad taught a PC to write Arabic.</h1>
+        <p>Port Said, Egypt, 1991. This is his code, ported line by line, drawing every letter you type.</p>
+        <div class="hero-acts">
+          <a class="button button--primary" href={`${base}/arabart/`} data-type>Type in Arabic</a>
+          <a class="button" href="#programs">Run his programs</a>
+        </div>
+      </div>
+      <Window kind="editor" title="ARABART.ASM" active num={1} class="hero-code" aria-hidden="true">
+        <p class="asm"><span class="op">msg</span> <span class="op">db</span> '<span class="str" data-keys>hgtk hguvfd</span>',0 <span class="cm">; the keys he would press</span></p>
+        <p slot="status">Any keyboard works: each key types the Arabic letter at its spot. Esc to stop.</p>
+      </Window>
+    </div>
+
+    <ol class="film" data-film aria-label="How his engine works">
+      <li>Arabic letters join their neighbors. Pull a word apart and each letter stands alone.</li>
+      <li>So one letter needs up to four shapes: alone, at the start, in the middle and at the end. Here is <span class="ar" lang="ar" data-letter>ع</span>. He drew every shape by hand, for five fonts.</li>
+      <li>His engine looks at each pair of neighbors and gives every letter its shape. The whole rule is 13 instructions of assembly. In JavaScript it is one line.</li>
+      <li>His name, drawn by his own engine: <span class="ar" lang="ar">ياسر عوض</span>, Yasser Awad. Port Said, 1991.</li>
+      <li>Fifteen of his programs survive, and every one runs in your browser on a real DOS emulator. Pick one.</li>
+    </ol>
+    <div class="forms" aria-hidden="true" data-forms><span>alone</span><span>start</span><span>middle</span><span>end</span></div>
+
+    <nav class="ncf" aria-label="His programs, as Norton Commander lists them" data-ncfilm>
+      {panels.map((pn, pi) => (
+        <Window kind="panel" title={pn.title} active={pi === 0} class={`ncf-p ncf-p${pi}`} data-ncp>
+          <div class="ncf-cols" aria-hidden="true"><span>Name</span><span>Description</span><span>Size</span><span>Year</span></div>
+          <ul class="ncf-rows">
+            {pn.rows.map((r, i) => (
+              <li>
+                <a href={r.href} class:list={{ on: i === 0, x: /^(EXE|COM)$/.test(r.ext) }} aria-label={`${r.title}, ${r.name}.${r.ext}`} data-title={r.title} data-file={`${r.name}.${r.ext}`}>
+                  <span class="n">{pad(r.name, 9) + r.ext}</span><span class="d">{r.title}</span><span class="s">{r.size}</span><span class="y">{r.year}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p slot="status" class="ncf-status" aria-hidden="true"><span data-st-file>{`${pn.rows[0].name}.${pn.rows[0].ext}`}</span><span data-st-title>{pn.rows[0].title}</span></p>
+        </Window>
+      ))}
+    </nav>
+  </div>
+</section>
+
+<style>
+  .hero { position: relative; }
+  .hero-pin {
+    position: relative;
+    min-height: calc(100svh - var(--mb) - var(--sl));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(260px, 1fr) auto auto;
+    row-gap: clamp(12px, 2vh, 24px);
+    padding: clamp(16px, 3vh, 32px) 0 clamp(20px, 3vh, 32px);
+  }
+  .hero-gl { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; z-index: 0; transition: opacity 0.4s var(--quart); }
+  .stage, .hero-foot, .film { position: relative; z-index: 1; }
+
+  /* The letters are the hero: the stage runs edge to edge */
+  .stage { display: grid; place-items: center; align-content: center; gap: 12px; min-height: 0; cursor: text; }
+  .stage-static { font: 700 clamp(4.5rem, 15vw, 13rem)/1.25 var(--ar); color: var(--yellow); text-shadow: -4px -4px 0 var(--vga-4); white-space: nowrap; }
+  .hero.live .stage-static { display: none; }
+  .stage-2d { image-rendering: pixelated; }
+  .stage-in { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; border: 0; background: none; color: transparent; caret-color: transparent; cursor: text; }
+  .hero:has(.stage-in:focus-visible) .stage { outline: 2px dashed var(--cyan); outline-offset: -6px; }
+  .meaning { padding-inline: var(--gut); text-align: center; font-size: clamp(1rem, 0.4vw + 0.9rem, 1.1875rem); color: var(--ink-2); }
+  .meaning [lang='ar'] { font-weight: 700; color: var(--yellow); }
+  .hero.live .meaning { position: absolute; left: 0; right: 0; top: var(--meaning-top, 75%); transition: opacity 0.2s var(--quart); }
+  .hero.typing .meaning { opacity: 0 !important; }
+
+  /* His cursor: a DOS underscore in the glyph color, blinking, only while you type */
+  .stage-caret { position: absolute; display: none; background: var(--vga-14); box-shadow: -2px -2px 0 var(--vga-4); pointer-events: none; }
+  .hero.live.typing .stage-caret { display: block; animation: caret 0.53s steps(1) infinite alternate; }
+  .hero[data-step]:not([data-step='0']) .stage-caret { display: none; }
+  @keyframes caret { to { visibility: hidden; } }
+
+  /* The headline, one line and the two buttons, in one place. While you type, his assembly takes their place */
+  .hero-foot { display: grid; padding-inline: var(--gut); }
+  .intro, .hero-code { grid-area: 1 / 1; align-self: end; }
+  .intro { display: grid; justify-items: center; text-align: center; gap: 10px; transition: opacity 0.25s var(--quart), visibility 0s; }
+  .intro h1 { font-size: clamp(2.125rem, 2.2vw + 1.25rem, 3.5rem); font-stretch: 78%; max-width: 22ch; }
+  .intro p { max-width: 56ch; font-size: clamp(1.0625rem, 0.3vw + 1rem, 1.25rem); color: var(--ink-2); }
+  .hero-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-top: 10px; }
+  .hero-code { justify-self: center; width: min(720px, 100%); opacity: 0; visibility: hidden; translate: 0 12px; transition: opacity 0.25s var(--quart), translate 0.35s var(--expo), visibility 0s 0.25s; }
+  .hero.typing:not([data-step]) .intro, .hero.typing[data-step='0'] .intro { opacity: 0; visibility: hidden; transition: opacity 0.2s var(--quart), visibility 0s 0.2s; }
+  .hero.typing:not([data-step]) .hero-code, .hero.typing[data-step='0'] .hero-code { opacity: 1; visibility: visible; translate: 0 0; transition: opacity 0.25s var(--quart), translate 0.35s var(--expo); }
+  .asm { font: 400 16px/1.5 var(--font-dos); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .asm .op { color: var(--vga-15); }
+  .asm .str { color: var(--vga-11); }
+  .asm .cm { color: var(--ink-2); }
+
+  /* Without the film (no JS, reduced motion, weak device): the steps are a short list under the hero */
+  .film { list-style: none; counter-reset: f; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px 32px; margin-inline: var(--gut); padding-top: 12px; border-top: 1px solid var(--rule); }
+  .film li { counter-increment: f; font-size: 1rem; line-height: 1.55; color: var(--ink-2); }
+  .film li::before { content: counter(f) ' '; font: 400 16px/1 var(--font-dos); color: var(--yellow); }
+  .ar { font-family: var(--ar); font-weight: 700; color: var(--yellow); font-size: 1.15em; white-space: nowrap; }
+  .forms, .ncf { display: none; }
+
+  /* With the film: the hero is sticky inside a tall section; the captions take turns at the bottom */
+  .hero.is-film { height: calc(500svh - var(--mb) - var(--sl)); }
+  .hero.is-film .hero-pin { position: sticky; top: var(--mb); height: calc(100svh - var(--mb) - var(--sl)); min-height: 0; grid-template-rows: minmax(0, 1fr) auto; }
+  .hero.is-film .film { position: absolute; left: var(--gut); right: var(--gut); bottom: clamp(28px, 7vh, 72px); display: block; height: 7.5em; margin: 0; padding: 0; border: 0; pointer-events: none; }
+  .hero.is-film .film li {
+    position: absolute; inset: auto auto 0 0; max-width: 46ch; font-size: clamp(1.0625rem, 0.5vw + 0.95rem, 1.375rem); color: var(--ink);
+    opacity: 0; translate: 0 14px; transition: opacity 0.35s var(--quart), translate 0.5s var(--expo); visibility: hidden;
+  }
+  .hero.is-film .film li::before { display: block; margin-bottom: 8px; content: counter(f) ' of 5'; }
+  .hero.is-film .film li.on { opacity: 1; translate: 0 0; visibility: visible; }
+  .hero.is-film .forms { display: block; position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .forms span { position: absolute; translate: -50% 0; font: 400 16px/1 var(--font-dos); color: var(--cyan); white-space: nowrap; opacity: 0; transition: opacity 0.3s; }
+  .hero[data-step='2'] .forms span { opacity: 1; }
+
+  /* The landing: Norton Commander's two panels, his real files, a cursor bar that walks the list */
+  .hero.is-film .ncf {
+    display: grid; position: absolute; z-index: 2; inset: 8% var(--gut) auto; height: 62%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px;
+    opacity: 0; visibility: hidden; transition: opacity 0.45s var(--quart), visibility 0s 0.45s;
+  }
+  .hero.nc-live .ncf { opacity: 1; visibility: visible; transition: opacity 0.45s var(--quart); }
+  .hero.nc-live .hero-gl { opacity: 0; }
+  .ncf-p { min-height: 0; container-type: inline-size; }
+  .ncf-p :global(.win-body) { display: flex; flex-direction: column; min-height: 0; }
+  .ncf-cols, .ncf-rows a { display: grid; grid-template-columns: calc(12ch + 16px) minmax(0, 1fr) calc(7ch + 16px) calc(4ch + 16px); }
+  .ncf-cols { font: 400 16px/24px var(--font-dos); color: var(--accent); text-align: center; }
+  .ncf-rows {
+    flex: 1; min-height: 0; overflow: hidden; list-style: none; font: 400 16px/22px var(--font-dos);
+    background: linear-gradient(var(--vga-11), var(--vga-11)) no-repeat right calc(4ch + 16px) top / 1px 100%,
+      linear-gradient(var(--vga-11), var(--vga-11)) no-repeat right calc(11ch + 32px) top / 1px 100%,
+      linear-gradient(var(--vga-11), var(--vga-11)) no-repeat left calc(12ch + 16px) top / 1px 100%;
+  }
+  .ncf-rows a { color: var(--vga-11); text-decoration: none; white-space: pre; }
+  .ncf-rows a.x { color: var(--vga-15); }
+  .ncf-rows a > span { padding: 0 8px; overflow: hidden; text-overflow: ellipsis; }
+  .ncf-rows .d { color: var(--vga-7); }
+  .ncf-rows a.on .d { color: var(--vga-1); }
+  .ncf-rows .s, .ncf-rows .y { text-align: right; font-variant-numeric: tabular-nums; }
+  .ncf-rows a.on { background: var(--vga-3); color: var(--vga-0); }
+  .ncf-rows a:focus-visible { outline: 2px solid var(--vga-14); outline-offset: -2px; }
+  .ncf-status { display: flex; justify-content: space-between; gap: 16px; white-space: nowrap; overflow: hidden; }
+  .ncf-status span:last-child { overflow: hidden; text-overflow: ellipsis; color: var(--vga-14); }
+
+  @media (pointer: coarse) { .ncf-rows { line-height: 24px; } }
+  @media (max-width: 760px) {
+    .hero-pin { padding-top: 12px; grid-template-rows: minmax(220px, 1fr) auto auto; }
+    .intro h1 { font-size: clamp(2rem, 8.6vw, 2.5rem); }
+    .intro p { font-size: 1rem; }
+    .hero-acts { width: 100%; }
+    .hero-acts .button { flex: 1; }
+    .hero.is-film .film { bottom: 20px; height: 9em; }
+    .hero.is-film .film li { font-size: 1.0625rem; }
+    .hero.is-film .ncf { grid-template-columns: 1fr; inset: 4% var(--gut) auto; height: 64%; }
+    .ncf-p1 { display: none; }
+  }
+  /* A narrow panel drops the description, as NC's brief view did; the status line still names the file */
+  @container (max-width: 480px) {
+    .ncf-cols, .ncf-rows a { grid-template-columns: minmax(0, 1fr) calc(7ch + 16px) calc(4ch + 16px); }
+    .ncf-cols span:nth-child(2), .ncf-rows .d { display: none; }
+    .ncf-rows { background-size: 1px 100%, 1px 100%, 0 0; }
+  }
+</style>
+
+<script>
+  import '../../scripts/shell/hero';
+</script>

@@ -1,195 +1,107 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Window from '../components/shell/Window.astro';
+import Term from '../components/explain/Term.astro';
 
 const base = import.meta.env.BASE_URL;
 ---
 
 <BaseLayout
-  title="About - DOSArchive"
-  description="The story behind DOSArchive: preserving a father's DOS programming legacy from 1990s Egypt."
+  title="For my father · Yasser Awad"
+  description="A son's tribute to Yasser Awad, how the site keeps his fifteen DOS programs running, and who helped."
 >
-  <div class="container">
-    <article class="about">
-      <header class="about-header">
-        <h1 class="glow">About DOSArchive</h1>
-        <p class="about-lead">
-          A son's project to preserve and share his father's programming work
-          from a bygone era of computing.
-        </p>
-      </header>
+  <article class="container about">
+    <section class="ded" aria-labelledby="ded-h">
+      <div class="ded-text">
+        <h1 id="ded-h">For my father, Yasser Awad</h1>
+        <p class="lead">In Port Said, from 1991 to 1993, with no internet and a Borland compiler, he taught a PC to write Arabic.</p>
+        <p>Then he built Arabic software at Sakhr in Cairo, and network software at Newbridge Networks and Alcatel in Kanata. There his name went on two patent filings. At DinarSoft, his phone apps won awards.</p>
+        <p>I made this site so his work keeps running, and so anyone can see what he built.</p>
+        <p class="sign">Youssef Awad, his son</p>
+      </div>
+      <figure class="sig">
+        <Window kind="screen" title={'C:\\SUN\\SUN.EXE'} active>
+          <img src={`${base}/images/brave-sun.png`} width="962" height="600" alt="The Brave Sun title screen: Arabic calligraphy on a cyan panel, a sun, and his signature" />
+        </Window>
+        <figcaption>The Brave Sun, 1993. The last line is his signature: <span lang="ar" dir="rtl">مهندس / ياسر محمد على</span>, Engineer Yasser Mohamed Ali.</figcaption>
+      </figure>
+    </section>
 
-      <section class="about-section">
-        <h2>The Programmer</h2>
-        <p>
-          In the early 1990s, <strong>Yasser Awad</strong> was a young programmer
-          in <strong>Port Said, Egypt</strong>. Armed with a PC and a deep understanding
-          of Assembly, C, and C++, he built software that solved real problems &mdash;
-          from Arabic text rendering to digital circuit simulation, from virus removal
-          to educational software.
-        </p>
-        <p>
-          His work spanned three prolific years from <span class="text-amber">1991</span>
-          to <span class="text-amber">1993</span>. During this time, he created a
-          foundational Arabic graphics library (ARABART), won a programming competition,
-          built an antivirus for a local virus, and crafted the software for his
-          graduation project &mdash; a digital circuit simulator with custom hardware.
-        </p>
-        <p>
-          Each program tells a story: interview assignments that launched a career,
-          boot screens traded for a first computer mouse, gifts created for doctors
-          and government offices, and a commercial demo for a local hardware store.
-          Together, they form a portrait of a programmer's life in early-90s Egypt.
-        </p>
-      </section>
+    <section class="made" aria-labelledby="made-h">
+      <h2 id="made-h">How this site was made</h2>
+      <ol>
+        <li>
+          <h3>Unpacking</h3>
+          <p>Every program was squeezed with DIET, a 1990s <Term id="packer">packer</Term> that works like a self-extracting zip: about 704 KB of program stored in 296 KB. Each one was left to unpack itself inside an <Term id="emulator">emulator</Term>, and what it left in memory was saved.</p>
+        </li>
+        <li>
+          <h3>Reading</h3>
+          <p>A <Term id="disassembly">disassembler</Term> turned the bytes back into readable assembly. Borland's compiler adds its own start-up code to every program. The Every Byte map shows which bytes he wrote and which came with his tools.</p>
+        </li>
+        <li>
+          <h3>Running</h3>
+          <p>In your browser, js-dos runs DOSBox, a whole PC compiled to WebAssembly. Each program gets its own settings. The CPU speed is fixed, because several programs time their animations by counting in a loop, and a faster PC would rush them.</p>
+        </li>
+        <li>
+          <h3>Porting</h3>
+          <p>ARABART on this site is his assembly, ported line by line to JavaScript. In 2,511 test drawings, the port and his original program light exactly the same pixels. A small emulator also drew the screens of ten programs from the unpacked code, and they match the screenshots here.</p>
+        </li>
+      </ol>
+    </section>
 
-      <section class="about-section">
-        <h2>The Archive</h2>
-        <p>
-          DOSArchive was built by <strong>Youssef Awad</strong>
-          (<a href="https://github.com/DeadPackets" target="_blank" rel="noopener">DeadPackets</a>)
-          to preserve his father's work and make it accessible to anyone with a web browser.
-        </p>
-        <p>
-          Using <strong>js-dos</strong> &mdash; a DOSBox emulator compiled to WebAssembly &mdash;
-          every program runs directly in the browser, exactly as it would have on a 1990s PC.
-          No installation, no emulator setup. Just click and run.
-        </p>
-        <p>
-          These programs were written for DOS, an operating system that has been obsolete
-          for decades. Without preservation efforts like this, they would exist only as
-          forgotten files on aging floppy disks. Now they live on the web, accessible to
-          anyone, anywhere.
-        </p>
-      </section>
-
-      <section class="about-section">
-        <h2>Technical Details</h2>
-        <div class="tech-list">
-          <div class="tech-item">
-            <span class="tech-label">Frontend</span>
-            <span class="tech-value">Astro (Static Site Generator)</span>
-          </div>
-          <div class="tech-item">
-            <span class="tech-label">Emulation</span>
-            <span class="tech-value">js-dos v8 (DOSBox via WebAssembly)</span>
-          </div>
-          <div class="tech-item">
-            <span class="tech-label">Programs</span>
-            <span class="tech-value">15 executables across 13 projects</span>
-          </div>
-          <div class="tech-item">
-            <span class="tech-label">Languages</span>
-            <span class="tech-value">Assembly, C, C++</span>
-          </div>
-          <div class="tech-item">
-            <span class="tech-label">Era</span>
-            <span class="tech-value">1991 &ndash; 1993</span>
-          </div>
-          <div class="tech-item">
-            <span class="tech-label">Source</span>
-            <span class="tech-value">
-              <a href="https://github.com/DeadPackets/DOSArchive" target="_blank" rel="noopener">
-                github.com/DeadPackets/DOSArchive
-              </a>
-            </span>
-          </div>
-          <div class="tech-item">
-            <span class="tech-label">License</span>
-            <span class="tech-value">MIT</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="about-section about-cta">
-        <p>
-          Ready to explore?
-          <a href={base} class="btn">
-            <span aria-hidden="true">&gt;</span> Browse the Archive
-          </a>
-        </p>
-      </section>
-    </article>
-  </div>
+    <Window kind="dialog" title="Credits" active as="section" class="credits" aria-labelledby="credits-h">
+      <h2 id="credits-h" class="sr-only">Credits</h2>
+      <dl>
+        <div><dt>Made by</dt><dd><a href="https://github.com/DeadPackets" rel="noopener">Youssef Awad</a>, for his father</dd></div>
+        <div><dt>DinarSoft</dt><dd>Every recovered DinarSoft file and page comes from the <a href="https://archive.org/" rel="noopener">Internet Archive</a>: the Wayback Machine and archive.org.</dd></div>
+        <div><dt>Text font</dt><dd>IBM VGA font from The Ultimate Oldschool PC Font Pack by VileR (<a href="https://int10h.org/oldschool-pc-fonts/" rel="noopener">int10h.org</a>), <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener">CC BY-SA 4.0</a></dd></div>
+        <div><dt>Emulation</dt><dd>js-dos and DOSBox</dd></div>
+        <div><dt>Motion</dt><dd>GSAP, Lenis and OGL</dd></div>
+        <div><dt>Analysis</dt><dd>Detect It Easy, Unicorn and Capstone</dd></div>
+        <div><dt>Type</dt><dd>Archivo by Omnibus-Type, Reem Kufi by Khaled Hosny, Martian Mono by Evil Martians, Pixelify Sans by Stefie Justprince</dd></div>
+        <div><dt>Site</dt><dd>Astro. The colors come from the Borland Turbo C editor he worked in.</dd></div>
+        <div><dt>Source</dt><dd><a href="https://github.com/DeadPackets/ARABART" rel="noopener">github.com/DeadPackets/ARABART</a>, MIT License</dd></div>
+      </dl>
+      <div class="acts">
+        <a class="button button--primary" href={`${base}/#programs`}>Run his programs</a>
+        <a class="button" href={`${base}/arabart/`}>Type in Arabic</a>
+      </div>
+    </Window>
+  </article>
 </BaseLayout>
 
 <style>
-  .about {
-    max-width: 720px;
-  }
+  .about { padding-block: clamp(24px, 4vw, 56px) clamp(56px, 8vw, 120px); }
 
-  .about-header {
-    margin-bottom: 2.5rem;
-  }
+  .ded { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: clamp(40px, 5vw, 96px); align-items: center; }
+  .ded h1 { font-size: clamp(2.5rem, 3.6vw + 1rem, 5rem); line-height: 0.98; text-wrap: balance; }
+  .ded .lead { margin-top: 24px; max-width: 32ch; font-size: clamp(1.25rem, 0.8vw + 1rem, 1.625rem); line-height: 1.4; color: var(--ink); }
+  .ded p:not(.lead) { margin-top: 16px; max-width: 52ch; font-size: 1.125rem; line-height: 1.65; color: var(--ink-2); }
+  .ded .sign { font: 400 16px/1.5 var(--font-dos); color: var(--accent); }
+  .sig img { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .sig figcaption { margin-top: 18px; font-size: 0.9375rem; color: var(--ink-2); }
+  .sig [lang='ar'] { color: var(--accent); font-size: 1.125rem; font-weight: 700; white-space: nowrap; }
 
-  .about-header h1 {
-    margin-bottom: 0.75rem;
-  }
+  .made { margin-top: clamp(88px, 11vw, 160px); }
+  .made h2 { font-size: clamp(2rem, 2.4vw + 1rem, 3.25rem); }
+  .made ol { list-style: none; counter-reset: s; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 40px clamp(32px, 4vw, 56px); margin-top: 36px; }
+  .made li { counter-increment: s; }
+  .made li::before { content: counter(s); display: block; margin-bottom: 10px; font: 400 32px/1 var(--font-dos); color: var(--accent); }
+  .made h3 { font-size: 1.5rem; }
+  .made p { margin-top: 10px; color: var(--ink-2); line-height: 1.65; }
 
-  .about-lead {
-    font-size: 1.05rem;
-    color: var(--color-text);
-    line-height: 1.7;
-  }
+  .credits { margin-top: clamp(88px, 11vw, 160px); max-width: 980px; }
+  .credits dl { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .credits dl div { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .credits dt { font: 400 16px/1.6 var(--font-dos); color: var(--accent); }
+  .credits dd { line-height: 1.6; overflow-wrap: anywhere; }
+  .credits a { color: inherit; text-decoration: underline; }
+  .credits a:hover { color: var(--accent); }
+  .credits .acts { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 28px; }
+  .credits .acts a { text-decoration: none; }
 
-  .about-section {
-    margin-bottom: 2.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--color-border);
-  }
-
-  .about-section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .about-section p {
-    font-size: 0.9rem;
-    line-height: 1.8;
-    color: var(--color-text);
-  }
-
-  /* ── Tech List ──── */
-  .tech-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
-  }
-
-  .tech-item {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--color-border);
-    font-size: 0.85rem;
-  }
-
-  .tech-item:last-child {
-    border-bottom: none;
-  }
-
-  .tech-label {
-    font-family: var(--font-display);
-    font-size: 1rem;
-    color: var(--color-amber);
-    min-width: 110px;
-    flex-shrink: 0;
-    letter-spacing: 0.04em;
-  }
-
-  .tech-value {
-    color: var(--color-text);
-  }
-
-  .tech-value a {
-    color: var(--color-phosphor);
-  }
-
-  /* ── CTA ──── */
-  .about-cta p {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
+  @media (max-width: 900px) {
+    .ded { grid-template-columns: minmax(0, 1fr); }
+    .credits dl div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   }
 </style>

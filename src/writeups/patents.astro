@@ -1,0 +1,252 @@
+---
+// The patents page. Facts: research/career.md, section 2 (both filings, read from the patent PDFs).
+// US 7,603,377: one 32-bit key per part, 10/5/5/5/7 bits for node, shelf, slot, card and port. US 2007/0130192: script
+// templates published as objects on the standard OSS interface.
+import Window from '../components/shell/Window.astro';
+import KeyBuilder from '../components/toys/KeyBuilder.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import AddressFilm from '../components/toys/story/AddressFilm.astro';
+import ShelfDown from '../components/toys/story/ShelfDown.astro';
+import TwoWays from '../components/toys/story/TwoWays.astro';
+import KeyZoom from '../components/toys/story/KeyZoom.astro';
+import SameQuestion from '../components/toys/story/SameQuestion.astro';
+import Fig5 from '../components/toys/story/Fig5.astro';
+import TemplateBridge from '../components/toys/story/TemplateBridge.astro';
+
+const base = import.meta.env.BASE_URL;
+const CLAIMS = [
+  ['Every part gets one number, and no two records in the whole database share it.', 'the abstract'],
+  ['The number is cut into groups of bits, one group for each level: node, shelf, card and port. Each group names the part above at that level.', 'point 1'],
+  ['“Inside” is a comparison. A record is inside a container when its number is bigger than the container’s number, and smaller than the number of the next container at the same level.', 'point 15'],
+  ['Each table is kept sorted by that number. The groups can have different sizes, such as 10, 5, 5, 5 and 7 bits.', 'points 17 to 20'],
+];
+const FILINGS = [
+  {
+    no: 'US 7,603,377', head: 'US 7,603,377 Properties', title: 'Method and data structure for indexed storage of hierarchically interrelated information in a relational database',
+    rows: [
+      ['Inventors', 'Yasser Awad, Ahmed Moustafa, Mohamad Hassoun'],
+      ['Assignee', 'Alcatel'],
+      ['Filed', '15 June 2005 in Canada; 24 October 2005 in the United States'],
+      ['Published', '21 December 2006, as US 2006/0288020 A1'],
+      ['Granted', '13 October 2009'],
+    ],
+    href: 'https://patents.google.com/patent/US7603377B2/en',
+  },
+  {
+    no: 'US 2007/0130192', head: 'US 2007/0130192 Properties', title: 'Method and system for configuring network devices through an operations support system interface',
+    rows: [
+      ['Inventors', 'Ronald Scott Bolder, Yasser Awad, Chantal Sylvie Vandette'],
+      ['Assignee', 'Alcatel'],
+      ['Filed', '1 December 2005 in the United States'],
+      ['Published', '7 June 2007, as US 2007/0130192 A1; in Europe as EP 1793529'],
+    ],
+    href: 'https://patents.google.com/patent/US20070130192A1/en',
+  },
+];
+---
+
+<article class="pt">
+  <section class="pt-hero" aria-labelledby="pt-h1">
+    <div class="pt-hero-copy">
+      <h1 id="pt-h1">One number for every port</h1>
+      <p class="pt-lead">A phone company’s network is millions of parts, nested inside each other. In 2005 Yasser Awad gave every part one number that says exactly where it sits. With it, the software that runs the network finds everything inside any part in a single read.</p>
+      <p class="pt-meta">US patent <b>7,603,377</b>, granted 13 October 2009. <b>Yasser Awad</b>, first-named inventor, with Ahmed Moustafa and Mohamad Hassoun, at Alcatel in Kanata.</p>
+    </div>
+    <AddressFilm />
+  </section>
+
+  <section class="pt-sec" id="tree" aria-labelledby="h-tree">
+    <div class="pt-text">
+      <h2 id="h-tree">Boxes inside boxes</h2>
+      <p class="pt-big">Picture a building full of telephone equipment. The network has <b>nodes</b>, the big switches. A node holds <b>shelves</b>. A shelf has <b>slots</b>, each slot holds a <b>card</b>, and each card has <b>ports</b>, where the cables plug in.</p>
+    </div>
+    <div class="pt-cols">
+      <p>The software that runs all this is the <Term id="nms">network manager</Term>. It keeps one record for every part, in a <Term id="relational-database">database</Term>, and it gets the same kind of question all day long: what is inside this? Which ports are on this card? Which cards are in this shelf?</p>
+      <p>The question is hardest at the worst moment. When a shelf loses power, every port inside it stops at once, and each one raises an alarm. The operator needs the whole list now, while customers wait. Try it on this node.</p>
+    </div>
+    <ShelfDown />
+    <p class="pt-after">A real network is far bigger than one node. His numbering has room for <strong>1,024 nodes</strong>. Each node holds 32 shelves, each shelf 32 slots, each slot 32 cards, and each card 128 ports. One full shelf can hold <strong>131,072 ports</strong>.</p>
+  </section>
+
+  <section class="pt-sec" id="usual" aria-labelledby="h-usual">
+    <div class="pt-pair">
+      <div class="pt-text">
+        <h2 id="h-usual">The usual way walks down the tree</h2>
+        <p class="pt-big">Most databases store a tree the simple way: each part remembers its parent.</p>
+        <p>A port knows its card, a card knows its slot, a slot knows its shelf. It is the same as a comments table where every reply stores the id of the comment it answers, with a <Term id="foreign-key">foreign key</Term>.</p>
+        <p>That is easy to write and slow to ask. To list the ports in a shelf, the database finds the shelf’s slots, then the cards in each slot, then the ports on each card. Every step down is one more jump into the <Term id="db-index">index</Term>. And the patent points out that this slowness hurts most at the worst time: while a network is coming back from an outage.</p>
+        <p>Below, both ways answer the same question side by side. Make the shelf bigger and run it again.</p>
+      </div>
+      <div class="pt-race-note">
+        <Window title="At full size" kind="dialog" class="pt-full">
+          <p>One full shelf: <b>32</b> slots, <b>1,024</b> cards, <b>131,072</b> ports.</p>
+          <p class="pt-full-n"><span><b>1,057</b> jumps</span><small>the usual way</small></p>
+          <p class="pt-full-n"><span><b>1</b> jump</span><small>with his key</small></p>
+        </Window>
+      </div>
+    </div>
+    <TwoWays />
+  </section>
+
+  <section class="pt-sec" id="key" aria-labelledby="h-key">
+    <div class="pt-text">
+      <h2 id="h-key">Make the number the address</h2>
+      <p class="pt-big">You already use numbers that work like this. A phone number starting with +1&nbsp;613 rings in the Ottawa area. An IP address like 10.1.2.3 is inside the network 10.1.0.0/16 because it starts with 10.1.</p>
+    </div>
+    <div class="pt-cols">
+      <p>Yasser did the same for equipment. Every part gets one 32-bit number, the same size as an IPv4 address. The first 10 bits name the node, the next 5 the shelf, then 5 for the slot, 5 for the card and 7 for the port. Each group is a <Term id="bit-field">bit field</Term>. A part higher up fills its own groups and leaves zeros below.</p>
+      <p>Now sort the table by that number. Everything inside one part shares the same first bits, so it sits together in one unbroken run. The database jumps to the first number once and reads forward to the last: a <Term id="range-scan">range scan</Term>. Move the sliders, then pick what to search inside.</p>
+    </div>
+    <KeyBuilder id="pt-kb" />
+    <div class="pt-gap"><KeyZoom for="pt-kb" /></div>
+  </section>
+
+  <section class="pt-sec" id="same" aria-labelledby="h-same">
+    <div class="pt-pair pt-pair--r">
+      <div class="pt-text">
+        <h2 id="h-same">The same trick, in the tools you use</h2>
+        <p class="pt-big">Modern databases have their own names for this idea.</p>
+        <p>A <Term id="materialized-path">materialized path</Term>, Postgres <Term id="ltree" />, a <Term id="dynamodb" /> <Term id="sort-key">sort key</Term> and an IP <Term id="cidr">subnet</Term> all do the same. Each puts the path to a thing inside one sortable value, so a whole branch becomes one stretch of an index. A <Term id="recursive-cte">recursive query</Term> is the walk down the tree from the race above.</p>
+        <p>Each tab asks for the same part you picked above. Change the key, and every tab follows.</p>
+      </div>
+      <Window title="Why his is so plain" kind="help" class="pt-why">
+        <p>One fixed-size integer per part. Every relational database of 2005 could store it, sort it and index it, with no extension and no text tricks. It sorts in true number order at every level, and one comparison tells you whether a part is inside another.</p>
+      </Window>
+    </div>
+    <SameQuestion for="pt-kb" />
+  </section>
+
+  <section class="pt-sec" id="claims" aria-labelledby="h-claims">
+    <div class="pt-text">
+      <h2 id="h-claims">What the patent protects, in plain words</h2>
+      <p class="pt-big">A patent spells out exactly what it protects, point by point, in its <Term id="patent-claim">numbered list</Term>. Here are his four big ones.</p>
+    </div>
+    <ol class="pt-claims">
+      {CLAIMS.map(([c, ref], i) => <li><span class="pt-cn" aria-hidden="true">{i + 1}</span><p>{c} <small>({ref})</small></p></li>)}
+    </ol>
+    <div class="pt-cols pt-cols--tight">
+      <p>The patent shows it with small 16-bit keys, one hex digit for each level, so you can read the address right off the number. Node 1 is <code>1000</code> in hex, which is 4096. Its shelf 1 is <code>1100</code>, 4352. That shelf’s card 1 is <code>1110</code>, 4368. Node 2 is <code>2000</code>, 8192.</p>
+      <p>To find the cards in node 1, the patent searches the card table for keys bigger than 4096 and smaller than 8192. Pick any container below and run the same search.</p>
+    </div>
+    <Fig5 />
+    <Deep title="For engineers: the full list, by number">
+      <ul>
+        <li><strong>Claims 1 to 5</strong> describe the record table, <strong>6 to 10</strong> the record itself, <strong>11 to 17</strong> the method of storing records, and <strong>18 to 20</strong> the groups of different widths.</li>
+        <li>Claim 1 covers a table for “at least node, shelf, card, and port levels”. Each record has a data part and a key that is “an integer having a specified bit length”, split into one region per level.</li>
+        <li>The abstract sums it up: the database uses “this, and only this, record key to index all database records in all record tables”. One key per row is the primary key, the parent link and the sort order at once.</li>
+        <li>The search is integer comparison on a B-tree, so it runs on any SQL database. In the 32-bit example a whole node is one range of 4,194,304 keys, and a card is one range of 128.</li>
+      </ul>
+    </Deep>
+  </section>
+
+  <section class="pt-sec" id="bridge" aria-labelledby="h-bridge">
+    <div class="pt-text">
+      <h2 id="h-bridge">One door, every router’s language</h2>
+      <p class="pt-big">In December 2005 Yasser and two colleagues filed a second idea. It lets a phone company’s own software set up any router through the one standard door it already speaks.</p>
+    </div>
+    <div class="pt-cols">
+      <p>A phone company runs its network from big back-office systems, its <Term id="oss">OSS</Term>. They reach the network manager through a standard interface, <Term id="corba" /> or <Term id="cmip" />, the way your app reaches a service through its published API. But every router maker has its own <Term id="cli">commands</Term>, and a new router can arrive long before any standard describes it.</p>
+      <p>Their answer: experts write a short script template for each router, with blanks. The network manager publishes each template on the standard interface as an ordinary object. The phone company’s system fills in the blanks and says “run”. The network manager writes the router’s own commands, sends them, and calls back when the answer is in, like a <Term id="webhook">webhook</Term>.</p>
+    </div>
+    <TemplateBridge />
+    <ThenNow
+      era="2005 filing"
+      rows={[
+        { then: 'A script template with blanks, one per router type', now: 'An Ansible task that fills a Jinja template', why: 'Experts write the template once. Everyone else only supplies the values.' },
+        { then: 'The template published as an object on the OSS interface', now: 'A job you can start through a public API', why: 'The caller needs no knowledge of the device’s own commands.' },
+        { then: 'Execute Complete, then Get Response', now: 'A webhook, or 202 Accepted and a job URL', why: 'Nobody holds a connection open while the device works.' },
+        { then: 'A versioning module picks the template for each make, type and software release', now: 'Per-platform variables, such as <code>ansible_network_os</code>', why: 'One task, the right command text for each device.' },
+        { then: 'A dependency table runs prerequisites first', now: 'Task order in a playbook, or <code>depends_on</code> in Terraform', why: 'Say what must happen before what.' },
+      ]}
+    />
+    <Deep title="For engineers: the template format">
+      <ul>
+        <li>The filing’s format for one line: <code>CommandName&lt;UserParamID|valid-range|default-value&gt;/&lt;NMSParamID&gt;</code>. The operator’s system fills user parameters within the valid range, or they take the default. The network manager fills its own parameters from its database, with the target router’s values.</li>
+        <li>Templates can be written in <Term id="cli" />, <Term id="tl1" /> or XML. Each one does one task, and a dependency table lists the templates that must run before it.</li>
+        <li>Claim 1, in short: create an object whose attribute comes from a script template; receive a value from the outside system through the interface; fill the template to make a command script; send it to the device; tell the outside system when the answer is ready, and send it.</li>
+        <li>The router templates in the diagram above are examples written in that format.</li>
+      </ul>
+    </Deep>
+  </section>
+
+  <section class="pt-sec" id="filings" aria-labelledby="h-filings">
+    <div class="pt-text">
+      <h2 id="h-filings">The two filings</h2>
+    </div>
+    <div class="pt-props">
+      {FILINGS.map(f => (
+        <Window title={f.head} kind="dialog" active as="article" class="pt-prop" aria-label={f.no}>
+          <h3>{f.no}</h3>
+          <p class="pt-prop-t">“{f.title}”</p>
+          <dl>{f.rows.map(([k, v]) => <div><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+          <a class="button k-btn" href={f.href}>Read it on Google Patents</a>
+        </Window>
+      ))}
+    </div>
+    <p class="pt-after">Both come from his years at Newbridge Networks and Alcatel in Kanata, where he was the architect of the CORBA interface of the 5620 Network Manager. <a href={`${base}/career/`}>Read his whole career</a>.</p>
+  </section>
+</article>
+
+<style>
+  .pt { display: grid; gap: clamp(96px, 12vw, 160px); padding-bottom: 24px; }
+  .pt > section { width: 100%; max-width: 1360px; margin-inline: auto; padding-inline: var(--gut); min-width: 0; }
+  .pt h2 { font-size: clamp(2.25rem, 2.6vw + 1rem, 3.75rem); font-stretch: 78%; color: var(--ink); max-width: 18ch; }
+  .pt h3 { color: var(--ink); }
+  .pt p, .pt li { font-size: 1.0625rem; line-height: 1.7; color: var(--ink); text-wrap: pretty; }
+  .pt strong { color: var(--accent); }
+  .pt-text { display: grid; gap: 14px; margin-bottom: clamp(28px, 3vw, 40px); }
+  .pt-text p { max-width: 62ch; }
+  .pt-big { font-size: clamp(1.1875rem, 0.5vw + 1rem, 1.4375rem) !important; line-height: 1.5 !important; font-weight: 500; max-width: 52ch !important; }
+  .pt-big b { color: var(--accent); }
+  .pt-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 56px); margin-bottom: 32px; }
+  .pt-cols p { max-width: 62ch; }
+  .pt-cols--tight { margin-top: 36px; }
+  .pt-after { margin-top: 28px; max-width: 72ch; }
+  .pt-gap { margin-top: 26px; }
+  .pt a:not(.button):not(.term) { color: var(--accent); text-underline-offset: 3px; }
+  .pt code { font: 500 0.92em var(--font-code); color: var(--accent); }
+
+  /* Hero: the title on the desktop, the patent's window beside it */
+  .pt-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px clamp(32px, 5vw, 80px); align-items: center; padding-top: clamp(32px, 5vw, 72px); }
+  .pt-hero h1 { font-size: clamp(3rem, 5vw + 1rem, 6.25rem); font-stretch: 72%; line-height: 0.9; letter-spacing: -0.02em; color: var(--ink); max-width: 9ch; }
+  .pt-lead { margin-top: 24px; max-width: 46ch; font-size: clamp(1.1875rem, 0.5vw + 1rem, 1.375rem) !important; line-height: 1.5 !important; font-weight: 500; }
+  .pt-meta { margin-top: 18px; max-width: 52ch; color: var(--ink-2) !important; font-size: 1rem !important; }
+  .pt-meta b { color: var(--accent); }
+
+  .pt-pair { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr); gap: 0 clamp(28px, 4vw, 64px); align-items: start; }
+  .pt-pair--r .pt-why { margin-top: clamp(0px, 8vw, 120px); }
+  .pt-race-note { padding-top: clamp(0px, 6vw, 96px); }
+  .pt-full p { font-size: 1rem; line-height: 1.5; }
+  .pt-full-n { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--w-gray); }
+  .pt-full-n span { font: 400 16px/1 var(--font-ui); }
+  .pt-full-n b { font: 400 32px/1 var(--font-dos); color: var(--w-navy); }
+  .pt-full-n small { font-size: 0.875rem; }
+  .pt-why p { font-size: 1rem; line-height: 1.6; }
+  .pt :global(.k-kb) { margin-top: 8px; }
+
+  .pt-claims { list-style: none; margin: 0 0 8px; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 28px; counter-reset: c; }
+  .pt-claims li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .pt-cn { display: grid; place-items: center; width: 56px; height: 56px; font: 400 32px/1 var(--font-dos); color: var(--w-black); background: var(--w-silver); box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray); }
+  .pt-claims p { font-weight: 500; }
+  .pt-claims small { color: var(--ink-2); font-size: 0.875rem; white-space: nowrap; }
+
+  .pt-props { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+  .pt-prop h3 { font: 400 32px/1 var(--font-dos); color: var(--w-navy); }
+  .pt-prop-t { margin-top: 10px; font-size: 1rem !important; line-height: 1.5 !important; font-style: italic; }
+  .pt-prop dl { margin: 14px 0 16px; display: grid; }
+  .pt-prop dl div { display: grid; grid-template-columns: 8em minmax(0, 1fr); gap: 12px; padding: 7px 0; border-top: 1px solid var(--w-gray); font-size: 0.9375rem; line-height: 1.45; }
+  .pt-prop dt { font: 400 0.9375rem/1.45 var(--font-ui); }
+  .pt-prop dd { margin: 0; }
+
+  @media (max-width: 1000px) {
+    .pt-hero, .pt-pair { grid-template-columns: minmax(0, 1fr); }
+    .pt-race-note, .pt-pair--r .pt-why { padding-top: 0; margin-top: 0; margin-bottom: 28px; }
+    .pt-props { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .pt-cols, .pt-claims { grid-template-columns: minmax(0, 1fr); }
+    .pt-prop dl div { grid-template-columns: 1fr; gap: 2px; }
+  }
+</style>

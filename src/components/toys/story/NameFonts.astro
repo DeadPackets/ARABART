@@ -1,0 +1,50 @@
+---
+// His name, drawn by his own engine (src/lib/arabart) in his fonts and styles. Server render: font 3 in 3-D, so it
+// shows without JS; the buttons redraw it live from public/arabart/fonts.bin.
+import Window from '../../shell/Window.astro';
+import Pix from '../arabart/Pix.astro';
+import { render, fromUnicode } from '../arabart/core.ts';
+import { ssrBin } from '../arabart/ssr.ts';
+
+const NAME = 'ياسر عوض';
+const keys = fromUnicode(NAME);
+const img = render(ssrBin(), keys, { font: 3, color: 14, shadow: 4, mode: '3d' });
+const MODES = [['plain', 'Plain'], ['3d', '3-D'], ['shadow', 'Shadow'], ['outline', 'Outline']];
+---
+
+<div class="nf" data-namefonts data-keys={keys}>
+  <Window title="ARABART.EXE  his name, his engine" kind="screen" class="nf-scr">
+    <div class="nf-out" data-out lang="ar" dir="rtl" aria-label={`${NAME}, Yasser Awad, drawn by ARABART`} role="img">
+      <Pix img={img} scale={4} />
+    </div>
+  </Window>
+  <div class="nf-ctl" data-ctl hidden>
+    <div role="group" aria-label="Font">{[1, 2, 3, 4].map(f => <button type="button" class="button k-btn" data-font={f} aria-pressed={String(f === 3)}>Font {f}</button>)}</div>
+    <div role="group" aria-label="Style">{MODES.map(([m, l]) => <button type="button" class="button k-btn" data-mode={m} aria-pressed={String(m === '3d')}>{l}</button>)}</div>
+  </div>
+</div>
+
+<style>
+  .nf { display: grid; gap: 14px; }
+  .nf-out { display: grid; place-items: center; min-height: 150px; padding: 18px 8px; background: var(--vga-0); }
+  .nf-out :global(svg) { width: min(100%, 520px); height: auto; }
+  .nf-ctl { display: grid; gap: 10px; }
+  .nf-ctl > div { display: flex; flex-wrap: wrap; gap: 10px; }
+</style>
+
+<script>
+  import { fonts, render, svgMarkup } from '../arabart/core.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-namefonts]').forEach(root => {
+    const out = root.querySelector<HTMLElement>('[data-out]')!, ctl = root.querySelector<HTMLElement>('[data-ctl]')!;
+    const st = { font: 3, mode: '3d' as 'plain' | '3d' | 'shadow' | 'outline' };
+    const draw = async () => {
+      const bin = await fonts();
+      out.innerHTML = svgMarkup(render(bin, root.dataset.keys!, { font: st.font, color: 14, shadow: 4, mode: st.mode }), 4);
+    };
+    const pick = (attr: string, v: string) => root.querySelectorAll<HTMLButtonElement>(`[data-${attr}]`).forEach(b => b.setAttribute('aria-pressed', String(b.getAttribute(`data-${attr}`) === v)));
+    root.querySelectorAll<HTMLButtonElement>('[data-font]').forEach(b => b.addEventListener('click', () => { st.font = +b.dataset.font!; pick('font', b.dataset.font!); draw(); }));
+    root.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach(b => b.addEventListener('click', () => { st.mode = b.dataset.mode as typeof st.mode; pick('mode', b.dataset.mode!); draw(); }));
+    ctl.hidden = false;
+  });
+</script>

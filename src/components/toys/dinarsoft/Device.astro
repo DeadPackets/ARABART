@@ -1,0 +1,133 @@
+---
+// One app on a Pocket PC: its real screens from DinarSoft's product pages, with their own Windows Mobile bars.
+// Swipe or tap the screen for the next one; a glowing spot is a real icon you can tap (HandyMenu, HandyLauncher).
+// While in view it plays through by itself, once, until you touch it. No JS: the screens still swipe (scroll snap).
+import Window from '../../shell/Window.astro';
+import { type App, screenImg } from '../../../data/dinarsoft';
+import './ds.css';
+
+interface Props { app: App; eager?: boolean; class?: string; [attr: string]: unknown }
+const { app, eager = false, class: cls, ...rest } = Astro.props;
+const shots = app.screens.map(s => ({ s, i: screenImg(s) }));
+const n = shots.length;
+---
+
+<figure class:list={['dsd-fig', cls]} data-dsd {...rest}>
+  <Window kind="device" title={app.name} class="dsd">
+    <div class="dsd-track" tabindex="0" role="group" aria-label={`${app.name} on a Pocket PC: ${n === 1 ? 'one screen' : `${n} screens, use the arrow keys`}`}>
+      {shots.map(({ s, i }, k) => (
+        <div class:list={['dsd-slide', { 'dsd-fit': s.fit }]} data-k={k}>
+          <img src={i.src} width={i.w} height={i.h} alt={s.alt} loading={eager && k === 0 ? 'eager' : 'lazy'} fetchpriority={eager && k === 0 ? 'high' : undefined} decoding="async" draggable="false" />
+          {s.hot && (
+            <button type="button" class="dsd-hot" style={`left:${(s.hot.x / 240) * 100}%;top:${(s.hot.y / 320) * 100}%`} data-to={s.hot.to} aria-label={s.hot.label}>
+              <span aria-hidden="true"></span>
+            </button>
+          )}
+        </div>
+      ))}
+    </div>
+  </Window>
+  {n > 1 && (
+    <div class="dsd-nav" hidden>
+      {shots.map((_, k) => <button type="button" class="dsd-dot" data-go={k} aria-label={`Screen ${k + 1} of ${n}`} aria-current={k === 0 ? 'true' : undefined}><i></i></button>)}
+    </div>
+  )}
+  <figcaption class="dsd-cap" data-cap>{shots[0].s.alt}</figcaption>
+</figure>
+
+<style is:global>
+  .dsd-fig { display: grid; justify-items: center; gap: 12px; margin: 0; min-width: 0; }
+  .dsd.win--device > .win-bar { display: none; }
+  .dsd.win--device > .win-body { aspect-ratio: 240 / 320; padding: 0; overflow: hidden; border-radius: 3px; background: #000; }
+  .dsd-track { display: flex; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; cursor: pointer; }
+  .dsd-track::-webkit-scrollbar { display: none; }
+  .dsd-track:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .dsd-slide { position: relative; flex: 0 0 100%; scroll-snap-align: start; }
+  .dsd-slide img { width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+  .dsd-slide.dsd-fit { display: grid; place-items: center; padding: 12px; background: #d4d0c8; }
+  .dsd-slide.dsd-fit img { width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; box-shadow: 0 2px 8px oklch(0 0 0 / 0.3); }
+  /* A real icon on the screen you can tap: a 44 px target with a soft ring on the icon itself */
+  .dsd-hot { position: absolute; width: 44px; height: 44px; translate: -50% -50%; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+  .dsd-hot span { position: absolute; inset: 9px; border-radius: 50%; box-shadow: 0 0 0 2px #ffef3d, 0 0 12px 3px oklch(0.95 0.17 100 / 0.8); animation: dsd-ping 1.6s var(--quart) infinite; }
+  .dsd-hot.tap span { animation: dsd-tap 0.42s var(--quart); }
+  .dsd-hot:focus-visible { outline: 3px solid var(--focus); }
+  @keyframes dsd-ping { 50% { scale: 1.25; opacity: 0.55; } }
+  @keyframes dsd-tap { 40% { scale: 0.7; background: oklch(1 0 0 / 0.6); } }
+  .dsd-nav { display: flex; flex-wrap: wrap; justify-content: center; }
+  .dsd-dot { display: grid; place-items: center; width: 34px; height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .dsd-dot i { width: 10px; height: 10px; border-radius: 50%; background: var(--rule); box-shadow: inset 0 0 0 1px oklch(0.4 0.05 255 / 0.5); transition: background-color 0.2s, scale 0.2s var(--quart); }
+  .dsd-dot[aria-current='true'] i { background: var(--ds-red); box-shadow: none; scale: 1.3; }
+  .dsd-dot:focus-visible { outline: 2px solid var(--focus); outline-offset: -4px; }
+  .dsd-cap { max-width: 34ch; min-height: 4.4em; font: 400 0.875rem/1.45 var(--ds-verdana); color: var(--ink-2); text-align: center; text-wrap: pretty; }
+  @media (pointer: coarse) { .dsd-dot { width: 44px; } }
+</style>
+
+<script>
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-dsd]').forEach(root => {
+    if (root.dataset.live) return;
+    root.dataset.live = '1';
+    const track = root.querySelector<HTMLElement>('.dsd-track')!;
+    const slides = [...track.querySelectorAll<HTMLElement>('.dsd-slide')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('.dsd-dot')];
+    const cap = root.querySelector<HTMLElement>('[data-cap]')!;
+    const n = slides.length;
+    let k = 0, timer = 0, touched = false, seen = false, shown = false;
+    root.querySelector<HTMLElement>('.dsd-nav')?.removeAttribute('hidden');
+
+    const paint = (i: number) => {
+      k = i;
+      dots.forEach((d, j) => (j === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+      cap.textContent = slides[i].querySelector('img')!.alt;
+      slides.forEach((s, j) => s.querySelector('.dsd-hot')?.setAttribute('tabindex', j === i ? '0' : '-1'));
+    };
+    const go = (i: number) => {
+      i = (i + n) % n;
+      track.scrollTo({ left: i * track.clientWidth, behavior: reduce() ? 'instant' : 'smooth' });
+      paint(i);
+    };
+    // Swipes and scrolls settle on a screen: keep the dots and the caption in step
+    let t = 0;
+    track.addEventListener('scroll', () => { clearTimeout(t); t = window.setTimeout(() => { const i = Math.round(track.scrollLeft / track.clientWidth); if (i !== k) paint(i); }, 90); }, { passive: true });
+
+    const stop = () => { touched = true; clearInterval(timer); timer = 0; };
+    // Plays through each screen once, the first time it is seen, unless the visitor prefers less motion
+    const tick = () => {
+      if (document.hidden || !shown) return;
+      const hot = slides[k].querySelector<HTMLElement>('.dsd-hot');
+      if (hot) { hot.classList.add('tap'); setTimeout(() => { hot.classList.remove('tap'); go(+hot.dataset.to!); }, 420); return; }
+      go(k + 1);
+      // The last screen stays up for one beat, then the device rests on the first one
+      if (k === n - 1) { clearInterval(timer); timer = 0; setTimeout(() => { if (!touched) go(0); }, 3200); }
+    };
+    // Once the device is near, fetch every screen so a swipe never lands on an empty one
+    new IntersectionObserver(([e], io) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      slides.forEach(s => (s.querySelector('img')!.loading = 'eager'));
+    }, { rootMargin: '300px' }).observe(root);
+    if (n > 1) new IntersectionObserver(([e]) => {
+      shown = e.isIntersecting;
+      if (shown && !seen && !touched && !reduce()) { seen = true; timer = window.setInterval(tick, 3200); }
+    }, { threshold: 0.6 }).observe(root);
+
+    track.addEventListener('pointerdown', stop, { passive: true });
+    track.addEventListener('click', e => {
+      if ((e.target as Element).closest('.dsd-hot')) return;
+      if (n > 1) go(k + 1);
+    });
+    track.addEventListener('keydown', e => {
+      const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+      if (d && n > 1) { e.preventDefault(); stop(); go(k + d); }
+    });
+    root.querySelectorAll<HTMLButtonElement>('.dsd-hot').forEach(b => b.addEventListener('click', () => {
+      stop();
+      b.classList.add('tap');
+      setTimeout(() => { b.classList.remove('tap'); go(+b.dataset.to!); }, reduce() ? 0 : 200);
+    }));
+    dots.forEach(d => d.addEventListener('click', () => { stop(); go(+d.dataset.go!); }));
+    addEventListener('resize', () => track.scrollTo({ left: k * track.clientWidth }));
+    paint(0);
+  });
+</script>

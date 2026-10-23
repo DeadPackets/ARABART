@@ -1,0 +1,131 @@
+---
+// HandyMenu, by Yasser Awad (DinarSoft, 2003 to 2008). Facts: HandyMenu.exe 3.6 and 3.7 Build 40 from the archived
+// installers (research/dinarsoft/re/handymenu/HOW.md), dinarsoft.com's revision history and details pages, and
+// research/career.md. Every toy is built from his own resources and traced from his own ARM code.
+import HmMenu from '../components/toys/ds-handymenu/HmMenu.astro';
+import HmSwitch from '../components/toys/ds-handymenu/HmSwitch.astro';
+import HmPower from '../components/toys/ds-handymenu/HmPower.astro';
+import HmCapture from '../components/toys/ds-handymenu/HmCapture.astro';
+import HmRotate from '../components/toys/ds-handymenu/HmRotate.astro';
+import HmIp from '../components/toys/ds-handymenu/HmIp.astro';
+import HmTrial from '../components/toys/ds-handymenu/HmTrial.astro';
+import HmKey from '../components/toys/ds-handymenu/HmKey.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Term from '../components/explain/Term.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+---
+
+<section id="hm-menu" class="hm">
+  <h2>Twenty-seven shortcuts, one tap away</h2>
+  <p class="lead">A Pocket PC kept its most useful switches deep inside Settings. HandyMenu put them all in one menu, behind one small icon: restart, power off, turn the screen, take a screenshot, check the network.</p>
+  <p>The last version, 3.7 from June 2008, is 81,408 bytes: smaller than a single photo on your phone. Everything below comes from that file, and from version 3.6 where the two differ.</p>
+  <HmMenu />
+  <p>Tap the <Term id="hm-tray-icon">tray icon</Term> for the menu. <Term id="hm-tap-and-hold">Hold it</Term>, and HandyMenu runs your Quick Action straight away, without opening anything. On the settings sheet you choose which items show, what the Quick Action is, the colors and the language. Both screens are rebuilt from his own files: the labels from HandyMenu.exe, the 27 icons from HandyMenu.vga, the translations from HandyMenu.bin. The menu itself is <Term id="hm-owner-draw">owner-drawn</Term>: HandyMenu paints every row, icon column and highlight in the five colors you pick.</p>
+  <p>Switch the language on the Display page and the whole program changes, the menu and the settings together. Every label has a number. English lives inside the program. HandyMenu.bin holds German, Dutch, Portuguese, Spanish and Hungarian as plain text, one line per label, like <code>IX3=Ausschalten</code>. His lookup takes the line with that number, and where a language has no line, the English label stays. Apps still translate this way today: a key per string, one file per language, English as the fallback.</p>
+  <Deep title="For engineers: the whole lookup, nine instructions">
+    <Listing
+      title="HandyMenu.exe 3.7  16E98, a label by number"
+      lines={[
+        { off: '16E98', code: 'cmp  r1,#80', note: 'room for 80 labels' },
+        { off: '16E9C', code: 'movge r0,#0', note: 'past the end: no label' },
+        { off: '16EA4', code: 'add  r2,r0,r1,lsl #2', note: 'this label’s slot, 4 bytes each' },
+        { off: '16EA8', code: 'ldr  r3,[r2,#4]', note: 'the translation', hi: true },
+        { off: '16EAC', code: 'cmp  r3,#0', note: 'is there one?' },
+        { off: '16EB0', code: 'movne r0,r3', note: 'yes: use it' },
+        { off: '16EB4', code: 'addeq r3,r1,#81', note: 'no: the English slot, 81 places on', hi: true },
+        { off: '16EB8', code: 'ldreq r0,[r0,r3,lsl #2]', note: 'the English label' },
+        { off: '16EBC', code: 'mov  pc,lr', note: 'return' },
+      ]}
+      foot="One table, two halves: the chosen language first, English 81 slots later. In JavaScript: return t[lang][n] ?? t.en[n]."
+    />
+  </Deep>
+</section>
+
+<section id="hm-switch" class="hm">
+  <h2>One jump for every item</h2>
+  <p class="lead">Pick an item and the menu hands back a number from 1 to 27. A simple program would then test that number 27 times. HandyMenu needs one jump.</p>
+  <p>The C compiler turned his <code>switch</code> statement into a <Term id="hm-jump-table">jump table</Term>. It has one two-byte row per item, and each row says how far ahead that item’s code starts. The processor subtracts 1, doubles it, reads the row, and adds the row to where it stands. Four instructions, whichever item you picked. Choose an item in the menu above or in the list here, and step through it.</p>
+  <HmSwitch />
+  <p>Look at the first three lines. Before any item runs, HandyMenu reads the key from the registry and checks its license again, on every single tap. If the 15 days are over, the item never runs: his Settings sheet opens instead, with the <b>Register…</b> button on its About page. Turn on “Trial is over” to follow that path.</p>
+</section>
+
+<section id="hm-power" class="hm">
+  <h2>Restart, wipe, sleep</h2>
+  <p class="lead">Three items reach all the way down to the hardware. Each takes only a handful of instructions.</p>
+  <p>Soft Reset restarts the Pocket PC, like rebooting a phone, and your files stay. Hard Reset is the factory reset: every file, program and setting erased. Power Off puts it to sleep. Pick one, step the code, and the Pocket PC does what the code says. Hard Reset waits for your answer, as it did on the device.</p>
+  <HmPower />
+  <p>Restarting is one call, <Term id="hm-ioctl">KernelIoControl</Term>, with one number: the system’s code for “restart now”. The factory reset is the same restart, with a note left for the next start: <code>SetCleanRebootFlag</code>. Power Off is a neat trick. There was no simple “sleep now” call, so HandyMenu presses the power button itself. It sends the power key’s code, 223, down and then up, and the system cannot tell it from a finger.</p>
+  <p>Most other items open one page of Settings directly. HandyMenu starts the Settings program with the page number on its command line: <code>cplmain.cpl 16 1</code> opens the Clock page, <code>cplmain.cpl 9 0</code> opens Sounds. Each one is a deep link into a <Term id="hm-cpl">control panel applet</Term>. Brightness took more care, because every maker kept that page somewhere else. HandyMenu looks for each in turn. It tries <code>Brightness.exe</code>, <code>frontlight.cpl</code>, <code>backlight.cpl</code>, <code>backlight.exe</code>, <code>frontlight.exe</code>, Fujitsu’s <code>fjcpl.cpl</code>, then a shortcut named <code>HandyBrightness.lnk</code> that you could make yourself, and only then the standard page. One menu item works on every brand.</p>
+</section>
+
+<section id="hm-capture" class="hm">
+  <h2>A screenshot, byte by byte</h2>
+  <p class="lead">Pocket PCs had no screenshot button. HandyMenu added one, and wrote the picture file itself, one header at a time.</p>
+  <p>The file is a <Term id="hm-bmp">BMP</Term>: 54 bytes of headers that say how big the picture is, then three bytes for every pixel. Step his code and watch the headers fill in. Then capture the Pocket PC beside it: the button builds a real .bmp the same way, and your computer opens it today.</p>
+  <HmCapture />
+  <p>Look at the order. He copies the screen first, and only then opens the Save dialog, so the dialog is never in your picture. The delay setting works the same way from the other side. It gives you time to open the screen you want before the copy is made.</p>
+</section>
+
+<section id="hm-rotate" class="hm">
+  <h2>Turning the screen, and turning it back</h2>
+  <p class="lead">Windows Mobile 2003 Second Edition could turn the screen sideways. Earlier Pocket PCs could not. HandyMenu runs on both.</p>
+  <p>The secret is how it finds the function. A program normally lists every system function it uses, and Windows will not start it if one is missing. HandyMenu asks for <code>ChangeDisplaySettingsEx</code> by name while it runs, the first time you rotate, and keeps the answer for next time. That is <Term id="hm-dynamic-linking">loading a function at run time</Term>. On an older device HandyMenu still starts, and simply says, in your language, that rotation is not supported. Web developers do the same when they check for a browser feature before using it.</p>
+  <HmRotate />
+  <p>One function serves all three items. First it asks the system for the current angle. If the screen is already turned, any rotate item turns it back upright, so each item is also its own undo.</p>
+</section>
+
+<section id="hm-ip" class="hm">
+  <h2>The network, in your pocket</h2>
+  <p class="lead">IP Helper shows the Pocket PC’s address on the network. It can hand the address back and ask for a fresh one.</p>
+  <p>On Wi-Fi, a device borrows its address from the network’s <Term id="hm-dhcp">DHCP</Term> server, the same way your laptop does today. <b>Release</b> gives the address back. <b>Renew</b> asks again, and four short messages fly back and forth. When a connection got stuck, these two buttons fixed it without a restart. Try them. The dialog is his own, dialog 507 inside HandyMenu.exe; the addresses are made-up private ones.</p>
+  <HmIp />
+  <Deep title="For engineers: ask for the size, then ask for the data">
+    <Listing
+      title="HandyMenu.exe 3.7  177C4, find this adapter"
+      lines={[
+        { off: '177E4', code: 'add  r1,sp,#0 / mov r0,#0', note: 'no buffer yet' },
+        { off: '177EC', code: 'bl   GetAdaptersInfo', note: 'answer: the size it needs', hi: true },
+        { off: '177FC', code: 'bl   malloc', note: 'exactly that much' },
+        { off: '17808', code: 'bl   GetAdaptersInfo', note: 'now fill it' , hi: true },
+        { off: '17828', code: 'ldr  r3,[r4,#412]', note: 'this adapter’s index' },
+        { off: '1782C', code: 'cmp  r3,r5', note: 'the one picked in the list?' },
+        { off: '17834', code: 'ldr  r3,[r4]', note: 'no: next adapter' },
+        { off: '17838', code: 'movs r4,r3 / bne 17828', note: 'until the list ends' },
+      ]}
+      foot="The IP Helper library (iphlpapi.dll) answers the first call with the size it needs, and the second with a linked list of adapters. GetInterfaceInfo at 175F8 works the same way, and Release and Renew are one call each: IpReleaseAddress and IpRenewAddress."
+    />
+  </Deep>
+  <ThenNow
+    era="2002 to 2008"
+    rows={[
+      { then: '<code>KernelIoControl(IOCTL_HAL_REBOOT)</code>', now: 'A system app on a phone calling the platform’s reboot API', why: 'One call to the layer under the operating system.' },
+      { then: '<code>ctlpnl.exe cplmain.cpl 16 1</code>', now: '<code>ms-settings:dateandtime</code>, or a Settings intent on Android', why: 'A deep link to one page of Settings.' },
+      { then: 'A switch compiled into a jump table', now: 'What C, Rust and Go compilers still emit for a dense switch', why: 'One table read instead of a chain of compares.' },
+      { then: '<code>GetProcAddress("ChangeDisplaySettingsEx")</code>', now: '<code>if ("share" in navigator)</code>', why: 'Use a feature only where it exists.' },
+      { then: 'HandyMenu.bin, <code>IX3=Ausschalten</code>', now: 'One JSON file per language, with English as the fallback', why: 'Strings by key, translated outside the code.' },
+      { then: 'Release and Renew', now: '<code>ipconfig /release</code> and <code>/renew</code>, or “Forget network” on a phone', why: 'Hand the address back, borrow a new one.' },
+    ]}
+  />
+</section>
+
+<section id="hm-trial" class="hm">
+  <h2>Fifteen days, written in disguise</h2>
+  <p class="lead">Like every DinarSoft program, HandyMenu was <Term id="shareware">shareware</Term>: try it free for 15 days, then buy a 16-letter key. Where it kept the install date is a small piece of craft.</p>
+  <p>The date sits in a 14-byte file, <code>\Windows\xintra.dat</code>, with a name that gives nothing away. Inside, the year, the month and the day are each stored twice, and every copy is dressed differently. The month appears as month × 2 + 3, and again as month × 2 + 1. Then every second byte goes up by one, a <Term id="hm-salt">salt</Term>, and a <Term id="checksum">checksum</Term> seals the lot. When HandyMenu reads the file, both copies must agree and the checksum must match. Change one byte and the trial ends. Pick an install date, step his encoder, then tap any byte.</p>
+  <HmTrial />
+  <p>This encoder is the same function, instruction for instruction, inside HandySwitcher 2.7 and HandyLauncher 3.4. It is one of 24 functions, 4,508 bytes of code, that all three 2006 builds share. Among them are the key engine, the date check, the color picker and the settings layout. Yasser wrote them once and built them into every app. Only the file name changes: HandySwitcher hides its date in <code>tonter.bin</code>, HandyLauncher in <code>mcterthr.dat</code>.</p>
+
+  <h3>The key, now free</h3>
+  <p>In 2026, Yasser Awad released HandyMenu as freeware. A key was always made from two things: your Pocket PC’s own code, shown in the License Key dialog, and the product’s name. His key function shuffles 120 numbers using the name, then uses the shuffle to turn each character of your code into a letter of the key. The <a href={`${base}/dinarsoft/handyswitcher/`}>HandySwitcher page</a> steps through it. Version 3.7 also accepts keys made from a few codes built into the program in place of the device’s. One is his own name, <code>YASSERMOHAMEDALI</code>. Others are the names of his family, and <code>GIVEAWAYVERSION1</code> served magazine give-aways. The key made from his name opens every copy of HandyMenu 3.7, on any Pocket PC.</p>
+  <HmKey />
+  <p>HandyMenu’s own check routine stands behind this key. Its real ARM code, from the 2008 installer, ran in an emulator with his key, the keys for random devices and a pile of near misses. It opened for his key and every device key, and it stayed shut for every near miss. HandyMenu 3.7 keeps the key in the registry as <code>HMLicKey</code>.</p>
+</section>
+
+<style>
+  .hm :global(.k-code) { display: block; }
+  .hm :global(ol.k-code) { margin-top: 0; padding-left: 0; }
+  .hm :global(.k-code li) { font-size: inherit; line-height: inherit; max-width: none; }
+</style>

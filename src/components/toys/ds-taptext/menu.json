@@ -1,0 +1,303 @@
+{
+ "type": "group",
+ "flags": "110",
+ "icon": 0,
+ "title": "",
+ "version": 1,
+ "children": [
+  {
+   "type": "group",
+   "flags": "110",
+   "icon": 1,
+   "title": "Signatures",
+   "children": [
+    {
+     "type": "group",
+     "flags": "110",
+     "icon": 40,
+     "title": "Personal",
+     "children": [
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 43,
+       "title": "Email address",
+       "text": "mailto:James.Watt@example.com"
+      },
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 44,
+       "title": "Address",
+       "text": "James Watt\r\n20 - 100 Atlanta Rd.\r\nBarhaven, NJ\r\n00000\r\n"
+      },
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 41,
+       "title": "Name",
+       "text": "Yours sincerely\r\nJames\r\n"
+      }
+     ]
+    },
+    {
+     "type": "separator"
+    },
+    {
+     "type": "group",
+     "flags": "110",
+     "icon": 48,
+     "title": "Business",
+     "children": [
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 43,
+       "title": "Email address",
+       "text": "mailto:James.Watt@example.com"
+      },
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 36,
+       "title": "Business Card",
+       "text": "James Watt\r\nMarketing Manager\r\nDinarSoft Corp.\r\nTel : +1 123 456 7890\r\nFax : +1 123 456 7891\r\n"
+      },
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 42,
+       "title": "Email signature",
+       "text": "James Watt\r\nMarketing Manager\r\nDinarSoft Corp.\r\nwww.DinarSoft.com\r\n"
+      },
+      {
+       "type": "text",
+       "flags": "1",
+       "icon": 44,
+       "title": "Address",
+       "text": "James Watt\r\nDinarSoft Corp\r\n100 Pine Rd. Unit 5\r\nManhattan, NY\r\n12345\r\n"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "flags": "100",
+   "icon": 3,
+   "title": "Email templates",
+   "children": [
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 30,
+     "title": "Standard reply",
+     "text": "Dear Sir,\r\nWe have received you Email.\r\nOne of our staff members will get back to you very soon\r\n\r\nDinarSoft\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 48,
+     "title": "Thank you",
+     "text": "Dear Sir,\r\nThank you for your Email.\r\n..."
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 20,
+     "title": "General",
+     "text": "Hi,\r\n...\r\nBest Regards\r\n"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "flags": "110",
+   "icon": 5,
+   "title": "Reports",
+   "children": [
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 34,
+     "title": "Financial",
+     "text": "{{DATE:MMMM}}\r\nSales : 00.00 $\r\nExpenses : 00.00$\r\nNet. : 00.00$\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 28,
+     "title": "Project Status",
+     "text": "{{DATE:dddd, MMMM d, yyyy}}\r\nX - Market study\r\nX - Initial design\r\nX - Design review\r\nX - Implementation\r\n   - Beta testing\r\n   - Bug fixes\r\n   - Packaging\r\n   - Product Release\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 24,
+     "title": "Attendance",
+     "text": "X - James Watt\r\n   - John Malak\r\n   - Ron Baker\r\nX - Susan Lee\r\nX - Bob Lance\r\n   - Chantal Foller\r\nX - Mike Taber\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 23,
+     "title": "Date and time",
+     "text": "Ottawa in {{DATE:MMMM d, yyyy}}\r\nThe time is now {{TIME:h:mm tt}}\r\n"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "flags": "100",
+   "icon": 6,
+   "title": "Meeting Notes",
+   "children": [
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 46,
+     "title": "Start",
+     "text": "{{DATE:dddd, MMMM d, yyyy}}\r\n\r\nTitle : ...\r\nAttendence : ...\r\n\r\nStart time : {{TIME:h:mm tt}}\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 52,
+     "title": "Actions",
+     "text": "Action Items :\r\nA1 \r\nName : ...\r\nAction : ...\r\nA2\r\nName : ...\r\nAction : ...\r\nA3\r\nName  : ...\r\nAction : ...\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 46,
+     "title": "End",
+     "text": "\r\nAction items :\r\nA1 :\r\nA2 :\r\n\r\nMeeting ended @ {{TIME:h:mm tt}}\r\n"
+    }
+   ]
+  },
+  {
+   "type": "separator"
+  },
+  {
+   "type": "group",
+   "flags": "110",
+   "icon": 39,
+   "title": "Web links",
+   "children": [
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 50,
+     "title": "DinarSoft Support",
+     "text": "http://www.aximsite.com/boards/forumdisplay.php?=60\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 53,
+     "title": "Google",
+     "text": "http://www.google.com\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 48,
+     "title": "CNN",
+     "text": "http://www.cnn.com\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 40,
+     "title": "MSN",
+     "text": "http://www.msn.com\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 26,
+     "title": "How stuff works",
+     "text": "http://www.howstuffworks.com\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 34,
+     "title": "Yahoo finance",
+     "text": "http://finance.yahoo.com\r\n"
+    }
+   ]
+  },
+  {
+   "type": "group",
+   "flags": "101",
+   "icon": 31,
+   "title": "Quotes",
+   "children": [
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 55,
+     "title": "Future",
+     "text": "\"The best way to predict the future is to invent it.\"\r\nAlan Kay\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 56,
+     "title": "Lion and Calf",
+     "text": "\"The lion and the calf shall lie down together but the calf won't get much sleep\"\r\nWoddy Allen\r\n\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 57,
+     "title": "Courage",
+     "text": "\"Many would be cowards if they had courage enough\"\r\nThomas Fuller\r\n\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 58,
+     "title": "Patience",
+     "text": "\"Patience has its limits. Take it too far, and it's cowardice\"\r\nGeorge Jackson\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 59,
+     "title": "Rare person",
+     "text": "\"It's a rare person who wants to hear what he doesn't want to hear\"\r\nDick Cavett\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 55,
+     "title": "Ending war",
+     "text": "\"The quickest way of ending a war is to lose it\"\r\nGrorge Orwell\r\n"
+    },
+    {
+     "type": "text",
+     "flags": "1",
+     "icon": 56,
+     "title": "Excellence",
+     "text": "\"The sad truth is that excellence makes people nervous\"\r\nShana Alexander\r\n"
+    }
+   ]
+  },
+  {
+   "type": "text",
+   "flags": "1",
+   "icon": 26,
+   "title": "Finding Help",
+   "text": "I'm trying to find some help on ..."
+  },
+  {
+   "type": "text",
+   "flags": "1",
+   "icon": 27,
+   "title": "Financial",
+   "text": "This is the financial report\r\n"
+  }
+ ]
+}

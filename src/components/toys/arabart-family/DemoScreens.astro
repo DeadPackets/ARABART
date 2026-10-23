@@ -1,0 +1,224 @@
+---
+// DEMO.EXE's four screens, rebuilt call by call on his own engine. Step, run or scrub through every ar_text call; the
+// side window shows the C it just ran. With tw set, it can also draw the line typed in that Typewriter.
+// Without JS: the real screenshot of screen 1.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { screens } from './demo.ts';
+import { ssrBin } from '../arabart/ssr.ts';
+
+interface Props { id?: string; tw?: string }
+const { id = 'demoscreens', tw = '' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const s = screens(ssrBin());
+const TABS = s.map((x, i) => [i + 1, x.title]);
+const n = s[0].calls.length;
+---
+
+<div class="ds" id={id} data-demoscreens data-tw={tw}>
+  <div class="ds-tabs" role="radiogroup" aria-label="Screen">
+    {TABS.map(([k, t], i) => (
+      <button type="button" role="radio" class="button k-btn ds-tab" data-scr={i} aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1}>
+        <span class="hk" aria-hidden="true">{k}</span> {t}
+      </button>
+    ))}
+  </div>
+  <div class="ds-main">
+    <Window title={'C:\\ARABART\\DEMO.EXE  screen 1 of 4'} kind="screen" class="ds-win">
+      <div class="ds-screen">
+        <img class="ds-shot" src={`${base}/images/arabart-demo.png`} width="962" height="600" loading="lazy"
+          alt="Screen 1 of his demo: الفن العربي ٤,١٥ in three columns, fonts 1 to 3, each line in a new color." />
+        <canvas class="ds-canvas" width="640" height="480" aria-hidden="true"></canvas>
+        <svg class="ds-guides" viewBox="0 0 640 480" aria-hidden="true" data-guides></svg>
+      </div>
+      <p class="sr-only" aria-live="polite" data-said></p>
+    </Window>
+    <Window title="main()  what it just did" kind="panel" num="2" class="ds-side">
+      <div class="ds-log" data-log>
+        <div>ar_font(3);</div><div>ar_color(15);</div><div class="on">ar_text(261, 374, s1);</div><div>y += ar_height(s1);</div>
+      </div>
+      <div class="ds-say" data-say>The last line of screen 1: font 3, in white.</div>
+      <div class="ds-opts">
+        <button type="button" class="button k-btn" data-toggle-guides aria-pressed="false">Show the measuring</button>
+        <div class="ds-src" role="radiogroup" aria-label="Which line" hidden={!tw}>
+          <button type="button" role="radio" class="button k-btn" data-src="his" aria-checked="true">His line</button>
+          <button type="button" role="radio" class="button k-btn" data-src="yours" aria-checked="false" tabindex="-1">Your line</button>
+        </div>
+      </div>
+    </Window>
+  </div>
+  <div class="ds-ctl"><Scrubber n={n + 1} at={n} label="Step through the lines of this screen" /></div>
+</div>
+
+<style is:global>
+  .ds { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; min-width: 0; }
+  .ds-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+  .ds-tab { padding: 0 12px; }
+  .ds:not(.is-live) .ds-tabs, .ds:not(.is-live) .ds-side, .ds:not(.is-live) .ds-ctl { display: none; }
+  .ds-main { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(250px, 1fr); gap: 22px; align-items: start; }
+  .ds:not(.is-live) .ds-main { grid-template-columns: minmax(0, 1fr); }
+  .ds-screen { position: relative; background: var(--vga-0); }
+  .ds.is-live .ds-screen { aspect-ratio: 4 / 3; }
+  .ds-shot { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .ds.is-live .ds-shot { display: none; }
+  .ds-canvas, .ds-guides { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .ds-canvas { image-rendering: pixelated; }
+  .ds:not(.is-live) .ds-canvas, .ds:not(.is-live) .ds-guides { display: none; }
+  .ds-guides { pointer-events: none; overflow: visible; }
+  .ds-guides .cur { fill: none; stroke: var(--vga-15); stroke-width: 1.5; stroke-dasharray: 3 3; }
+  .ds-guides .col { fill: none; stroke: var(--vga-11); stroke-width: 1.5; stroke-dasharray: 6 4; }
+  .ds-guides .band { fill: var(--vga-11); opacity: 0.12; }
+  .ds-guides text { font: 600 15px var(--font-code); fill: var(--vga-14); paint-order: stroke; stroke: var(--vga-0); stroke-width: 4px; }
+  .ds-guides .w { fill: var(--vga-11); }
+  .ds-guides line { stroke: var(--vga-14); stroke-width: 2; }
+  .ds-log { font: 500 clamp(12.5px, 0.2vw + 10px, 14px)/1.9 var(--font-code); }
+  .ds-log > div { padding: 0 8px; color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ds-log > div.on { color: var(--surface); background: var(--accent-2); }
+  .ds-log .cm { color: inherit; opacity: 0.9; }
+  .ds-say { margin-top: 14px; min-height: 5.2em; font: 400 1rem/1.55 var(--sans); color: var(--ink); }
+  .ds-say b { color: var(--accent); }
+  .ds-opts { display: grid; gap: 12px; margin-top: 16px; }
+  .ds-opts .k-btn { justify-self: start; }
+  .ds-src { display: flex; flex-wrap: wrap; gap: 10px; }
+  .ds-src [lang='ar'] { font: 700 1.05rem/1 var(--font-ar); }
+  .ds-ctl { position: sticky; bottom: calc(var(--sl, 0px) + 8px); z-index: 2; padding: 10px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--rule), 8px 8px 0 oklch(0 0 0 / 0.55); margin-right: 14px; }
+  @media (max-width: 1023px) { .ds-main { grid-template-columns: minmax(0, 1fr); } .ds-say { min-height: 0; } }
+  @media (max-width: 640px) { .ds-ctl { margin-right: 0; padding: 8px; } .ds-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); } .ds-tabs .ds-tab { white-space: normal; text-align: left; line-height: 1.2; min-height: 44px; height: auto; padding-block: 6px; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, toUnicode } from '../arabart/core.ts';
+  import { scrubber } from '../scrubber.ts';
+  import { screens, strings, type Screen, type Call } from './demo.ts';
+  import { frame, stamp, show, NAMES, reduce } from './vga.ts';
+
+  const esc = (t: string) => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  document.querySelectorAll<HTMLElement>('[data-demoscreens]').forEach(async root => {
+    const bin = await fonts();
+    const $ = <T extends Element = HTMLElement>(q: string) => root.querySelector<T>(q)!;
+    const canvas = $<HTMLCanvasElement>('canvas'), guides = $<SVGSVGElement>('[data-guides]');
+    const log = $('[data-log]'), say = $('[data-say]'), said = $('[data-said]'), title = $('.ds-win .win-title');
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[data-scr]')];
+    const srcs = [...root.querySelectorAll<HTMLButtonElement>('[data-src]')];
+    const tw = root.dataset.tw ? document.getElementById(root.dataset.tw) : null;
+    let data: Screen[] = screens(bin), scr = 0, shown = -1, showGuides = false, src = 'his', yours = '';
+    const f = frame();
+
+    const draw = (k: number) => {
+      const calls = data[scr].calls;
+      if (k === shown + 1 && k > 0) stamp(f, calls[k - 1].img, calls[k - 1].x, calls[k - 1].y + calls[k - 1].h);
+      else { f.data.fill(0); for (let i = 0; i < k; i++) stamp(f, calls[i].img, calls[i].x, calls[i].y + calls[i].h); }
+      shown = k;
+      show(canvas, f);
+    };
+
+    // Dashed boxes: each column's measured width and every line's height so far; the current line always
+    const paintGuides = (k: number) => {
+      const calls = data[scr].calls, c = calls[k - 1];
+      let svg = '';
+      if (showGuides) {
+        const cols = new Map<number, Call[]>();
+        calls.slice(0, k).forEach(x => (cols.get(x.col) ?? cols.set(x.col, []).get(x.col)!).push(x));
+        for (const [, xs] of cols) {
+          const a = xs[0], z = xs[xs.length - 1], w = calls.find(x => x.col === a.col && x.width)!.width!;
+          const left = a.x - w, bottom = z.y + z.h;
+          xs.forEach((x, i) => { if (i % 2 === 0) svg += `<rect class="band" x="${Math.max(0, left)}" y="${x.y}" width="${Math.min(w, a.x)}" height="${x.h}"/>`; });
+          svg += `<rect class="col" x="${left}" y="1" width="${w}" height="${bottom - 1}"/>`;
+          svg += `<line x1="${a.x}" y1="${bottom + 4}" x2="${a.x}" y2="${bottom + 18}"/><text x="${a.x - 4}" y="${bottom + 18}" text-anchor="end">x ${a.x}</text>`;
+          svg += `<text class="w" x="${a.x - 4}" y="${bottom + 38}" text-anchor="end">font ${a.font}: ${a.h} px</text>`;
+          if (z.width) svg += `<text class="w" x="${a.x - 4}" y="${bottom + 58}" text-anchor="end">${z.width} px wide</text>`;
+        }
+      }
+      if (c) svg += `<rect class="cur" x="${Math.max(1, c.x - c.img.advance)}" y="${c.y + 0.5}" width="${Math.min(c.img.advance, c.x)}" height="${c.h}"/>`;
+      guides.innerHTML = svg;
+    };
+
+    const logLines = (k: number) => {
+      const c = data[scr].calls[k - 1];
+      if (!c) return [['cleardevice();', ''], ['x = 630;', 'the right edge'], ['y = 0;', 'the top']];
+      const L: string[][] = [[`ar_font(${c.font});`, ''], [`ar_color(${c.color});`, NAMES[c.color]], [`ar_text(${c.x}, ${c.y}, s${scr % 2 + 1});`, ''], [`y += ar_height(s${scr % 2 + 1});`, `${c.h}`]];
+      if (c.width) L.push([`x -= ar_width(s${scr % 2 + 1});`, `${c.width}`]);
+      return L;
+    };
+    const sayFor = (k: number) => {
+      const calls = data[scr].calls, c = calls[k - 1];
+      if (!c) return `A fresh screen. The pen starts at the right edge, <b>x = 630</b>, and at the top, <b>y = 0</b>.`;
+      let t = `Line ${c.row} of 12 in <b>font ${c.font}</b>, in ${NAMES[c.color]}. ARABART says this font is <b>${c.h} pixels</b> tall, so the next line starts at y = ${c.y + c.h}.`;
+      if (c.width) t = `Line 12 of 12 in font ${c.font}. Now it asks how wide the line is: <b>${c.width} pixels</b>. ${k < calls.length ? `The next column starts that far to the left, at <b>x = ${c.x - c.width}</b>.` : 'That was the last column. A key press shows the next screen.'}`;
+      return t;
+    };
+
+    const go = (k: number, how: string) => {
+      draw(k);
+      paintGuides(k);
+      const L = logLines(k);
+      log.innerHTML = L.map(([code, cm], i) => `<div class="${(data[scr].calls[k - 1] ? i === 2 : i === 0) ? 'on' : ''}">${esc(code)}${cm ? `<span class="cm">  // ${esc(cm)}</span>` : ''}</div>`).join('');
+      say.innerHTML = sayFor(k);
+      if (how !== 'play') said.textContent = say.textContent!;
+      if (how === 'step' && !reduce()) gsap.fromTo(log.querySelector('.on'), { opacity: 0.4 }, { opacity: 1, duration: 0.3 });
+    };
+
+    const s = scrubber($('[data-scrub]'), go, { speed: 0.13 });
+    const pick = (i: number, play = false) => {
+      scr = i;
+      tabs.forEach((t, j) => { t.setAttribute('aria-checked', String(j === i)); t.tabIndex = j === i ? 0 : -1; });
+      title.textContent = `C:\\ARABART\\DEMO.EXE  screen ${i + 1} of 4`;
+      shown = -1;
+      const n = data[i].calls.length;
+      s.resize(n + 1, play ? 0 : n);
+      if (play) s.play();
+    };
+    const radios = (bs: HTMLButtonElement[], onPick: (i: number) => void) => bs.forEach((b, i) => {
+      b.addEventListener('click', () => onPick(i));
+      b.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const j = (i + d + bs.length) % bs.length; onPick(j); bs[j].focus();
+      });
+    });
+    radios(tabs, i => pick(i));
+
+    $('[data-toggle-guides]').addEventListener('click', e => {
+      showGuides = !showGuides;
+      (e.currentTarget as HTMLElement).setAttribute('aria-pressed', String(showGuides));
+      paintGuides(s.i);
+    });
+
+    // The line typed in the Typewriter: it stores keys the way his programs did, numbers already reversed
+    const readTw = () => (tw?.querySelector('[data-stored]')?.textContent ?? '').split('↵')[0].replace(/\s+$/, '').slice(0, 60);
+    const setSrc = (v: string) => {
+      src = v;
+      srcs.forEach(b => { const on = b.dataset.src === v; b.setAttribute('aria-checked', String(on)); b.tabIndex = on ? 0 : -1; });
+      const line = v === 'yours' && yours.trim() ? yours : '';
+      data = line ? screens(bin, ...strings(bin, line)) : screens(bin);
+      shown = -1;
+      s.go(Math.min(s.i, data[scr].calls.length), 'jump');
+    };
+    radios(srcs, i => setSrc(srcs[i].dataset.src!));
+    const label = () => {
+      const b = srcs[1];
+      if (b) b.innerHTML = yours.trim() ? `Your line: <span lang="ar" dir="rtl">${esc(toUnicode(yours))}</span>` : 'Your line';
+    };
+    if (tw) {
+      yours = readTw(); label();
+      const stored = tw.querySelector('[data-stored]');
+      if (stored) new MutationObserver(() => {
+        yours = readTw(); label();
+        if (src === 'yours') setSrc('yours');
+      }).observe(stored, { childList: true, characterData: true, subtree: true });
+    }
+    document.querySelectorAll<HTMLButtonElement>(`[data-run-demo="${root.id}"]`).forEach(b => b.addEventListener('click', () => {
+      setSrc('yours');
+      pick(0);
+      s.go(0, 'jump');
+      root.scrollIntoView({ behavior: reduce() ? 'auto' : 'smooth', block: 'start' });
+      setTimeout(() => s.play(), reduce() ? 0 : 700);
+    }));
+
+    root.classList.add('is-live');
+    pick(0);
+  });
+</script>

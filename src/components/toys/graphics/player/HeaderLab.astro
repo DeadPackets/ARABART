@@ -1,0 +1,162 @@
+---
+// The five header bytes of line 1, and the five places in his code they are written to. Pick an ink, a shadow, a
+// direction: the bytes change, the instructions change, and his player redraws محافظة بورسعيد with them.
+import Window from '../../../shell/Window.astro';
+import { Player, SCRIPT, DEC, INC, SHADOW, NOSHADOW, Y } from './player.ts';
+import { EGA, css } from '../ega.ts';
+import { memSync, png } from '../ssr.ts';
+import { NAMES, hx } from './screen.ts';
+import './player.css';
+
+const X0 = 190, Y0 = 77, CW = 272, CH = 40;
+const mem = memSync('SCREEN_SCREEN.COM');
+const s = SCRIPT.screen, e = mem.indexOf(Y, s + 9);
+const line = mem.slice(s, e);
+const p = new Player(line, 0);
+p.run();
+const crop = new Uint8Array(CW * CH);
+for (let y = 0; y < CH; y++) for (let x = 0; x < CW; x++) crop[y * CW + x] = p.pix[(y + Y0) * 640 + x + X0];
+const still = png(crop, CW, CH);
+const head = [...line.slice(0, 9)];
+const data = JSON.stringify({ X0, Y0, CW, CH, line: [...line] });
+---
+
+<div class="gp gphl" data-gp-header>
+  <script type="application/json" data-line set:html={data} />
+  <div class="gphl-grid">
+    <Window title="HEADER  line 1" kind="dialog" class="gphl-ctl">
+      <div class="gp-field">
+        <span id="gphl-ink">Ink</span>
+        <div class="gp-sw" role="radiogroup" aria-labelledby="gphl-ink" data-g="color">
+          {EGA.map((c, i) => <button type="button" role="radio" style={`--c:${css(c)}`} aria-checked={String(i === 7)} tabindex={i === 7 ? 0 : -1} aria-label={NAMES[i]} data-v={i}></button>)}
+        </div>
+      </div>
+      <div class="gp-field">
+        <span id="gphl-sh">Shadow</span>
+        <div class="gp-seg" role="radiogroup" aria-labelledby="gphl-sh" data-g="jmp">
+          <button type="button" role="radio" class="button k-btn" aria-checked="true" data-v={SHADOW}>On</button>
+          <button type="button" role="radio" class="button k-btn" aria-checked="false" tabindex="-1" data-v={NOSHADOW}>Off</button>
+        </div>
+      </div>
+      <div class="gp-field">
+        <span id="gphl-shc">Shadow color</span>
+        <div class="gp-sw" role="radiogroup" aria-labelledby="gphl-shc" data-g="shadow">
+          {EGA.map((c, i) => <button type="button" role="radio" style={`--c:${css(c)}`} aria-checked={String(i === 4)} tabindex={i === 4 ? 0 : -1} aria-label={NAMES[i]} data-v={i}></button>)}
+        </div>
+      </div>
+      <div class="gp-field">
+        <span id="gphl-dir">The pen moves</span>
+        <div class="gp-seg" role="radiogroup" aria-labelledby="gphl-dir" data-g="x">
+          <button type="button" role="radio" class="button k-btn" aria-checked="true" data-v={DEC}>Right to left</button>
+          <button type="button" role="radio" class="button k-btn" aria-checked="false" tabindex="-1" data-v={INC}>Left to right</button>
+        </div>
+      </div>
+    </Window>
+    <div class="gphl-out">
+      <Window title="SCREEN  line 1" kind="screen" class="gphl-scr">
+        <div class="gp-crt" style={`--gp-ar:${CW} / ${CH}`}>
+          <img src={still} width={CW} height={CH} alt="محافظة بورسعيد, Port Said Governorate, in gray with a red shadow." data-still />
+          <canvas hidden aria-hidden="true"></canvas>
+        </div>
+      </Window>
+      <Window title="SCREEN.COM  after reading the header" kind="editor" class="gphl-code">
+        <p class="gphl-cap">The script's first 9 bytes</p>
+        <ol class="gp-bytes gphl-head" aria-label="Header and origin bytes">
+          {head.map((v, i) => <li class={i < 5 ? 'is-hd' : 'is-org'} data-h={i}>{hx(v)}</li>)}
+        </ol>
+        <p class="gphl-cap">The 5 places in his code they go</p>
+        <ol class="gphl-lines" aria-live="polite">
+          <li><span class="o">013B</span><span class="b"><i data-b="0">4B</i></span><code data-c="0">dec bx</code><span class="n" data-n="0">x: one column left</span></li>
+          <li><span class="o">0143</span><span class="b"><i data-b="1">43</i></span><code data-c="1">inc bx</code><span class="n" data-n="1">w: one column right</span></li>
+          <li><span class="o">017F</span><span class="b">EB <i data-b="2">00</i></span><code data-c="2">jmp 0181h</code><span class="n" data-n="2">into the shadow code</span></li>
+          <li><span class="o">0178</span><span class="b">B8 <i data-b="3">07</i> 0C</span><code data-c="3">mov ax,0C07h</code><span class="n" data-n="3">ink: light gray</span></li>
+          <li><span class="o">0181</span><span class="b">B8 <i data-b="4">04</i> 0C</span><code data-c="4">mov ax,0C04h</code><span class="n" data-n="4">shadow: red</span></li>
+        </ol>
+      </Window>
+    </div>
+  </div>
+  <p class="gp-say" data-say aria-live="polite">Header <b>4B 43 00 07 04</b>: his own line 1. Change any of it and his player draws the line again.</p>
+</div>
+
+<style is:global>
+  .gphl-grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .gphl-ctl .win-body { display: grid; gap: 18px; }
+  .gphl-out { display: grid; gap: 22px; min-width: 0; }
+  .gphl .gphl-cap { font: 600 12px/1.3 var(--font-code); color: var(--accent-2); margin: 0 0 8px; }
+  .gphl .gphl-cap + ol + .gphl-cap { margin-top: 16px; }
+  .gphl-head > li { transition: background-color 0.3s, color 0.3s; }
+  .gphl-lines { display: grid; gap: 2px; font: 500 13px/1.6 var(--font-code); }
+  .gphl-lines li { display: grid; grid-template-columns: 4.5ch 9.5ch 14ch minmax(0, 1fr); gap: 1.2ch; color: var(--ink); }
+  .gphl-lines .o { color: var(--accent-2); }
+  .gphl-lines .b { color: var(--ink-2); white-space: nowrap; }
+  .gphl-lines i { font-style: normal; color: var(--surface); background: var(--accent); padding: 0 2px; }
+  .gphl-lines code { font: inherit; color: var(--accent); white-space: nowrap; }
+  .gphl-lines .n { color: var(--ink-2); }
+  .gphl-lines .flash, .gphl-head .flash { animation: gphl-flash 0.8s var(--quart); }
+  @keyframes gphl-flash { from { background: var(--vga-15); color: var(--vga-0); } }
+  @media (max-width: 860px) { .gphl-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) {
+    .gphl-lines li { grid-template-columns: 4.5ch 9.5ch minmax(0, 1fr); }
+    .gphl-lines .n { grid-column: 2 / -1; font-size: 12px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .gphl-lines .flash, .gphl-head .flash { animation: none; } }
+</style>
+
+<script>
+  import { Player, DEC, SHADOW } from './player.ts';
+  import { Screen, loop, reduce, radios, NAMES, hx } from './screen.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-header]').forEach(root => {
+    const d = JSON.parse(root.querySelector('[data-line]')!.textContent!) as { X0: number; Y0: number; CW: number; CH: number; line: number[] };
+    const base = Uint8Array.from(d.line);
+    const canvas = root.querySelector('canvas')!;
+    const scr = new Screen(canvas, d.CW, d.CH, d.X0, d.Y0);
+    const head = [...root.querySelectorAll<HTMLElement>('.gphl-head > li')];
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const v = { x: DEC, jmp: SHADOW, color: 7, shadow: 4 };
+    let p: Player;
+
+    const anim = loop(root, () => {
+      for (let n = 0; n < 16; n++) if (!p.step()) { scr.flush(); return false; }
+      scr.flush();
+    });
+    const draw = () => {
+      const b = base.slice();
+      b[0] = v.x; b[1] = v.x === DEC ? 0x43 : 0x4b; b[2] = v.jmp; b[3] = v.color; b[4] = v.shadow;
+      // Mirrored, the pen starts at the left end of the line (column 202) instead of 445, so the line stays in view
+      const col = v.x === DEC ? 445 : 202;
+      b[7] = col & 255; b[8] = col >> 8;
+      head.forEach((li, i) => {
+        const t = hx(b[i]);
+        if (li.textContent !== t) { li.textContent = t; li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash'); }
+      });
+      const set = (i: number, byte: string, code: string, note: string) => {
+        const bi = root.querySelector<HTMLElement>(`[data-b="${i}"]`)!;
+        if (bi.textContent !== byte) { bi.textContent = byte; bi.classList.remove('flash'); void bi.offsetWidth; bi.classList.add('flash'); }
+        root.querySelector(`[data-c="${i}"]`)!.textContent = code;
+        root.querySelector(`[data-n="${i}"]`)!.textContent = note;
+      };
+      const left = v.x === DEC;
+      set(0, hx(b[0]), left ? 'dec bx' : 'inc bx', left ? 'x: one column left' : 'x: one column right');
+      set(1, hx(b[1]), left ? 'inc bx' : 'dec bx', left ? 'w: one column right' : 'w: one column left');
+      set(2, hx(b[2]), v.jmp === SHADOW ? 'jmp 0181h' : 'jmp 018Eh', v.jmp === SHADOW ? 'into the shadow code' : 'past the shadow code');
+      set(3, hx(b[3]), `mov ax,0C${hx(b[3])}h`, `ink: ${NAMES[b[3]]}`);
+      set(4, hx(b[4]), `mov ax,0C${hx(b[4])}h`, v.jmp === SHADOW ? `shadow: ${NAMES[b[4]]}` : `shadow: ${NAMES[b[4]]}, skipped`);
+      const mine = v.x === DEC && v.jmp === SHADOW && v.color === 7 && v.shadow === 4;
+      say.innerHTML = mine
+        ? 'Header <b>4B 43 00 07 04</b>: his own line 1. Change any of it and his player draws the line again.'
+        : `Header <b>${[...b.slice(0, 5)].map(hx).join(' ')}</b>${left ? '' : `, origin column <b>${col}</b>`}: the same 340 strokes, ${left ? 'right to left' : 'left to right, a mirror image'}, ${NAMES[v.color]}${v.jmp === SHADOW ? ` with a ${NAMES[v.shadow]} shadow` : ', no shadow'}.`;
+      p = new Player(b, 0);
+      p.onPlot = (x, y, c) => scr.set(x, y, c);
+      scr.clear();
+      if (reduce()) { p.run(); scr.flush(); anim.stop(); } else { anim.stop(); anim.start(); }
+    };
+
+    for (const g of root.querySelectorAll<HTMLElement>('[role=radiogroup][data-g]')) {
+      radios(g, b => { (v as Record<string, number>)[g.dataset.g!] = +b.dataset.v!; draw(); });
+    }
+    canvas.hidden = false;
+    root.querySelector<HTMLElement>('[data-still]')!.hidden = true;
+    p = new Player(base, 0); p.onPlot = (x, y, c) => scr.set(x, y, c); p.run(); scr.flush();
+  });
+</script>

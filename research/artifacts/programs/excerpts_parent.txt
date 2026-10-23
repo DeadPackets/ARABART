@@ -1,0 +1,181 @@
+## FORM_X run-once decoder
+0a6f 90           nop 
+0a70 56           push si
+0a71 57           push di
+0a72 be6f0a       mov si, 0xa6f
+0a75 2ec604c3     mov byte ptr cs:[si], 0xc3
+0a79 be200b       mov si, 0xb20
+0a7c b93500       mov cx, 0x35
+0a7f 33c0         xor ax, ax
+0a81 33db         xor bx, bx
+0a83 2e8a1c       mov bl, byte ptr cs:[si]
+0a86 46           inc si
+0a87 2e8a04       mov al, byte ptr cs:[si]
+0a8a 8ad0         mov dl, al
+0a8c 2bc3         sub ax, bx
+0a8e 80fc00       cmp ah, 0
+0a91 7402         je 0xa95
+0a93 fec8         dec al
+0a95 2e8804       mov byte ptr cs:[si], al
+0a98 8ada         mov bl, dl
+0a9a 32e4         xor ah, ah
+0a9c 32ff         xor bh, bh
+0a9e 46           inc si
+0a9f e2e6         loop 0xa87
+0aa1 5f           pop di
+0aa2 5e           pop si
+0aa3 c3           ret 
+## FORM_X tens complement
+04c0 56           push si
+04c1 b91400       mov cx, 0x14
+04c4 8a04         mov al, byte ptr [si]
+04c6 b409         mov ah, 9
+04c8 2ae0         sub ah, al
+04ca 8824         mov byte ptr [si], ah
+04cc 4e           dec si
+04cd e2f5         loop 0x4c4
+04cf 5e           pop si
+04d0 800401       add byte ptr [si], 1
+04d3 803c09       cmp byte ptr [si], 9
+04d6 7609         jbe 0x4e1
+04d8 be7b05       mov si, 0x57b
+04db b91400       mov cx, 0x14
+04de e80100       call 0x4e2
+04e1 c3           ret 
+## FORM_X normalize
+04e2 03f1         add si, cx
+04e4 33c0         xor ax, ax
+04e6 4e           dec si
+04e7 0004         add byte ptr [si], al
+04e9 33c0         xor ax, ax
+04eb 33d2         xor dx, dx
+04ed 8a04         mov al, byte ptr [si]
+04ef bb0a00       mov bx, 0xa
+04f2 f7f3         div bx
+04f4 8814         mov byte ptr [si], dl
+04f6 e2ee         loop 0x4e6
+04f8 a2e101       mov byte ptr [0x1e1], al
+04fb c3           ret 
+## FORM_X checksum patch
+0b73 90           nop 
+0b74 56           push si
+0b75 57           push di
+0b76 51           push cx
+0b77 50           push ax
+0b78 be730b       mov si, 0xb73
+0b7b 2ec604c3     mov byte ptr cs:[si], 0xc3
+0b7f be5e03       mov si, 0x35e
+0b82 b80000       mov ax, 0
+0b85 b93400       mov cx, 0x34
+0b88 2e0304       add ax, word ptr cs:[si]
+0b8b 46           inc si
+0b8c e2fa         loop 0xb88
+0b8e be130f       mov si, 0xf13
+0b91 0517a5       add ax, 0xa517
+0b94 2e014401     add word ptr cs:[si + 1], ax
+0b98 58           pop ax
+0b99 59           pop cx
+0b9a 5f           pop di
+0b9b 5e           pop si
+0b9c c3           ret 
+## SCREEN interpreter
+012e 8a14         mov dl, byte ptr [si]
+0130 46           inc si
+0131 80fa70       cmp dl, 0x70
+0134 7c39         jl 0x16f
+0136 80fa78       cmp dl, 0x78
+0139 7503         jne 0x13e
+013b 4b           dec bx
+013c ebf0         jmp 0x12e
+013e 80fa77       cmp dl, 0x77
+0141 7503         jne 0x146
+0143 43           inc bx
+0144 ebe8         jmp 0x12e
+0146 80fa79       cmp dl, 0x79
+0149 74bd         je 0x108
+014b 80fa7b       cmp dl, 0x7b
+014e 751f         jne 0x16f
+0150 be9b0a       mov si, 0xa9b
+0153 b8000b       mov ax, 0xb00
+0156 cd21         int 0x21
+0158 3cff         cmp al, 0xff
+015a 7439         je 0x195
+015c fe067901     inc byte ptr [0x179]
+0160 803e790110   cmp byte ptr [0x179], 0x10
+0165 75bf         jne 0x126
+0167 c606790102   mov byte ptr [0x179], 2
+016c 90           nop 
+016d ebb7         jmp 0x126
+016f b600         mov dh, 0
+0171 03d7         add dx, di
+0173 8a0c         mov cl, byte ptr [si]
+0175 46           inc si
+0176 b500         mov ch, 0
+0178 b8030c       mov ax, 0xc03
+017b 87cb         xchg bx, cx
+017d cd10         int 0x10
+017f eb0d         jmp 0x18e
+0181 b80e0c       mov ax, 0xc0e
+0184 41           inc cx
+0185 41           inc cx
+0186 42           inc dx
+0187 42           inc dx
+0188 cd10         int 0x10
+018a 49           dec cx
+018b 49           dec cx
+018c 4a           dec dx
+018d 4a           dec dx
+018e 42           inc dx
+018f 87cb         xchg bx, cx
+0191 e2e5         loop 0x178
+0193 eb99         jmp 0x12e
+## KVC freeze
+07e6 1e           push ds
+07e7 2ec606a80900 mov byte ptr cs:[0x9a8], 0
+07ed 0e           push cs
+07ee 1f           pop ds
+07ef b80cff       mov ax, 0xff0c
+07f2 cd21         int 0x21
+07f4 3dc1c0       cmp ax, 0xc0c1
+07f7 756b         jne 0x864
+07f9 b409         mov ah, 9
+07fb ba7708       mov dx, 0x877
+0840 b80335       mov ax, 0x3503
+0843 cc           int3 
+0844 06           push es
+0845 1f           pop ds
+0846 8bd3         mov dx, bx
+0848 b82125       mov ax, 0x2521
+084b cc           int3 
+084c 0e           push cs
+084d 1f           pop ds
+## KVC COM sig
+0d6e ba1105       mov dx, 0x511
+0d71 2e8b1e0d0d   mov bx, word ptr cs:[0xd0d]
+0d76 b91a00       mov cx, 0x1a
+0d79 b43f         mov ah, 0x3f
+0d7b cd21         int 0x21
+0d7d 7303         jae 0xd82
+0d7f e9a901       jmp 0xf2b
+0d82 be1105       mov si, 0x511
+0d85 83c605       add si, 5
+0d88 bf9f05       mov di, 0x59f
+0d8b b91500       mov cx, 0x15
+0d8e fc           cld 
+0d8f f3a6         repe cmpsb byte ptr [si], byte ptr es:[di]
+0d91 7403         je 0xd96
+0d93 e9bc01       jmp 0xf52
+## KVC EXE marker
+1010 ba1105       mov dx, 0x511
+1013 2e8b1eab0f   mov bx, word ptr cs:[0xfab]
+1018 b91a00       mov cx, 0x1a
+101b b43f         mov ah, 0x3f
+101d cd21         int 0x21
+101f 7303         jae 0x1024
+1021 e90802       jmp 0x122c
+1024 803e2105c1   cmp byte ptr [0x521], 0xc1
+1029 7403         je 0x102e
+102b e91e02       jmp 0x124c
+102e 803e2205c0   cmp byte ptr [0x522], 0xc0
+1033 7403         je 0x1038
+1035 e91402       jmp 0x124c

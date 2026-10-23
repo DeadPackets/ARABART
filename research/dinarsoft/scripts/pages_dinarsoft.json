@@ -1,0 +1,227 @@
+[
+ {
+  "id": "ds-2006-05-home-frames",
+  "ts": "20060508132501",
+  "url": "http://www.dinarsoft.com/",
+  "owner": "DinarSoft",
+  "local": true,
+  "shows": "Frames site as it looked in May 2006 (frameset from Aug 2006; first archived inner pages). Header art never archived."
+ },
+ {
+  "id": "ds-2006-05-home-content",
+  "ts": "20060508132501",
+  "url": "http://www.dinarsoft.com/home.html",
+  "owner": "DinarSoft",
+  "local": true,
+  "shows": "Frames site home content, full length (May 2006): MemMaid 1.6, HandyMenu 3.6, HandySwitcher 2.7"
+ },
+ {
+  "id": "ds-2006-10-home-content",
+  "ts": "20061031232526",
+  "url": "http://www.dinarsoft.com/home.html",
+  "owner": "DinarSoft",
+  "local": true,
+  "shows": "Frames site home content, last version before the Nov 2006 relaunch"
+ },
+ {
+  "id": "ds-2006-home-relaunch",
+  "ts": "20061206211940",
+  "url": "http://www.dinarsoft.com/",
+  "owner": "DinarSoft",
+  "shows": "Relaunched site with online store (Dec 2006)",
+  "local": true
+ },
+ {
+  "id": "ds-2007-06-home-handyswitcher3",
+  "ts": "20070624134718",
+  "url": "http://www.dinarsoft.com/",
+  "owner": "DinarSoft",
+  "shows": "Home page June 2007, featuring HandySwitcher 3.0 (same design since the Nov 2006 relaunch)",
+  "local": true
+ },
+ {
+  "id": "ds-2007-08-home-memmaid2",
+  "ts": "20070813091855",
+  "url": "http://www.dinarsoft.com/",
+  "owner": "DinarSoft",
+  "shows": "Home page Aug 2007, featuring the all-new MemMaid 2.0",
+  "local": true
+ },
+ {
+  "id": "ds-2008-home-final",
+  "ts": "20081206084630",
+  "url": "http://www.dinarsoft.com/",
+  "owner": "DinarSoft",
+  "shows": "Home page Dec 2008, final design",
+  "local": true
+ },
+ {
+  "id": "ds-2008-products",
+  "ts": "20081013140937",
+  "url": "http://www.dinarsoft.com/products/",
+  "owner": "DinarSoft",
+  "shows": "Products page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-memmaid",
+  "ts": "20081224021723",
+  "url": "http://www.dinarsoft.com/memmaid/",
+  "owner": "DinarSoft",
+  "shows": "MemMaid product page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-handyswitcher",
+  "ts": "20081202031136",
+  "url": "http://www.dinarsoft.com/handyswitcher/",
+  "owner": "DinarSoft",
+  "shows": "HandySwitcher product page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-handymenu",
+  "ts": "20081211140453",
+  "url": "http://www.dinarsoft.com/handymenu/",
+  "owner": "DinarSoft",
+  "shows": "HandyMenu product page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-handylauncher",
+  "ts": "20081017105701",
+  "url": "http://www.dinarsoft.com/handylauncher/",
+  "owner": "DinarSoft",
+  "shows": "HandyLauncher product page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-taptext",
+  "ts": "20081211140548",
+  "url": "http://www.dinarsoft.com/taptext/",
+  "owner": "DinarSoft",
+  "shows": "TapText product page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-hijridate",
+  "ts": "20081211140459",
+  "url": "http://www.dinarsoft.com/hijridate/",
+  "owner": "DinarSoft",
+  "shows": "HijriDate product page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-memmaid-awards",
+  "ts": "20081106124524",
+  "url": "http://www.dinarsoft.com/memmaid/awards.html",
+  "owner": "DinarSoft",
+  "shows": "MemMaid awards page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-handyswitcher-awards",
+  "ts": "20081120170658",
+  "url": "http://www.dinarsoft.com/handyswitcher/awards.html",
+  "owner": "DinarSoft",
+  "shows": "HandySwitcher awards page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-handymenu-awards",
+  "ts": "20081120164601",
+  "url": "http://www.dinarsoft.com/handymenu/awards.html",
+  "owner": "DinarSoft",
+  "shows": "HandyMenu awards page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-handylauncher-awards",
+  "ts": "20081120171130",
+  "url": "http://www.dinarsoft.com/handylauncher/awards.html",
+  "owner": "DinarSoft",
+  "shows": "HandyLauncher awards page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-taptext-awards",
+  "ts": "20081120151257",
+  "url": "http://www.dinarsoft.com/taptext/awards.html",
+  "owner": "DinarSoft",
+  "shows": "TapText awards page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-memmaid-reviews",
+  "ts": "20080924063426",
+  "url": "http://www.dinarsoft.com/memmaid/reviews.html",
+  "owner": "DinarSoft",
+  "shows": "MemMaid reviews page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-memmaid-download",
+  "ts": "20081218230255",
+  "url": "http://www.dinarsoft.com/memmaid/download.html",
+  "owner": "DinarSoft",
+  "shows": "MemMaid download page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-news",
+  "ts": "20081013140915",
+  "url": "http://www.dinarsoft.com/news/",
+  "owner": "DinarSoft",
+  "shows": "Press releases index",
+  "local": true
+ },
+ {
+  "id": "ds-2008-news-logochange",
+  "ts": "20081120160741",
+  "url": "http://www.dinarsoft.com/news/logochange.html",
+  "owner": "DinarSoft",
+  "shows": "Press release: DinarSoft changed its logo (Yasser Awad)",
+  "local": true
+ },
+ {
+  "id": "ds-2008-news-two-dinarsoft-products-selected-as-best-software-award-",
+  "ts": "20081120171608",
+  "url": "http://www.dinarsoft.com/news/two-dinarsoft-products-selected-as-best-software-award-2007-by-pocketpc-maga.html",
+  "owner": "DinarSoft",
+  "shows": "Press release: two DinarSoft products win Best Software 2007",
+  "local": true
+ },
+ {
+  "id": "ds-2008-news-all-new-memmaid-2.0-released",
+  "ts": "20081120162518",
+  "url": "http://www.dinarsoft.com/news/all-new-memmaid-2.0-released.html",
+  "owner": "DinarSoft",
+  "shows": "Press release: All-new MemMaid 2.0 released (Yasser Awad)",
+  "local": true
+ },
+ {
+  "id": "ds-2008-company-about",
+  "ts": "20081106124500",
+  "url": "http://www.dinarsoft.com/company/about.html",
+  "owner": "DinarSoft",
+  "shows": "About DinarSoft",
+  "privacy": "shows street address and phone/fax numbers: blur before publishing",
+  "local": true
+ },
+ {
+  "id": "ds-2008-gitex",
+  "ts": "20081106051821",
+  "url": "http://www.dinarsoft.com/gitex.html",
+  "owner": "DinarSoft",
+  "shows": "GITEX page",
+  "local": true
+ },
+ {
+  "id": "ds-2008-estore-products",
+  "ts": "20081106051817",
+  "url": "http://www.dinarsoft.com/estore/products.html",
+  "owner": "DinarSoft",
+  "shows": "Online store",
+  "local": true
+ }
+]

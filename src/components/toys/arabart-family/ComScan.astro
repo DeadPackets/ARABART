@@ -1,0 +1,92 @@
+---
+// One word of the commercial, مركز, scanned column by column as his script stores it: the bytes for each column of
+// strokes, counted against the same pixels stored as a plain picture.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { parse } from './com.ts';
+
+interface Props { id?: string }
+const { id = 'comscan' } = Astro.props;
+const com = new Uint8Array(readFileSync(join(process.cwd(), 'public/bytes/files/ARABIC_DEMO.COM.mem')));
+// Slide 13, its only line: مركز بورسعيد لخدمات الكمبيوتر. The first word, مركز, is its rightmost 74 columns.
+const line = parse(com).slides[12][0];
+const X1 = line.col0, X0 = 487;
+const runs = line.runs.filter(r => r.x >= X0 && r.x <= X1);
+const y0 = Math.min(...runs.map(r => r.y)), y1 = Math.max(...runs.map(r => r.y + r.n));
+const cols = Array.from({ length: X1 - X0 + 1 }, (_, i) => X1 - i).map(x => runs.filter(r => r.x === x).map(r => [r.y - y0, r.n, r.y - line.row0]));
+const data = { cols, h: y1 - y0, w: cols.length, face: line.face };
+---
+
+<div class="coms" id={id} data-comscan data-d={JSON.stringify(data)}>
+  <Window title="ONE WORD, as his script stores it" kind="editor" active class="coms-win">
+    <div class="coms-grid">
+      <div class="coms-word"><canvas width={data.w} height={data.h} style={`aspect-ratio:${data.w}/${(data.h * 1.37).toFixed(1)}`} role="img" aria-label="The word مركز, drawn from his strokes"></canvas><span class="coms-bar" data-bar aria-hidden="true"></span></div>
+      <div class="coms-side">
+        <span class="coms-lab" data-col>Column 1 of {data.w}</span>
+        <div class="coms-bytes" data-bytes aria-live="polite"></div>
+        <dl class="coms-tot">
+          <div><dt>His script so far</dt><dd><b data-his>0</b> bytes</dd></div>
+          <div><dt>The same pixels as a plain picture</dt><dd><b data-raw>0</b> bytes</dd></div>
+        </dl>
+      </div>
+    </div>
+    <Scrubber n={data.w + 1} at={data.w} label="Scan the word, column by column" />
+  </Window>
+</div>
+
+<style is:global>
+  .coms-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(220px, 1fr); gap: 22px; align-items: start; margin-bottom: 16px; }
+  .coms-word { position: relative; padding: 14px; background: var(--vga-0); }
+  .coms-word canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+  .coms-word { max-width: 560px; }
+  .coms-bar { position: absolute; top: 6px; bottom: 6px; left: 14px; width: 4px; background: var(--vga-14); box-shadow: 0 0 8px var(--vga-14); opacity: 0; pointer-events: none; }
+  .coms.is-live .coms-bar { opacity: 1; }
+  .coms-lab { font: 600 12px/1.4 var(--font-code); color: var(--accent-2); }
+  .coms-bytes { display: flex; flex-wrap: wrap; gap: 4px; min-height: 64px; margin: 8px 0 14px; align-content: start; }
+  .coms-bytes span { display: grid; gap: 2px; justify-items: center; padding: 4px 6px; font: 700 13px/1.1 var(--font-code); color: var(--ink); box-shadow: inset 0 0 0 1px var(--rule); }
+  .coms-bytes small { font: 500 10px/1.1 var(--font-code); color: var(--ink-2); }
+  .coms-bytes .x { color: var(--accent-2); }
+  .coms-tot { display: grid; gap: 10px; margin: 0; }
+  .coms-tot dt { font: 500 0.875rem/1.3 var(--sans); color: var(--ink-2); }
+  .coms-tot dd { margin: 2px 0 0; font: 500 0.875rem/1.3 var(--font-code); color: var(--ink-2); }
+  .coms-tot b { font-size: 1.5rem; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .coms:not(.is-live) .coms-side { visibility: hidden; }
+  @media (max-width: 760px) { .coms-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { scrubber } from '../scrubber.ts';
+  import { frame, show, reduce } from './vga.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-comscan]').forEach(root => {
+    const d = JSON.parse(root.dataset.d!) as { cols: number[][][]; h: number; w: number; face: number };
+    const canvas = root.querySelector('canvas')!, bar = root.querySelector<HTMLElement>('[data-bar]')!;
+    const bytes = root.querySelector<HTMLElement>('[data-bytes]')!, lab = root.querySelector<HTMLElement>('[data-col]')!;
+    const his = root.querySelector<HTMLElement>('[data-his]')!, raw = root.querySelector<HTMLElement>('[data-raw]')!;
+    const f = frame(d.w, d.h);
+    const hx = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
+    // Column i is drawn at canvas x = w - 1 - i: the scan runs right to left, like the script
+    const go = (k: number, how: string) => {
+      f.data.fill(0);
+      let n = 0;
+      for (let i = 0; i < k; i++) {
+        for (const [y, len] of d.cols[i]) for (let j = 0; j < len; j++) f.data[(y + j) * d.w + d.w - 1 - i] = 15;
+        n += d.cols[i].length * 2 + 1;
+      }
+      show(canvas, f);
+      const cur = d.cols[k - 1];
+      lab.textContent = k ? `Column ${k} of ${d.w}` : 'Before the first column';
+      bytes.innerHTML = cur ? cur.map(([, len, off]) => `<span>${hx(off)} ${hx(len)}<small>row +${off}, ${len} px</small></span>`).join('') + `<span class="x">78<small>x: next</small></span>` : '';
+      his.textContent = n.toLocaleString('en-US');
+      raw.textContent = Math.ceil((k * d.h) / 2).toLocaleString('en-US');
+      const cw = canvas.getBoundingClientRect().width / d.w;
+      gsap.to(bar, { x: (d.w - k) * cw, duration: how === 'play' && !reduce() ? 0.12 : 0, ease: 'none', overwrite: true });
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, go, { speed: 0.07 });
+    new ResizeObserver(() => go(s.i, 'jump')).observe(canvas);
+    root.classList.add('is-live');
+  });
+</script>

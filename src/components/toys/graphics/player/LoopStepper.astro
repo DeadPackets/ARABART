@@ -1,0 +1,76 @@
+---
+// His drawing loop in the CodeStepper, linked to the script bytes it reads and a zoom on the pixels it plots:
+// the first 24 bytes of line 1, the start of the first letter م.
+import Window from '../../../shell/Window.astro';
+import CodeStepper from '../../CodeStepper.astro';
+import { ASM, C, trace } from './loop.ts';
+import { EGA, css } from '../ega.ts';
+import { memSync } from '../ssr.ts';
+import './player.css';
+
+const N = 24, X0 = 436, Y0 = 90, GW = 14, GH = 17;
+const b = memSync('SCREEN_SCREEN.COM').slice(0x19c - 0x100);
+const { steps, plots, body } = trace(b, N);
+const bytes = [...b.slice(0, body + N)];
+const kind = (i: number) => (i < 5 ? 'is-hd' : i < body ? 'is-org' : bytes[i] === 0x78 ? 'is-mv' : '');
+const hx = (v: number) => v.toString(16).toUpperCase().padStart(2, '0');
+const grid = new Uint8Array(GW * GH);
+for (const [x, y, c] of plots) if (x >= X0 && x < X0 + GW && y >= Y0 && y < Y0 + GH) grid[(y - Y0) * GW + x - X0] = c;
+const last = steps[steps.length - 1];
+const data = JSON.stringify({ plots, X0, Y0, GW, GH, body }).replace(/</g, '\\u003c');
+---
+
+<div class="gp gp-loop">
+  <CodeStepper id="scr-loop" title="SCREEN.COM  the drawing loop" asm={ASM} c={C} steps={steps} speed={0.32}>
+    <div slot="visual" class="gpgl" data-gp-loop data-for="scr-loop">
+      <script type="application/json" data-grid set:html={data} />
+      <Window title="MEMORY  the first bytes of the script" kind="panel" num="4" class="gpgl-mem">
+        <ol class="gp-bytes gpgl-bytes" aria-label="Script bytes: 5 header bytes, 4 origin bytes, then strokes and x">
+          {bytes.map((v, i) => <li class:list={[kind(i), { 'is-now': i >= body + last.h[0] && i <= body + last.h[1] }]}>{hx(v)}</li>)}
+        </ol>
+        <p class="gpgl-key"><span class="gp-bytes"><span class="is-hd">4B</span></span> header <span class="gp-bytes"><span class="is-org">40</span></span> origin: row 64, column 445 <span class="gp-bytes"><span class="is-mv">78</span></span> x</p>
+      </Window>
+      <Window title="ZOOM  ×20" kind="screen" class="gpgl-zoom">
+        <svg class="gpgl-grid" viewBox={`0 0 ${GW} ${GH}`} role="img" aria-label="The pixels drawn so far, 14 by 17, with the pen as a white frame." shape-rendering="crispEdges">
+          {[...grid].map((c, i) => <rect x={i % GW} y={Math.floor(i / GW)} width="1" height="1" fill={css(EGA[c])} data-i={i} />)}
+          <path class="gpgl-lines" d={Array.from({ length: GW - 1 }, (_, i) => `M${i + 1} 0V${GH}`).join('') + Array.from({ length: GH - 1 }, (_, i) => `M0 ${i + 1}H${GW}`).join('')} />
+          <rect class="gpgl-pen" x={last.pen[0] - X0} y={last.pen[1] - Y0} width="1" height="1" data-pen />
+        </svg>
+      </Window>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .gpgl { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .gpgl-bytes > li { transition: background-color 0.2s, color 0.2s; }
+  .gpgl .gpgl-key { margin-top: 14px; font-size: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
+  .gpgl-key .gp-bytes > * { min-width: 2.2em; height: 20px; }
+  .gpgl-zoom .win-body { display: grid; place-items: center; }
+  .gpgl-grid { width: 100%; max-width: 300px; height: auto; display: block; margin-inline: auto; }
+  .gpgl-grid rect[data-i] { transition: fill 0.25s; }
+  .gpgl-lines { stroke: oklch(1 0 0 / 0.12); stroke-width: 0.04; fill: none; }
+  .gpgl-pen { fill: none; stroke: var(--vga-15); stroke-width: 0.14; transition: x 0.25s var(--expo), y 0.25s var(--expo); }
+  @media (max-width: 1023px) { .gpgl { grid-template-columns: minmax(0, 1fr); } .gpgl-grid { max-width: 240px; } }
+  @media (prefers-reduced-motion: reduce) { .gpgl-grid rect, .gpgl-bytes > li { transition: none !important; } }
+</style>
+
+<script>
+  import { EGA, css } from '../ega.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-loop]').forEach(vis => {
+    const root = document.getElementById(vis.dataset.for!)!;
+    const g = JSON.parse(vis.querySelector('[data-grid]')!.textContent!) as { plots: [number, number, number][]; X0: number; Y0: number; GW: number; GH: number; body: number };
+    const cells = [...vis.querySelectorAll<SVGRectElement>('rect[data-i]')], pen = vis.querySelector<SVGRectElement>('[data-pen]')!;
+    const chips = [...vis.querySelectorAll<HTMLElement>('.gpgl-bytes > li')];
+    root.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as { k: number; pen: [number, number]; h: [number, number] };
+      const grid = new Uint8Array(g.GW * g.GH);
+      for (const [x, y, c] of g.plots.slice(0, s.k)) if (x >= g.X0 && x < g.X0 + g.GW && y >= g.Y0 && y < g.Y0 + g.GH) grid[(y - g.Y0) * g.GW + x - g.X0] = c;
+      cells.forEach((r, i) => r.setAttribute('fill', css(EGA[grid[i]])));
+      pen.setAttribute('x', String(s.pen[0] - g.X0));
+      pen.setAttribute('y', String(Math.min(g.GH - 1, s.pen[1] - g.Y0)));
+      chips.forEach((c, i) => c.classList.toggle('is-now', i >= g.body + s.h[0] && i <= g.body + s.h[1]));
+    });
+  });
+</script>

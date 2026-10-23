@@ -1,0 +1,147 @@
+---
+// His key filter (FORM_X.EXE 016A:0079): one byte says which kinds of key may come next. Keys whose bit is off are
+// refused before they reach the formula. Uses filterKey from the exact port, so every answer is his.
+import Window from '../../shell/Window.astro';
+import BitField from '../BitField.astro';
+import { START_MASK } from '../../../lib/formx/formx';
+
+const PAD = ['(', ')', 'x', '/', '7', '8', '9', '*', '4', '5', '6', '-', '1', '2', '3', '+', '0', '.'];
+const GROUPS = [
+  { bits: 1, label: 'seen', tone: 'c' as const }, { bits: 1, label: '.' }, { bits: 1, label: '-' }, { bits: 1, label: '*/+' },
+  { bits: 1, label: 'x' }, { bits: 1, label: '0-9' }, { bits: 1, label: '(' }, { bits: 1, label: ')' },
+];
+---
+
+<div class="kxk" data-keyfilter data-start={START_MASK}>
+  <Window title="FORM_X.EXE  the key filter" kind="editor" active class="kxk-win">
+    <div class="kxk-top">
+      <div class="kxk-line" tabindex="0" role="textbox" aria-label="The formula. Type here, or use the keys below." aria-describedby="kxk-msg" data-line>
+        <span class="kxk-f">F(x)=</span><span class="kxk-typed" data-typed></span><span class="kxk-cur" aria-hidden="true">_</span>
+      </div>
+      <p class="kxk-msg" id="kxk-msg" aria-live="polite" data-msg>Type a formula. Keys he would refuse are dimmed.</p>
+    </div>
+    <div class="kxk-mid">
+      <div class="kxk-pad" role="group" aria-label="His keys">
+        {PAD.map(k => <button type="button" class="button k-btn kxk-k" data-k={k}>{k}</button>)}
+        <button type="button" class="button k-btn kxk-k kxk-wide" data-k="\b" aria-label="Backspace">⌫</button>
+        <button type="button" class="button button--primary k-btn kxk-k kxk-enter" data-k="\r">Enter</button>
+      </div>
+      <div class="kxk-byte">
+        <p class="kxk-h">The byte that decides, one bit per kind of key</p>
+        <BitField label="His key filter byte" value={START_MASK} readonly groups={GROUPS} size="lg" />
+        <p class="kxk-hist" data-hist role="note" aria-label="The byte before each typed key, kept for Backspace"></p>
+      </div>
+    </div>
+  </Window>
+</div>
+
+<style>
+  .kxk { min-width: 0; }
+  .kxk-line { display: flex; flex-wrap: wrap; align-items: baseline; min-height: 56px; padding: 12px 14px; font: 400 clamp(20px, 2.4vw, 32px)/1.2 var(--font-dos); color: var(--vga-7); background: var(--vga-0); cursor: text; overflow-wrap: anywhere; }
+  .kxk-line:focus-visible { outline: 3px solid var(--vga-14); outline-offset: 2px; }
+  .kxk-f { color: var(--vga-7); }
+  .kxk-typed { color: var(--vga-15); word-break: break-all; }
+  .kxk-cur { color: var(--vga-15); animation: kxk-blink 1.06s steps(1) infinite; }
+  @keyframes kxk-blink { 50% { opacity: 0; } }
+  .kxk-line.no { animation: kxk-no 0.3s; }
+  @keyframes kxk-no { 25% { translate: -6px; } 75% { translate: 6px; } }
+  .kxk-msg { margin: 10px 0 0; min-height: 3em; font-size: 1rem; line-height: 1.5; color: var(--ink); }
+  .kxk-msg :global(b) { color: var(--accent); }
+  .kxk-msg.err { color: var(--vga-14); }
+  .kxk-mid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 22px 32px; margin-top: 18px; align-items: start; }
+  .kxk-pad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .kxk-k { min-height: 48px; padding: 0; font: 700 1.25rem/1 var(--font-code); }
+  .kxk-wide { grid-column: span 2; font-size: 1rem; }
+  .kxk-enter { grid-column: 1 / -1; font-size: 1rem; }
+  .kxk-k[aria-disabled='true'] { opacity: 0.3; }
+  .kxk-byte :global(.k-bits-row) { gap: 10px 3px; flex-wrap: nowrap; }
+  .kxk-byte :global(.k-bits) { --cell: min(44px, calc((100vw - 120px) / 8)); }
+  .kxk-h { margin: 0 0 10px; font: 700 0.8125rem/1.4 var(--font-code); color: var(--accent-2); }
+  .kxk-hist { margin-top: 12px; min-height: 1.5em; font: 500 0.8125rem/1.5 var(--font-code); color: var(--ink-2); overflow-wrap: anywhere; }
+  @media (max-width: 860px) { .kxk-mid { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .kxk-cur { animation: none; } .kxk-line.no { animation: none; } }
+</style>
+
+<script>
+  import { filterKey, solve, START_MASK } from '../../../lib/formx/formx';
+
+  type BF = HTMLElement & { bitfield?: { set(v: number, quiet?: boolean): void } };
+  const NAMES: Record<string, string> = { '(': 'an opening bracket', ')': 'a closing bracket', x: 'x', '.': 'a point', '-': 'a minus', '+': 'a plus', '*': 'a times', '/': 'a divide' };
+  const name = (k: string) => (/\d/.test(k) ? 'a digit' : NAMES[k] ?? k);
+  const allowed = (m: number) => {
+    const out = [];
+    if (m & 2) out.push('(');
+    if (m & 1) out.push(')');
+    if (m & 4) out.push('a digit');
+    if (m & 8) out.push('x');
+    if (m & 16) out.push('* / +');
+    if (m & 32) out.push('-');
+    if ((m & 0xc0) === 0x40) out.push('a point');
+    return out.join(', ');
+  };
+  const hex = (m: number) => m.toString(16).toUpperCase().padStart(2, '0') + 'h';
+
+  document.querySelectorAll<HTMLElement>('[data-keyfilter]').forEach(root => {
+    const line = root.querySelector<HTMLElement>('[data-line]')!, typed = root.querySelector<HTMLElement>('[data-typed]')!;
+    const msg = root.querySelector<HTMLElement>('[data-msg]')!, hist = root.querySelector<HTMLElement>('[data-hist]')!;
+    const keys = [...root.querySelectorAll<HTMLButtonElement>('[data-k]')];
+    const bf = root.querySelector<BF>('[data-bitfield]')!;
+    let text = '', mask = +root.dataset.start!, stack: number[] = [];
+
+    function paint() {
+      typed.textContent = text;
+      bf.bitfield?.set(mask, true);
+      keys.forEach(b => {
+        const k = b.dataset.k!;
+        if (k === '\b' || k === '\r') return;
+        b.setAttribute('aria-disabled', String(filterKey(mask, k.charCodeAt(0)) < 0));
+      });
+      hist.textContent = stack.length ? `Saved for Backspace: ${stack.map(hex).join(' ')}` : '';
+    }
+    function refuse(html: string) {
+      msg.innerHTML = html;
+      msg.classList.add('err');
+      line.classList.remove('no'); void line.offsetWidth; line.classList.add('no');
+    }
+    function press(k: string) {
+      msg.classList.remove('err');
+      if (k === '\b') {
+        if (!stack.length) return refuse('Nothing to take back.');
+        mask = stack.pop()!;
+        text = text.slice(0, -1);
+        msg.innerHTML = `Backspace puts back the byte from before that key: <b>${hex(mask)}</b>. Undo is exact.`;
+        return paint();
+      }
+      if (k === '\r') {
+        if (!text) return refuse('Nothing typed yet.');
+        try {
+          const r = solve(text, '1', '10');
+          msg.innerHTML = `He accepts it. ${r.usedX ? `At x = 1 it gives <b>${r.rows[0].fxText.trim()}</b>.` : `It gives <b>${r.rows[0].fxText.trim()}</b>.`} Only valid keys ever reached the formula, so his solver can trust it.`;
+        } catch (e) {
+          refuse(`On Enter he checks the end and the brackets: <b>${(e as Error).message.trim()}</b>`);
+        }
+        return;
+      }
+      const next = filterKey(mask, k.charCodeAt(0));
+      if (next < 0) return refuse(`He refuses ${name(k)} here. After <b>${text.slice(-1) || 'the start'}</b> he takes only: ${allowed(mask)}.`);
+      if (text.length >= 69) return refuse('His formula holds 69 characters.');
+      stack.push(mask);
+      mask = next;
+      text += k;
+      msg.innerHTML = `Accepted. The byte is now <b>${hex(mask)}</b>: next he takes ${allowed(mask)}.`;
+      paint();
+    }
+
+    keys.forEach(b => b.addEventListener('click', () => press(b.dataset.k!)));
+    line.addEventListener('keydown', e => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const k = e.key === 'Backspace' ? '\b' : e.key === 'Enter' ? '\r' : e.key.length === 1 ? e.key : '';
+      if (!k) return;
+      e.preventDefault();
+      press(k === 'X' ? 'x' : k);
+    });
+    line.addEventListener('click', () => line.focus());
+    paint();
+    msg.innerHTML = `The byte starts at <b>${hex(START_MASK)}</b>: he takes ${allowed(START_MASK)}.`;
+  });
+</script>

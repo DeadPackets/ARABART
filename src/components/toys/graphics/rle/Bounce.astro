@@ -1,0 +1,84 @@
+---
+// The Arabic name's entrance (PORTSAID.EXE 03D6 and 0853): a curtain at the top of the screen, then nine straight
+// moves that make a drop and a bounce. The chart is his nine moves; the screen shows each draw.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { memSync, png } from '../ssr.ts';
+import { portsaid, bootScreen, BOUNCE, PORTSAID } from './rle.ts';
+import './rle.css';
+
+const ps = portsaid(memSync(PORTSAID));
+const first = ps.frames.findIndex(f => f.phase === 'curtain'), lastF = ps.frames.findIndex(f => f.phase === 'english') - 1;
+const n = lastF - first + 1;
+const crop = (s: ReturnType<typeof bootScreen>) => s.pixels().slice(0, 640 * 200);
+const still = png(crop(bootScreen(ps, lastF)), 640, 200);
+// Chart: x = draw number across the whole entrance, y = the name's top row
+const W = 600, H = 170, sx = (i: number) => 40 + (i / (n - 1)) * (W - 50), sy = (y: number) => 20 + (y / 130) * (H - 40);
+const ys = ps.frames.slice(first, lastF + 1).map(f => (f.phase === 'curtain' ? 0 : f.y!));
+const pathD = ys.map((y, i) => `${i ? 'L' : 'M'}${sx(i).toFixed(1)} ${sy(y).toFixed(1)}`).join('');
+let k = 80;
+const marks = BOUNCE.map(([y0, y1, steps]) => { const at = k + steps; k += steps + 1; return { at, y: y1, up: y1 < y0, h: Math.abs(y1 - y0) }; });
+---
+
+<div class="ps-bn" data-psbn data-first={first} data-n={n}>
+  <Window title="THE BOUNCE   the name's top row" kind="panel" class="ps-bn-chart">
+    <svg class="dg" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="ps-bn-t">
+      <title id="ps-bn-t">The Arabic name's top row over its entrance: 80 draws of the curtain at row 0, then a fall to row 123 and bounces up to 110, 117, 119 and 122, settling at 123.</title>
+      <line class="wire" x1="40" x2={W - 10} y1={sy(123)} y2={sy(123)} stroke-dasharray="3 5" />
+      <text class="t-sm" x="2" y={sy(0) + 4}>row 0</text>
+      <text class="t-sm" x="2" y={sy(123) + 4}>123</text>
+      <text class="t-sm" x={sx(40)} y={sy(0) - 8} text-anchor="middle">curtain</text>
+      <path class="wire-hi" d={pathD} />
+      {marks.filter(m => m.up).map(m => <text class="t-cy" x={sx(m.at)} y={sy(m.y) - 8} text-anchor="middle">{m.h}</text>)}
+      <circle class="ps-bn-dot" data-dot r="7" cx={sx(n - 1)} cy={sy(123)} />
+    </svg>
+  </Window>
+  <Window title="PORTSAID.EXE   the top of the screen" kind="screen" class="g-win">
+    <div class="ps-bn-scr">
+      <img src={still} width="640" height="200" alt="The PCS logo and the Arabic name بورسعيد للحاسبات, settled at row 123." />
+      <canvas width="640" height="200" hidden aria-hidden="true"></canvas>
+    </div>
+  </Window>
+  <p class="g-say" aria-live="polite" data-say>The name has settled at row 123, after bounces of 13, 6, 4 and 1 rows.</p>
+  <Scrubber n={n} at={n - 1} label="Draws of the Arabic name" />
+</div>
+
+<style>
+  .ps-bn { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px 22px; align-items: start; }
+  .ps-bn > :global(.k-scrub), .ps-bn > .g-say { grid-column: 1 / -1; }
+  .ps-bn-dot { fill: var(--vga-12); stroke: #000; stroke-width: 2; }
+  .ps-bn-scr { position: relative; aspect-ratio: 640 / 200; background: #000; }
+  .ps-bn-scr > * { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .ps-bn-scr > [hidden] { display: none; }
+  @media (max-width: 860px) { .ps-bn { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { scrubber, type How } from '../../scrubber.ts';
+  import { boot, paint } from './view.ts';
+  import { Screen } from './rle.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-psbn]').forEach(async root => {
+    const ps = await boot();
+    const first = +root.dataset.first!, n = +root.dataset.n!;
+    const cv = root.querySelector('canvas')!, img = root.querySelector('img')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const dot = root.querySelector<SVGCircleElement>('[data-dot]')!, path = root.querySelector<SVGPathElement>('path.wire-hi')!;
+    const pts = path.getAttribute('d')!.slice(1).split('L').map(p => p.split(' ').map(Number));
+    // The screen just before the curtain: the finished logo
+    const before = new Screen(80, 350);
+    for (let i = 0; i < first; i++) { const f = ps.frames[i]; if (f.pic) for (const [a, b, c] of f.ops) before.blit(ps.pics[f.pic], a, b, c); }
+    const show = (i: number, how: How) => {
+      const s = new Screen(80, 350, before);
+      for (let j = 0; j <= i; j++) { const f = ps.frames[first + j]; for (const [a, b, c] of f.ops) s.blit(ps.pics[f.pic!], a, b, c); }
+      paint(cv, s.pixels().slice(0, 640 * 200), 640, 200);
+      dot.setAttribute('cx', String(pts[i][0])); dot.setAttribute('cy', String(pts[i][1]));
+      const f = ps.frames[first + i];
+      say.textContent = f.phase === 'curtain'
+        ? `Curtain, draw ${i + 1} of 80: ${i + 1} of 80 bytes of every row are in. Even rows come from the left, odd rows from the right.`
+        : i === n - 1 && how !== 'step' ? 'The name has settled at row 123, after bounces of 13, 6, 4 and 1 rows.' : `Draw ${i + 1} of ${n}: the name's top is at row ${f.y}.`;
+    };
+    scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 1 / 60 });
+    show(n - 1, 'jump');
+    img.hidden = true; cv.hidden = false;
+  });
+</script>

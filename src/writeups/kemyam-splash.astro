@@ -1,0 +1,124 @@
+---
+// NAMES.COM, the KemYam group splash (1993). Facts: research/programs.md section 8,
+// research/artifacts/programs/gfxprogs/NOTES.txt and his unpacked file (public/bytes/files/NAMES_NAMES.COM.mem).
+// Every picture and effect on this page is decoded and played from his file by a line-by-line port
+// (src/components/toys/graphics/rle/rle.ts), pixel-exact against an emulator run of the real program.
+import Show from '../components/toys/graphics/rle/Show.astro';
+import Decoder from '../components/toys/graphics/rle/Decoder.astro';
+import Planes from '../components/toys/graphics/rle/Planes.astro';
+import Effects from '../components/toys/graphics/rle/Effects.astro';
+import Retrace from '../components/toys/graphics/rle/Retrace.astro';
+import Sparkle from '../components/toys/graphics/rle/Sparkle.astro';
+import Term from '../components/explain/Term.astro';
+import Deep from '../components/explain/Deep.astro';
+import Listing from '../components/explain/Listing.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+
+const base = import.meta.env.BASE_URL;
+const bytes = (mem: number) => `${base}/bytes/?f=NAMES_NAMES.COM&layer=memory&at=${(mem - 0x100).toString(16)}`;
+---
+
+<section id="ks-show" class="ks-hero">
+  <h2>Five names, one splash</h2>
+  <p class="lead">For the defense of his graduation project in 1993, Yasser opened with a show. First his team's name, then its logo, then a card for each of the five members of the KemYam group.</p>
+  <Show />
+  <div class="ks-cols">
+    <p>The cards name Yasser Mohamed Ali, Mohamed Asaad Fouda, Khalid Zakaria Moustafa, Hatem Mohamed Moustafa and Ebrahem El-Syed El-Etr. Between cards, the blue KemYam box comes back, so every name gets its own entrance. Pick a name above to replay that card.</p>
+    <p>Every byte of NAMES.COM is his. There is no compiler and no library inside it: 1,097 bytes of hand-written <Term id="assembly">assembly</Term>, his own picture format, his own decoder and five effects of his own. This page plays the real pictures from his file, through his code ported line by line to JavaScript.</p>
+  </div>
+</section>
+
+<section id="ks-format" aria-labelledby="ks-format-h">
+  <h2 id="ks-format-h">His own picture format</h2>
+  <p class="lead">One byte, <Term id="hex">37h</Term>, is his marker. Any other byte is copied as it is. After the marker come a count and a byte to repeat: three bytes that can stand for up to 255.</p>
+  <div class="ks-cols">
+    <p>This is <Term id="run-length-encoding">run-length encoding</Term>, the simplest way to pack a picture: say "39 of these" instead of writing them 39 times. BMP and TIFF files can still be packed this way, and JPEG uses runs for its zeros. The marker 37h followed by a count of 0 ends a picture, and the next two bytes give the size of one color layer.</p>
+    <p>Step through his decoder below on the real first bytes of his background tile. Watch the left window read and the right one fill: <code>37 27 FF</code> becomes 39 bytes of FF, one <code>rep stosb</code> instruction writing them all. The C version beside it is the same loop, line for line.</p>
+  </div>
+  <Decoder />
+  <div class="ks-facts">
+    <div><b>612</b><span>bytes become the 800 of the background tile</span></div>
+    <div><b>5,088</b><span>bytes become the 9,984 of each name card: half the size</span></div>
+    <div><b>10</b><span>pictures, one after another, each starting where the last one ends</span></div>
+  </div>
+  <p class="ks-p">His decoder never needs to be told where a picture starts. When it finishes one, it leaves its pointer at the next, so the show simply calls it again. For the name cards, which take turns with the KemYam box, a single <code>mov si</code> points it at the right card.</p>
+</section>
+
+<section id="ks-planes" aria-labelledby="ks-planes-h">
+  <h2 id="ks-planes-h">Four layers of color</h2>
+  <p class="lead">A 16-color screen keeps each pixel's color as four bits, and each bit lives in its own layer of memory. His pictures are stored the same way: four layers, one after another.</p>
+  <Planes />
+  <div class="ks-cols ks-after">
+    <p>Switch a layer off and every color that used it changes at once. Blue, green and red make the colors, and the fourth layer makes them bright. These <Term id="bit-planes">bit planes</Term> are like an image saved as separate red, green, blue and alpha channels, except that each channel here is a single bit.</p>
+    <p>To copy a picture to the screen, his code tells the graphics card which layer to write and copies that layer's bytes. Then it moves on: layers 0, 1, 2 and 3. One instruction, <code>rep movsb</code>, moves each strip. A setting on the card, its <Term id="map-mask">Map Mask</Term>, decides which layer the bytes land in.</p>
+  </div>
+  <Deep title="For engineers: his layer copy, line by line">
+    <Listing
+      title="NAMES.COM 0981  copy a strip into all four layers"
+      lines={[
+        { off: '0982', code: 'mov  es,[050Dh]', note: 'the screen, at A000h' },
+        { off: '0986', code: 'mov  si,[050Bh] / mov di,[050Fh]', note: 'where to read, where to write' },
+        { off: '098E', code: 'mov  cx,[0513h]', note: 'how many bytes in the strip' },
+        { off: '0992', code: 'mov  ds,[0509h]', note: 'the decoded picture' },
+        { off: '0996', code: 'mov  dx,3C4h / mov al,2 / out dx,al', note: 'the Map Mask register', hi: true },
+        { off: '099C', code: 'inc  dx / mov al,1 / out dx,al', note: 'layer 0 first' },
+        { off: '09A3', code: 'rep  movsb', note: 'copy the strip', hi: true },
+        { off: '09A8', code: 'add  si,cs:[0511h]', note: 'the same strip in the next layer' },
+        { off: '09AD', code: 'shl  al,1 / cmp al,10h / jne 099F', note: 'layers 2, 4, 8' },
+        { off: '09B3', code: 'mov  al,0Fh / out dx,al', note: 'all four layers again' },
+      ]}
+      foot="Every effect on this page is a pattern of calls to this one routine, each with a different strip."
+    />
+    <p>Before any of this, his first instructions set up a stack of his own inside the program, <code>mov ss,cs / mov sp,0500h</code>, and place the decode buffer right after the program's last byte. <a href={bytes(0x981)}>See the plane copy in the byte map.</a></p>
+  </Deep>
+</section>
+
+<section id="ks-effects" aria-labelledby="ks-effects-h">
+  <h2 id="ks-effects-h">Five effects to play</h2>
+  <p class="lead">Each picture enters its own way. Pick one of his five effects and one of his ten pictures, then run it, step it, or drag through it.</p>
+  <Effects />
+  <div class="ks-cols ks-after">
+    <p>Every effect is made of the same layer copy, called on different strips in a different order. The yellow lines show what each step copies. The spiral follows a table of 40 screen positions he wrote into the program, starting from the middle and winding out to the edges.</p>
+    <p>The comb and the columns are two halves meeting. Every other row, or every other column, comes from one side, and the rest come from the other. The box opens from the center of each name card, two bytes wider and eight rows taller every step. With his own pictures, each effect here is exactly his code; with any other picture, the same pattern runs over that picture's space.</p>
+  </div>
+</section>
+
+<section id="ks-time" aria-labelledby="ks-time-h">
+  <h2 id="ks-time-h">In step with the screen</h2>
+  <p class="lead">The show keeps time by the monitor, not the processor. Its pauses, and the box that opens every name card, take the same time on a slow PC or a fast one.</p>
+  <Retrace />
+  <div class="ks-cols ks-after">
+    <p>A screen redraws itself 60 to 70 times a second, whatever the processor. Each time the beam reaches the bottom, it flies back to the top, and one bit on the graphics card turns on for that short trip. His routine waits for the trip to end, then for the next one to begin: exactly one refresh. Called with 64, it waits 64 refreshes, about a second, between pictures. This is the <Term id="vertical-retrace">vertical retrace</Term>.</p>
+    <p>Move the speed. A faster processor checks that bit more often, but the refreshes stay where they are. So his pauses and his box play at the same speed on every PC. A loop that simply counts would finish sooner on every faster machine.</p>
+  </div>
+  <ThenNow
+    rows={[
+      { then: 'Wait for the screen to finish a refresh, then draw the next step', now: '<code>requestAnimationFrame</code>', why: 'Both run your drawing once per screen refresh, so motion is smooth and the same everywhere.' },
+      { then: 'Pictures packed with a marker byte and a count', now: 'RLE in BMP files, PackBits in TIFF, the zero runs in JPEG', why: 'Long stretches of one color cost a few bytes instead of hundreds.' },
+      { then: 'Copy one color layer at a time through the Map Mask', now: 'Writing one channel of a texture', why: 'The hardware decides where each byte lands; the code just moves bytes.' },
+    ]}
+  />
+</section>
+
+<section id="ks-sign" aria-labelledby="ks-sign-h">
+  <h2 id="ks-sign-h">Signed with a spark</h2>
+  <p class="lead">When you press a key, the show ends in text mode with his signature, and a bright spark runs along it, one letter per screen refresh.</p>
+  <Sparkle />
+  <p class="ks-p">The text is printed once. After that, his loop touches only <Term id="video-memory">video memory</Term>. In text mode every letter on screen is two bytes, the letter and its color. So the spark just writes bright white into one color byte, waits a refresh and writes the gray back. Today you would toggle a CSS class on one <code>&lt;span&gt;</code>. He liked this signature enough to bring it, with his decoder and his layer copy, into the <a href={`${base}/program/portsaid-cs-splash/`}>boot screen for Port Said Computer Systems</a>.</p>
+</section>
+
+<style>
+  .ks-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px clamp(24px, 4vw, 48px); margin-top: 28px; }
+  .ks-cols p { margin: 0 !important; }
+  .ks-after { margin-top: 32px; }
+  .ks-hero :global(.ky-show) { margin-top: 28px; }
+  #ks-format :global(.k-cs), #ks-planes :global(.ky-pl), #ks-effects :global(.ky-fx), #ks-time :global(.ky-rt), #ks-sign :global(.ky-sp) { margin-top: 32px; }
+  .ks-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 40px; }
+  .ks-facts div { display: grid; gap: 4px; padding: 14px 16px; border-top: 3px solid var(--accent-2); background: var(--blue-deep); }
+  .ks-facts b { font: 800 clamp(1.75rem, 2vw + 1rem, 2.5rem)/1 var(--font-display); font-stretch: 80%; color: var(--accent); }
+  .ks-facts span { font-size: 0.9375rem; line-height: 1.45; color: var(--ink-2); }
+  .ks-p { margin-top: 28px !important; }
+  @media (max-width: 760px) {
+    .ks-cols, .ks-facts { grid-template-columns: minmax(0, 1fr); }
+  }
+</style>

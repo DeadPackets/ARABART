@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Window from '../components/shell/Window.astro';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<BaseLayout title="Not found · Yasser Awad" description="This page does not exist in the archive.">
+  <section class="container missing" aria-labelledby="nf-h">
+    <p class="cmd" aria-hidden="true">C:\&gt;<span data-missing>PAGE</span><br />Bad command or file name<br /><br />C:\&gt;<span class="cur">_</span></p>
+    <Window kind="dialog" title="Error" active class="box">
+      <h1 id="nf-h">That page is not here</h1>
+      <p>Every one of his programs is one step away.</p>
+      <div class="acts">
+        <a class="button button--primary" href={`${base}/#programs`}>Run his programs</a>
+        <a class="button" href={`${base}/terminal/`}>Open the DOS shell</a>
+      </div>
+    </Window>
+  </section>
+</BaseLayout>
+
+<script>
+  const name = decodeURIComponent(location.pathname.split('/').filter(Boolean).pop() ?? '').toUpperCase().slice(0, 40);
+  if (name) document.querySelector('[data-missing]')!.textContent = name;
+</script>
+
+<style>
+  .missing { display: grid; justify-items: center; gap: clamp(32px, 6vh, 64px); padding-block: clamp(32px, 8vh, 96px); }
+  .cmd { justify-self: stretch; font: 400 16px/1.5 var(--font-dos); color: var(--vga-7); overflow-wrap: anywhere; }
+  .cur { animation: blink 1.06s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .cur { animation: none; } }
+  .box { width: min(600px, 100%); }
+  h1 { font-size: clamp(2rem, 2.4vw + 1rem, 3rem); color: var(--ink); }
+  .box p { margin-top: 12px; font-size: 1.125rem; }
+  .acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-top: 28px; }
+</style>

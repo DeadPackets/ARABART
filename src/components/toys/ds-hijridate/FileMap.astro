@@ -1,0 +1,63 @@
+---
+// One file (or one installer) as a bar, every part to scale. Tap a part to read what is in it.
+interface Part { name: string; bytes: number; what: string; hue?: number }
+interface Props { id: string; title: string; parts: Part[]; at?: number }
+const { id, title, parts, at = 0 } = Astro.props;
+const total = parts.reduce((a, p) => a + p.bytes, 0);
+const fmt = (n: number) => n.toLocaleString('en-US');
+---
+
+<div class="hdt-fm" id={id} data-fm>
+  <p class="hdt-fm-t"><b>{title}</b> · {fmt(total)} bytes</p>
+  <div class="hdt-fm-bar" role="tablist" aria-label={title}>
+    {parts.map((p, i) => (
+      <button type="button" role="tab" id={`${id}-t${i}`} aria-controls={`${id}-p`} aria-selected={i === at ? 'true' : 'false'} tabindex={i === at ? 0 : -1}
+        style={`flex-grow:${p.bytes};--h:${p.hue ?? 220 + i * 40}`} data-i={i}>
+        <span>{p.name}</span>
+      </button>
+    ))}
+  </div>
+  <div class="hdt-fm-p" id={`${id}-p`} role="tabpanel" aria-labelledby={`${id}-t${at}`} aria-live="polite" data-p>
+    {parts.map((p, i) => (
+      <div data-d={i} hidden={i !== at}>
+        <p class="hdt-fm-n"><b>{p.name}</b> {fmt(p.bytes)} bytes, {((p.bytes / total) * 100).toFixed(p.bytes / total < 0.01 ? 1 : 0)}%</p>
+        <p set:html={p.what} />
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .hdt-fm { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
+  .hdt-fm-t { margin: 0; font-size: 0.9375rem; }
+  .hdt-fm-bar { display: flex; gap: 2px; min-width: 0; min-height: 56px; }
+  .hdt-fm-bar button {
+    flex-basis: 0; min-width: 44px; min-height: 56px; padding: 4px; overflow: hidden; border: 0; cursor: pointer;
+    background: oklch(0.52 0.12 var(--h)); color: #fff; font: 700 0.75rem/1.2 var(--font-code); text-align: left; transition: background 0.15s;
+  }
+  .hdt-fm-bar button span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hdt-fm-bar button[aria-selected='true'] { background: oklch(0.42 0.14 var(--h)); outline: 3px solid var(--accent); outline-offset: 2px; }
+  .hdt-fm-bar button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .hdt-fm-p { min-height: 6.5em; padding: 14px 16px; border: 1px solid var(--rule); background: var(--surface-2, transparent); }
+  .hdt-fm-p p { margin: 0; line-height: 1.55; }
+  .hdt-fm-n { margin-bottom: 6px !important; }
+  @media (max-width: 640px) { .hdt-fm-bar { flex-wrap: wrap; } .hdt-fm-bar button { flex: 1 1 30%; } }
+</style>
+
+<script>
+  for (const root of document.querySelectorAll<HTMLElement>('[data-fm]')) {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')], panel = root.querySelector<HTMLElement>('[data-p]')!;
+    const pick = (i: number, focus = false) => {
+      tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+      panel.querySelectorAll<HTMLElement>('[data-d]').forEach(d => (d.hidden = d.dataset.d !== String(i)));
+      panel.setAttribute('aria-labelledby', tabs[i].id);
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => t.addEventListener('click', () => pick(i)));
+    root.querySelector('[role=tablist]')!.addEventListener('keydown', e => {
+      const k = e as KeyboardEvent, i = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (k.key === 'ArrowRight') pick((i + 1) % tabs.length, true);
+      if (k.key === 'ArrowLeft') pick((i + tabs.length - 1) % tabs.length, true);
+    });
+  }
+</script>

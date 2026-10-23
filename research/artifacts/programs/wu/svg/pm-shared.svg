@@ -1,0 +1,35 @@
+<svg class="dg" viewBox="0 0 640 286" role="img" aria-labelledby="pm-shared-t">
+<title id="pm-shared-t">ARABART.EXE and PESM.EXE drawn to the same scale, with lines joining the identical blocks: three blocks of letter shapes and the shaping routine.</title>
+<text class="t-cy" x="10" y="22">ARABART.EXE 4.15 (1993), 30,096 bytes</text>
+<rect class="box" x="10" y="32" width="600" height="30" />
+<text class="t-cy" x="10" y="186">PESM.EXE (1991), 6,096 bytes, same scale</text>
+<rect class="box" x="10" y="130" width="121.531" height="30" />
+<rect class="box-hi" x="93.3931" y="32" width="21.0327" height="30" />
+<rect class="box-hi" x="110.498" y="130" width="21.0327" height="30" />
+<path class="wire-hi" d="M103.9 62 L121.0 130" />
+<rect class="box-hi" x="72.0813" y="32" width="20.7935" height="30" />
+<rect class="box-hi" x="89.7049" y="130" width="20.7935" height="30" />
+<path class="wire-hi" d="M82.5 62 L100.1 130" />
+<rect class="box-hi" x="55.933" y="32" width="13.1579" height="30" />
+<rect class="box-hi" x="73.4769" y="130" width="13.1579" height="30" />
+<path class="wire-hi" d="M62.5 62 L80.1 130" />
+<rect class="box-hi" x="21.3238" y="32" width="2.71132" height="30" />
+<rect class="box-hi" x="24.1148" y="130" width="2.71132" height="30" />
+<path class="wire-hi" d="M22.7 62 L25.5 130" />
+<text x="10" y="226">Byte for byte the same: 1,055 + 1,043 + 660 bytes of letter</text>
+<text x="10" y="250">shapes, and the 136-byte shaping routine. In all, 3,271</text>
+<text class="t-yl" x="10" y="274">bytes match in runs of 16 bytes or more.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 166" role="img" aria-labelledby="pm-shared-tn">
+<title id="pm-shared-tn">PESM.EXE with the blocks it shares with ARABART highlighted.</title>
+<text class="t-cy" x="10" y="18">PESM.EXE, 6,096 bytes</text>
+<rect class="box" x="10" y="28" width="280" height="26" />
+<rect class="box-hi" x="241.542" y="28" width="48.458" height="26" />
+<rect class="box-hi" x="193.635" y="28" width="47.9068" height="26" />
+<rect class="box-hi" x="156.247" y="28" width="30.315" height="26" />
+<rect class="box-hi" x="42.5197" y="28" width="6.24672" height="26" />
+<text x="10" y="84">Yellow: bytes that are also</text>
+<text x="10" y="106">in ARABART.EXE 4.15 (1993):</text>
+<text class="t-yl" x="10" y="132">2,758 B of letter shapes</text>
+<text class="t-yl" x="10" y="154">and the 136 B shaper.</text>
+</svg>

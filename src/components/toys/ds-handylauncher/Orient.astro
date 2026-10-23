@@ -1,0 +1,117 @@
+---
+// A screen turn per shortcut: HandyLauncher.exe 3.4 sub_18F7C (with sub_18F20, which finds the call at run time).
+// Pick the shortcut's orientation and where the screen is now; launching walks his code and turns the device.
+import CodeStepper from '../CodeStepper.astro';
+import './hl.css';
+import { orientSteps, ORIENT } from './hl.ts';
+
+const ASM = [
+  { off: '18F28', code: 'ldr  r0,[r4,#8]', note: 'looked it up before?' },
+  { off: '18F38', code: 'bl   LoadLibraryW', note: '"coredll.dll"' },
+  { off: '18F44', code: 'bl   GetProcAddressW', note: '"ChangeDisplaySettingsEx"' },
+  { off: '18F94', code: 'cmp  r6,#0', note: 'the shortcut setting' },
+  { off: '18F98', code: 'beq  done', note: '0: Use Current' },
+  { off: '18FB8', code: 'mov  r8,#0C0h', note: 'the form: 0C0h bytes' },
+  { off: '18FBC', code: 'mov  r5,#800000h', note: 'orientation only' },
+  { off: '18FC8', code: 'mov  r3,#2', note: 'CDS_TEST: just ask' },
+  { off: '18FE4', code: 'mov  pc,fp', note: 'call it' },
+  { off: '19014', code: 'mov  r6,r4', note: 'Portrait: 0' },
+  { off: '1900C', code: 'mov  r6,#1', note: 'Landscape (R): 90' },
+  { off: '19000', code: 'mov  r6,#4', note: 'Landscape (L): 270' },
+  { off: '19024', code: 'cmp  r6,r3 / beq done', note: 'already there?' },
+  { off: '19054', code: 'str  r6,[sp,#188h]', note: 'the new orientation' },
+  { off: '1906C', code: 'mov  pc,fp', note: 'call it again: turn' },
+];
+const C = [
+  { code: 'if (!looked) {' },
+  { code: '  cds = find("ChangeDisplaySettingsEx");' },
+  { code: 'if (!cds || setting == 0)' },
+  { code: '  return;', note: 'Use Current' },
+  { code: 'DEVMODE dm = { .dmSize = 0xC0 };' },
+  { code: 'cds(NULL, &dm, NULL, CDS_TEST, NULL);' },
+  { code: 'want = DMDO[setting];', note: '0, 90 or 270' },
+  { code: 'if (want == now) return;' },
+  { code: 'dm.dmDisplayOrientation = want;' },
+  { code: 'cds(NULL, &dm, NULL, 0, NULL);', note: 'turn' },
+];
+const steps = orientSteps(2, 0);
+---
+
+<div class="hl-or" data-hlorient>
+  <div class="hl-row" data-ctl hidden>
+    <label class="hl-pick">Shortcut: Pocket Excel, set to
+      <select data-set>{ORIENT.map((o, i) => <option value={i} selected={i === 2}>{o}</option>)}</select></label>
+    <label class="hl-pick">The screen now
+      <select data-cur><option value="0">Portrait, 0°</option><option value="1">Landscape, 90°</option><option value="4">Landscape, 270°</option></select></label>
+    <button type="button" class="button button--primary" data-go>Launch it</button>
+  </div>
+  <CodeStepper id="hl-orcs" title="HandyLauncher.exe  turn, then open" asm={ASM} c={C} steps={steps} speed={0.6}>
+    <div slot="visual" class="hl-ov" data-vis>
+      <div class="hl-od-stage" aria-hidden="true">
+        <div class="hl-od" data-dev style="--r:-90deg">
+          <div class="hl-od-scr"><div class="hl-od-txt" data-txt style="--c:90deg"><b>Pocket Excel</b><span data-deg>90°</span></div></div>
+          <i class="hl-od-btn"></i>
+        </div>
+      </div>
+      <p class="hl-say" data-out aria-live="polite">Landscape (R): the screen turns to 90° before Pocket Excel opens.</p>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hl-or { display: grid; gap: 14px; }
+  .hl-pick { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 44px; font: 500 1rem/1.3 var(--sans); color: var(--ink); }
+  .hl-pick select { min-height: 44px; padding: 0 8px; font: 500 1rem/1 var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--xp-line, #7f9db9); border-radius: 2px; }
+  .hl-ov { display: grid; gap: 12px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hl-od-stage { display: grid; place-items: center; height: 230px; }
+  .hl-od { position: relative; width: 132px; height: 196px; padding: 18px 10px 32px; border-radius: 16px; background: linear-gradient(160deg, #5a5f6b, #2b2e35 60%, #3c4049); box-shadow: 0 10px 24px rgb(0 0 0 / 0.3); transform: rotate(var(--r, 0deg)); }
+  .hl-od-btn { position: absolute; left: 50%; bottom: 9px; width: 30px; height: 14px; translate: -50% 0; border-radius: 7px; background: #1d1f24; }
+  .hl-od-scr { position: relative; width: 100%; height: 100%; overflow: hidden; background: linear-gradient(#1b3f8b 0 14px, #fff 14px); }
+  .hl-od-txt { position: absolute; left: 50%; top: 50%; display: grid; gap: 4px; place-items: center; width: 112px; height: 146px; translate: -50% -50%; rotate: var(--c, 0deg); font: 700 13px/1.2 Tahoma, Verdana, sans-serif; color: #1b3f8b; text-align: center; }
+  .hl-od-txt span { font-weight: 400; color: #444; }
+  .hl-od-txt.land { width: 146px; height: 112px; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { orientSteps, reduce, ORIENT, DEG, type Step } from './hl.ts';
+
+  document.querySelectorAll<HTMLElement & { hl?: boolean }>('[data-hlorient]').forEach(root => {
+    if (root.hl) return;
+    root.hl = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: Step[], at?: number): void } }>('[data-stepper]')!;
+    const dev = root.querySelector<HTMLElement>('[data-dev]')!, txt = root.querySelector<HTMLElement>('[data-txt]')!;
+    const set = root.querySelector<HTMLSelectElement>('[data-set]')!, cur = root.querySelector<HTMLSelectElement>('[data-cur]')!;
+    const out = root.querySelector<HTMLElement>('[data-out]')!;
+    let shown = -1;
+
+    const turn = (deg: number, how: string) => {
+      if (deg === shown) return;
+      shown = deg;
+      const d = how === 'jump' || reduce() ? 0 : 0.6;
+      gsap.to(dev, { '--r': `${-deg}deg`, duration: d, ease: 'power2.inOut' });
+      gsap.to(txt, { '--c': `${deg}deg`, duration: d, ease: 'power2.inOut' });
+      txt.classList.toggle('land', deg % 180 !== 0);
+      txt.querySelector('[data-deg]')!.textContent = `${deg}°`;
+    };
+    cs.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail;
+      turn(step.deg as number, how);
+      if (step.done) {
+        const s = +set.value, want = DEG[[-1, 0, 1, 4][s]];
+        out.innerHTML = s === 0 ? 'Use Current: Pocket Excel opens the way the screen already is.'
+          : want === DEG[+cur.value] ? `${ORIENT[s]}: the screen is already there, so it stays still.`
+          : `${ORIENT[s]}: the screen turns to <b>${want}°</b>, then Pocket Excel opens.`;
+      }
+    });
+    const go = (play: boolean) => {
+      const st = orientSteps(+set.value, +cur.value);
+      cs.stepper?.load(st, play ? 0 : st.length - 1);
+      if (play) cs.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+    };
+    root.querySelector('[data-go]')!.addEventListener('click', () => go(true));
+    set.addEventListener('change', () => go(false));
+    cur.addEventListener('change', () => go(false));
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+  });
+</script>

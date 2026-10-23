@@ -1,0 +1,157 @@
+---
+// The Brave Sun (SUN.EXE, September 1993). Facts: research/programs.md (section 4), research/artifacts/programs/gfxprogs
+// (NOTES.txt, sun_user.txt, sun_orbit.txt, sun_strings_decoded.txt) and his unpacked program. Every screen in the toys
+// is rebuilt from his own drawing calls (src/components/toys/graphics/sun/sun.ts); every Arabic letter comes from ARABART.
+import Orbits from '../components/toys/graphics/sun/Orbits.astro';
+import OrbitLoop from '../components/toys/graphics/sun/OrbitLoop.astro';
+import SunDark from '../components/toys/graphics/sun/SunDark.astro';
+import Letters from '../components/toys/graphics/sun/Letters.astro';
+import Verses from '../components/toys/graphics/sun/Verses.astro';
+import Menu from '../components/toys/graphics/sun/Menu.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import { render, svgRuns } from '../components/toys/arabart/core.ts';
+import { ssrBin } from '../components/toys/arabart/ssr.ts';
+
+const base = import.meta.env.BASE_URL;
+// The last line of his poem to the sun, as his opening screen draws it: font 2, color 4, on his card's blue-gray
+const poem = render(ssrBin(), 'ty]h javrdk alsh K ,y]h javrdk t;vm K ,y]h javrdk pdhm', { font: 2, color: 4 });
+const poemRuns = svgRuns(poem);
+---
+
+<section id="bs-sky" class="bs">
+  <h2>Four planets, true to their years</h2>
+  <p class="lead">Pick “The sun and nature” and his solar system starts to turn. Mercury, Venus, Earth and Mars circle the sun at the true pace of their years. This is his loop, running in your browser on the numbers he typed.</p>
+  <div class="bs-toy"><Orbits /></div>
+  <div class="bs-cols">
+    <p>Every planet is a <Term id="sprite">sprite</Term>: a tiny picture he drew once (Earth in blue with green land, Venus in brown) and saved. Each frame he stamps it in its new place. The picture carries a black edge, and that edge paints over the spot where the planet stood a frame before, so nothing ever needs erasing. In a browser today you would stamp the same sprites onto a canvas with <code>drawImage</code>.</p>
+    <p>Where to stamp is school trigonometry. Across is the cosine of the planet’s angle times the width of its oval; down is the sine times the height. Every frame Mercury’s angle turns by π/80, and each other planet turns 88 ÷ its own year as far. So Mars, at 687 days, crawls while Mercury races, as in the sky. Most PCs of 1993 had no chip for decimals, so Borland’s <Term id="float-emulator">floating-point emulator</Term> worked out every sine and cosine in software.</p>
+  </div>
+  <h3>One frame, line by line</h3>
+  <p class="bs-p">Step through one frame of his loop: the code the compiler made from his C on one side, his C on the other. The yellow box shows each planet stamped over its old spot. Then every angle turns, ready for the next frame.</p>
+  <OrbitLoop />
+  <ThenNow
+    rows={[
+      { then: '<code>do { … } while (key == 0)</code>', now: '<code>requestAnimationFrame(draw)</code>', why: 'Draw, move everything a little, go again.' },
+      { then: '<code>putimage</code> with a black edge', now: '<code>drawImage</code> from a sprite sheet', why: 'Draw small pictures once, then copy them where they go.' },
+      { then: '<code>160 + cos(mars) * 80</code>', now: '<code>Math.cos</code> and <code>Math.sin</code>', why: 'Circles and ovals are still drawn this way.' },
+    ]}
+  />
+</section>
+
+<section id="bs-dark" class="bs">
+  <h2>A sun drawn in the dark</h2>
+  <p class="lead">His menu shows a sun glowing in six shades of gold on a starry sky, on a screen that could show only 16 colors at a time. He drew the sky and the sun while they were invisible, then switched them on.</p>
+  <div class="bs-cols">
+    <p>In this graphics mode every pixel stores a slot number from 0 to 15. The graphics card keeps a small table, the <Term id="vga-palette">palette</Term>, that says which color each slot shows. A slot can hold any of 262,144 colors. Change a slot, and every pixel drawn in it changes at once, the way one CSS custom property recolors every element that uses it.</p>
+    <p>His sun is six filled circles in six slots, each circle a little smaller than the last. First he turns those six slots black, so the drawing happens unseen. Then he gives them six shades of gold, the middle first. The whole sun appears in a blink, glowing from the center, and not one pixel is drawn twice. The stars come on the same way. In all, 129 places in his code change a color slot.</p>
+  </div>
+  <SunDark />
+  <p class="bs-p bs-after">Step through with <b>Show the hidden</b> on to see what is drawn in black. Then pick any slot and drag its red, green and blue. His sun and sky recolor instantly, because only the palette changes.</p>
+</section>
+
+<section id="bs-letters" class="bs">
+  <h2>Shadows and outlines on ARABART</h2>
+  <p class="lead">Every word of Arabic in The Brave Sun is drawn by ARABART, the Arabic library he wrote. For this program he built two effects of his own on top of it: a soft shadow and a crisp outline.</p>
+  <div class="bs-toy"><Letters /></div>
+  <div class="bs-cols">
+    <p>His C program never draws a letter itself. It keeps each line as the keys you would press on an Arabic keyboard: <code>hgals</code> is <span lang="ar" dir="rtl">الشمس</span>, the sun. Then it asks ARABART, which waits in memory like a background service, to join the letters and draw them. <a href={`${base}/arabart/`}>ARABART has its own page</a>, where you can type with it.</p>
+    <p>The shadow draws the line in dark color 8, six pixels right and six down, then draws it again in its own color on top. The outline draws four copies one pixel off on the diagonals, then the line itself in the middle. His section titles use both. In his code, 217 places draw a plain line, 57 an outlined one and 14 a shadowed one, and 59 pick a font. Font 5, the tall letters of <span lang="ar" dir="rtl">الشمس</span>, was made for this program.</p>
+  </div>
+  <ThenNow
+    rows={[
+      { then: 'Color 8, six pixels right and down, then the line', now: '<code>text-shadow: 6px 6px</code>', why: 'A darker copy behind, offset.' },
+      { then: 'Four copies one pixel off, then the middle', now: 'Four <code>text-shadow</code>s at 1px, or <code>-webkit-text-stroke</code>', why: 'A ring of dark copies makes the edge.' },
+      { then: '<code>hgals</code>, the keys of an Arabic keyboard', now: 'Unicode text and a shaping engine', why: 'Plain text in, joined letters out.' },
+    ]}
+  />
+  <Deep title="For engineers: finding ARABART, and the outline">
+    <Listing
+      title="SUN.EXE · 04B6:000B, is ARABART there?"
+      lines={[
+        { off: '000B', code: 'enter 2,0', note: 'a C function with assembly inside' },
+        { off: '001A', code: 'push ax / push bx / push cx / push dx' },
+        { off: '001E', code: 'mov  ax,3600h', note: 'AH 36h: ARABART. AL 00h: are you there?', hi: true },
+        { off: '0021', code: 'int  10h', note: 'the video service; ARABART answers 5944h' },
+        { off: '0023', code: 'sub  ax,5943h', note: '5944h minus 5943h = 1: yes', hi: true },
+        { off: '002D', code: 'mov  ax,[bp-2] / leave / retf', note: 'return 1 when it is there' },
+      ]}
+      foot="When the answer is not 1, main() prints “ARABIC-ART is not active please run ARAB-ART.EXE first.” and returns to DOS."
+    />
+    <Listing
+      lang="c"
+      title="04B6:01B4, his outline, as C"
+      lines={[
+        { code: 'void outline_text(int x, int y, char far *s, int edge, int fill) {' },
+        { code: '  ar_color(edge);', note: 'ARABART function 01' },
+        { code: '  ar_draw(x - 1, y - 1, s);  ar_draw(x + 1, y - 1, s);', hi: true },
+        { code: '  ar_draw(x - 1, y + 1, s);  ar_draw(x + 1, y + 1, s);', hi: true },
+        { code: '  ar_color(fill);' },
+        { code: '  ar_draw(x, y, s);', note: 'ARABART function 07: the line itself' },
+        { code: '}' },
+      ]}
+      foot="ar_draw asks ARABART for the line height first and adds it to y, so his y is always the top of the line. The shadow, at 04B6:0163, is the same with ar_color(8) and one draw at x + 6, y + 6."
+    />
+  </Deep>
+</section>
+
+<section id="bs-quran" class="bs">
+  <h2>Fifteen verses about the sun</h2>
+  <p class="lead">The third choice on his menu opens “The sun in the Quran”. Each verse gets its own card, laid out by hand and drawn by his engine.</p>
+  <div class="bs-toy"><Verses /></div>
+  <div class="bs-cols">
+    <p>The section opens with his own introduction. The sun is named in the Quran 30 times, he writes, and in three ways. It is a sign of God’s creation, it is sworn by in oaths, and it shines inside the stories, such as the people of the cave and the prophet Yusuf. Then come the fifteen cards, from Al-An’am to Ya-Sin.</p>
+    <p>Each card has its own margins, set by hand to fit its verse. The opening and closing words are small and blue, the verse large and yellow with a black outline, its lines 45 pixels apart. Wherever the verse names <span lang="ar" dir="rtl">الشمس</span>, the sun, it is underlined. A <code>#</code> before and after the word switches the underline on and off, like a <code>&lt;u&gt;</code> tag. Verse numbers are typed backwards, <code>69</code> for 96, because ARABART writes from right to left.</p>
+  </div>
+  <figure class="bs-quote">
+    <p lang="ar" dir="rtl">والشمس تجري لمستقر لها ذلك تقدير العزيز العليم</p>
+    <figcaption>The verse that opens the whole program, before the title: “And the sun runs to its resting place. That is the decree of the Almighty, the All-Knowing.” Ya-Sin 36:38.</figcaption>
+  </figure>
+</section>
+
+<section id="bs-map" class="bs">
+  <h2>The whole program, from its menu</h2>
+  <p class="lead">His main menu has five choices. Behind them sit 33,586 bytes of his own C code, in eight parts.</p>
+  <div class="bs-toy"><Menu /></div>
+  <div class="bs-cols">
+    <p>He wrote The Brave Sun in Borland C++ for the PC Middle East competition for Arabic educational software, and it won 3rd place. Its title card calls it an educational program for young Arabic speakers, designed and built by Eng. Yasser Mohamed Ali, first release, September 1993.</p>
+    <p>There are no image files. Every picture, from the planets to the mosque and the phases of the Moon, is drawn by his code from coordinates he typed. 255 places in it draw a straight line. F1 brings up help on any screen, Esc goes back and Alt+X leaves from anywhere, like the shortcuts of a desktop app.</p>
+  </div>
+  <Deep title="For engineers: how it is built">
+    <p>Borland C++ with its 1991 runtime, in the <Term id="memory-model">large memory model</Term>: every function is a far call, so the program can grow past 64 KB of code. It uses 80186 instructions such as <code>enter</code> and <code>push 1</code>, and every function starts with the compiler’s stack check. Drawing goes through Borland’s <Term id="bgi">BGI</Term> library, with the VGA driver loaded from <code>EGAVGA.BGI</code> at start-up, in 640 by 480 pixels and 16 colors.</p>
+    <Listing
+      title="SUN.EXE · main() at 0302:0007"
+      lines={[
+        { off: '0007', code: 'push bp / mov bp,sp' },
+        { off: '0017', code: 'call far 04B6:000B', note: 'is ARABART there?', hi: true },
+        { off: '001E', code: 'cmp  di,1 / je 0032' },
+        { off: '0023', code: 'push ds / push 0188h / call printf', note: '“ARABIC-ART is not active …”' },
+        { off: '0032', code: 'call far 04DA:0D0F', note: 'start the graphics, show the opening verse' },
+      ]}
+      foot="Then the title card, his poem, and the menu loop, which jumps to one of five places by a small table."
+    />
+  </Deep>
+  <figure class="bs-poem">
+    <svg viewBox={`0 0 ${poem.width} ${poem.height}`} width={poem.width * 2} height={poem.height * 2} shape-rendering="crispEdges" role="img" aria-label="فغدا تشرقين شمسا، وغدا تشرقين فكرة، وغدا تشرقين حياة, drawn by his engine">{poemRuns.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+    <figcaption>The last line of the poem he wrote for the opening screens: “Tomorrow you rise as a sun, tomorrow as an idea, tomorrow as life.”</figcaption>
+  </figure>
+</section>
+
+<style>
+  .bs :global(h3) { margin-top: clamp(48px, 6vw, 72px); }
+  .bs-toy { margin: clamp(24px, 3vw, 36px) 0 clamp(28px, 3vw, 40px); }
+  .bs-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px clamp(24px, 4vw, 48px); margin: 24px 0 28px; align-items: start; }
+  .bs-cols p { margin: 0; max-width: 60ch; }
+  .bs-p { margin: 14px 0 22px; max-width: 70ch; }
+  .bs-after { margin-top: 18px; }
+  .bs [lang='ar'] { font-family: var(--font-ar); font-weight: 700; color: var(--accent); }
+  .bs-quote { margin: clamp(36px, 5vw, 56px) 0 0; padding: 22px clamp(18px, 3vw, 32px); background: var(--surface-2); box-shadow: inset 4px 0 0 var(--accent); }
+  .bs-quote p { margin: 0; max-width: none; font-size: clamp(1.375rem, 1.2vw + 1rem, 2rem); line-height: 1.6; text-align: right; }
+  .bs-quote figcaption, .bs-poem figcaption { margin-top: 12px; font-size: 0.9375rem; line-height: 1.55; color: var(--ink-2); max-width: 70ch; }
+  .bs-poem { margin: clamp(48px, 6vw, 72px) 0 0; display: grid; justify-items: end; }
+  .bs-poem svg { width: min(100%, 760px); height: auto; padding: 16px; background: #3ca1c6; }
+  .bs-poem figcaption { justify-self: stretch; }
+  @media (max-width: 760px) { .bs-cols { grid-template-columns: minmax(0, 1fr); } }
+</style>

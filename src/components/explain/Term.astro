@@ -1,0 +1,10 @@
+---
+import { glossary } from '../../data/glossary';
+
+interface Props { id: string }
+const { id } = Astro.props;
+if (!glossary[id]) throw new Error(`Unknown glossary term "${id}". Add it to a file in src/data/glossary/.`);
+const base = import.meta.env.BASE_URL;
+---
+
+<a class="term" href={`${base}/glossary/#${id}`} data-term={id}><slot>{glossary[id].term}</slot></a>

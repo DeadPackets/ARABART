@@ -1,0 +1,82 @@
+---
+// One question in six tools, linked to a KeyBuilder (prop `for`): pick a tab to see how each one stores port 17 and
+// asks for "everything inside" the part chosen above. Every tab updates when the key changes.
+import Window from '../../shell/Window.astro';
+import { views } from './same';
+
+interface Props { for: string; values?: number[]; level?: number }
+const { for: kb, values = [5, 2, 3, 1, 17], level = 2 } = Astro.props;
+const vs = views(values, level);
+const what = (v: number[], l: number) => ['node', 'shelf', 'slot', 'card'].slice(0, l).map((f, i) => `${f} ${v[i]}`).join(', ');
+---
+
+<div class="sq" data-same data-for={kb}>
+  <div class="sq-tabs" role="tablist" aria-label="Pick a tool">
+    {vs.map((x, i) => <button type="button" role="tab" class="button k-btn" id={`sq-t-${x.id}`} aria-controls={`sq-p-${x.id}`} aria-selected={String(i === 0)} tabindex={i === 0 ? 0 : -1}>{x.name}</button>)}
+  </div>
+  {vs.map((x, i) => (
+    <Window title={x.name} kind="editor" active class="sq-panel" id={`sq-p-${x.id}`} role="tabpanel" aria-labelledby={`sq-t-${x.id}`} hidden={i !== 0} data-panel={x.id}>
+      <div class="sq-grid">
+        <div>
+          <p class="sq-lab">Port {values[4]} is stored as</p>
+          <pre class="sq-code"><code data-stored set:html={x.stored} /></pre>
+        </div>
+        <div>
+          <p class="sq-lab">Everything inside <span data-what>{what(values, level)}</span></p>
+          <pre class="sq-code"><code data-q set:html={x.q} /></pre>
+        </div>
+      </div>
+      <p class="sq-how" data-how set:html={x.how} />
+    </Window>
+  ))}
+</div>
+
+<style>
+  .sq-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .sq-tabs .k-btn { box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray), inset 2px 2px oklch(0.88 0 0); }
+  .sq-tabs .k-btn[aria-selected='true'] { background: var(--w-white); color: var(--w-black); box-shadow: inset 1px 1px var(--w-black), inset -1px -1px var(--w-white), inset 2px 2px var(--w-gray); font-weight: 700; }
+  .sq-grid { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 18px; }
+  .sq-lab { font: 600 0.8125rem/1.4 var(--font-code); color: var(--ink-2); margin-bottom: 6px; }
+  .sq-code { margin: 0; padding: 12px 14px; background: oklch(0.97 0 0); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white); font: 500 clamp(12px, 0.3vw + 10px, 14px)/1.65 var(--font-code); color: var(--w-black); white-space: pre-wrap; overflow-wrap: anywhere; }
+  .sq-code code { color: inherit; font: inherit; }
+  .sq-how { margin-top: 16px; max-width: 70ch; font: 500 1rem/1.6 var(--sans); color: var(--ink); }
+  .sq-panel:not([hidden]) { animation: sq-in 0.25s var(--expo); }
+  @keyframes sq-in { from { opacity: 0; translate: 0 6px; } }
+  @media (max-width: 760px) { .sq-grid { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { views } from './same';
+
+  const unpack = (key: number) => { let k = key; return [7, 5, 5, 5, 10].map(w => { const x = k % 2 ** w; k = Math.floor(k / 2 ** w); return x; }).reverse(); };
+
+  document.querySelectorAll<HTMLElement>('[data-same]').forEach(root => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const go = (i: number, focus = false) => {
+      tabs.forEach((t, k) => { t.setAttribute('aria-selected', String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+      panels.forEach((p, k) => { p.hidden = k !== i; p.classList.toggle('is-active', k === i); });
+      if (focus) tabs[i].focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => go(i));
+      t.addEventListener('keydown', e => {
+        const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (d) { e.preventDefault(); go((i + d + tabs.length) % tabs.length, true); }
+      });
+    });
+    document.getElementById(root.dataset.for!)?.addEventListener('keybuilder', e => {
+      const d = (e as CustomEvent).detail as { key: number; level: number };
+      const v = unpack(d.key);
+      const what = ['node', 'shelf', 'slot', 'card'].slice(0, d.level).map((f, i) => `${f} ${v[i]}`).join(', ');
+      views(v, d.level).forEach((x, i) => {
+        const p = panels[i];
+        p.querySelector('[data-stored]')!.innerHTML = x.stored;
+        p.querySelector('[data-q]')!.innerHTML = x.q;
+        p.querySelector('[data-how]')!.innerHTML = x.how;
+        p.querySelector('[data-what]')!.textContent = what;
+        p.querySelector('.sq-lab')!.textContent = `Port ${v[4]} is stored as`;
+      });
+    });
+  });
+</script>

@@ -1,0 +1,198 @@
+---
+// Why his pixel code is fast: pick pixels in two screen bytes and a color, then paint them one write per pixel or his
+// way, one write per byte (Set/Reset holds the color, the Bit Mask the pixels). The 4 planes show under every pixel.
+import Window from '../../shell/Window.astro';
+import { EGA, COLOR_NAMES } from './wk.ts';
+
+const XS = Array.from({ length: 16 }, (_, k) => 24 + k);
+const SEL = new Set([29, 30, 31, 32, 33, 34, 35, 36, 37]);
+const PLANES = [{ p: 3, name: 'bright' }, { p: 2, name: 'red' }, { p: 1, name: 'green' }, { p: 0, name: 'blue' }];
+const bit = (c: number, p: number) => (c >> p) & 1;
+---
+
+<div class="wk-wr" data-wkwrite>
+  <Window title="ONE BYTE = 8 PIXELS  row 44, x 24 to 39" kind="editor" active class="wk-wr-win">
+    <div class="wk-wr-grid" role="group" aria-label="Pick the pixels to paint">
+      {[0, 1].map(b => (
+        <div class="wk-wr-blk">
+          <span class="wk-wr-h" aria-hidden="true"></span>
+          <span class="wk-wr-byte" aria-hidden="true">byte {(3523 + b).toLocaleString('en-US')}</span>
+          <span class="wk-wr-h" aria-hidden="true">pixels</span>
+          {XS.slice(b * 8, b * 8 + 8).map(x => (
+            <button type="button" class="wk-wr-px" data-x={x} aria-pressed={String(SEL.has(x))} aria-label={`Pixel ${x}`} style={`--c:${EGA[7]}`}><span>{x}</span></button>
+          ))}
+          {PLANES.map(pl => (
+            <>
+              <span class="wk-wr-h" aria-hidden="true">plane {pl.p} <i>{pl.name}</i></span>
+              {XS.slice(b * 8, b * 8 + 8).map(x => <span class:list={['wk-wr-bit', { one: bit(7, pl.p) }]} data-p={pl.p} data-x={x} aria-hidden="true">{bit(7, pl.p)}</span>)}
+            </>
+          ))}
+          <span class="wk-wr-h" aria-hidden="true">Bit Mask</span>
+          {XS.slice(b * 8, b * 8 + 8).map(x => <span class:list={['wk-wr-bit wk-wr-m', { one: SEL.has(x) }]} data-x={x} aria-hidden="true">{SEL.has(x) ? 1 : 0}</span>)}
+        </div>
+      ))}
+    </div>
+    <div class="wk-wr-colors" role="radiogroup" aria-label="Color: the Set/Reset register">
+      <span class="wk-wr-lab" aria-hidden="true">Set/Reset</span>
+      {EGA.map((c, i) => (
+        <button type="button" role="radio" class="wk-wr-sw" data-c={i} aria-checked={String(i === 12)} tabindex={i === 12 ? 0 : -1} aria-label={`Color ${i}, ${COLOR_NAMES[i]}`} style={`--c:${c}`}></button>
+      ))}
+    </div>
+  </Window>
+  <div class="wk-wr-side">
+    <div class="wk-wr-acts" hidden>
+      <button type="button" class="button k-btn" data-act="pixel">One pixel at a time</button>
+      <button type="button" class="button button--primary k-btn" data-act="his">His way: one write a byte</button>
+      <button type="button" class="button k-btn" data-act="clear">Gray again</button>
+    </div>
+    <dl class="wk-wr-score">
+      <div><dt>One pixel at a time</dt><dd><b data-n="pixel">9</b> writes</dd></div>
+      <div class="his"><dt>His way</dt><dd><b data-n="his">2</b> writes</dd></div>
+    </dl>
+    <p class="wk-wr-say" aria-live="polite" data-say>9 pixels picked, across 2 bytes: 9 writes one pixel at a time, 2 writes his way. Tap pixels to change the pick.</p>
+  </div>
+</div>
+
+<style is:global>
+  .wk-wr { display: grid; gap: 18px; }
+  .wk-wr-grid { display: grid; grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr); gap: 14px; }
+  .wk-wr-blk { display: grid; grid-template-columns: auto repeat(8, minmax(0, 1fr)); gap: 6px 3px; align-items: center; }
+  .wk-wr-blk + .wk-wr-blk { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+  .wk-wr-blk + .wk-wr-blk .wk-wr-h { display: none; }
+  .wk-wr-h { padding-right: 8px; font: 600 12px/1.2 var(--font-code); color: var(--accent-2); white-space: nowrap; }
+  .wk-wr-h i { font-style: normal; color: var(--ink-2); font-weight: 500; }
+  .wk-wr-byte { grid-column: span 8; font: 600 12px/1.2 var(--font-code); color: var(--accent-2); text-align: center; border-bottom: 2px solid var(--accent-2); padding-bottom: 4px; }
+  .wk-wr-px { position: relative; display: grid; place-items: end center; min-height: 52px; padding: 0 0 4px; background: var(--c); border: 0; cursor: pointer; font: 500 10px/1 var(--font-code); color: #000; touch-action: manipulation; }
+  .wk-wr-px[aria-pressed='true'] { box-shadow: inset 0 0 0 3px var(--accent), 0 0 0 1px #000; }
+  .wk-wr-px[aria-pressed='true']::before { content: ''; position: absolute; top: 5px; width: 8px; height: 8px; background: var(--accent); box-shadow: 0 0 0 1px #000; }
+  .wk-wr-px:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; z-index: 1; }
+  .wk-wr-px.hit { animation: wk-hit 0.35s ease-out; }
+  @keyframes wk-hit { from { filter: brightness(2.2); } }
+  .wk-wr-bit { display: grid; place-items: center; height: 22px; font: 600 12px/1 var(--font-code); color: var(--ink-2); background: var(--surface-2); }
+  .wk-wr-bit.one { color: var(--surface); background: var(--ink); }
+  .wk-wr-m.one { background: var(--accent); }
+  .wk-wr-colors { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 16px; }
+  .wk-wr-lab { font: 600 12px/1 var(--font-code); color: var(--accent-2); margin-right: 6px; }
+  .wk-wr-sw { width: 30px; height: 44px; padding: 0; border: 0; background: var(--c); box-shadow: inset 0 0 0 1px #000; cursor: pointer; }
+  .wk-wr-sw[aria-checked='true'] { outline: 3px solid var(--accent); outline-offset: 2px; position: relative; z-index: 1; }
+  .wk-wr-sw:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .wk-wr-side { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); grid-template-areas: 'acts acts' 'score say'; gap: 16px 24px; align-items: start; }
+  .wk-wr-acts { grid-area: acts; }
+  .wk-wr-score { grid-area: score; }
+  .wk-wr-say { grid-area: say; }
+  .wk-wr-acts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .wk-wr-acts .k-btn { min-height: 44px; }
+  .wk-wr-score { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0; }
+  .wk-wr-score div { padding: 12px 14px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .wk-wr-score .his { box-shadow: inset 0 0 0 2px var(--accent); }
+  .wk-wr-score dt { font: 600 12px/1.3 var(--font-code); color: var(--accent-2); }
+  .wk-wr-score dd { margin: 4px 0 0; font: 500 0.9375rem/1.2 var(--sans); color: var(--ink-2); }
+  .wk-wr-score b { font: 800 2.5rem/1 var(--font-display); color: var(--ink); font-variant-numeric: tabular-nums; margin-right: 6px; }
+  .wk-wr-score .his b { color: var(--accent); }
+  .wk-wr-say { margin: 0 !important; font-size: 1rem !important; line-height: 1.55 !important; min-height: 4.6em; }
+  @media (max-width: 760px) { .wk-wr-side { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'acts' 'score' 'say'; } }
+  @media (max-width: 640px) {
+    .wk-wr-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+    .wk-wr-blk, .wk-wr-blk + .wk-wr-blk { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+    .wk-wr-blk + .wk-wr-blk .wk-wr-h { display: block; }
+    .wk-wr-h { grid-column: 1 / -1; margin-top: 2px; }
+    .wk-wr-h:first-child { display: none !important; }
+    .wk-wr-sw { width: calc((100% - 7 * 6px) / 8); }
+    .wk-wr-lab { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wk-wr-px.hit { animation: none; } }
+</style>
+
+<script>
+  import { EGA, COLOR_NAMES, reduce } from './wk.ts';
+
+  document.querySelectorAll<HTMLElement & { wk?: boolean }>('[data-wkwrite]').forEach(root => {
+    if (root.wk) return;
+    root.wk = true;
+    const pxs = [...root.querySelectorAll<HTMLButtonElement>('.wk-wr-px')];
+    const sws = [...root.querySelectorAll<HTMLButtonElement>('.wk-wr-sw')];
+    const say = root.querySelector('[data-say]')!;
+    const color = new Map(pxs.map(b => [+b.dataset.x!, 7]));
+    let pick = 12, busy = 0;
+
+    const sel = () => pxs.filter(b => b.getAttribute('aria-pressed') === 'true').map(b => +b.dataset.x!);
+    const bytes = (xs: number[]) => new Set(xs.map(x => x >> 3)).size;
+    const paintPx = (x: number) => {
+      color.set(x, pick);
+      const b = pxs.find(p => +p.dataset.x! === x)!;
+      b.style.setProperty('--c', EGA[pick]);
+      if (!reduce()) { b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit'); }
+      root.querySelectorAll<HTMLElement>(`.wk-wr-bit[data-p][data-x="${x}"]`).forEach(s => {
+        const on = (pick >> +s.dataset.p!) & 1;
+        s.textContent = String(on); s.classList.toggle('one', !!on);
+      });
+    };
+    const update = () => {
+      const xs = sel(), n = xs.length, k = bytes(xs);
+      root.querySelectorAll<HTMLElement>('.wk-wr-m').forEach(s => { const on = xs.includes(+s.dataset.x!); s.textContent = on ? '1' : '0'; s.classList.toggle('one', on); });
+      root.querySelector('[data-n="pixel"]')!.textContent = String(n);
+      root.querySelector('[data-n="his"]')!.textContent = String(k);
+      return { n, k };
+    };
+    const msg = (t: string) => (say.innerHTML = t);
+    const wait = (ms: number) => new Promise(r => setTimeout(r, reduce() ? 0 : ms));
+
+    pxs.forEach(b => b.addEventListener('click', () => {
+      b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+      const { n, k } = update();
+      msg(n ? `${n} pixel${n > 1 ? 's' : ''} picked, across ${k} byte${k > 1 ? 's' : ''}: ${n} write${n > 1 ? 's' : ''} one pixel at a time, <b>${k} his way</b>.` : 'No pixels picked. Tap a pixel to add it to the Bit Mask.');
+    }));
+    // Arrows move along the pixels, as in a toolbar
+    root.querySelector('.wk-wr-grid')!.addEventListener('keydown', e => {
+      const ke = e as KeyboardEvent, i = pxs.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0 || (ke.key !== 'ArrowLeft' && ke.key !== 'ArrowRight')) return;
+      ke.preventDefault();
+      pxs[Math.max(0, Math.min(15, i + (ke.key === 'ArrowRight' ? 1 : -1)))].focus();
+    });
+    sws.forEach((b, i) => {
+      b.addEventListener('click', () => {
+        sws.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+        pick = +b.dataset.c!;
+        msg(`Set/Reset = <b>${pick}</b>, ${COLOR_NAMES[pick]}: ${[3, 2, 1, 0].map(p => (pick >> p) & 1).join('')} in the 4 planes. One value covers all of them.`);
+      });
+      b.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const t = sws[(i + d + 16) % 16]; t.click(); t.focus();
+      });
+    });
+
+    root.querySelector('[data-act="pixel"]')!.addEventListener('click', async () => {
+      const run = ++busy, xs = sel().sort((a, b) => b - a);
+      let w = 0;
+      for (const x of xs) {
+        if (run !== busy) return;
+        paintPx(x); w++;
+        msg(`Write ${w}: pixel ${x}. Pick it in the mask, read the byte, write it. ${xs.length - w} to go.`);
+        await wait(140);
+      }
+      if (run === busy) msg(`<b>${xs.length} writes</b> for ${xs.length} pixels. Now try his way.`);
+    });
+    root.querySelector('[data-act="his"]')!.addEventListener('click', async () => {
+      const run = ++busy, xs = sel(), groups = [...new Set(xs.map(x => x >> 3))].sort((a, b) => b - a);
+      let w = 0;
+      for (const g of groups) {
+        if (run !== busy) return;
+        const inB = xs.filter(x => x >> 3 === g);
+        inB.forEach(paintPx); w++;
+        msg(`Write ${w}: byte ${(44 * 80 + g).toLocaleString('en-US')}, Bit Mask ${[0, 1, 2, 3, 4, 5, 6, 7].map(k => (inB.includes(g * 8 + k) ? 1 : 0)).join('')}. ${inB.length} pixels at once, all 4 planes.`);
+        await wait(420);
+      }
+      if (run === busy) msg(`<b>${groups.length} write${groups.length > 1 ? 's' : ''}</b> for ${xs.length} pixels. Across a whole 48-pixel button edge it is 7 writes instead of 48.`);
+    });
+    root.querySelector('[data-act="clear"]')!.addEventListener('click', () => {
+      busy++;
+      const keep = pick; pick = 7; pxs.forEach(b => paintPx(+b.dataset.x!)); pick = keep;
+      msg('Back to the gray of the button face: 0111 in the planes.');
+    });
+
+    root.querySelector<HTMLElement>('.wk-wr-acts')!.hidden = false;
+    update();
+  });
+</script>

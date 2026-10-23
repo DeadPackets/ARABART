@@ -1,0 +1,527 @@
+{
+ "file": "FORM_X/FORM_X.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 32,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "DOS EXE header, rebuilt by the museum unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 44,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "3 segment addresses that DOS patches with the real load address.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 44,
+   "end": 48,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Fills the header to a 16-byte boundary.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 48,
+   "end": 75,
+   "kind": "table",
+   "label": "Small table",
+   "note": "Byte values at the start of his data.",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 75,
+   "end": 95,
+   "kind": "table",
+   "label": "Pointers to the x values",
+   "note": "10 word pointers, one per table row, 20 bytes apart.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 95,
+   "end": 295,
+   "kind": "data",
+   "label": "x values",
+   "note": "10 numbers of 20 digits, one per result row.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 295,
+   "end": 315,
+   "kind": "table",
+   "label": "Pointers to the results",
+   "note": "10 word pointers, 20 bytes apart.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 315,
+   "end": 515,
+   "kind": "data",
+   "label": "F(x) results",
+   "note": "10 numbers of 20 digits.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 515,
+   "end": 530,
+   "kind": "data",
+   "label": "Variables",
+   "note": "Flags, pointers and the overflow flag at DS:01E1.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 530,
+   "end": 610,
+   "kind": "data",
+   "label": "Formula text",
+   "note": "What you type, starting with an extra \"(\" so the whole formula is one bracket.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-keys"
+  },
+  {
+   "start": 610,
+   "end": 690,
+   "kind": "data",
+   "label": "Saved states",
+   "note": "The state byte before each typed character, so Backspace can step back.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-keys"
+  },
+  {
+   "start": 690,
+   "end": 692,
+   "kind": "data",
+   "label": "State byte",
+   "note": "DS:0282, one bit per kind of key allowed next. It starts as 2Eh.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-keys"
+  },
+  {
+   "start": 692,
+   "end": 742,
+   "kind": "text",
+   "label": "Blank line",
+   "note": "Spaces and a $, used to clear the input line.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 742,
+   "end": 746,
+   "kind": "table",
+   "label": "Prompt pointers",
+   "note": "Two pointers to the \"initial value\" and \"final value\" prompts.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 746,
+   "end": 910,
+   "kind": "text",
+   "label": "Prompts",
+   "note": "\"Enter the intial value ----->  X =\", the final value prompt, the table title and \"* OVERFLOW *\".",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 910,
+   "end": 966,
+   "kind": "text",
+   "label": "Plain copy of the credit",
+   "note": "\"Yasser Dot Design..\" and \"<c>1992 YASSER MOHAMED ALI.\" in plain text. The credit on screen comes from the scrambled copy in the code.",
+   "by": "yasser",
+   "evidence": "inferred",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 966,
+   "end": 982,
+   "kind": "table",
+   "label": "Error pointers",
+   "note": "8 pointers to the error messages.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 982,
+   "end": 1351,
+   "kind": "text",
+   "label": "Error messages and table header",
+   "note": "\"Bad end of the formula\", \"Error in number of praces\", \"Out of accurecy scope\" and the column titles.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 1351,
+   "end": 5840,
+   "kind": "data",
+   "label": "Work area",
+   "note": "Zeros in the file: number buffers (x at DS:0567, operands at 057B and 058F) and the formula as a list of 20-digit numbers and operators.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 5840,
+   "end": 5855,
+   "kind": "startup",
+   "label": "Textbook start",
+   "note": "push ds / mov ax,0 / push ax, then DS = the data segment.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 5855,
+   "end": 5922,
+   "kind": "code",
+   "label": "Curtain effect",
+   "note": "Scrolls the screen open with BIOS INT 10h, one line at a time.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 5922,
+   "end": 5957,
+   "kind": "code",
+   "label": "Exit and set-up",
+   "note": "The exit path, and the screen set-up before typing.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 5957,
+   "end": 6402,
+   "kind": "code",
+   "label": "Key filter",
+   "note": "Reads keys and accepts only those whose bit is set in DS:0282; Backspace, Enter and Esc.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-keys"
+  },
+  {
+   "start": 6402,
+   "end": 6488,
+   "kind": "code",
+   "label": "Screen helpers",
+   "note": "Cursor and message printing.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 6488,
+   "end": 6718,
+   "kind": "code",
+   "label": "Number reader",
+   "note": "Turns typed text into a 20-digit fixed-point number (up to 7 integer digits).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 6718,
+   "end": 6772,
+   "kind": "code",
+   "label": "Run-once block 1",
+   "note": "Patches 5 bytes of the scrambled credit, then writes RET over its own first byte.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 6772,
+   "end": 7021,
+   "kind": "code",
+   "label": "Table loop",
+   "note": "Reads the first and last x and works out each row.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 7021,
+   "end": 7090,
+   "kind": "code",
+   "label": "Ten's complement",
+   "note": "Negates a number: 9 minus each digit, then + 1.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 7090,
+   "end": 7116,
+   "kind": "code",
+   "label": "Carry pass",
+   "note": "One DIV 10 per digit, right to left.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 7116,
+   "end": 7496,
+   "kind": "code",
+   "label": "Formula set-up",
+   "note": "Prepares the formula for one x value.",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 7496,
+   "end": 7639,
+   "kind": "code",
+   "label": "Add",
+   "note": "Digit-by-digit addition, then the carry pass.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 7639,
+   "end": 7938,
+   "kind": "code",
+   "label": "Multiply",
+   "note": "Long multiplication: 20 by 20 digits into 40.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 7938,
+   "end": 8488,
+   "kind": "code",
+   "label": "Divide",
+   "note": "Repeated subtraction; a quotient digit may reach 250 before a carry pass.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-digits"
+  },
+  {
+   "start": 8488,
+   "end": 8511,
+   "kind": "code",
+   "label": "Find the innermost bracket",
+   "note": "Recursive: calls itself for each \"(\".",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-solve"
+  },
+  {
+   "start": 8511,
+   "end": 8564,
+   "kind": "code",
+   "label": "Run-once block 2",
+   "note": "Unscrambles the credit: each byte minus the stored byte before it.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 8564,
+   "end": 8688,
+   "kind": "code",
+   "label": "Evaluate one bracket",
+   "note": "* and / first, then + and -.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-solve"
+  },
+  {
+   "start": 8688,
+   "end": 8742,
+   "kind": "text",
+   "label": "Scrambled credit",
+   "note": "54 bytes inside the code that become \"Yasser Dot Design.. <c>1992 YASSER MOHAMED ALI.\" at run time.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 8742,
+   "end": 8771,
+   "kind": "code",
+   "label": "Write a result into the formula",
+   "note": "Copies a result string back into the formula text.",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 8771,
+   "end": 8813,
+   "kind": "code",
+   "label": "Run-once block 3",
+   "note": "Adds up the code from 035E and adds A517h to the exit jump at 0F13.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 8813,
+   "end": 9003,
+   "kind": "code",
+   "label": "Number helpers",
+   "note": "Copy and compare 20-digit numbers.",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 9003,
+   "end": 9136,
+   "kind": "code",
+   "label": "Credit writer",
+   "note": "Writes the unscrambled credit straight into video memory, then returns into the exit.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 9136,
+   "end": 9699,
+   "kind": "code",
+   "label": "Results and errors",
+   "note": "Prints the result table and the error messages.",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 9699,
+   "end": 9702,
+   "kind": "code",
+   "label": "Patched exit jump",
+   "note": "Stored as E9 00 00; block 3 turns it into E9 45 FD (to 0C5B).",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#fx-guard"
+  },
+  {
+   "start": 9702,
+   "end": 9743,
+   "kind": "code",
+   "label": "After the exit jump",
+   "note": "Where the stored jump of zero bytes leads; block 3 sends the exit to his credit instead.",
+   "by": "yasser",
+   "evidence": "inferred"
+  },
+  {
+   "start": 9743,
+   "end": 9744,
+   "kind": "code",
+   "label": "Closing RETF",
+   "note": "Closes his main procedure.",
+   "by": "yasser",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 5957,
+   "end": 6192,
+   "name": "key_filter",
+   "note": "Ignores every key whose bit is off in the state byte.",
+   "link": "#fx-keys",
+   "lines": [
+    {
+     "off": 5961,
+     "note": "Load the state byte"
+    },
+    {
+     "off": 6036,
+     "note": "Bit off: ignore the key"
+    },
+    {
+     "off": 6122,
+     "note": "A point needs bit 40h and no 80h"
+    },
+    {
+     "off": 6152,
+     "note": "After a digit: keep \"point seen\", allow ) digit op - ."
+    },
+    {
+     "off": 6173,
+     "note": "Save the old state for Backspace"
+    }
+   ]
+  },
+  {
+   "start": 7021,
+   "end": 7090,
+   "name": "tens_complement",
+   "note": "Negates a 20-digit number.",
+   "link": "#fx-digits",
+   "lines": [
+    {
+     "off": 7062,
+     "note": "9 - digit"
+    },
+    {
+     "off": 7072,
+     "note": "+1 on the last digit"
+    }
+   ]
+  },
+  {
+   "start": 7090,
+   "end": 7116,
+   "name": "carry_pass",
+   "note": "Normalizes digits above 9.",
+   "link": "#fx-digits",
+   "lines": [
+    {
+     "off": 7106,
+     "note": "DIV 10: remainder stays, quotient carries"
+    }
+   ]
+  },
+  {
+   "start": 8511,
+   "end": 8564,
+   "name": "unscramble_credit",
+   "note": "Run-once delta decoder.",
+   "link": "#fx-guard",
+   "lines": [
+    {
+     "off": 8517,
+     "note": "RET over its own first byte"
+    },
+    {
+     "off": 8540,
+     "note": "This byte minus the previous one"
+    }
+   ]
+  },
+  {
+   "start": 8771,
+   "end": 8813,
+   "name": "checksum_patch",
+   "note": "Run-once checksum that repairs the exit jump.",
+   "link": "#fx-guard",
+   "lines": [
+    {
+     "off": 8792,
+     "note": "Sum 52 words from 035E"
+    },
+    {
+     "off": 8804,
+     "note": "Add the result into the jump at 0F13"
+    }
+   ]
+  }
+ ]
+}

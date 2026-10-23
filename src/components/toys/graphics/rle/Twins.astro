@@ -1,0 +1,101 @@
+---
+// The 153 bytes that PORTSAID.EXE (C with inline assembly) shares with NAMES.COM (pure assembly), in 7 runs.
+// Pick a run: both files show it in place, and pointing at a byte lights its twin. Checked at build time.
+import Window from '../../../shell/Window.astro';
+import { memSync } from '../ssr.ts';
+import { NAMES, PORTSAID } from './rle.ts';
+import './rle.css';
+
+const nb = memSync(NAMES), pb = memSync(PORTSAID);
+const N = (a: number) => nb[a - 0x100], P = (a: number) => pb[a + 0x50];
+const RUNS = [
+  { a: 0x08a3, b: 0x0378, n: 22, name: 'Picture decoder', asm: 'lodsb · cmp al,37h · je · stosb · jmp · lodsb · cmp al,0 · je · xor ch,ch · mov cl,al · lodsb · rep stosb · jmp', says: 'The heart of his run-length decoder: read a byte, copy it, or repeat the next one.' },
+  { a: 0x0996, b: 0x03b2, n: 18, name: 'Layer copy', asm: 'mov dx,3C4h · mov al,2 · out dx,al · inc dx · mov al,1 · out dx,al · push cx · push si · push di · rep movsb · pop di · pop si · pop cx', says: 'Pick a color layer through the Map Mask, copy a strip into it.' },
+  { a: 0x088f, b: 0x032d, n: 8, name: 'Refresh wait', asm: 'in al,dx · and al,8 · je · pop dx · pop ax · loop', says: 'Wait for the screen to begin its next refresh.' },
+  { a: 0x068f, b: 0x6cfd, n: 15, name: 'Key wait', asm: 'mov ah,11h · int 16h · jz · mov ah,0 · int 16h · mov ax,3 · int 10h', says: 'Wait for a key, then switch back to text mode.' },
+  { a: 0x06ce, b: 0x6d42, n: 24, name: 'Spark, line 1', asm: 'mov ah,2 · mov dx,0300h · int 10h · mov ax,0B800h · mov ds,ax · mov di,33h · mov cx,19h · push cx · mov al,[di] · mov byte [di],0Fh', says: 'Move the cursor out of the way and start the spark along his name.' },
+  { a: 0x06f3, b: 0x6d6b, n: 12, name: 'Spark, line 2', asm: 'mov di,0D3h · mov cx,1Ah · push cx · mov al,[di] · mov byte [di],0Fh', says: 'The spark on the second line, 26 letters.' },
+  { a: 0x070e, b: 0x6d8b, n: 54, name: 'His signature', asm: '"    YASSER DOT DESIGN.    $<c>1993 YASSER MOHAMED ALI$"', says: 'His sign-off text, letter for letter.' },
+];
+const CTX = 8;
+const hex = (v: number) => v.toString(16).toUpperCase().padStart(2, '0');
+const h4 = (v: number) => v.toString(16).toUpperCase().padStart(4, '0');
+const runs = RUNS.map(r => {
+  for (let i = 0; i < r.n; i++) if (N(r.a + i) !== P(r.b + i)) throw new Error(`Twins: run ${r.name} differs at ${i}`);
+  const cells = (get: (a: number) => number, s: number) => [...Array(r.n + 2 * CTX)].map((_, i) => ({ v: hex(get(s - CTX + i)), k: i - CTX, at: h4(s - CTX + i) }));
+  return { ...r, left: cells(N, r.a), right: cells(P, r.b) };
+});
+const total = RUNS.reduce((s, r) => s + r.n, 0);
+---
+
+<div class="ps-tw" data-pstw>
+  <div class="ps-tw-runs g-js" role="group" aria-label={`${total} shared bytes in ${RUNS.length} runs`}>
+    {runs.map((r, i) => (
+      <button type="button" class="ps-tw-run" data-run={i} aria-pressed={String(i === 0)} style={`flex-grow:${r.n}`}>
+        <b>{r.name}</b><span>{r.n} bytes</span>
+      </button>
+    ))}
+  </div>
+  {runs.map((r, i) => (
+    <div class="ps-tw-pair" data-pair={i} hidden={i !== 0}>
+      <Window title={`NAMES.COM  his assembly`} kind="editor" class="ps-tw-win">
+        <div class="ps-tw-hex">{r.left.map(c => <span class:list={['ps-tw-b', { s: c.k >= 0 && c.k < r.n }]} data-k={c.k} tabindex={c.k === 0 ? 0 : undefined} title={c.at}>{c.v}</span>)}</div>
+      </Window>
+      <Window title={`PORTSAID.EXE  inside C`} kind="editor" class="ps-tw-win">
+        <div class="ps-tw-hex">{r.right.map(c => <span class:list={['ps-tw-b', { s: c.k >= 0 && c.k < r.n }]} data-k={c.k} title={c.at}>{c.v}</span>)}</div>
+      </Window>
+      <p class="g-say ps-tw-say"><b>{r.name}, {r.n} identical bytes.</b> {r.says}</p>
+      <p class="g-note ps-tw-asm">{r.asm}</p>
+    </div>
+  ))}
+</div>
+
+<style>
+  .ps-tw { display: grid; gap: 20px; }
+  .ps-tw-runs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ps-tw-run { flex-basis: 96px; display: grid; gap: 2px; min-height: 52px; padding: 8px 10px; text-align: left; color: var(--black); background: var(--cyan); border: 0; box-shadow: 4px 4px 0 var(--black); cursor: pointer; transition: background-color 0.15s; }
+  .ps-tw-run b { font: 700 0.875rem/1.2 var(--sans); }
+  .ps-tw-run span { font: 500 11px/1.2 var(--font-code); }
+  .ps-tw-run:hover { background: var(--yellow); }
+  .ps-tw-run[aria-pressed='true'] { background: var(--yellow); box-shadow: inset 0 0 0 2px var(--black), 4px 4px 0 var(--black); }
+  .ps-tw-run:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  .ps-tw-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 22px; }
+  .ps-tw-pair[hidden] { display: none; }
+  .ps-tw-say, .ps-tw-asm { grid-column: 1 / -1; min-height: 0 !important; }
+  .ps-tw-asm { overflow-wrap: anywhere; }
+  .ps-tw-hex { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 3px; font: 600 14px/1 var(--font-code); }
+  .ps-tw-b { display: grid; place-items: center; min-height: 30px; color: var(--ink-2); opacity: 0.85; }
+  .ps-tw-b.s { color: var(--surface); background: var(--accent-2); opacity: 1; cursor: default; transition: background-color 0.12s; }
+  .ps-tw-b.s.on { background: var(--vga-14); color: var(--vga-0); }
+  .ps-tw-b:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  @media (max-width: 760px) { .ps-tw-pair { grid-template-columns: minmax(0, 1fr); } }
+  @media (prefers-reduced-motion: reduce) { .ps-tw-b.s { transition: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-pstw]').forEach(root => {
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-run]')], pairs = [...root.querySelectorAll<HTMLElement>('[data-pair]')];
+    btns.forEach(b => b.addEventListener('click', () => {
+      btns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      pairs.forEach(p => (p.hidden = p.dataset.pair !== b.dataset.run));
+    }));
+    // Pointing at a shared byte lights it and its twin in the other file; arrows walk the run
+    pairs.forEach(p => {
+      const light = (k: string | null) => p.querySelectorAll<HTMLElement>('.ps-tw-b.s').forEach(c => c.classList.toggle('on', c.dataset.k === k));
+      p.addEventListener('pointerover', e => light((e.target as HTMLElement).closest<HTMLElement>('.ps-tw-b.s')?.dataset.k ?? null));
+      p.addEventListener('pointerleave', () => light(null));
+      const first = p.querySelector<HTMLElement>('.ps-tw-b.s[tabindex]')!;
+      first.setAttribute('aria-label', 'Shared bytes. Use the arrow keys to walk them.');
+      first.addEventListener('focus', () => light(first.dataset.k!));
+      first.addEventListener('blur', () => light(null));
+      first.addEventListener('keydown', e => {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        e.preventDefault();
+        const all = [...p.querySelectorAll<HTMLElement>('.ps-tw-win:first-child .ps-tw-b.s')], max = all.length - 1;
+        const k = Math.max(0, Math.min(max, +(first.dataset.cur ?? 0) + (e.key === 'ArrowRight' ? 1 : -1)));
+        first.dataset.cur = String(k);
+        light(String(k));
+      });
+    });
+  });
+</script>

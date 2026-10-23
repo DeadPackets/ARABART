@@ -1,0 +1,131 @@
+---
+import Term from '../components/explain/Term.astro';
+import Figure from '../components/explain/Figure.astro';
+import Steps from '../components/explain/Steps.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+// SCREEN.COM loads at 0100h, so file offset = address - 100h
+const map = (addr: number) => `/DOSArchive/bytes/?f=SCREEN_SCREEN.COM&layer=memory&at=${(addr - 0x100).toString(16)}`;
+---
+
+<section id="scr-tldr">
+  <ul class="tldr">
+    <li>SCREEN.COM (1991) is not a picture. It is a 156-byte player and a 3,262-byte script that tells the player where to draw short vertical strokes.</li>
+    <li>Each line of text starts with 5 bytes that the player writes into its own instructions, so one small loop draws every color and shadow style.</li>
+    <li>He reused this player in TAHER.COM and the ARABIC/DEMO.COM advertisement. This page explains it once, in full.</li>
+  </ul>
+</section>
+
+<section id="scr-file">
+  <h2>What is inside a 1,672-byte screensaver?</h2>
+  <p class="lead">156 bytes of code, then three lines of drawing script, then the exit code and his credit.</p>
+  <Figure title="SCREEN.COM, every byte" caption="Measured in the unpacked file. On disk, DIET packs all of it into 1,672 bytes.">
+    @@scr-file@@
+  </Figure>
+  <p>SCREEN is a <Term id="com-file">COM file</Term>, compressed with the <Term id="diet">DIET</Term> packer. The code is an <Term id="interpreter">interpreter</Term>: it reads the script one byte at a time and draws. The three script lines are the Arabic text on the screen: محافظة بورسعيد / مركز المعلومات و التوثيق / إدارة الحاسب الآلى ("Port Said Governorate / Information and Documentation Center / Computer Department").</p>
+</section>
+
+<section id="scr-strokes">
+  <h2>How do bytes become pixels?</h2>
+  <p class="lead">A stroke is 2 bytes: how far below the line's origin it starts, and how many pixels it runs down. The letter <code>x</code> moves the pen one column.</p>
+  <Steps
+    title="First 27 script bytes, drawn"
+    steps={[
+      '<code>4B 43 00 07 04</code>: the line header. It sets the step direction, the shadow and two colors (next section).',
+      '<code>40 00 BD 01</code>: the origin, two 16-bit numbers. Rows count from 64 (0040h); the pen starts at column 445 (01BDh).',
+      '<code>20 04</code>: a stroke. It starts 20h (32) rows below the origin and runs 4 pixels down. Each pixel is drawn twice: grey, then red 2 right and 2 down.',
+      '<code>78</code> is the letter x: one column left. Two more strokes follow, each one column further left.',
+      'Two strokes in one column (<code>1D 04 23 04</code>): ink, a gap, more ink.',
+      '12 more strokes finish the start of the first letter. Line 1 has 340 strokes in 945 bytes.',
+    ]}
+  >
+    @@scr-zoom@@
+  </Steps>
+  <p>This is <Term id="run-length-encoding">run-length encoding</Term> turned on its side: the script stores runs of ink, not pixels. Every pixel goes through the <Term id="bios">BIOS</Term> pixel call, <code>INT 10h</code> with <code>AH = 0Ch</code>, in <Term id="ega">EGA</Term> mode 10h (640 by 350, 16 colors). The second call, 2 pixels right and 2 down, paints the shadow that makes the letters look raised.</p>
+  <p>The pen starts at the right and moves left, the way Arabic is written. The three lines hold 1,135 strokes in all.</p>
+  <Deep title="For engineers: the whole drawing loop">
+    <Listing
+      title="SCREEN.COM 012E to 0193"
+      lines={[
+        { off: '012E', code: 'mov  dl, [si] / inc si', note: 'next script byte' },
+        { off: '0131', code: 'cmp  dl, 70h / jl 016F', note: 'below 70h: a stroke' },
+        { off: '0136', code: "cmp  dl, 'x' / jne 013E" },
+        { off: '013B', code: 'dec  bx', note: 'one column; this opcode comes from the header', hi: true },
+        { off: '013E', code: "cmp  dl, 'w' / jne 0146" },
+        { off: '0143', code: 'inc  bx', note: 'the other way; also from the header', hi: true },
+        { off: '0146', code: "cmp  dl, 'y' / je 0108", note: 'next line: read a new header' },
+        { off: '014B', code: "cmp  dl, '{' ...", note: 'end of frame (next section)' },
+        { off: '016F', code: 'mov  dh, 0 / add dx, di', note: 'row = origin + offset' },
+        { off: '0173', code: 'mov  cl, [si] / inc si / mov ch, 0', note: 'CX = stroke length' },
+        { off: '0178', code: 'mov  ax, 0C03h', note: 'AH = 0Ch plot; AL = color from the header', hi: true },
+        { off: '017B', code: 'xchg bx, cx / int 10h', note: 'CX = column, DX = row' },
+        { off: '017F', code: 'jmp  018E', note: 'offset from the header: skip or draw the shadow', hi: true },
+        { off: '0181', code: 'mov  ax, 0C0Eh / inc cx x2 / inc dx x2 / int 10h', note: 'shadow pixel' },
+        { off: '018A', code: 'dec  cx x2 / dec dx x2' },
+        { off: '018E', code: 'inc  dx / xchg bx, cx / loop 0178', note: 'next pixel down' },
+        { off: '0193', code: 'jmp  012E' },
+      ]}
+      foot="The entire drawing engine. The rest of the code sets the video mode, reads headers, checks the keyboard and exits."
+    />
+    <p><a href={map(0x100)}>See the player in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="scr-patch">
+  <h2>How does one loop draw every style?</h2>
+  <p class="lead">Each line starts with 5 header bytes. The player writes them into its own instructions: two step opcodes, a jump offset and two colors.</p>
+  <Figure title="Header bytes become code" caption="The three header values are measured in the file. 0Dh makes the jump at 017F skip the shadow pixel.">
+    @@scr-patch@@
+  </Figure>
+  <p>This is <Term id="self-modifying-code">self-modifying code</Term> used as configuration. The plot instruction is <code>mov ax, 0C03h</code>; the header writes the stroke color over the 03, so the inner loop never reads a variable. The jump at 017F is the shadow switch: offset 00 falls through to the shadow pixel, offset 0Dh jumps past it.</p>
+  <p>Even the direction is data. A header could swap <code>dec bx</code> and <code>inc bx</code> and draw a line the other way. All three lines in SCREEN use <code>4B 43</code>, so <code>x</code> moves left.</p>
+  <Deep title="For engineers: reading a header">
+    <Listing
+      title="SCREEN.COM 0108 to 012D"
+      lines={[
+        { off: '0108', code: 'mov  al, [si] / inc si / mov [013Bh], al', note: "opcode for 'x'" },
+        { off: '010E', code: 'mov  al, [si] / inc si / mov [0143h], al', note: "opcode for 'w'" },
+        { off: '0114', code: 'mov  al, [si] / inc si / mov [0180h], al', note: 'shadow jump offset', hi: true },
+        { off: '011A', code: 'mov  al, [si] / inc si / mov [0179h], al', note: 'stroke color' },
+        { off: '0120', code: 'mov  al, [si] / inc si / mov [0182h], al', note: 'shadow color' },
+        { off: '0126', code: 'mov  di, [si] / inc si / inc si', note: 'origin row' },
+        { off: '012A', code: 'mov  bx, [si] / inc si / inc si', note: 'origin column' },
+      ]}
+    />
+  </Deep>
+</section>
+
+<section id="scr-loop">
+  <h2>Why does it keep moving?</h2>
+  <p class="lead">At the end of the script it checks the keyboard. If no key is waiting, it adds 1 to the color byte inside its own code and draws line 3 again.</p>
+  <Figure title="Line 3, frame by frame" caption="The color byte at 0179 counts from 02h to 0Fh, then starts again. The colors are the standard EGA palette.">
+    @@scr-cycle@@
+  </Figure>
+  <p>The check is the DOS call "is a key waiting?" (<code>INT 21h</code>, <code>AH = 0Bh</code>), once per frame. A key ends the program: text mode, then the credit "K E M Y A M Software Corp., &lt;C&gt;1991 YASSER MOHAMED ALI." in plain text. It is not a <Term id="tsr">TSR</Term>: nothing waits in the background for the screen to go idle. It runs until someone presses a key.</p>
+</section>
+
+<section id="scr-family">
+  <h2>Where else does this player appear?</h2>
+  <p class="lead">In two more 1991 programs that share their first 241 bytes: <a href="/ARABART/program/taher/">TAHER.COM</a> and the <a href="/ARABART/program/arabart-commercial/">ARABIC/DEMO.COM advertisement</a>.</p>
+  <ThenNow
+    rows={[
+      { then: 'A picture stored as drawing commands, played by a 156-byte interpreter', now: 'SVG paths, or a Lottie animation played by a small runtime', why: 'The file says how to draw, not every pixel, so it stays small.' },
+      { then: 'Runs of ink: start and length in each column', now: 'Run-length encoding in fax images and TIFF PackBits', why: 'Long runs of one color compress well.' },
+      { then: 'Header bytes written into the drawing loop', now: 'Shader uniforms set before each GPU draw call', why: 'One routine draws every style; only a few values change per line.' },
+      { then: 'One player in three programs', now: 'A game engine that loads level files', why: 'Write the engine once, ship new content as data.' },
+    ]}
+  />
+  <p>The later version adds a hidden credit, a pause between pictures and an end command. The <a href="/ARABART/program/taher/">TAHER page</a> shows those parts.</p>
+</section>
+
+<section id="scr-him">
+  <h2>What this tells us about him</h2>
+  <p class="lead">At the start of his career he already thought in engines and data formats, not in single pictures.</p>
+  <ul>
+    <li><strong>Size-minded:</strong> 156 bytes of code; the whole screensaver is 1,672 bytes on disk.</li>
+    <li><strong>Engine first:</strong> he designed a script format and a player, then reused the player for paid work.</li>
+    <li><strong>At home in the machine:</strong> colors, direction and the shadow switch live inside the instructions themselves.</li>
+    <li><strong>Weak spots:</strong> two BIOS calls per pixel are slow; the animation speed depends on the CPU; unknown bytes from 70h up are drawn as strokes instead of being rejected; 10 stray script bytes sit after the credit, likely left from a longer earlier build.</li>
+  </ul>
+</section>

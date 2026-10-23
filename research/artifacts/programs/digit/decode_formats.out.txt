@@ -1,0 +1,911 @@
+== BFL0.CIR (2079 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(70,51) +18=5 part=7411 +1a=1 +19=0
+   IC   @(70,23) +18=5 part=7404  [+7 uninitialised bytes: 0e002000000020] +1a=2 +19=0
+   IC   @(39,23) +18=5 part=7408  [+7 uninitialised bytes: 0e002000000040] +1a=3 +19=0
+   IC   @(101,23) +18=5 part=7432  [+7 uninitialised bytes: 0e002000000020] +1a=4 +19=0
+   NODE @(114,18) +13=1
+   NODE @(84,18) +13=3
+   PRIME@(15,25) #1 kind=in side(+13)=3
+   PRIME@(15,28) #2 kind=in side(+13)=3
+   PRIME@(15,31) #3 kind=in side(+13)=3
+   PRIME@(15,34) #4 kind=in side(+13)=3
+   PRIME@(135,18) #5 kind=VCC side(+13)=1
+   PRIME@(135,25) #6 kind=in side(+13)=1
+   PRIME@(135,28) #7 kind=in side(+13)=1
+   NODE @(122,28) +13=2
+   PRIME@(136,55) #8 kind=out side(+13)=1
+   PRIME@(91,86) #9 kind=in side(+13)=2
+   PRIME@(98,86) #10 kind=in side(+13)=2
+   NODE @(50,31) +13=4
+   NODE @(63,42) +13=5
+   NODE @(95,42) +13=6
+   NODE @(32,42) +13=7
+   PRIME@(14,44) #11 kind=GND side(+13)=3
+   NODE @(94,27) +13=8
+   WIRE (84,19)->(45,24) pins 14/0 refs=[3, 3, 2, 1] path=040404040404040404040404040404040404040404040404040404040404010101010104040404
+   WIRE (76,24)->(84,20) pins 0/14 refs=[3, 2, 1, 2] path=0606060609090909
+   WIRE (114,20)->(107,24) pins 14/0 refs=[4, 1, 2, 1] path=01010101040404
+   WIRE (114,19)->(86,19) pins 0/0 refs=[3, 1, 1, 1] path=04040404040404040404040404040404040404040404040404040404
+   WIRE (21,24)->(39,24) pins 1/1 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,27)->(39,26) pins 2/2 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (21,30)->(39,30) pins 4/3 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,33)->(39,32) pins 5/4 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (129,19)->(116,19) pins 0/5 refs=[1, 0, 1, 0] path=04040404040404040404040404
+   WIRE (129,26)->(107,26) pins 13/6 refs=[4, 0, 2, 0] path=04040404040404040404040404040404040404040404
+   WIRE (129,29)->(124,29) pins 0/7 refs=[2, 0, 1, 0] path=0404040404
+   WIRE (122,29)->(107,28) pins 12/0 refs=[4, 2, 2, 1] path=040404040704040404040404040404
+   WIRE (115,20)->(76,52) pins 14/0 refs=[1, 1, 2, 1] path=02020266020202020202020202020202020202020202010101010404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (123,30)->(76,58) pins 11/0 refs=[1, 2, 2, 1] path=02020202020202020202020202020202020202020101010101010101040404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (130,56)->(76,56) pins 12/8 refs=[1, 0, 2, 0] path=040404040404040404680404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (90,80)->(76,62) pins 9/9 refs=[1, 0, 2, 0] path=080808080808080808080707070707070707040404040404
+   WIRE (97,80)->(76,60) pins 10/10 refs=[1, 0, 2, 0] path=08080808080808080808070707070707070707070404040404040404040404
+   WIRE (50,32)->(45,32) pins 10/0 refs=[3, 4, 2, 1] path=0404040404
+   WIRE (39,34)->(50,33) pins 0/6 refs=[4, 3, 1, 2] path=0606090606060606060606
+   WIRE (52,32)->(70,32) pins 5/0 refs=[2, 4, 2, 1] path=060606060606060606060606060606060606
+   WIRE (39,28)->(101,24) pins 1/3 refs=[4, 3, 2, 2] path=0606090606060606060609090606060606060606060606060606060606060606060606060606060606060606060906060606060606060606060606060606
+   WIRE (101,26)->(70,34) pins 6/2 refs=[2, 4, 2, 2] path=040404040404040401040404040404040404040404040404040404010102020202020404
+   WIRE (45,34)->(76,32) pins 10/9 refs=[2, 3, 2, 2] path=03060606060606060606060606060606060606060606060606060606080808060606
+   WIRE (45,36)->(70,52) pins 1/8 refs=[1, 3, 2, 2] path=0303030202020202020203030303030306060606060606060606060606060606
+   WIRE (64,42)->(70,36) pins 7/0 refs=[2, 5, 2, 1] path=080808090909060606
+   WIRE (96,42)->(101,36) pins 7/0 refs=[4, 6, 2, 1] path=0808080909090606
+   WIRE (33,42)->(39,36) pins 7/0 refs=[3, 7, 2, 1] path=080808090909060606
+   WIRE (34,43)->(63,43) pins 0/0 refs=[5, 7, 1, 1] path=060606060606060606066a060606060606060606060606
+   WIRE (70,64)->(33,44) pins 0/7 refs=[7, 1, 1, 2] path=04040404040404040404040404040404040404040707070707070707070707070707070707080808
+   WIRE (20,43)->(32,43) pins 0/11 refs=[7, 0, 1, 0] path=060606060606060606060606
+   WIRE (76,64)->(76,34) pins 9/8 refs=[2, 1, 2, 2] path=04040808080808080808080808080808080808080808080808080808080808080606
+   WIRE (76,36)->(101,32) pins 5/8 refs=[4, 2, 2, 2] path=06060606090909090606060606060606060606060606060606
+   WIRE (101,34)->(70,54) pins 2/6 refs=[1, 4, 2, 2] path=040404040404040404040404040401010101010404040468020202020202020202060202020202020404
+   WIRE (95,43)->(65,43) pins 0/0 refs=[5, 6, 1, 1] path=040404040404040404040404040404040404046804040404
+   WIRE (96,28)->(107,30) pins 11/0 refs=[4, 8, 2, 1] path=0906060606060603030306
+   WIRE (94,28)->(76,30) pins 11/0 refs=[2, 8, 2, 1] path=040404040404040404040401010404040404
+   WIRE (95,29)->(101,30) pins 4/0 refs=[4, 8, 2, 1] path=02060606060606
+   WIRE (101,28)->(76,54) pins 13/3 refs=[1, 4, 2, 2] path=0303030202020202020202020202010101010101040404040404040404040404040404040404040404040402020202020206
+== BFL0.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== BFL1.CIR (174 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(6,6) +18=5 part=7404  [+7 uninitialised bytes: 01a801a2019401] +1a=1 +19=0
+   IC   @(20,8) +18=5 part=7404  [+7 uninitialised bytes: 03200000032000] +1a=2 +19=0
+   NODE @(16,8) +13=1
+   WIRE (12,7)->(16,8) pins 0/14 refs=[1, 1, 1, 2] path=0606020606
+   WIRE (18,8)->(26,9) pins 14/0 refs=[2, 1, 2, 1] path=06080606060606060606020204
+== BFL1.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=1, inversion=1 -> NOR, dual-output=0
+== BFL18.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 in #1
+   pin  5: gate 1 in #2
+   pin  6: gate 1 out #3
+   pin  7: GND
+   pin  8: gate 2 out #3
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 2 in #2
+   pin 12: gate 0 out #3
+   pin 13: gate 0 in #2
+   pin 14: VCC
+   gate type: Nand3_1
+   +24=1 gates(+26)=3 +25=1 +27=0
+== BFL2.CIR (2079 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(70,51) +18=5 part=7411 +1a=1 +19=0
+   IC   @(70,23) +18=5 part=7404  [+7 uninitialised bytes: 0e002000000020] +1a=2 +19=0
+   IC   @(39,23) +18=5 part=7408  [+7 uninitialised bytes: 0e002000000040] +1a=3 +19=0
+   IC   @(101,23) +18=5 part=7432  [+7 uninitialised bytes: 0e002000000020] +1a=4 +19=0
+   NODE @(114,18) +13=1
+   NODE @(84,18) +13=3
+   PRIME@(15,25) #1 kind=in side(+13)=3
+   PRIME@(15,28) #2 kind=in side(+13)=3
+   PRIME@(15,31) #3 kind=in side(+13)=3
+   PRIME@(15,34) #4 kind=in side(+13)=3
+   PRIME@(135,18) #5 kind=VCC side(+13)=1
+   PRIME@(135,25) #6 kind=in side(+13)=1
+   PRIME@(135,28) #7 kind=in side(+13)=1
+   NODE @(122,28) +13=2
+   PRIME@(136,55) #8 kind=out side(+13)=1
+   PRIME@(91,86) #9 kind=in side(+13)=2
+   PRIME@(98,86) #10 kind=in side(+13)=2
+   NODE @(50,31) +13=4
+   NODE @(63,42) +13=5
+   NODE @(95,42) +13=6
+   NODE @(32,42) +13=7
+   PRIME@(14,44) #11 kind=GND side(+13)=3
+   NODE @(94,27) +13=8
+   WIRE (84,19)->(45,24) pins 14/0 refs=[3, 3, 2, 1] path=040404040404040404040404040404040404040404040404040404040404010101010104040404
+   WIRE (76,24)->(84,20) pins 0/14 refs=[3, 2, 1, 2] path=0606060609090909
+   WIRE (114,20)->(107,24) pins 14/0 refs=[4, 1, 2, 1] path=01010101040404
+   WIRE (114,19)->(86,19) pins 0/0 refs=[3, 1, 1, 1] path=04040404040404040404040404040404040404040404040404040404
+   WIRE (21,24)->(39,24) pins 1/1 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,27)->(39,26) pins 2/2 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (21,30)->(39,30) pins 4/3 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,33)->(39,32) pins 5/4 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (129,19)->(116,19) pins 0/5 refs=[1, 0, 1, 0] path=04040404040404040404040404
+   WIRE (129,26)->(107,26) pins 13/6 refs=[4, 0, 2, 0] path=04040404040404040404040404040404040404040404
+   WIRE (129,29)->(124,29) pins 0/7 refs=[2, 0, 1, 0] path=0404040404
+   WIRE (122,29)->(107,28) pins 12/0 refs=[4, 2, 2, 1] path=040404040704040404040404040404
+   WIRE (115,20)->(76,52) pins 14/0 refs=[1, 1, 2, 1] path=02020266020202020202020202020202020202020202010101010404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (123,30)->(76,58) pins 11/0 refs=[1, 2, 2, 1] path=02020202020202020202020202020202020202020101010101010101040404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (130,56)->(76,56) pins 12/8 refs=[1, 0, 2, 0] path=040404040404040404680404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (90,80)->(76,62) pins 9/9 refs=[1, 0, 2, 0] path=080808080808080808080707070707070707040404040404
+   WIRE (97,80)->(76,60) pins 10/10 refs=[1, 0, 2, 0] path=08080808080808080808070707070707070707070404040404040404040404
+   WIRE (50,32)->(45,32) pins 10/0 refs=[3, 4, 2, 1] path=0404040404
+   WIRE (39,34)->(50,33) pins 0/6 refs=[4, 3, 1, 2] path=0606090606060606060606
+   WIRE (52,32)->(70,32) pins 5/0 refs=[2, 4, 2, 1] path=060606060606060606060606060606060606
+   WIRE (39,28)->(101,24) pins 1/3 refs=[4, 3, 2, 2] path=0606090606060606060609090606060606060606060606060606060606060606060606060606060606060606060906060606060606060606060606060606
+   WIRE (101,26)->(70,34) pins 6/2 refs=[2, 4, 2, 2] path=040404040404040401040404040404040404040404040404040404010102020202020404
+   WIRE (45,34)->(76,32) pins 10/9 refs=[2, 3, 2, 2] path=03060606060606060606060606060606060606060606060606060606080808060606
+   WIRE (45,36)->(70,52) pins 1/8 refs=[1, 3, 2, 2] path=0303030202020202020203030303030306060606060606060606060606060606
+   WIRE (64,42)->(70,36) pins 7/0 refs=[2, 5, 2, 1] path=080808090909060606
+   WIRE (96,42)->(101,36) pins 7/0 refs=[4, 6, 2, 1] path=0808080909090606
+   WIRE (33,42)->(39,36) pins 7/0 refs=[3, 7, 2, 1] path=080808090909060606
+   WIRE (34,43)->(63,43) pins 0/0 refs=[5, 7, 1, 1] path=060606060606060606066a060606060606060606060606
+   WIRE (70,64)->(33,44) pins 0/7 refs=[7, 1, 1, 2] path=04040404040404040404040404040404040404040707070707070707070707070707070707080808
+   WIRE (20,43)->(32,43) pins 0/11 refs=[7, 0, 1, 0] path=060606060606060606060606
+   WIRE (76,64)->(76,34) pins 9/8 refs=[2, 1, 2, 2] path=04040808080808080808080808080808080808080808080808080808080808080606
+   WIRE (76,36)->(101,32) pins 5/8 refs=[4, 2, 2, 2] path=06060606090909090606060606060606060606060606060606
+   WIRE (101,34)->(70,54) pins 2/6 refs=[1, 4, 2, 2] path=040404040404040404040404040401010101010404040468020202020202020202060202020202020404
+   WIRE (95,43)->(65,43) pins 0/0 refs=[5, 6, 1, 1] path=040404040404040404040404040404040404046804040404
+   WIRE (96,28)->(107,30) pins 11/0 refs=[4, 8, 2, 1] path=0906060606060603030306
+   WIRE (94,28)->(76,30) pins 11/0 refs=[2, 8, 2, 1] path=040404040404040404040401010404040404
+   WIRE (95,29)->(101,30) pins 4/0 refs=[4, 8, 2, 1] path=02060606060606
+   WIRE (101,28)->(76,54) pins 13/3 refs=[1, 4, 2, 2] path=0303030202020202020202020202010101010101040404040404040404040404040404040404040404040402020202020206
+== BFL2.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=0, inversion=0 -> AND, dual-output=0
+== BFL3.CIR (106 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(21,21) +18=5 part=7403  [+7 uninitialised bytes: 520cf633520cf6] +1a=1 +19=0
+   IC   @(0,0) +18=5 part=7400 +1a=2 +19=0
+== BFL3.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   3 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== BFL4.CIR (276 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(33,33) +18=5 part=7400 +1a=1 +19=0
+   PRIME@(20,35) #1 kind=in side(+13)=3
+   PRIME@(20,38) #2 kind=in side(+13)=3
+   PRIME@(29,46) #3 kind=out side(+13)=2
+   PRIME@(43,26) #4 kind=VCC side(+13)=0
+   PRIME@(33,58) #5 kind=GND side(+13)=2
+   WIRE (26,34)->(33,34) pins 1/1 refs=[1, 0, 2, 0] path=06060606060606
+   WIRE (26,37)->(33,36) pins 2/2 refs=[1, 0, 2, 0] path=09060606060606
+   WIRE (28,40)->(33,38) pins 3/3 refs=[1, 0, 2, 0] path=08080606060606
+   WIRE (44,32)->(39,34) pins 14/4 refs=[1, 0, 2, 0] path=02020404040404
+   WIRE (32,52)->(33,46) pins 7/5 refs=[1, 0, 2, 0] path=08080808080806
+== BFL4.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   4 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== BFL5.CIR (241 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(34,28) +18=5 part=7400  [+7 uninitialised bytes: fffffffffff9f8] +1a=1 +19=0
+   IC   @(58,28) +18=5 part=7400  [+7 uninitialised bytes: f44c0800000001] +1a=2 +19=0
+   NODE @(49,48) +13=1
+   PRIME@(50,64) #1 kind=in side(+13)=2
+   WIRE (40,37)->(34,39) pins 6/10 refs=[1, 1, 2, 2] path=0606060808086c08080606020202020404040408040402020202020202020202020202020202020202020404080808080808080804040404040404040408060606060606
+   WIRE (49,58)->(49,50) pins 0/1 refs=[1, 0, 1, 0] path=0808080808080808
+== BFL5.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   3 in / 1 out, controlling value=0, inversion=0 -> AND, dual-output=0
+== BFL6.CIR (66 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+== BFL6.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   3 in / 1 out, controlling value=1, inversion=1 -> NOR, dual-output=0
+== BFL7.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   8 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== BFL8.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=1, inversion=0 -> OR, dual-output=0
+== BFL8.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 2 out #0
+   pin  2: gate 0 in #0
+   pin  3: gate 0 in #1
+   pin  4: gate 1 out #2
+   pin  5: gate 1 in #0
+   pin  6: gate 1 in #1
+   pin  7: GND
+   pin  8: gate 2 in #0
+   pin  9: gate 2 in #1
+   pin 10: gate 2 out #2
+   pin 11: gate 3 in #0
+   pin 12: gate 3 in #1
+   pin 13: gate 3 out #2
+   pin 14: VCC
+   gate type: Nor2_1
+   +24=1 gates(+26)=4 +25=0 +27=180
+== FIL0.CIR (2079 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(70,51) +18=5 part=7411  [+7 uninitialised bytes: 08000000000000] +1a=1 +19=0
+   IC   @(70,23) +18=5 part=7404  [+7 uninitialised bytes: 04000040000050] +1a=2 +19=0
+   IC   @(39,23) +18=5 part=7408  [+7 uninitialised bytes: 01030400030002] +1a=3 +19=0
+   IC   @(101,23) +18=5 part=7432  [+7 uninitialised bytes: 04040404040404] +1a=4 +19=0
+   NODE @(114,18) +13=1
+   NODE @(84,18) +13=3
+   PRIME@(15,25) #1 kind=in side(+13)=3
+   PRIME@(15,28) #2 kind=in side(+13)=3
+   PRIME@(15,31) #3 kind=in side(+13)=3
+   PRIME@(15,34) #4 kind=in side(+13)=3
+   PRIME@(135,18) #5 kind=VCC side(+13)=1
+   PRIME@(135,25) #6 kind=in side(+13)=1
+   PRIME@(135,28) #7 kind=in side(+13)=1
+   NODE @(122,28) +13=2
+   PRIME@(136,55) #8 kind=out side(+13)=1
+   PRIME@(91,86) #9 kind=in side(+13)=2
+   PRIME@(98,86) #10 kind=in side(+13)=2
+   NODE @(50,31) +13=4
+   NODE @(63,42) +13=5
+   NODE @(95,42) +13=6
+   NODE @(32,42) +13=7
+   PRIME@(14,44) #11 kind=GND side(+13)=3
+   NODE @(94,27) +13=8
+   WIRE (84,19)->(45,24) pins 14/0 refs=[3, 3, 2, 1] path=040404040404040404040404040404040404040404040404040404040404010101010104040404
+   WIRE (76,24)->(84,20) pins 0/14 refs=[3, 2, 1, 2] path=0606060609090909
+   WIRE (114,20)->(107,24) pins 14/0 refs=[4, 1, 2, 1] path=01010101040404
+   WIRE (114,19)->(86,19) pins 0/0 refs=[3, 1, 1, 1] path=04040404040404040404040404040404040404040404040404040404
+   WIRE (21,24)->(39,24) pins 1/1 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,27)->(39,26) pins 2/2 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (21,30)->(39,30) pins 4/3 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,33)->(39,32) pins 5/4 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (129,19)->(116,19) pins 0/5 refs=[1, 0, 1, 0] path=04040404040404040404040404
+   WIRE (129,26)->(107,26) pins 13/6 refs=[4, 0, 2, 0] path=04040404040404040404040404040404040404040404
+   WIRE (129,29)->(124,29) pins 0/7 refs=[2, 0, 1, 0] path=0404040404
+   WIRE (122,29)->(107,28) pins 12/0 refs=[4, 2, 2, 1] path=040404040704040404040404040404
+   WIRE (115,20)->(76,52) pins 14/0 refs=[1, 1, 2, 1] path=02020266020202020202020202020202020202020202010101010404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (123,30)->(76,58) pins 11/0 refs=[1, 2, 2, 1] path=02020202020202020202020202020202020202020101010101010101040404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (130,56)->(76,56) pins 12/8 refs=[1, 0, 2, 0] path=040404040404040404680404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (90,80)->(76,62) pins 9/9 refs=[1, 0, 2, 0] path=080808080808080808080707070707070707040404040404
+   WIRE (97,80)->(76,60) pins 10/10 refs=[1, 0, 2, 0] path=08080808080808080808070707070707070707070404040404040404040404
+   WIRE (50,32)->(45,32) pins 10/0 refs=[3, 4, 2, 1] path=0404040404
+   WIRE (39,34)->(50,33) pins 0/6 refs=[4, 3, 1, 2] path=0606090606060606060606
+   WIRE (52,32)->(70,32) pins 5/0 refs=[2, 4, 2, 1] path=060606060606060606060606060606060606
+   WIRE (39,28)->(101,24) pins 1/3 refs=[4, 3, 2, 2] path=0606090606060606060609090606060606060606060606060606060606060606060606060606060606060606060906060606060606060606060606060606
+   WIRE (101,26)->(70,34) pins 6/2 refs=[2, 4, 2, 2] path=040404040404040401040404040404040404040404040404040404010102020202020404
+   WIRE (45,34)->(76,32) pins 10/9 refs=[2, 3, 2, 2] path=03060606060606060606060606060606060606060606060606060606080808060606
+   WIRE (45,36)->(70,52) pins 1/8 refs=[1, 3, 2, 2] path=0303030202020202020203030303030306060606060606060606060606060606
+   WIRE (64,42)->(70,36) pins 7/0 refs=[2, 5, 2, 1] path=080808090909060606
+   WIRE (96,42)->(101,36) pins 7/0 refs=[4, 6, 2, 1] path=0808080909090606
+   WIRE (33,42)->(39,36) pins 7/0 refs=[3, 7, 2, 1] path=080808090909060606
+   WIRE (34,43)->(63,43) pins 0/0 refs=[5, 7, 1, 1] path=060606060606060606066a060606060606060606060606
+   WIRE (70,64)->(33,44) pins 0/7 refs=[7, 1, 1, 2] path=04040404040404040404040404040404040404040707070707070707070707070707070707080808
+   WIRE (20,43)->(32,43) pins 0/11 refs=[7, 0, 1, 0] path=060606060606060606060606
+   WIRE (76,64)->(76,34) pins 9/8 refs=[2, 1, 2, 2] path=04040808080808080808080808080808080808080808080808080808080808080606
+   WIRE (76,36)->(101,32) pins 5/8 refs=[4, 2, 2, 2] path=06060606090909090606060606060606060606060606060606
+   WIRE (101,34)->(70,54) pins 2/6 refs=[1, 4, 2, 2] path=040404040404040404040404040401010101010404040468020202020202020202060202020202020404
+   WIRE (95,43)->(65,43) pins 0/0 refs=[5, 6, 1, 1] path=040404040404040404040404040404040404046804040404
+   WIRE (96,28)->(107,30) pins 11/0 refs=[4, 8, 2, 1] path=0906060606060603030306
+   WIRE (94,28)->(76,30) pins 11/0 refs=[2, 8, 2, 1] path=040404040404040404040401010404040404
+   WIRE (95,29)->(101,30) pins 4/0 refs=[4, 8, 2, 1] path=02060606060606
+   WIRE (101,28)->(76,54) pins 13/3 refs=[1, 4, 2, 2] path=0303030202020202020202020202010101010101040404040404040404040404040404040404040404040402020202020206
+== FIL0.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== FIL0.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: 20122e12]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== FIL0.TCK (77 bytes) header="Copyright 1993 by KEMYAM (c) For Tecknologies Save" parse_end=OK
+   +13=0 +1c=546 +18=1 +19=1 open-collector=0 +0e..12=0001000000 text=b''
+== FIL1.CIR (174 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(6,6) +18=5 part=7404 +1a=1 +19=0
+   IC   @(20,8) +18=5 part=7404  [+7 uninitialised bytes: 0e002000000040] +1a=2 +19=0
+   NODE @(16,8) +13=1
+   WIRE (12,7)->(16,8) pins 0/14 refs=[1, 1, 1, 2] path=0606020606
+   WIRE (18,8)->(26,9) pins 14/0 refs=[2, 1, 2, 1] path=06080606060606060606020204
+== FIL1.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=1, inversion=1 -> NOR, dual-output=0
+== FIL1.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: 0000c212]
+   +24=1 gates(+26)=4 +25=1 +27=0
+== FIL1.TCK (77 bytes) header="Copyright 1993 by KEMYAM (c) For Tecknologies Save" parse_end=OK
+   +13=0 +1c=546 +18=1 +19=1 open-collector=1 +0e..12=0001000000 text=b''
+== FIL10.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 out #2
+   pin  2: gate 0 in #0
+   pin  3: gate 0 in #1
+   pin  4: gate 1 out #2
+   pin  5: gate 1 in #0
+   pin  6: gate 1 in #1
+   pin  7: GND
+   pin  8: gate 2 in #0
+   pin  9: gate 2 in #1
+   pin 10: gate 2 out #2
+   pin 11: gate 3 in #0
+   pin 12: gate 3 in #1
+   pin 13: gate 3 out #2
+   pin 14: VCC
+   gate type: Nor2_1  [+5 uninitialised bytes: 7374726561]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== FIL11.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 out #2
+   pin  2: gate 0 in #0
+   pin  3: gate 0 in #1
+   pin  4: gate 1 out #2
+   pin  5: gate 1 in #0
+   pin  6: gate 1 in #1
+   pin  7: GND
+   pin  8: gate 2 in #0
+   pin  9: gate 2 in #1
+   pin 10: gate 2 out #2
+   pin 11: gate 3 in #0
+   pin 12: gate 3 in #1
+   pin 13: gate 3 out #2
+   pin 14: VCC
+   gate type: Nor2_1  [+5 uninitialised bytes: 7472004073]
+   +24=1 gates(+26)=4 +25=1 +27=0
+== FIL12.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 out #2
+   pin  2: gate 0 in #0
+   pin  3: gate 0 in #1
+   pin  4: gate 1 out #2
+   pin  5: gate 1 in #0
+   pin  6: gate 1 in #1
+   pin  7: GND
+   pin  8: gate 2 in #0
+   pin  9: gate 2 in #1
+   pin 10: gate 2 out #2
+   pin 11: gate 3 in #0
+   pin 12: gate 3 in #1
+   pin 13: gate 3 out #2
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: 74310040]
+   +24=1 gates(+26)=4 +25=1 +27=0
+== FIL13.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 out #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 out #1
+   pin  5: gate 2 in #0
+   pin  6: gate 2 out #1
+   pin  7: GND
+   pin  8: gate 3 out #1
+   pin  9: gate 3 in #0
+   pin 10: gate 4 out #1
+   pin 11: gate 4 in #0
+   pin 12: gate 5 out #1
+   pin 13: gate 5 in #0
+   pin 14: VCC
+   gate type: Not  [+8 uninitialised bytes: 6361746500407374]
+   +24=2 gates(+26)=6 +25=0 +27=0
+== FIL14.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 out #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 out #1
+   pin  5: gate 2 in #0
+   pin  6: gate 2 out #1
+   pin  7: GND
+   pin  8: gate 3 out #1
+   pin  9: gate 3 in #0
+   pin 10: gate 4 out #1
+   pin 11: gate 4 in #0
+   pin 12: gate 5 out #1
+   pin 13: gate 5 in #0
+   pin 14: VCC
+   gate type: Not  [+8 uninitialised bytes: 697070696e670040]
+   +24=2 gates(+26)=6 +25=1 +27=0
+== FIL15.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 out #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 out #1
+   pin  5: gate 2 in #0
+   pin  6: gate 2 out #1
+   pin  7: GND
+   pin  8: gate 3 out #1
+   pin  9: gate 3 in #0
+   pin 10: gate 4 out #1
+   pin 11: gate 4 in #0
+   pin 12: gate 5 out #1
+   pin 13: gate 5 in #0
+   pin 14: VCC
+   gate type: Not  [+8 uninitialised bytes: 7175630040696f73]
+   +24=2 gates(+26)=6 +25=1 +27=0
+== FIL16.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 out #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 out #1
+   pin  5: gate 2 in #0
+   pin  6: gate 2 out #1
+   pin  7: GND
+   pin  8: gate 3 out #1
+   pin  9: gate 3 in #0
+   pin 10: gate 4 out #1
+   pin 11: gate 4 in #0
+   pin 12: gate 5 out #1
+   pin 13: gate 5 in #0
+   pin 14: VCC
+   gate type: Not  [+8 uninitialised bytes: 6f7340636c656172]
+   +24=2 gates(+26)=6 +25=1 +27=0
+== FIL17.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 out #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 out #1
+   pin  5: gate 2 in #0
+   pin  6: gate 2 out #1
+   pin  7: GND
+   pin  8: gate 3 out #1
+   pin  9: gate 3 in #0
+   pin 10: gate 4 out #1
+   pin 11: gate 4 in #0
+   pin 12: gate 5 out #1
+   pin 13: gate 5 in #0
+   pin 14: VCC
+   gate type: Buffer  [+5 uninitialised bytes: 900000e211]
+   +24=3 gates(+26)=6 +25=1 +27=0
+== FIL18.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 out #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 out #1
+   pin  5: gate 2 in #0
+   pin  6: gate 2 out #1
+   pin  7: GND
+   pin  8: gate 3 out #1
+   pin  9: gate 3 in #0
+   pin 10: gate 4 out #1
+   pin 11: gate 4 in #0
+   pin 12: gate 5 out #1
+   pin 13: gate 5 in #0
+   pin 14: VCC
+   gate type: Buffer  [+5 uninitialised bytes: 00fffffc10]
+   +24=3 gates(+26)=6 +25=1 +27=0
+== FIL19.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 in #1
+   pin  5: gate 1 in #2
+   pin  6: gate 1 out #3
+   pin  7: GND
+   pin  8: gate 2 out #3
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 2 in #2
+   pin 12: gate 0 out #3
+   pin 13: gate 0 in #2
+   pin 14: VCC
+   gate type: Nand3_1  [+4 uninitialised bytes: ffffe611]
+   +24=1 gates(+26)=3 +25=0 +27=0
+== FIL2.CIR (2079 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(70,51) +18=5 part=7411 +1a=1 +19=0
+   IC   @(70,23) +18=5 part=7404  [+7 uninitialised bytes: 0e002000000020] +1a=2 +19=0
+   IC   @(39,23) +18=5 part=7408  [+7 uninitialised bytes: 94084a3494084a] +1a=3 +19=0
+   IC   @(101,23) +18=5 part=7432  [+7 uninitialised bytes: 0e002000000020] +1a=4 +19=0
+   NODE @(114,18) +13=1
+   NODE @(84,18) +13=3
+   PRIME@(15,25) #1 kind=in side(+13)=3
+   PRIME@(15,28) #2 kind=in side(+13)=3
+   PRIME@(15,31) #3 kind=in side(+13)=3
+   PRIME@(15,34) #4 kind=in side(+13)=3
+   PRIME@(135,18) #5 kind=VCC side(+13)=1
+   PRIME@(135,25) #6 kind=in side(+13)=1
+   PRIME@(135,28) #7 kind=in side(+13)=1
+   NODE @(122,28) +13=2
+   PRIME@(136,55) #8 kind=out side(+13)=1
+   PRIME@(91,86) #9 kind=in side(+13)=2
+   PRIME@(98,86) #10 kind=in side(+13)=2
+   NODE @(50,31) +13=4
+   NODE @(63,42) +13=5
+   NODE @(95,42) +13=6
+   NODE @(32,42) +13=7
+   PRIME@(14,44) #11 kind=GND side(+13)=3
+   NODE @(94,27) +13=8
+   WIRE (84,19)->(45,24) pins 14/0 refs=[3, 3, 2, 1] path=040404040404040404040404040404040404040404040404040404040404010101010104040404
+   WIRE (76,24)->(84,20) pins 0/14 refs=[3, 2, 1, 2] path=0606060609090909
+   WIRE (114,20)->(107,24) pins 14/0 refs=[4, 1, 2, 1] path=01010101040404
+   WIRE (114,19)->(86,19) pins 0/0 refs=[3, 1, 1, 1] path=04040404040404040404040404040404040404040404040404040404
+   WIRE (21,24)->(39,24) pins 1/1 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,27)->(39,26) pins 2/2 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (21,30)->(39,30) pins 4/3 refs=[3, 0, 2, 0] path=060606060606060606060606060606060606
+   WIRE (21,33)->(39,32) pins 5/4 refs=[3, 0, 2, 0] path=060606060906060606060606060606060606
+   WIRE (129,19)->(116,19) pins 0/5 refs=[1, 0, 1, 0] path=04040404040404040404040404
+   WIRE (129,26)->(107,26) pins 13/6 refs=[4, 0, 2, 0] path=04040404040404040404040404040404040404040404
+   WIRE (129,29)->(124,29) pins 0/7 refs=[2, 0, 1, 0] path=0404040404
+   WIRE (122,29)->(107,28) pins 12/0 refs=[4, 2, 2, 1] path=040404040704040404040404040404
+   WIRE (115,20)->(76,52) pins 14/0 refs=[1, 1, 2, 1] path=02020266020202020202020202020202020202020202010101010404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (123,30)->(76,58) pins 11/0 refs=[1, 2, 2, 1] path=02020202020202020202020202020202020202020101010101010101040404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (130,56)->(76,56) pins 12/8 refs=[1, 0, 2, 0] path=040404040404040404680404040404040404040404040404040404040404040404040404040404040404040404040404
+   WIRE (90,80)->(76,62) pins 9/9 refs=[1, 0, 2, 0] path=080808080808080808080707070707070707040404040404
+   WIRE (97,80)->(76,60) pins 10/10 refs=[1, 0, 2, 0] path=08080808080808080808070707070707070707070404040404040404040404
+   WIRE (50,32)->(45,32) pins 10/0 refs=[3, 4, 2, 1] path=0404040404
+   WIRE (39,34)->(50,33) pins 0/6 refs=[4, 3, 1, 2] path=0606090606060606060606
+   WIRE (52,32)->(70,32) pins 5/0 refs=[2, 4, 2, 1] path=060606060606060606060606060606060606
+   WIRE (39,28)->(101,24) pins 1/3 refs=[4, 3, 2, 2] path=0606090606060606060609090606060606060606060606060606060606060606060606060606060606060606060906060606060606060606060606060606
+   WIRE (101,26)->(70,34) pins 6/2 refs=[2, 4, 2, 2] path=040404040404040401040404040404040404040404040404040404010102020202020404
+   WIRE (45,34)->(76,32) pins 10/9 refs=[2, 3, 2, 2] path=03060606060606060606060606060606060606060606060606060606080808060606
+   WIRE (45,36)->(70,52) pins 1/8 refs=[1, 3, 2, 2] path=0303030202020202020203030303030306060606060606060606060606060606
+   WIRE (64,42)->(70,36) pins 7/0 refs=[2, 5, 2, 1] path=080808090909060606
+   WIRE (96,42)->(101,36) pins 7/0 refs=[4, 6, 2, 1] path=0808080909090606
+   WIRE (33,42)->(39,36) pins 7/0 refs=[3, 7, 2, 1] path=080808090909060606
+   WIRE (34,43)->(63,43) pins 0/0 refs=[5, 7, 1, 1] path=060606060606060606066a060606060606060606060606
+   WIRE (70,64)->(33,44) pins 0/7 refs=[7, 1, 1, 2] path=04040404040404040404040404040404040404040707070707070707070707070707070707080808
+   WIRE (20,43)->(32,43) pins 0/11 refs=[7, 0, 1, 0] path=060606060606060606060606
+   WIRE (76,64)->(76,34) pins 9/8 refs=[2, 1, 2, 2] path=04040808080808080808080808080808080808080808080808080808080808080606
+   WIRE (76,36)->(101,32) pins 5/8 refs=[4, 2, 2, 2] path=06060606090909090606060606060606060606060606060606
+   WIRE (101,34)->(70,54) pins 2/6 refs=[1, 4, 2, 2] path=040404040404040404040404040401010101010404040468020202020202020202060202020202020404
+   WIRE (95,43)->(65,43) pins 0/0 refs=[5, 6, 1, 1] path=040404040404040404040404040404040404046804040404
+   WIRE (96,28)->(107,30) pins 11/0 refs=[4, 8, 2, 1] path=0906060606060603030306
+   WIRE (94,28)->(76,30) pins 11/0 refs=[2, 8, 2, 1] path=040404040404040404040401010404040404
+   WIRE (95,29)->(101,30) pins 4/0 refs=[4, 8, 2, 1] path=02060606060606
+   WIRE (101,28)->(76,54) pins 13/3 refs=[1, 4, 2, 2] path=0303030202020202020202020202010101010101040404040404040404040404040404040404040404040402020202020206
+== FIL2.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=0, inversion=0 -> AND, dual-output=0
+== FIL2.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: And2_1  [+5 uninitialised bytes: 10b610b810]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== FIL20.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 in #1
+   pin  5: gate 1 in #2
+   pin  6: gate 1 out #3
+   pin  7: GND
+   pin  8: gate 2 out #3
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 2 in #2
+   pin 12: gate 0 out #3
+   pin 13: gate 0 in #2
+   pin 14: VCC
+   gate type: Nor3_1  [+5 uninitialised bytes: 02ffffd012]
+   +24=1 gates(+26)=3 +25=0 +27=0
+== FIL21.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 in #1
+   pin  5: gate 1 in #2
+   pin  6: gate 1 out #3
+   pin  7: GND
+   pin  8: gate 2 out #3
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 2 in #2
+   pin 12: gate 0 out #3
+   pin 13: gate 0 in #2
+   pin 14: VCC
+   gate type: And3_1  [+5 uninitialised bytes: 03ffffba13]
+   +24=1 gates(+26)=3 +25=0 +27=0
+== FIL22.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 1 in #0
+   pin  4: gate 1 in #1
+   pin  5: gate 1 in #2
+   pin  6: gate 1 out #3
+   pin  7: GND
+   pin  8: gate 2 out #3
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 2 in #2
+   pin 12: gate 0 out #3
+   pin 13: gate 0 in #2
+   pin 14: VCC
+   gate type: Nand3_1  [+4 uninitialised bytes: 0400c890]
+   +24=1 gates(+26)=3 +25=1 +27=0
+== FIL23.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 255 0x0 #0
+   pin  4: gate 0 out #2
+   pin  5: gate 0 in #3
+   pin  6: gate 0 out #4
+   pin  7: GND
+   pin  8: gate 1 out #4
+   pin  9: gate 0 in #0
+   pin 10: gate 1 in #1
+   pin 11: gate 255 0x0 #0
+   pin 12: gate 1 in #2
+   pin 13: gate 1 in #3
+   pin 14: VCC
+   gate type: Nand4_1  [+4 uninitialised bytes: ffff2016]
+   +24=1 gates(+26)=2 +25=0 +27=0
+== FIL24.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 255 0x0 #0
+   pin  4: gate 0 out #2
+   pin  5: gate 0 in #3
+   pin  6: gate 0 out #4
+   pin  7: GND
+   pin  8: gate 1 out #4
+   pin  9: gate 0 in #0
+   pin 10: gate 1 in #1
+   pin 11: gate 255 0x0 #0
+   pin 12: gate 1 in #2
+   pin 13: gate 1 in #3
+   pin 14: VCC
+   gate type: Nand4_1  [+4 uninitialised bytes: ffff8017]
+   +24=1 gates(+26)=2 +25=0 +27=0
+== FIL25.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 255 0x0 #0
+   pin  4: gate 0 out #2
+   pin  5: gate 0 in #3
+   pin  6: gate 0 out #4
+   pin  7: GND
+   pin  8: gate 1 out #4
+   pin  9: gate 0 in #0
+   pin 10: gate 1 in #1
+   pin 11: gate 255 0x0 #0
+   pin 12: gate 1 in #2
+   pin 13: gate 1 in #3
+   pin 14: VCC
+   gate type: And4_1  [+5 uninitialised bytes: 06ffff0019]
+   +24=1 gates(+26)=2 +25=0 +27=0
+== FIL26.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 255 0x0 #0
+   pin  4: gate 0 out #2
+   pin  5: gate 0 in #3
+   pin  6: gate 0 out #4
+   pin  7: GND
+   pin  8: gate 1 out #4
+   pin  9: gate 0 in #0
+   pin 10: gate 1 in #1
+   pin 11: gate 255 0x0 #0
+   pin 12: gate 1 in #2
+   pin 13: gate 1 in #3
+   pin 14: VCC
+   gate type: And4_1  [+5 uninitialised bytes: 07ffff801a]
+   +24=1 gates(+26)=2 +25=0 +27=0
+== FIL27.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 in #2
+   pin  4: gate 0 in #3
+   pin  5: gate 0 in #4
+   pin  6: gate 0 in #5
+   pin  7: GND
+   pin  8: gate 0 out #8
+   pin  9: gate 255 0x0 #0
+   pin 10: gate 255 0x0 #0
+   pin 11: gate 0 in #6
+   pin 12: gate 0 in #7
+   pin 13: gate 255 0x0 #0
+   pin 14: VCC
+   gate type: Nand8_1  [+4 uninitialised bytes: 0400fb90]
+   +24=1 gates(+26)=1 +25=0 +27=0
+== FIL3.CIR (106 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(21,21) +18=5 part=7403  [+7 uninitialised bytes: 03200000032000] +1a=1 +19=0
+   IC   @(0,0) +18=5 part=7400  [+7 uninitialised bytes: e7804c81d5ffa7] +1a=2 +19=0
+== FIL3.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   3 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== FIL3.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: And2_1  [+5 uninitialised bytes: 07da073e14]
+   +24=1 gates(+26)=4 +25=1 +27=0
+== FIL4.CIR (276 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(33,33) +18=5 part=7400  [+7 uninitialised bytes: 080c4a34080c4a] +1a=1 +19=0
+   PRIME@(20,35) #1 kind=in side(+13)=3
+   PRIME@(20,38) #2 kind=in side(+13)=3
+   PRIME@(29,46) #3 kind=out side(+13)=2
+   PRIME@(43,26) #4 kind=VCC side(+13)=0
+   PRIME@(33,58) #5 kind=GND side(+13)=2
+   WIRE (26,34)->(33,34) pins 1/1 refs=[1, 0, 2, 0] path=06060606060606
+   WIRE (26,37)->(33,36) pins 2/2 refs=[1, 0, 2, 0] path=09060606060606
+   WIRE (28,40)->(33,38) pins 3/3 refs=[1, 0, 2, 0] path=08080606060606
+   WIRE (44,32)->(39,34) pins 14/4 refs=[1, 0, 2, 0] path=02020404040404
+   WIRE (32,52)->(33,46) pins 7/5 refs=[1, 0, 2, 0] path=08080808080806
+== FIL4.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   4 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== FIL4.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: 70157215]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== FIL5.CIR (241 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+   IC   @(34,28) +18=5 part=7400  [+7 uninitialised bytes: 0400a538d5ffa7] +1a=1 +19=0
+   IC   @(58,28) +18=5 part=7400  [+7 uninitialised bytes: 02022000000220] +1a=2 +19=0
+   NODE @(49,48) +13=1
+   PRIME@(50,64) #1 kind=in side(+13)=2
+   WIRE (40,37)->(34,39) pins 6/10 refs=[1, 1, 2, 2] path=0606060808086c08080606020202020404040408040402020202020202020202020202020202020202020404080808080808080804040404040404040408060606060606
+   WIRE (49,58)->(49,50) pins 0/1 refs=[1, 0, 1, 0] path=0808080808080808
+== FIL5.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   3 in / 1 out, controlling value=0, inversion=0 -> AND, dual-output=0
+== FIL5.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: Or2_1  [+6 uninitialised bytes: 000036162c16]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== FIL6.CIR (66 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+== FIL6.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   3 in / 1 out, controlling value=1, inversion=1 -> NOR, dual-output=0
+== FIL6.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: f016c213]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== FIL7.CIR (66 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+== FIL7.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   8 in / 1 out, controlling value=0, inversion=1 -> NAND, dual-output=0
+== FIL7.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 in #0
+   pin  2: gate 0 in #1
+   pin  3: gate 0 out #2
+   pin  4: gate 1 in #0
+   pin  5: gate 1 in #1
+   pin  6: gate 1 out #2
+   pin  7: GND
+   pin  8: gate 2 out #2
+   pin  9: gate 2 in #0
+   pin 10: gate 2 in #1
+   pin 11: gate 3 out #2
+   pin 12: gate 3 in #0
+   pin 13: gate 3 in #1
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: e017da17]
+   +24=1 gates(+26)=4 +25=1 +27=0
+== FIL8.CIR (66 bytes) header="Copyright 1993 by KEMYAM (c) For ScreenImage Save" parse_end=OK
+== FIL8.GAT (60 bytes) header="Copyright 1993 by KEMYAM (c) For Gate Save" parse_end=OK
+   2 in / 1 out, controlling value=1, inversion=0 -> OR, dual-output=0
+== FIL8.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 out #2
+   pin  2: gate 0 in #0
+   pin  3: gate 0 in #1
+   pin  4: gate 1 out #2
+   pin  5: gate 1 in #0
+   pin  6: gate 1 in #1
+   pin  7: GND
+   pin  8: gate 2 in #0
+   pin  9: gate 2 in #1
+   pin 10: gate 2 out #2
+   pin 11: gate 3 in #0
+   pin 12: gate 3 in #1
+   pin 13: gate 3 out #2
+   pin 14: VCC
+   gate type: Nand2_1  [+4 uninitialised bytes: 38187218]
+   +24=1 gates(+26)=4 +25=1 +27=0
+== FIL9.IC (138 bytes) header="Copyright 1993 by KEMYAM (c) For ICs Save" parse_end=OK
+   pin  1: gate 0 out #2
+   pin  2: gate 0 in #0
+   pin  3: gate 0 in #1
+   pin  4: gate 1 out #2
+   pin  5: gate 1 in #0
+   pin  6: gate 1 in #1
+   pin  7: GND
+   pin  8: gate 2 in #0
+   pin  9: gate 2 in #1
+   pin 10: gate 2 out #2
+   pin 11: gate 3 in #0
+   pin 12: gate 3 in #1
+   pin 13: gate 3 out #2
+   pin 14: VCC
+   gate type: Nor2_1  [+5 uninitialised bytes: 747265616d]
+   +24=1 gates(+26)=4 +25=0 +27=0
+== GROUP.CIR (173 bytes) header="Copyright 1993 By KEMYAM (C) " parse_end=OK
+   0: KEMYAM  [+5 uninitialised bytes: efffddffb3] flag=0
+   1: CONECTINON  [+1 uninitialised bytes: ea] flag=0
+   2: TEST2  [+6 uninitialised bytes: ffeffff7ffdd] flag=0
+   3: TEST  [+7 uninitialised bytes: fcff2480fcfffc] flag=0
+   4: NAND_2_INP  [+1 uninitialised bytes: 4c] flag=0
+   5: ANY_THING  [+2 uninitialised bytes: ffb2] flag=0
+   6: NOTHING_1  [+2 uninitialised bytes: ff23] flag=0
+   7: NOTHING_2  [+2 uninitialised bytes: 0050] flag=0
+   8: NOTHING_3  [+2 uninitialised bytes: 2beb] flag=0
+== GROUP.GAT (173 bytes) header="Copyright 1993 By KEMYAM (C) " parse_end=OK
+   0: Nand2_1  [+4 uninitialised bytes: 1f721101] flag=1
+   1: Nor2_1  [+5 uninitialised bytes: 00000f0f0f] flag=1
+   2: And2_1  [+5 uninitialised bytes: 008be55dca] flag=1
+   3: Nand3_1  [+4 uninitialised bytes: fe065301] flag=1
+   4: Nand4_1  [+4 uninitialised bytes: 000f0f0f] flag=1
+   5: And3_1  [+5 uninitialised bytes: 5dca080055] flag=1
+   6: Nor3_1  [+5 uninitialised bytes: 9a022ed001] flag=1
+   7: Nand8_1  [+4 uninitialised bytes: 000f0f0f] flag=1
+   8: Or2_1  [+6 uninitialised bytes: 00fe9f268b07] flag=1
+== GROUP.IC (420 bytes) header="Copyright 1993 By KEMYAM (C) " parse_end=OK
+   0: 7400  [+7 uninitialised bytes: 6e1270127212c4] flag=0
+   1: 7403  [+7 uninitialised bytes: c8108010821084] flag=0
+   2: 7408  [+7 uninitialised bytes: 5613661468146a] flag=0
+   3: 7409  [+7 uninitialised bytes: 201500002a1532] flag=0
+   4: 7426  [+7 uninitialised bytes: 0416081600000c] flag=0
+   5: 7432  [+7 uninitialised bytes: 6a136e13701372] flag=0
+   6: 7437  [+7 uninitialised bytes: a417a617c616ae] flag=0
+   7: 7438  [+7 uninitialised bytes: 68186c187e1800] flag=0
+   8: 7401  [+7 uninitialised bytes: 73747265616d62] flag=0
+   9: 7402  [+7 uninitialised bytes: 6f666600407374] flag=0
+   10: 7428  [+7 uninitialised bytes: 73652471760040] flag=0
+   11: 7433  [+7 uninitialised bytes: 616d6275664073] flag=0
+   12: 7439  [+7 uninitialised bytes: 62756666657265] flag=0
+   13: 7404  [+7 uninitialised bytes: 63247176004073] flag=0
+   14: 7405  [+7 uninitialised bytes: 6474680040696f] flag=0
+   15: 7406  [+7 uninitialised bytes: 696c2471760040] flag=0
+   16: 7416  [+7 uninitialised bytes: 690040696f7340] flag=0
+   17: 7407  [+7 uninitialised bytes: ffffbd10b800a8] flag=0
+   18: 7417  [+7 uninitialised bytes: ffffa711880178] flag=0
+   19: 7410  [+7 uninitialised bytes: ffff9112580248] flag=0
+   20: 7427  [+7 uninitialised bytes: ffff7b13280318] flag=0
+   21: 7411  [+7 uninitialised bytes: ffff6514f803e8] flag=0
+   22: 7412  [+7 uninitialised bytes: ffffc415e804d8] flag=0
+   23: 7413  [+7 uninitialised bytes: ffff1017980588] flag=0
+   24: 7420  [+7 uninitialised bytes: ffff9018580648] flag=0
+   25: 7421  [+7 uninitialised bytes: ffff101a180708] flag=0
+   26: 7440  [+7 uninitialised bytes: ffff901bd807c8] flag=0
+   27: 7430  [+7 uninitialised bytes: ffff301da80898] flag=0
+== GROUP.TCK (82 bytes) header="Copyright 1993 By KEMYAM (C) " parse_end=OK
+   0: TTL  [+8 uninitialised bytes: 52509a2000b81c8b] flag=0
+   1: TTLOpenC  [+3 uninitialised bytes: 8b4410] flag=0
+files with parse mismatch: 0 | wire paths verified: 170

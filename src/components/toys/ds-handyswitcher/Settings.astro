@@ -1,0 +1,151 @@
+---
+// HandySwitcher 3.1's settings, rebuilt from the dialog templates inside HandySwitcher.dll, with its License Key dialog.
+// The color page drives the menu preview (and the live HandySwitcher at the top of the page).
+import Sheet from './Sheet.astro';
+import { renderDialog, type Dialog } from './pocket.ts';
+import { pocketPcCode, groups, unlock } from '../../../lib/dinarsoft/handyswitcher.ts';
+import ui from './ui.json';
+import logo from './logo-2008.png';
+import actions from './menu-actions-27.png';
+
+const D = ui['31'].dialogs as unknown as Record<string, Dialog>;
+const ACTS = ['Close', 'Minimize', 'Show Menu', 'Minimize All', 'Close All but Active', 'Close All', 'System Default', 'No Action'];
+const pick = (first: string) => [first, ...ACTS.filter(a => a !== first)];
+// The code every Pocket PC showed when its hardware ID could not be read (his fallback, shared by all three apps)
+const CODE = pocketPcCode('730007B6BFA373D1380000050BFE45CE5');
+const ROLES = [
+  { id: 1041, v: '--mt', label: 'Menu Text', c: '#ffffff' },
+  { id: 1042, v: '--mbk', label: 'Menu Background', c: '#3f9f9f' },
+  { id: 1043, v: '--ibk', label: 'Icons Background', c: '#2e8080' },
+  { id: 1044, v: '--ht', label: 'Highlighted Text', c: '#ffffff' },
+  { id: 1045, v: '--hbk', label: 'Highlighted Background', c: '#4f7fb8' },
+];
+const pages = [
+  { tab: 'Actions', html: renderDialog(D['507'], {
+    1005: { checked: true }, 1001: { options: pick('Close'), value: 'X button, tap' }, 1002: { options: pick('Minimize'), value: 'X button, tap and hold' },
+    1003: { options: pick('Show Menu'), value: 'Program icon, tap' }, 1004: { options: pick('Close All'), value: 'Program icon, tap and hold' }, 1035: { checked: true } }, 'sa') },
+  { tab: 'Menu Items', html: renderDialog(D['508'], Object.fromEntries([1017, 1018, 1019, 1020, 1021, 1022, 1023].map(i => [i, { checked: true }])), 'sm') },
+  { tab: 'Icons', html: renderDialog(D['506'], { 3: { checked: true }, 1041: { checked: true }, 1042: { checked: true }, 1044: { value: '4' }, 1047: { value: '36' }, 1049: { value: '68' }, 1051: { checked: true } }, 'si') },
+  { tab: 'Colors', html: renderDialog(D['186'], { 1056: { options: ['Custom Colors', 'No Colors', 'Theme Colors', 'Reverse Theme Colors'], value: 'Menu colors' },
+    ...Object.fromEntries(ROLES.map(r => [r.id, { value: r.label, attrs: `data-role="${r.v}"`, style: `--sw:${r.c}` }])) }, 'sc') },
+  { tab: 'About', html: renderDialog(D['504'], { 1053: { img: logo.src }, 1025: { value: 'The trial period will expire after 15 day(s)', attrs: 'data-about' }, 1026: { attrs: 'data-register' } }, 'sb') },
+  { tab: 'Key', html: renderDialog(D['105'], { 1017: { img: logo.src }, 1002: { value: groups(CODE) }, 1004: { attrs: 'data-k="0" maxlength="4"' }, 1005: { attrs: 'data-k="1" maxlength="4"' }, 1006: { attrs: 'data-k="2" maxlength="4"' }, 1007: { attrs: 'data-k="3" maxlength="4"' } }, 'sk') },
+];
+const KEY = unlock.generate({});
+---
+
+<div class="hs-set" data-hsset data-code={CODE}>
+  <div class="hs-set-dev">
+    <Sheet id="hs-sheet" title="Settings" pages={pages} at={3} label="HandySwitcher 3.1 settings" soft={['ok', '']} />
+  </div>
+  <div class="hs-set-side">
+    <div class="hs-prev" aria-hidden="true" data-prev style={`--act:url(${actions.src})`}>
+      <p><span class="hs-prev-ic" style="--h:85">N</span><b>Notes</b><i></i></p>
+      <p class="hi"><span class="hs-prev-ic" style="--h:255">▶</span><b>Windows Media</b><i></i></p>
+      <p><span class="hs-prev-ic" style="--h:240">W</span><b>Pocket Word</b><i></i></p>
+      <p class="hs-prev-foot">HandySwitcher <span>Opt</span></p>
+    </div>
+    <div class="hs-set-pick" data-pick hidden>
+      {ROLES.map(r => <label><input type="color" value={r.c} data-for={r.v} /><span>{r.label}</span></label>)}
+    </div>
+    <p class="hs-set-note" data-note aria-live="polite">Tap a color square on the Colors page. The menu above, and the HandySwitcher at the top of this page, follow it.</p>
+    <p class="hs-set-reg" data-regtip hidden>On the About page, tap <b>Register...</b> and type the freeware key: <code>{groups(KEY)}</code>. <button type="button" class="button" data-fill>Type it for me</button></p>
+  </div>
+</div>
+
+<style is:global>
+  .hs-set { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px 32px; align-items: start; }
+  .hs-set-dev { width: 320px; max-width: 100%; }
+  .hs-set-side { display: grid; gap: 16px; max-width: 40ch; }
+  .hs-prev { --mt: #fff; --mbk: #3f9f9f; --ibk: #2e8080; --ht: #fff; --hbk: #4f7fb8; width: 240px; max-width: 100%; color: var(--mt); background: var(--mbk); border: 1px solid #000; font: 700 13px/1 Tahoma, Verdana, sans-serif; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.25); }
+  .hs-prev p { display: flex; align-items: center; gap: 8px; margin: 0 !important; height: 28px; padding: 0 6px; font: inherit !important; color: var(--mt) !important; }
+  .hs-prev p.hi { color: var(--ht) !important; background: var(--hbk); }
+  .hs-prev b { flex: 1; font: inherit; color: inherit; }
+  .hs-prev i { width: 18px; height: 18px; background: var(--act) no-repeat 0 0 / 600% 100%; image-rendering: pixelated; }
+  .hs-prev-ic { display: grid; place-items: center; width: 18px; height: 18px; font-size: 10px; color: #fff; background: oklch(0.6 0.15 var(--h)); border-radius: 4px; box-shadow: 0 0 0 2px var(--ibk); }
+  .hs-prev p.hs-prev-foot { justify-content: space-between; color: #000 !important; background: #fffbf0; font-size: 12px !important; height: 22px; }
+  .hs-prev-foot span { font-weight: 400; border: 1px solid #000; border-radius: 4px; padding: 0 4px; }
+  .hs-set-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 12px; }
+  .hs-set-pick label { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 0.875rem; color: var(--ink); cursor: pointer; }
+  .hs-set-pick input { width: 44px; height: 44px; padding: 0; border: 1px solid var(--xp-line, #7f9db9); background: #fff; cursor: pointer; }
+  .hs-set-pick input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hs-set-note, .hs-set-reg { margin: 0 !important; font-size: 0.9375rem !important; line-height: 1.5 !important; }
+  .hs-set-reg code { font: 700 1rem/1 var(--font-code); color: var(--accent); white-space: nowrap; }
+  .hs-set-reg .button { margin-top: 8px; min-height: 44px; padding: 0 14px; }
+  #hs-sheet .ppc-tabs button:last-child { display: none; }
+  #hs-sheet .ppc-dlg [data-about].ok { color: #006000; font-weight: 700; }
+  @media (max-width: 720px) { .hs-set { grid-template-columns: minmax(0, 1fr); justify-items: center; } .hs-set-side { justify-items: center; } .hs-set-side > p { text-align: center; } }
+</style>
+
+<script>
+  import { dinarKey, UNIVERSAL } from '../../../lib/dinarsoft/handyswitcher.ts';
+
+  document.querySelectorAll<HTMLElement & { hs?: boolean }>('[data-hsset]').forEach(root => {
+    if (root.hs) return;
+    root.hs = true;
+    const sheet = root.querySelector<HTMLElement>('[data-sheet]')!;
+    const tabs = () => [...sheet.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const note = root.querySelector<HTMLElement>('[data-note]')!, prev = root.querySelector<HTMLElement>('[data-prev]')!;
+    const pickers = [...root.querySelectorAll<HTMLInputElement>('[data-pick] input')];
+    const mode = sheet.querySelector<HTMLSelectElement>('select[data-id="1056"]')!;
+    const THEME: Record<string, string> = { '--mt': '#ffffff', '--mbk': '#0d4fa7', '--ibk': '#0a3d82', '--ht': '#000000', '--hbk': '#ffd65a' };
+    const NONE: Record<string, string> = { '--mt': '#000000', '--mbk': '#ffffff', '--ibk': '#ffffff', '--ht': '#ffffff', '--hbk': '#000000' };
+    const apply = (vars: Record<string, string>) => {
+      const targets = [prev, ...document.querySelectorAll<HTMLElement>('[data-hslive]')];
+      for (const [k, v] of Object.entries(vars)) {
+        for (const t of targets) t.style.setProperty(k, v);
+        const sw = sheet.querySelector<HTMLElement>(`[data-role="${k}"]`);
+        if (sw) sw.style.setProperty('--sw', v);
+      }
+    };
+    const custom = () => Object.fromEntries(pickers.map(p => [p.dataset.for!, p.value]));
+    const setMode = () => {
+      const m = mode.value;
+      apply(m === 'No Colors' ? NONE : m === 'Theme Colors' ? THEME : m === 'Reverse Theme Colors'
+        ? { '--mt': THEME['--mbk'], '--mbk': THEME['--mt'], '--ibk': '#dfe9f7', '--ht': THEME['--hbk'], '--hbk': THEME['--ht'] } : custom());
+      note.textContent = m === 'Theme Colors' ? 'Theme Colors: the menu takes the colors of the Today theme, read from the registry at Software\\Microsoft\\Color.'
+        : m === 'Reverse Theme Colors' ? 'Reverse Theme Colors: the same theme colors, swapped.' : m === 'No Colors' ? 'No Colors: plain black and white.' : 'Custom Colors: your five colors.';
+    };
+    mode.addEventListener('change', setMode);
+    pickers.forEach(p => p.addEventListener('input', () => { mode.value = 'Custom Colors'; setMode(); }));
+    sheet.querySelectorAll<HTMLElement>('[data-role]').forEach(sw => sw.addEventListener('click', () => {
+      pickers.find(p => p.dataset.for === sw.dataset.role)?.click();
+    }));
+    root.querySelector<HTMLElement>('[data-pick]')!.hidden = false;
+
+    // About → Register... → License Key → ok
+    const code = root.dataset.code!;
+    const about = sheet.querySelector<HTMLElement>('[data-about]')!;
+    const boxes = [...sheet.querySelectorAll<HTMLInputElement>('[data-k]')];
+    const regTip = root.querySelector<HTMLElement>('[data-regtip]')!;
+    let onKey = false;
+    sheet.addEventListener('sheet', e => {
+      const k = (e as CustomEvent).detail as number;
+      onKey = k === tabs().length - 1;
+      regTip.hidden = !(onKey || k === tabs().length - 2);
+      const soft = sheet.closest('.win')!.querySelector<HTMLElement>('.ds-soft span')!;
+      soft.textContent = 'ok';
+    });
+    sheet.querySelector('[data-register]')?.addEventListener('click', () => { tabs()[tabs().length - 1].click(); boxes[0].focus(); });
+    boxes.forEach((b, i) => b.addEventListener('input', () => {
+      b.value = b.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 4);
+      if (b.value.length === 4 && boxes[i + 1]) boxes[i + 1].focus();
+      const typed = boxes.map(x => x.value).join('');
+      if (typed.length < 16) return;
+      const good = typed === dinarKey(code, 'HandySwitcher3') || typed === dinarKey(UNIVERSAL, 'HandySwitcher3');
+      if (good) {
+        about.textContent = 'This version of HandySwitcher is Registered';
+        about.classList.add('ok');
+        note.textContent = 'Registered. HandySwitcher’s own check, run on its own code in an emulator, accepts this key.';
+        tabs()[tabs().length - 2].click();
+      } else note.textContent = 'Those 16 letters are not a key for this code. Try the freeware key.';
+    }));
+    root.querySelector('[data-fill]')!.addEventListener('click', () => {
+      const k = dinarKey(UNIVERSAL, 'HandySwitcher3');
+      if (!onKey) tabs()[tabs().length - 1].click();
+      boxes.forEach((b, i) => { b.value = k.slice(i * 4, i * 4 + 4); });
+      boxes[3].dispatchEvent(new Event('input'));
+    });
+    regTip.hidden = true;
+  });
+</script>

@@ -1,0 +1,67 @@
+---
+// How HandySwitcher is built, 2.7 (2006) and 3.1 (2008): which file does what, with their real sizes.
+import Steps from '../../explain/Steps.astro';
+
+const STEPS = [
+  'Version 2.7, 2006: two programs. <b>HandySwitcher.exe</b> (77,824 bytes) holds the menu and the settings. <b>HHTask.exe</b> (28,672 bytes) lives in the system folder and sits on the top bar.',
+  'You tap the icon. HHTask sees the tap first and sends HandySwitcher a message, the way one browser tab can <code>postMessage</code> another. The menu drops down.',
+  'Version 3.1, 2008: the work moves into a <b>background service</b>. HandySwitcher.dll (143,360 bytes) runs inside <b>services.exe</b>, the phone’s host for always-on services, under the short name <b>HSW</b>. Think of a launchd or systemd service.',
+  'HandySwitcher.exe shrinks to 10,752 bytes. It is now a starter: it asks the system to start the service, then passes on commands.',
+  'Hardware buttons: setup adds shortcuts like <b>HandySwitcher [Close All]</b>. Assign one to a button, press it, and the starter tells the service <code>-closeall</code>.',
+];
+---
+
+<Steps title="Two programs in 2006, a service in 2008" steps={STEPS}>
+  <svg class="dg hs-parts" viewBox="0 0 760 340" role="img" aria-labelledby="hs-parts-t">
+    <title id="hs-parts-t">Version 2.7: the top bar, HHTask.exe and HandySwitcher.exe. Version 3.1: services.exe hosting HandySwitcher.dll, a 10 KB starter, and hardware-button shortcuts.</title>
+    <text class="t-yl" x="10" y="18">2.7 · 2006</text>
+    <text class="t-yl" x="400" y="18">3.1 · 2008</text>
+    <rect class="hs-bar" x="10" y="30" width="350" height="30" rx="3" />
+    <text class="hs-w" x="22" y="50">top bar</text>
+    <g data-s="1-2"><rect class="box" x="10" y="92" width="170" height="62" /><text x="22" y="117">HHTask.exe</text><text class="t-sm" x="22" y="138">28,672 bytes</text></g>
+    <g data-s="1-2"><rect class="box" x="190" y="92" width="170" height="62" /><text class="hs-n" x="202" y="117">HandySwitcher.exe</text><text class="t-sm" x="202" y="138">77,824 bytes</text></g>
+    <path class="wire-hi arrow" data-s="2" d="M95 60 V88" />
+    <path class="wire-hi arrow" data-s="2" d="M180 123 H186" />
+    <g data-s="2"><rect class="box-hi" x="190" y="176" width="170" height="74" /><text class="hs-w" x="202" y="200">the menu</text><text class="hs-w t-sm" x="202" y="222">Notes ✕</text><text class="hs-w t-sm" x="202" y="240">Calendar ✕</text></g>
+    <path class="wire-hi arrow" data-s="2" d="M275 154 V172" />
+
+    <rect class="hs-bar" x="400" y="30" width="350" height="30" rx="3" />
+    <text class="hs-w" x="412" y="50">top bar</text>
+    <g data-s="3+"><rect class="box-dash" x="400" y="80" width="350" height="96" /><text class="t-sm" x="412" y="98">services.exe · always running</text>
+      <rect class="box-hi" x="412" y="108" width="326" height="56" /><text class="hs-w" x="424" y="132">HandySwitcher.dll · HSW</text><text class="hs-w t-sm" x="424" y="152">143,360 bytes: menu, top bar, actions</text></g>
+    <path class="wire-hi arrow" data-s="3+" d="M700 104 V64" />
+    <g data-s="4+"><rect class="box" x="400" y="204" width="170" height="56" /><text class="hs-n" x="412" y="228">HandySwitcher.exe</text><text class="t-sm" x="412" y="248">10,752 bytes</text></g>
+    <path class="wire-hi arrow" data-s="4+" d="M485 204 V180" />
+    <g data-s="5"><rect class="box" x="580" y="204" width="170" height="56" /><text x="592" y="228">[Close All]</text><text class="t-sm" x="592" y="248">a button shortcut</text>
+      <path class="wire-hi arrow" d="M580 232 H574" /><text class="t-sm" x="412" y="300">-close · -closeall · -minimize</text><text class="t-sm" x="412" y="320">-minimizeall · -closebkgnd · -cycleapp</text></g>
+  </svg>
+  <svg slot="narrow" class="dg hs-parts" viewBox="0 0 360 560" role="img" aria-labelledby="hs-parts-tn">
+    <title id="hs-parts-tn">2.7: HHTask.exe and HandySwitcher.exe under the top bar. 3.1: services.exe hosts HandySwitcher.dll; a 10 KB starter and button shortcuts talk to it.</title>
+    <text class="t-yl" x="6" y="16">2.7 · 2006</text>
+    <rect class="hs-bar" x="6" y="26" width="348" height="28" rx="3" /><text class="hs-w" x="16" y="45">top bar</text>
+    <g data-s="1-2"><rect class="box" x="6" y="76" width="168" height="56" /><text x="16" y="99">HHTask.exe</text><text class="t-sm" x="16" y="119">28,672 bytes</text></g>
+    <g data-s="1-2"><rect class="box" x="186" y="76" width="168" height="56" /><text class="hs-n" x="196" y="99">HandySwitcher.exe</text><text class="t-sm" x="196" y="119">77,824 bytes</text></g>
+    <path class="wire-hi arrow" data-s="2" d="M90 54 V72" /><path class="wire-hi arrow" data-s="2" d="M174 104 H182" />
+    <g data-s="2"><rect class="box-hi" x="186" y="146" width="168" height="48" /><text class="hs-w" x="196" y="175">the menu</text></g>
+    <path class="wire-hi arrow" data-s="2" d="M270 132 V142" />
+    <text class="t-yl" x="6" y="238">3.1 · 2008</text>
+    <rect class="hs-bar" x="6" y="248" width="348" height="28" rx="3" /><text class="hs-w" x="16" y="267">top bar</text>
+    <g data-s="3+"><rect class="box-dash" x="6" y="296" width="348" height="92" /><text class="t-sm" x="16" y="314">services.exe · always running</text>
+      <rect class="box-hi" x="16" y="322" width="328" height="56" /><text class="hs-w" x="26" y="345">HandySwitcher.dll · HSW</text><text class="hs-w t-sm" x="26" y="366">143,360 bytes</text></g>
+    <path class="wire-hi arrow" data-s="3+" d="M320 318 V280" />
+    <g data-s="4+"><rect class="box" x="6" y="414" width="168" height="56" /><text class="hs-n" x="16" y="437">HandySwitcher.exe</text><text class="t-sm" x="16" y="457">10,752 bytes</text></g>
+    <path class="wire-hi arrow" data-s="4+" d="M90 414 V392" />
+    <g data-s="5"><rect class="box" x="186" y="414" width="168" height="56" /><text x="196" y="437">[Close All]</text><text class="t-sm" x="196" y="457">button shortcut</text>
+      <path class="wire-hi arrow" d="M186 442 H178" /><text class="t-sm" x="6" y="500">-close · -closeall · -minimize</text><text class="t-sm" x="6" y="520">-minimizeall · -closebkgnd · -cycleapp</text></g>
+  </svg>
+</Steps>
+
+<style is:global>
+  .hs-parts .hs-bar { fill: oklch(0.4 0.15 258); }
+  .hs-parts .hs-w { fill: #fff; }
+  .hs-parts .hs-n { font-size: 12px; font-weight: 700; }
+  .hs-parts text.hs-w.t-sm { fill: oklch(0.95 0.02 258); }
+  .steps.is-live .hs-parts [data-s]:not(.on) { opacity: 0.08; }
+  .hs-parts [data-s] { transition: opacity 0.3s; }
+  @media (prefers-reduced-motion: reduce) { .hs-parts [data-s] { transition: none; } }
+</style>

@@ -1,0 +1,25 @@
+---
+import '../../styles/explain.css';
+
+interface Row { then: string; now: string; why?: string }
+interface Props { rows: Row[]; title?: string; era?: string }
+const { rows, title = 'Then and now', era = '1991 to 1993' } = Astro.props;
+---
+
+<div class="tn" tabindex="0">
+  <table>
+    <caption>{title}</caption>
+    <thead>
+      <tr><th scope="col">{era}</th><th scope="col">2026</th><th scope="col">Why it is the same idea</th></tr>
+    </thead>
+    <tbody>
+      {rows.map(r => (
+        <tr>
+          <td data-h={era} set:html={r.then} />
+          <td data-h="2026" set:html={r.now} />
+          <td data-h="Same idea" set:html={r.why ?? ''} />
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,109 @@
+---
+// His two effects on top of ARABART (04B6:0163 shadow_text, 04B6:01B4 outline_text), one draw call at a time, on four
+// lines from The Brave Sun with the fonts and colors he used for them. Every pixel is drawn by his engine (src/lib/arabart).
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { png } from '../ssr.ts';
+import { ssrBin } from '../../arabart/ssr.ts';
+import { LINES, compose, type Fx } from './letters.ts';
+
+const bin = ssrBin();
+const first = compose(bin, LINES[0], 'title', 99);
+const FX: [Fx, string][] = [['plain', 'Plain'], ['shadow', 'Shadow'], ['outline', 'Outline'], ['title', 'Both']];
+---
+
+<div class="lt" data-letters>
+  <div class="lt-row">
+    <div class="lt-lines" role="radiogroup" aria-label="One of his lines">
+      {LINES.map((l, i) => (
+        <button type="button" role="radio" class="lt-line" data-i={i} aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1}>
+          <span lang="ar" dir="rtl">{l.ar}</span><small>{l.en}</small>
+        </button>
+      ))}
+    </div>
+    <div class="lt-fx" role="radiogroup" aria-label="Effect" hidden>
+      {FX.map(([k, n], i) => <button type="button" role="radio" class="button k-btn" data-fx={k} aria-checked={String(k === 'title')} tabindex={k === 'title' ? 0 : -1}>{n}</button>)}
+    </div>
+  </div>
+  <Window title="ARAB-ART  his line, draw by draw" kind="screen" class="lt-win">
+    <div class="lt-scr" style={`aspect-ratio:${first.w} / ${first.h}`}>
+      <img class="lt-still" src={png(first.px, first.w, first.h, first.rgb)} width={first.w} height={first.h} alt={`${LINES[0].ar}, ${LINES[0].en}, drawn by his engine with a shadow and an outline.`} />
+      <canvas class="lt-cv" width={first.w} height={first.h} hidden role="img" aria-label="The line, drawn by his engine up to this draw."></canvas>
+      <svg class="lt-ov" viewBox={`0 0 ${first.w} ${first.h}`} preserveAspectRatio="none" aria-hidden="true"><path class="lt-pen" d="" /></svg>
+    </div>
+    <div class="lt-ctl"><Scrubber n={first.n} at={first.n - 1} label="Step through the draws" /></div>
+    <p class="lt-say" aria-live="polite" data-say set:html={first.say} />
+  </Window>
+</div>
+
+<style is:global>
+  .lt { display: grid; gap: 18px; }
+  .lt-row { display: grid; gap: 12px; }
+  .lt-lines { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .lt-line {
+    display: grid; gap: 2px; align-content: start; min-height: 64px; padding: 8px 10px; text-align: right; cursor: pointer;
+    color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  .lt-line [lang='ar'] { font: 700 1.125rem/1.4 var(--font-ar); color: var(--accent); }
+  .lt-line small { font: 500 0.75rem/1.35 var(--sans); color: var(--ink-2); text-align: left; }
+  .lt-line:hover { box-shadow: inset 0 0 0 2px var(--accent-2); }
+  .lt-line[aria-checked='true'] { box-shadow: inset 0 0 0 2px var(--accent); background: color-mix(in oklch, var(--accent) 14%, var(--surface-2)); }
+  .lt-line:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .lt-fx:not([hidden]) { display: flex; flex-wrap: wrap; gap: 8px; }
+  .lt-scr { position: relative; width: 100%; background: var(--vga-3); }
+  .lt-scr :is(img, canvas, svg) { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .lt-pen { fill: none; stroke: var(--vga-14); stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+  .lt-ctl { margin-top: 16px; }
+  .lt-say { min-height: 3.2em; margin: 12px 0 0 !important; font-size: 1rem !important; line-height: 1.55 !important; }
+  .lt-say b { color: var(--accent); }
+  @media (max-width: 760px) { .lt-lines { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts } from '../../arabart/core.ts';
+  import { scrubber } from '../../scrubber.ts';
+  import { blit } from '../ega.ts';
+  import { LINES, compose, type Fx } from './letters.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-letters]').forEach(async root => {
+    const bin = await fonts();
+    const cv = root.querySelector<HTMLCanvasElement>('.lt-cv')!, scr = root.querySelector<HTMLElement>('.lt-scr')!;
+    const ov = root.querySelector<SVGSVGElement>('.lt-ov')!, pen = root.querySelector<SVGPathElement>('.lt-pen')!;
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    let line = 0, fx: Fx = 'title';
+    const paint = (k: number, how: string) => {
+      const f = compose(bin, LINES[line], fx, k);
+      blit(cv, f.px, f.w, f.h, f.rgb);
+      scr.style.aspectRatio = `${f.w} / ${f.h}`;
+      ov.setAttribute('viewBox', `0 0 ${f.w} ${f.h}`);
+      // A small cross where this draw starts: the right edge of the line, on its bottom
+      const [x, y] = f.pen;
+      pen.setAttribute('d', `M${x - 5} ${y}h10M${x} ${y - 5}v10`);
+      if (how !== 'jump' && !reduce()) gsap.fromTo(pen, { opacity: 1, scale: 1.8, transformOrigin: `${x}px ${y}px` }, { scale: 1, duration: 0.35, ease: 'expo.out' });
+      say.innerHTML = f.say;
+    };
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, paint, { speed: 0.6 });
+    const reload = () => { s.resize(compose(bin, LINES[line], fx, 99).n, 0); s.play(); };
+    const group = (sel: string, on: (b: HTMLButtonElement) => void) => {
+      const bs = [...root.querySelectorAll<HTMLButtonElement>(sel)];
+      const pick = (b: HTMLButtonElement) => { bs.forEach(x => { const y = x === b; x.setAttribute('aria-checked', String(y)); x.tabIndex = y ? 0 : -1; }); on(b); };
+      bs.forEach(b => {
+        b.addEventListener('click', () => pick(b));
+        b.addEventListener('keydown', e => {
+          const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+          if (!d) return;
+          e.preventDefault();
+          const to = bs[(bs.indexOf(b) + d + bs.length) % bs.length]; pick(to); to.focus();
+        });
+      });
+    };
+    group('.lt-line', b => { line = +b.dataset.i!; fx = LINES[line].fx; root.querySelectorAll<HTMLButtonElement>('[data-fx]').forEach(x => { const y = x.dataset.fx === fx; x.setAttribute('aria-checked', String(y)); x.tabIndex = y ? 0 : -1; }); reload(); });
+    group('[data-fx]', b => { fx = b.dataset.fx as Fx; reload(); });
+    root.querySelector<HTMLElement>('.lt-fx')!.hidden = false;
+    cv.hidden = false;
+    root.querySelector<HTMLElement>('.lt-still')!.hidden = true;
+    paint(s.i, 'jump');
+  });
+</script>

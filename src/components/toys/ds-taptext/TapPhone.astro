@@ -1,0 +1,200 @@
+---
+// TapText 1.3 rebuilt from its own files: the pen icon on the top bar, his default menu (TapText.dmd), his 60-icon
+// strip, cascading and one-menu styles, and his two ways of typing: one character message at a time, or, for Notes,
+// the clipboard and Notes' own Paste command (0x137F4). Without JS it shows DinarSoft's own menu screenshot.
+import Window from '../../shell/Window.astro';
+import pen from './tt-icon-101-32.png';
+import strip from './icons.png';
+import shot from './ttm.png';
+
+interface Props { id: string }
+const { id } = Astro.props;
+---
+
+<div class="ttt-phone" id={id} data-ttt-phone data-pen={pen.src} data-strip={strip.src}>
+  <figure class="ttt-dev">
+    <Window title="Pocket Word" kind="device" num="8:03" class="ttt-win">
+      <div class="ttt-fit" data-fit>
+        <div class="ttt-q" data-q>
+          <div class="ttt-doc" data-doc role="textbox" aria-readonly="true" aria-multiline="true" aria-label="The document" tabindex="0"><span data-text></span><i class="ttt-caret" aria-hidden="true"></i></div>
+          <noscript><img class="ttt-shot" src={shot.src} width="274" height="169" alt="TapText’s menu in 2005: Signatures, Email templates, Reports, Meeting Notes, Quotes, Finding Help and Financial, each with its icon, over a bar that reads TapText and Opt." /></noscript>
+          <div class="ttt-menus" data-menus></div>
+        </div>
+      </div>
+      <Fragment slot="status"><span>Edit</span><span>Menu</span></Fragment>
+    </Window>
+    <figcaption>TapText rebuilt from its own files. Tap the pen on the top bar, then pick any saved text.</figcaption>
+  </figure>
+
+  <div class="ttt-side">
+    <button type="button" class="button button--primary ttt-open" data-open aria-haspopup="menu" aria-expanded="false">Tap TapText’s pen</button>
+    <fieldset class="ttt-set">
+      <legend>The program in front</legend>
+      <div class="ttt-radios" role="radiogroup" aria-label="The program in front">
+        <button type="button" role="radio" aria-checked="true" data-app="word">Pocket Word</button>
+        <button type="button" role="radio" aria-checked="false" data-app="notes">Notes</button>
+      </div>
+    </fieldset>
+    <label class="ttt-check"><input type="checkbox" checked data-cascade /> Use cascading menus</label>
+    <button type="button" class="button k-btn" data-clear>Clear the page</button>
+    <p class="ttt-read" aria-live="polite" data-read>Pick a saved text from TapText’s menu.</p>
+  </div>
+</div>
+
+<style>
+  .ttt-phone { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
+  .ttt-dev { margin: 0; min-width: 0; }
+  .ttt-dev > figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--ink-2); }
+  .ttt-dev :global(.ttt-win > .win-body) { padding: 0; overflow: hidden; }
+  .ttt-fit { width: 100%; height: 100%; overflow: hidden; }
+  .ttt-q { --k: 1.2; position: relative; width: 240px; height: 268px; transform: scale(var(--k)); transform-origin: 0 0; background: #fff; color: #000; font: 11px/1.3 Tahoma, Verdana, 'DejaVu Sans', sans-serif; }
+  .ttt-doc { position: absolute; inset: 0; padding: 6px 8px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; outline: none; }
+  .ttt-doc:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+  .ttt-caret { display: inline-block; width: 1px; height: 12px; margin-left: 1px; vertical-align: -2px; background: #000; animation: ttt-blink 1s steps(1) infinite; }
+  @keyframes ttt-blink { 50% { opacity: 0; } }
+  .ttt-shot { position: absolute; left: 0; top: 0; width: 240px; height: auto; }
+  .ttt-menus { position: absolute; inset: 0; pointer-events: none; }
+  .ttt-menus :global(.ttt-m) { position: absolute; width: 128px; margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid #000; box-shadow: 2px 2px 0 #0005; pointer-events: auto; }
+  .ttt-menus :global(.ttt-m button) { display: flex; align-items: center; gap: 4px; width: 100%; height: 19px; padding: 0 4px 0 2px; border: 0; background: none; color: #000; font: 700 11px Tahoma, sans-serif; text-align: left; white-space: nowrap; cursor: pointer; }
+  .ttt-menus :global(.ttt-m button:hover), .ttt-menus :global(.ttt-m button:focus-visible), .ttt-menus :global(.ttt-m button[aria-expanded='true']) { background: #0a246a; color: #fff; outline: none; }
+  .ttt-menus :global(.ttt-m button span) { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+  .ttt-menus :global(.ttt-m button b) { font-weight: 400; font-size: 8px; }
+  .ttt-menus :global(.ttt-ico) { width: 16px; height: 16px; flex: none; background-repeat: no-repeat; image-rendering: pixelated; }
+  .ttt-menus :global(.ttt-sep) { height: 1px; margin: 3px 6px 3px 22px; background: #000; }
+  .ttt-menus :global(.ttt-foot) { display: flex; justify-content: space-between; align-items: center; height: 16px; padding: 0 3px; border-top: 1px solid #000; font: 700 10px Tahoma, sans-serif; }
+  .ttt-menus :global(.ttt-foot i) { font-style: normal; padding: 0 3px; border: 1px solid #000; border-radius: 6px; font-size: 9px; }
+  :global(.ttt-pen) { display: grid; place-items: center; width: 22px; height: 22px; margin: -4px 4px -4px 0; padding: 0; border: 0; border-radius: 3px; background: none; cursor: pointer; }
+  :global(.ttt-pen img) { width: 18px; height: 18px; }
+  :global(.ttt-pen[aria-expanded='true']) { background: oklch(1 0 0 / 0.35); }
+
+  .ttt-side { display: grid; gap: 16px; align-content: start; min-width: 0; }
+  .ttt-open { justify-self: start; min-height: 44px; }
+  .ttt-set { margin: 0; padding: 12px 14px 14px; border: 1px solid var(--rule); }
+  .ttt-set legend { padding: 0 6px; font-weight: 700; font-size: 0.9375rem; }
+  .ttt-radios { display: flex; flex-wrap: wrap; gap: 8px; }
+  .ttt-radios button { min-height: 44px; padding: 0 14px; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+  .ttt-radios button[aria-checked='true'] { outline: 3px solid var(--accent); outline-offset: -1px; font-weight: 700; }
+  .ttt-check { display: flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 600; cursor: pointer; }
+  .ttt-check input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .ttt-read { margin: 0; font-weight: 600; line-height: 1.5; }
+  @media (max-width: 760px) { .ttt-phone { grid-template-columns: minmax(0, 1fr); justify-items: center; } .ttt-side { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .ttt-caret { animation: none; } }
+</style>
+
+<script>
+  import { MENU, typed, type Node, type Group } from './tt.ts';
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-ttt-phone]')) {
+    const q = root.querySelector<HTMLElement>('[data-q]')!, fit = root.querySelector<HTMLElement>('[data-fit]')!;
+    const menus = root.querySelector<HTMLElement>('[data-menus]')!, text = root.querySelector<HTMLElement>('[data-text]')!;
+    const doc = root.querySelector<HTMLElement>('[data-doc]')!, read = root.querySelector<HTMLElement>('[data-read]')!;
+    const open = root.querySelector<HTMLButtonElement>('[data-open]')!, cascade = root.querySelector<HTMLInputElement>('[data-cascade]')!;
+    const win = root.querySelector<HTMLElement>('.win')!, title = win.querySelector<HTMLElement>('.win-title')!;
+    let app: 'word' | 'notes' = 'word', timer = 0, stack: Group[] = [];
+
+    new ResizeObserver(() => q.style.setProperty('--k', String(fit.clientWidth / 240))).observe(fit);
+
+    // His pen icon, on the system's top bar beside the clock
+    const pen = document.createElement('button');
+    pen.type = 'button'; pen.className = 'ttt-pen'; pen.setAttribute('aria-label', 'TapText'); pen.setAttribute('aria-haspopup', 'menu'); pen.setAttribute('aria-expanded', 'false');
+    pen.innerHTML = `<img src="${root.dataset.pen}" width="18" height="18" alt="">`;
+    win.querySelector('.win-bar')!.insertBefore(pen, win.querySelector('.win-num'));
+
+    const icon = (i: number) => `<i class="ttt-ico" style="background-image:url(${root.dataset.strip});background-position:${-16 * i}px 0" aria-hidden="true"></i>`;
+    const oneMenu = (g: Group) => (g.flags[2] === '1' ? true : g.flags[2] === '2' ? false : !cascade.checked);
+
+    // Each open menu remembers its group; a row's data-i is its index in that group
+    const groupOf = new WeakMap<Element, Group>();
+    const list = (g: Group, depth: number, x: number, y: number, back: boolean) => {
+      const rows = g.children.map((c: Node, i) => {
+        if (c.type === 'separator') return '<li role="separator" class="ttt-sep"></li>';
+        if (c.type === 'group') {
+          const one = oneMenu(c);
+          return `<li role="none"><button type="button" role="menuitem" data-i="${i}" aria-haspopup="menu" aria-expanded="false">${icon(c.icon)}<span>${esc(c.title)}${one ? ' ...' : ''}</span>${one ? '' : '<b aria-hidden="true">▶</b>'}</button></li>`;
+        }
+        return `<li role="none"><button type="button" role="menuitem" data-i="${i}">${icon(c.icon)}<span>${esc(c.title)}</span></button></li>`;
+      }).join('');
+      const head = back ? `<li role="none"><button type="button" role="menuitem" data-back>${icon(0)}<span>Previous Menu</span></button></li><li role="separator" class="ttt-sep"></li>` : '';
+      const foot = depth === 0 ? '<li role="none" class="ttt-foot" aria-hidden="true"><span>TapText</span><i>Opt</i></li>' : '';
+      menus.insertAdjacentHTML('beforeend', `<ul class="ttt-m" role="menu" aria-label="${esc(g.title || 'TapText')}" data-depth="${depth}" style="left:${x}px;top:${y}px">${head}${rows}${foot}</ul>`);
+      const ul = menus.lastElementChild!;
+      groupOf.set(ul, g);
+      return ul;
+    };
+
+    const show = (g: Group, back: boolean) => {
+      menus.innerHTML = '';
+      list(g, 0, 2, 2, back).querySelector<HTMLElement>('button')?.focus();
+      setOpen(true);
+    };
+    const setOpen = (on: boolean) => {
+      if (!on) { menus.innerHTML = ''; stack = []; }
+      pen.setAttribute('aria-expanded', String(on)); open.setAttribute('aria-expanded', String(on));
+    };
+    const toggle = () => (menus.innerHTML ? setOpen(false) : show(MENU, false));
+    pen.addEventListener('click', toggle);
+    open.addEventListener('click', toggle);
+
+    const type = (s: string, name: string) => {
+      clearInterval(timer);
+      setOpen(false);
+      doc.focus({ preventScroll: true });
+      if (app === 'notes') {
+        // Notes: the clipboard and Notes' own Paste command, the whole text at once
+        setTimeout(() => { text.textContent += s.replace(/\r\n/g, '\n'); read.textContent = `“${name}”: TapText put it on the clipboard and pressed Notes’ Paste. One message.`; }, reduce ? 0 : 100);
+        return;
+      }
+      const chars = [...s.replace(/\n/g, '')];
+      const posted = 2 + chars.reduce((n, c) => n + (c === '\r' ? 5 : 1), 0);
+      const done = () => (read.textContent = `“${name}”: ${chars.length} characters, typed as ${posted} key messages into Pocket Word.`);
+      if (reduce) { text.textContent += chars.join('').replace(/\r/g, '\n'); done(); return; }
+      let k = 0;
+      read.textContent = `Typing “${name}”…`;
+      timer = window.setInterval(() => {
+        text.textContent += chars[k] === '\r' ? '\n' : chars[k];
+        doc.scrollTop = doc.scrollHeight;
+        if (++k >= chars.length) { clearInterval(timer); done(); }
+      }, 28);
+    };
+
+    menus.addEventListener('click', e => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!b) return;
+      if (b.hasAttribute('data-back')) { stack.pop(); const g = stack.at(-1); return g ? show(g, true) : show(MENU, false); }
+      const ul = b.closest('ul')!, n = groupOf.get(ul)!.children[+b.dataset.i!];
+      if (n.type === 'text') return type(typed(n.text, new Date()), n.title);
+      if (n.type !== 'group') return;
+      if (oneMenu(n)) { stack.push(n); return show(n, true); }
+      // Cascading: the submenu opens beside its row, kept on the 240-pixel screen
+      const depth = +(ul as HTMLElement).dataset.depth!;
+      menus.querySelectorAll<HTMLElement>('ul').forEach(m => { if (+m.dataset.depth! > depth) m.remove(); });
+      ul.querySelectorAll('[aria-expanded="true"]').forEach(x => x.setAttribute('aria-expanded', 'false'));
+      b.setAttribute('aria-expanded', 'true');
+      const x = Math.min((ul as HTMLElement).offsetLeft + 100, 240 - 130);
+      const y = Math.max(2, Math.min((ul as HTMLElement).offsetTop + b.offsetTop, 268 - n.children.length * 19 - 6));
+      list(n, depth + 1, x, y, false).querySelector<HTMLElement>('button')?.focus();
+    });
+    menus.addEventListener('keydown', e => {
+      const t = e.target as HTMLElement, ul = t.closest<HTMLElement>('ul')!;
+      const items = [...ul.querySelectorAll<HTMLButtonElement>('button')], i = items.indexOf(t as HTMLButtonElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus(); }
+      if (e.key === 'ArrowRight' && t.hasAttribute('aria-haspopup')) t.click();
+      const depth = +ul.dataset.depth!;
+      if (e.key === 'ArrowLeft' && depth > 0) { ul.remove(); menus.querySelector<HTMLElement>(`ul[data-depth="${depth - 1}"] [aria-expanded="true"]`)?.focus(); }
+      if (e.key === 'Escape') { setOpen(false); pen.focus(); }
+    });
+    document.addEventListener('pointerdown', e => { if (menus.innerHTML && !root.contains(e.target as Element)) setOpen(false); });
+
+    root.querySelectorAll<HTMLElement>('[data-app]').forEach(b => b.addEventListener('click', () => {
+      app = b.dataset.app as 'word' | 'notes';
+      root.querySelectorAll('[data-app]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
+      title.textContent = app === 'word' ? 'Pocket Word' : 'Notes';
+      q.classList.toggle('is-notes', app === 'notes');
+    }));
+    cascade.addEventListener('change', () => { if (menus.innerHTML) { stack = []; show(MENU, false); } });
+    root.querySelector('[data-clear]')!.addEventListener('click', () => { clearInterval(timer); text.textContent = ''; read.textContent = 'The page is empty again.'; });
+  }
+</script>

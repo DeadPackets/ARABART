@@ -19,22 +19,25 @@ const ARABART_DIR = join(PROGRAMS_DIR, "ARABART");
 const programs = [
   { id: "arabart-demo", folder: "ARABART", executable: "DEMO.EXE", needsArabart: true },
   { id: "arabart-editor", folder: "ARABART", executable: "EDITOR.EXE", needsArabart: true },
-  { id: "arabart-commercial", folder: "ARABIC", executable: "DEMO.COM", needsArabart: true },
-  { id: "digi-test", folder: "DIGI_T", executable: "MAIN.EXE", needsArabart: true },
-  { id: "text-editor-gui", folder: "EDIT", executable: "EDIT.EXE", needsArabart: true },
-  { id: "text-editor-demo", folder: "EDIT", executable: "EDITOR.EXE", needsArabart: true },
-  { id: "formula-solver", folder: "FORM_X", executable: "FORM_X.EXE", needsArabart: true },
-  { id: "kvc-antivirus", folder: "KVC", executable: "KVC.EXE", needsArabart: true },
-  { id: "kemyam-splash", folder: "NAMES", executable: "NAMES.COM", needsArabart: true },
-  { id: "arabic-basmallah", folder: "PESM", executable: "PESM.EXE", needsArabart: true },
-  { id: "portsaid-cs-splash", folder: "PORTSAID", executable: "PORTSAID.EXE", needsArabart: true },
-  { id: "portsaid-it-screensaver", folder: "SCREEN", executable: "SCREEN.COM", needsArabart: true },
-  { id: "brave-sun", folder: "SUN", executable: "SUN.EXE", needsArabart: true },
-  { id: "taher", folder: "TAHER", executable: "TAHER.COM", needsArabart: true },
-  { id: "winkey", folder: "WINKEY", executable: "WINKEY.EXE", needsArabart: true },
+  { id: "arabart-commercial", folder: "ARABIC", executable: "DEMO.COM", needsArabart: false },
+  { id: "digi-test", folder: "DIGI_T", executable: "MAIN.EXE", needsArabart: false },
+  { id: "text-editor-gui", folder: "EDIT", executable: "EDIT.EXE", needsArabart: false },
+  { id: "text-editor-demo", folder: "EDIT", executable: "EDITOR.EXE", needsArabart: false },
+  { id: "formula-solver", folder: "FORM_X", executable: "FORM_X.EXE", needsArabart: false },
+  { id: "kvc-antivirus", folder: "KVC", executable: "KVC.EXE", needsArabart: false },
+  // Live demo scene (harmless Koko double + marked samples stored scrambled; UNWRAP.COM restores them at boot), files made by research/artifacts/koko/build.py
+  { id: "kvc-live", folder: "KVC_LIVE", executable: "START.BAT", needsArabart: false },
+  { id: "kemyam-splash", folder: "NAMES", executable: "NAMES.COM", needsArabart: false },
+  { id: "arabic-basmallah", folder: "PESM", executable: "PESM.EXE", needsArabart: false },
+  { id: "portsaid-cs-splash", folder: "PORTSAID", executable: "PORTSAID.EXE", needsArabart: false },
+  { id: "portsaid-it-screensaver", folder: "SCREEN", executable: "SCREEN.COM", needsArabart: false },
+  // SUN ships its own driver, ARAB-ART 7.15 with ARAB-ART.FNT; it refuses to install if ARABART 4.15 is already resident
+  { id: "brave-sun", folder: "SUN", executable: "SUN.EXE", needsArabart: true, tsr: "ARAB-ART.EXE" },
+  { id: "taher", folder: "TAHER", executable: "TAHER.COM", needsArabart: false },
+  { id: "winkey", folder: "WINKEY", executable: "WINKEY.EXE", needsArabart: false },
 ];
 
-function makeDosboxConf(executable, needsArabart, cycles = 1000) {
+function makeDosboxConf(executable, needsArabart, cycles = 1000, tsr = "ARABART.EXE") {
   const lines = [
     "[sdl]",
     "fullscreen=false",
@@ -50,7 +53,7 @@ function makeDosboxConf(executable, needsArabart, cycles = 1000) {
   ];
 
   if (needsArabart) {
-    lines.push("ARABART.EXE > NUL");
+    lines.push(`${tsr} > NUL`);
     lines.push("cls");
   }
 
@@ -77,8 +80,8 @@ function makeTerminalDosboxConf() {
     "ARABART.EXE > NUL",
     "cd C:\\",
     "cls",
-    "echo Welcome to DOSArchive!",
-    "echo A collection of Yasser Awad DOS programs from the 1990s.",
+    "echo Welcome to ARABART!",
+    "echo Yasser Awad's DOS programs from the 1990s.",
     "echo Each directory contains a project with a README.TXT.",
     "echo Type DIR to list all directories.",
     "echo.",
@@ -113,7 +116,7 @@ async function createBundle(program) {
     archive.pipe(output);
 
     // Add dosbox.conf
-    const conf = makeDosboxConf(program.executable, program.needsArabart, program.cycles);
+    const conf = makeDosboxConf(program.executable, program.needsArabart, program.cycles, program.tsr);
     archive.append(conf, { name: ".jsdos/dosbox.conf" });
 
     // Add program files
@@ -127,7 +130,7 @@ async function createBundle(program) {
     }
 
     // Add ARABART files if needed and not already in the program folder
-    if (program.needsArabart && program.folder !== "ARABART") {
+    if (program.needsArabart && !program.tsr && program.folder !== "ARABART") {
       const arabartFiles = readdirSync(ARABART_DIR);
       for (const file of arabartFiles) {
         // Only add if not already present in the program folder
@@ -164,6 +167,7 @@ async function createTerminalBundle() {
     const entries = readdirSync(PROGRAMS_DIR);
     for (const entry of entries) {
       const fullPath = join(PROGRAMS_DIR, entry);
+      if (entry === "KVC_LIVE") continue; // the Koko double and its marked files belong only to the kvc-live demo
       if (statSync(fullPath).isDirectory()) {
         addDirectoryFiles(archive, fullPath, entry);
       } else if (entry === "RUN.BAT") {

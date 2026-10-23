@@ -1,0 +1,96 @@
+---
+// HandySwitcher 3.1's trial record: where it hides, how it counts 15 days, and why turning the clock back does not help.
+// Facts: HandySwitcher.dll 3.1, 0x100045C8 (the check) and HandySwitcherSetup.dll (writes the record once).
+---
+
+<div class="hs-tc" data-hstc>
+  <div class="hs-tc-name" aria-label="The registry name, built from pieces">
+    <p>The record’s name is never stored whole. The code builds it from pieces at run time:</p>
+    <div class="hs-tc-pieces" data-pieces>
+      <p class="hs-tc-eq"><code>"Rp"</code><span>+</span><code>"p"</code><span>+</span><code>"Help"</code><span>=</span><code class="whole">RppHelp</code></p>
+      <p class="hs-tc-eq"><code>"Te"</code><span>+</span><code>"dy"</code><span>=</span><code class="whole">Tedy</code></p>
+    </div>
+  </div>
+  <div class="hs-tc-box">
+    <label class="hs-tc-slide"><span>The phone’s date: <b data-daytext>day 3 after installing</b></span>
+      <input type="range" min="-3" max="30" step="1" value="3" data-day aria-label="Days since installing" disabled />
+    </label>
+    <div class="hs-tc-cal" aria-hidden="true" data-cal></div>
+    <dl class="hs-tc-out">
+      <div><dt>Record</dt><dd data-rec>14 bytes: the install date, twice, plus a checksum</dd></div>
+      <div><dt>HandySwitcher says</dt><dd data-say>The trial period will expire after 12 day(s)</dd></div>
+    </dl>
+    <p class="hs-tc-tip" data-tip hidden>Drag past day 15, then drag back. The record has already been replaced.</p>
+    <p class="hs-tc-btns" data-btns hidden><button type="button" class="button" data-again>Install it again</button><button type="button" class="button" data-reset>Reset this demo</button></p>
+  </div>
+</div>
+
+<style is:global>
+  .hs-tc { display: grid; gap: 18px; }
+  .hs-tc-name p { margin: 0 0 8px !important; font-size: 0.9375rem !important; }
+  .hs-tc-pieces { display: grid; gap: 8px; }
+  .hs-tc-eq { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 !important; }
+  .hs-tc-pieces code { padding: 6px 8px; font: 600 0.9375rem/1 var(--font-code); color: var(--ink); background: #fff; border: 1px solid var(--rule); }
+  .hs-tc-pieces code.whole { color: #fff; background: var(--accent); border-color: var(--accent); }
+  .hs-tc-pieces span { color: var(--ink-2); font-weight: 700; }
+  .hs-tc-box { display: grid; gap: 12px; padding: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--rule); }
+  .hs-tc-slide { display: grid; gap: 6px; font: 500 0.9375rem/1.3 var(--sans); }
+  .hs-tc-slide b { color: var(--accent); }
+  .hs-tc-slide input { width: 100%; height: 44px; accent-color: var(--accent); }
+  .hs-tc-slide input:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hs-tc-cal { display: grid; grid-template-columns: repeat(34, minmax(0, 1fr)); gap: 2px; }
+  .hs-tc-cal i { height: 18px; background: var(--surface); border-radius: 2px; }
+  .hs-tc-cal i.trial { background: oklch(0.82 0.1 150); }
+  .hs-tc-cal i.inst { background: var(--accent); }
+  .hs-tc-cal i.now { box-shadow: 0 0 0 2px #000; }
+  .hs-tc-cal i.dead { background: oklch(0.75 0.12 25); }
+  .hs-tc-out { display: grid; gap: 8px; margin: 0; }
+  .hs-tc-out div { display: grid; grid-template-columns: 11ch minmax(0, 1fr); gap: 12px; }
+  .hs-tc-out dt { font: 700 0.8125rem/1.4 var(--sans); color: var(--ink-2); }
+  .hs-tc-out dd { margin: 0; font: 500 0.9375rem/1.4 var(--sans); }
+  .hs-tc-out dd code { font: 700 0.9375rem/1 var(--font-code); color: var(--hot); }
+  .hs-tc-tip { margin: 0 !important; font-size: 0.875rem !important; color: var(--ink-2); }
+  .hs-tc-btns { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 !important; }
+  .hs-tc-btns .button { min-height: 44px; padding: 0 14px; }
+  @media (max-width: 520px) { .hs-tc-out div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement & { hs?: boolean }>('[data-hstc]').forEach(root => {
+    if (root.hs) return;
+    root.hs = true;
+    const day = root.querySelector<HTMLInputElement>('[data-day]')!, text = root.querySelector<HTMLElement>('[data-daytext]')!;
+    const cal = root.querySelector<HTMLElement>('[data-cal]')!, rec = root.querySelector<HTMLElement>('[data-rec]')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const btns = root.querySelector<HTMLElement>('[data-btns]')!, reset = root.querySelector<HTMLButtonElement>('[data-reset]')!;
+    const again = root.querySelector<HTMLButtonElement>('[data-again]')!;
+    let sealed = false;
+    cal.innerHTML = Array.from({ length: 34 }, () => '<i></i>').join('');
+    const cells = [...cal.children] as HTMLElement[];
+    const paint = () => {
+      const d = +day.value;
+      // His test: today must be within install .. install + 15, counted as (year*12 + month)*31 + day
+      if (!sealed && (d > 15 || d < 0)) sealed = true;
+      text.textContent = d === 0 ? 'the day you install' : d < 0 ? `${-d} day${d === -1 ? '' : 's'} before installing` : `day ${d} after installing`;
+      cells.forEach((c, n) => {
+        const k = n - 3;
+        c.className = sealed && k !== d ? 'dead' : k === 0 ? 'inst' : k > 0 && k <= 15 ? 'trial' : '';
+        if (k === d) c.classList.add('now');
+      });
+      if (sealed) {
+        rec.innerHTML = 'Erased and replaced with the five letters <code>fsjri</code>. It no longer decodes to any date.';
+        say.textContent = 'This trial period has expired, please register.';
+      } else {
+        rec.textContent = '14 bytes: the install date, twice, plus a checksum';
+        say.textContent = `The trial period will expire after ${15 - d} day(s)`;
+      }
+      btns.hidden = !sealed;
+    };
+    day.addEventListener('input', paint);
+    reset.addEventListener('click', () => { sealed = false; day.value = '3'; paint(); day.focus(); });
+    // His setup (HandySwitcherSetup.dll, 0x101804) writes the record only when none exists, and the sealed one does
+    again.addEventListener('click', () => { day.value = '0'; paint(); rec.innerHTML = 'Setup looks for the record first. It finds <code>fsjri</code> and leaves it alone.'; });
+    day.disabled = false;
+    root.querySelector<HTMLElement>('[data-tip]')!.hidden = false;
+    paint();
+  });
+</script>

@@ -1,0 +1,96 @@
+---
+// His five wipe effects (NAMES.COM 0747, 07B7, 082E, 08C4, 0904), ported line by line, on any of his ten pictures.
+// Run, step or scrub; the strips each step copies light up. Without JS: the Box effect's last frame on Yasser's card.
+import Window from '../../../shell/Window.astro';
+import Scrubber from '../../Scrubber.astro';
+import { memSync, png } from '../ssr.ts';
+import { kemyam, effect, Screen, EFFECTS, NAMES_PICS, NAMES } from './rle.ts';
+import './rle.css';
+
+const k = kemyam(memSync(NAMES));
+const v = k.view('c1'), steps = effect('box', v, k.order);
+const s = new Screen(40, 200);
+for (const [a, b, n] of [[0, 0, 8000]] as const) s.blit(k.bg, a, b, n);
+for (const st of steps) for (const [a, b, n] of st.ops) s.blit(v.pic, a, b, n);
+const still = png(s.pixels(), 320, 200);
+const HIS: Record<string, string> = { spiral: 'the background', comb: 'KEMYAM', venetian: 'Computer Group', columns: 'the logo', box: 'the KemYam box and every name card' };
+---
+
+<div class="ky-fx" data-kyfx data-his={JSON.stringify(HIS)}>
+  <div class="ky-fx-pick g-js">
+    <div class="g-chips" role="group" aria-label="Effect">
+      {EFFECTS.map(e => <button type="button" class="button k-btn" data-fx={e.id} aria-pressed={String(e.id === 'box')}>{e.name} <span class="ky-at">{e.at}</span></button>)}
+    </div>
+    <label class="ky-fx-sel">
+      <span>Picture</span>
+      <select data-pic>
+        {NAMES_PICS.map(p => <option value={p.id} selected={p.id === 'c1'}>{p.id === 'tile' ? 'The background' : p.name}</option>)}
+      </select>
+    </label>
+  </div>
+  <Window title="NAMES.COM   one effect, step by step" kind="screen" class="g-win">
+    <div class="g-crt">
+      <img src={still} width="320" height="200" alt="The Box effect finished: Yasser Mohamed Ali's name card on the gray tiled background." />
+      <canvas width="320" height="200" aria-hidden="true" hidden></canvas>
+    </div>
+  </Window>
+  <p class="g-say" aria-live="polite" data-say><b>Box.</b> {EFFECTS.find(e => e.id === 'box')!.says} In his show it opens {HIS.box}.</p>
+  <Scrubber n={steps.length} at={steps.length - 1} label="Steps of the effect" />
+</div>
+
+<style>
+  .ky-fx { display: grid; gap: 18px; }
+  .ky-fx-pick { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; justify-content: space-between; }
+  .ky-at { font: 500 0.75rem/1 var(--font-code); opacity: 0.75; }
+  .ky-fx-sel { display: flex; align-items: center; gap: 10px; font: 600 0.875rem/1 var(--font-code); color: var(--accent-2); }
+  .ky-fx-sel select { min-height: 44px; min-width: 0; max-width: 100%; padding: 0 10px; font: 600 0.9375rem/1 var(--sans); color: var(--black); background: var(--cyan); border: 0; box-shadow: 4px 4px 0 var(--black); cursor: pointer; }
+  .ky-fx-sel select:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+  @media (max-width: 520px) { .ky-fx-sel { width: 100%; } .ky-fx-sel select { flex: 1; } }
+</style>
+
+<script>
+  import { scrubber, type How } from '../../scrubber.ts';
+  import { names, paint, reduce } from './view.ts';
+  import { Screen, effect, EFFECTS, type FxId, type PicId, type Step } from './rle.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-kyfx]').forEach(async root => {
+    const k = await names();
+    const HIS: Record<string, string> = JSON.parse(root.dataset.his!);
+    const cv = root.querySelector('canvas')!, img = root.querySelector('img')!, say = root.querySelector<HTMLElement>('[data-say]')!;
+    const sel = root.querySelector<HTMLSelectElement>('[data-pic]')!, fxBtns = [...root.querySelectorAll<HTMLButtonElement>('[data-fx]')];
+    let fx: FxId = 'box', pic: PicId = 'c1', steps: Step[] = [], base = new Screen(40, 200);
+    const o = { speed: 2 / 70 };
+
+    const show = (i: number, how: How) => {
+      const v = k.view(pic), s = new Screen(40, 200, base);
+      for (let j = 0; j <= i; j++) for (const [a, b, n] of steps[j].ops) s.blit(v.pic, a, b, n);
+      paint(cv, s);
+      // Light up what this step copied, unless the effect has finished
+      if (i < steps.length - 1 || how === 'step') {
+        const ctx = cv.getContext('2d')!;
+        ctx.fillStyle = 'rgba(255, 255, 85, 0.55)';
+        for (const [, b, n] of steps[i].ops) ctx.fillRect((b % 40) * 8, Math.floor(b / 40), n * 8, 1);
+      }
+    };
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, o);
+    const load = (autoplay: boolean) => {
+      const e = EFFECTS.find(x => x.id === fx)!, mine = HIS[fx], v = k.view(pic);
+      steps = effect(fx, v, k.order);
+      base = new Screen(40, 200);
+      if (pic !== 'tile') base.blit(k.bg, 0, 0, 8000);
+      o.speed = (steps[0].wait) / 70;
+      const what = sel.options[sel.selectedIndex].text;
+      say.innerHTML = `<b>${e.name}.</b> ${e.says} In his show it opens ${mine}. Here: ${what}, ${steps.length} steps.`;
+      scrub.resize(steps.length, autoplay && !reduce() ? 0 : steps.length - 1);
+      if (autoplay && !reduce()) scrub.play();
+    };
+    fxBtns.forEach(b => b.addEventListener('click', () => {
+      fxBtns.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      fx = b.dataset.fx as FxId;
+      load(true);
+    }));
+    sel.addEventListener('change', () => { pic = sel.value as PicId; load(true); });
+    load(false);
+    img.hidden = true; cv.hidden = false;
+  });
+</script>

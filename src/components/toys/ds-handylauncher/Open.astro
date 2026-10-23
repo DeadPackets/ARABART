@@ -1,0 +1,107 @@
+---
+// Where a shortcut goes: HandyLauncher.exe 3.4 sub_190D8. Folders and the device root go to File Explorer;
+// everything else goes to ShellExecuteEx, and Windows picks the program by file type.
+import CodeStepper from '../CodeStepper.astro';
+import './hl.css';
+import { openSteps, TARGETS, GLYPH, kindOf } from './hl.ts';
+
+const ASM = [
+  { off: '190EC', code: 'bl   FindFirstFileW', note: 'what is the target?' },
+  { off: '190FC', code: 'bl   FindClose' },
+  { off: '19104', code: 'ands r3,r3,#10h', note: 'the folder bit' },
+  { off: '19108', code: 'movne r5,r4', note: 'folder: it becomes the argument' },
+  { off: '1910C', code: 'ldrne r4,=fexplore', note: 'and File Explorer the program' },
+  { off: '19118', code: 'bl   lstrcmpW', note: 'the root, "\\"?' },
+  { off: '19128', code: 'ldreq r4,=fexplore' },
+  { off: '19138', code: 'mov  r3,#60', note: 'the form: 60 bytes' },
+  { off: '1913C', code: 'str  r4,[sp,#10h]', note: 'what to open' },
+  { off: '19160', code: 'strne r5,[sp,#14h]', note: 'its argument' },
+  { off: '19178', code: 'bl   ShellExecuteEx', note: 'Windows opens it' },
+];
+const C = [
+  { code: 'h = FindFirstFile(target, &fd);' },
+  { code: 'if (h != INVALID_HANDLE_VALUE)' },
+  { code: '  if (isDir(fd)) explore(target);' },
+  { code: 'if (!lstrcmp(target, L"\\\\"))', },
+  { code: '  explore(target);' },
+  { code: 'sei = { 60, ..., target, args };' },
+  { code: 'ShellExecuteEx(&sei);', note: 'Windows picks' },
+];
+const steps = openSteps(TARGETS[1]);
+const DEST = [
+  { id: 'fexplore.exe', name: 'File Explorer', glyph: GLYPH.folder },
+  { id: 'app', name: 'The program itself', glyph: GLYPH.app },
+  { id: 'pword.exe', name: 'Pocket Word', glyph: GLYPH.doc },
+  { id: 'wmplayer.exe', name: 'Windows Media Player', glyph: GLYPH.song },
+];
+---
+
+<div class="hl-op" data-hlopen>
+  <div class="hl-row" role="group" aria-label="Launch a shortcut" data-ctl hidden>
+    {TARGETS.map((t, i) => <button type="button" class:list={['button', { 'button--primary': i === 1 }]} data-t={i} aria-pressed={String(i === 1)}><Fragment set:html={GLYPH[kindOf(t.path)]} /> {t.label}</button>)}
+  </div>
+  <CodeStepper id="hl-opcs" title="HandyLauncher.exe  open a shortcut" asm={ASM} c={C} steps={steps} speed={0.6}>
+    <div slot="visual" class="hl-opv" data-vis>
+      <div class="hl-opv-card"><span class="hl-opv-lab">target</span><code data-path>{TARGETS[1].path}</code><span class="hl-opv-tag" data-tag>a file</span></div>
+      <div class="hl-opv-arrow" aria-hidden="true">→</div>
+      <ul class="hl-opv-dest">
+        {DEST.map(d => <li data-d={d.id} class:list={{ on: d.id === 'pword.exe' }}><Fragment set:html={d.glyph} /> {d.name}</li>)}
+      </ul>
+      <p class="hl-say" data-out aria-live="polite">A document: Windows looks up its type and opens <b>Pocket Word</b>.</p>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .hl-op { display: grid; gap: 14px; }
+  .hl-op .hl-row .button svg { width: 16px; height: 16px; vertical-align: -3px; }
+  .hl-opv { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px 16px; align-items: center; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hl-opv .hl-say { grid-column: 1 / -1; }
+  .hl-opv-card { display: grid; gap: 6px; padding: 12px; background: #fff; border: 1px solid var(--xp-line, #7f9db9); }
+  .hl-opv-card code { font: 600 0.875rem/1.3 var(--font-code); color: #000; overflow-wrap: anywhere; }
+  .hl-opv-lab { font: 600 0.75rem/1 var(--sans); color: var(--ink-2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .hl-opv-tag { justify-self: start; padding: 2px 8px; font: 700 0.8125rem/1.4 var(--sans); color: #fff; background: #316ac5; border-radius: 2px; }
+  .hl-opv-tag.folder { background: #a87b12; }
+  .hl-opv-arrow { font: 700 1.5rem/1 var(--sans); color: var(--accent); }
+  .hl-opv-dest { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .hl-opv-dest li { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font: 600 0.9375rem/1.2 var(--sans); color: var(--ink-2); background: #fff; border: 1px solid transparent; opacity: 0.75; transition: opacity 0.2s; }
+  .hl-opv-dest li.on { color: #000; border-color: #316ac5; box-shadow: inset 4px 0 0 #316ac5; opacity: 1; }
+  .hl-opv-dest svg { flex: none; }
+  @media (max-width: 640px) { .hl-opv { grid-template-columns: minmax(0, 1fr); } .hl-opv-arrow { rotate: 90deg; justify-self: center; } }
+  @media (prefers-reduced-motion: reduce) { .hl-opv-dest li { transition: none; } }
+</style>
+
+<script>
+  import { openSteps, TARGETS, type Step } from './hl.ts';
+
+  document.querySelectorAll<HTMLElement & { hl?: boolean }>('[data-hlopen]').forEach(root => {
+    if (root.hl) return;
+    root.hl = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: Step[], at?: number): void } }>('[data-stepper]')!;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-t]')];
+    const dest = [...root.querySelectorAll<HTMLElement>('[data-d]')];
+    const tag = root.querySelector<HTMLElement>('[data-tag]')!, out = root.querySelector<HTMLElement>('[data-out]')!;
+    let t = TARGETS[1];
+    const NAME: Record<string, string> = { 'fexplore.exe': 'File Explorer', app: 'the program itself', 'pword.exe': 'Pocket Word', 'wmplayer.exe': 'Windows Media Player' };
+
+    cs.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as Step;
+      dest.forEach(d => d.classList.toggle('on', d.dataset.d === s.to));
+      const known = s.a as number >= 2 || t.path === '\\';
+      tag.textContent = !known ? '?' : t.folder ? 'a folder' : 'a file';
+      tag.classList.toggle('folder', known && t.folder);
+      if (s.done) out.innerHTML = t.folder ? `A folder: <b>File Explorer</b> opens ${t.path === '\\' ? 'the whole device' : t.path}.`
+        : t.path.endsWith('.exe') ? 'A program: Windows starts <b>it</b>.'
+        : `A ${t.path.endsWith('.mp3') ? 'song' : 'document'}: Windows looks up its type and opens <b>${NAME[s.to as string]}</b>.`;
+    });
+    btns.forEach((b, i) => b.addEventListener('click', () => {
+      t = TARGETS[i];
+      btns.forEach(x => { x.setAttribute('aria-pressed', String(x === b)); x.classList.toggle('button--primary', x === b); });
+      root.querySelector('[data-path]')!.textContent = t.path;
+      out.textContent = 'Follow his code below.';
+      cs.stepper?.load(openSteps(t), 0);
+      cs.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+    }));
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+  });
+</script>

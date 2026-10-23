@@ -1,0 +1,198 @@
+---
+// HandySwitcher on a Pocket PC: tap its icon in the top bar, switch to a program, or close one for real.
+// The menu is drawn with his own action icons (menu-actions-27.png, from HandySwitcher 2.7) and his five menu colors.
+import Window from '../../shell/Window.astro';
+import { PROGS } from './hs.ts';
+import actions from './menu-actions-27.png';
+import bar from './topbar-16.png';
+
+const ACTS = [
+  { a: 'all', label: 'Close All', icon: 1 },
+  { a: 'others', label: 'Close All But Active', icon: 2 },
+  { a: 'min', label: 'Minimize All', icon: 3 },
+];
+const sprite = (n: number, of: number, src: string) => `background-image:url(${src});background-size:${of * 100}% 100%;background-position:${(n * 100) / (of - 1)}% 0`;
+---
+
+<div class="hs-live-wrap" data-hslive-wrap style={`--act:url(${actions.src});--bar:url(${bar.src})`}>
+  <Window title="Notes" kind="device" num="9:41" class="ds-dev hs-live-dev" aria-label="A Pocket PC running HandySwitcher">
+    <div class="hs-live" data-hslive>
+      <div class="hs-scr" data-scr>
+        <div class="hs-today" data-today hidden>
+          <p class="hs-today-t">Today</p>
+          <p>No upcoming appointments</p>
+          <p>No unread messages</p>
+          <p>No tasks</p>
+        </div>
+        <div class="hs-app" data-appview>
+          <span class="hs-app-ic" data-appic style="--h:85">N</span>
+          <p class="hs-app-n" data-appname>Notes</p>
+          <i></i><i></i><i></i><i></i>
+        </div>
+      </div>
+      <div class="hs-menu" data-menu role="group" aria-label="HandySwitcher: running programs">
+        <ul class="hs-menu-list" data-list>
+          {PROGS.map((p, i) => (
+            <li data-p={p.id} class:list={{ act: i === 0 }}>
+              <button type="button" class="hs-m-go" data-go={p.id}><span class="hs-m-ic" style={`--h:${p.hue}`}>{p.glyph}</span><span class="hs-m-n">{p.name}</span></button>
+              <button type="button" class="hs-m-x" data-x={p.id} aria-label={`Close ${p.name}`} style={sprite(0, 6, actions.src)}></button>
+            </li>
+          ))}
+        </ul>
+        <ul class="hs-menu-acts">
+          {ACTS.map(x => <li><button type="button" class="hs-m-go" data-act={x.a}><span class="hs-m-ic img" style={sprite(x.icon, 6, actions.src)}></span><span class="hs-m-n">{x.label}</span></button></li>)}
+        </ul>
+        <p class="hs-menu-foot"><span>HandySwitcher</span><span class="hs-opt">Opt</span></p>
+      </div>
+      <div class="hs-live-box" data-box hidden>
+        <b>Warning...</b>
+        <p><span data-boxname>Bubble Breaker</span> is not responding because it is busy, waiting for a response from you, or has stopped running.</p>
+        <p>Do you want HandySwitcher to terminate the program anyway?</p>
+        <button type="button" data-yes>Yes</button><button type="button" data-no>No</button>
+      </div>
+      <p class="hs-live-st" aria-live="polite" data-st></p>
+    </div>
+    <p slot="status" class="ds-soft"><span>New</span><span>Menu</span></p>
+  </Window>
+  <p class="hs-live-tip" data-tip hidden>Tap <b>his icon</b> in the top bar to open the menu. Tap a name to switch to it, or its <b>X</b> to close it.</p>
+</div>
+
+<style is:global>
+  .hs-live-wrap { display: grid; justify-items: center; gap: 12px; }
+  .hs-live-dev { width: min(100%, 320px); }
+  .hs-live { --mt: #ffffff; --mbk: #3f9f9f; --ibk: #2e8080; --ht: #ffffff; --hbk: #4f7fb8;
+    --u: calc(100cqw / 240); position: relative; height: 100%; container-type: size; font-family: Tahoma, Verdana, sans-serif; color: #000; background: #fff; overflow: hidden; }
+  .hs-live > * { font-size: calc(100cqw / 240 * 12); }
+  .hs-scr { position: absolute; inset: 0; }
+  .hs-today { padding: calc(100cqw / 24); background: linear-gradient(160deg, oklch(0.62 0.12 230), oklch(0.42 0.12 250)); height: 100%; color: #fff; }
+  .hs-today p { margin: 0 0 0.6em; font-size: calc(100cqw / 240 * 12); }
+  .hs-today .hs-today-t { font-weight: 700; font-size: calc(100cqw / 240 * 15); border-bottom: 1px solid oklch(1 0 0 / 0.5); padding-bottom: 0.4em; }
+  .hs-app { display: grid; justify-items: center; align-content: start; gap: calc(100cqw / 30); padding-top: calc(100cqw / 7); height: 100%; background: linear-gradient(oklch(0.98 0.005 250), oklch(0.93 0.01 250)); }
+  .hs-app i { width: 70%; height: calc(100cqw / 40); background: oklch(0.86 0.01 250); border-radius: 2px; }
+  .hs-app i:nth-of-type(2n) { width: 55%; }
+  .hs-app-ic, .hs-m-ic { display: grid; place-items: center; flex: none; font-weight: 700; color: #fff; background: oklch(0.6 0.15 var(--h, 250)); border-radius: 20%; }
+  .hs-app-ic { width: calc(100cqw / 5); height: calc(100cqw / 5); font-size: calc(100cqw / 12); }
+  .hs-app-n { margin: 0; font-weight: 700; font-size: calc(100cqw / 240 * 16); color: #222; }
+  .hs-menu { position: absolute; top: 0; right: 0; width: 82%; color: var(--mt); background: var(--mbk); border: 1px solid #000; box-shadow: 2px 2px 0 oklch(0 0 0 / 0.35); transform-origin: 90% 0; }
+  .hs-live.is-live:not(.open) .hs-menu { display: none; }
+  .hs-menu ul { margin: 0; padding: 0; list-style: none; }
+  .hs-menu li { display: flex; align-items: stretch; min-height: calc(100cqw / 240 * 22); }
+  .hs-menu-acts { border-top: 1px solid oklch(1 0 0 / 0.55); }
+  .hs-m-go { flex: 1; display: flex; align-items: center; gap: calc(100cqw / 60); min-width: 0; padding: 0 calc(100cqw / 60); font: inherit; color: inherit; text-align: left; background: none; border: 0; cursor: pointer; }
+  .hs-m-ic { width: calc(100cqw / 15); height: calc(100cqw / 15); font-size: calc(100cqw / 30); box-shadow: 0 0 0 2px var(--ibk); }
+  .hs-m-ic.img { background-color: var(--ibk); background-repeat: no-repeat; border-radius: 0; image-rendering: pixelated; }
+  .hs-m-n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+  .hs-menu li.act .hs-m-n::after { content: ' ◂'; font-weight: 400; }
+  .hs-m-go:hover, .hs-m-go:focus-visible { color: var(--ht); background: var(--hbk); outline: none; }
+  .hs-m-x { flex: none; width: calc(100cqw / 240 * 24); background-repeat: no-repeat; background-color: transparent; background-origin: content-box; background-clip: content-box; padding: 0 calc(100cqw / 240 * 4); border: 0; cursor: pointer; image-rendering: pixelated; background-size: calc(100cqw / 240 * 96) calc(100cqw / 240 * 16) !important; background-position: 0 center !important; }
+  .hs-m-x:hover, .hs-m-x:focus-visible { box-shadow: inset 0 0 0 calc(100cqw / 240 * 4) var(--hbk); outline: none; }
+  .hs-menu li.closing { opacity: 0.5; }
+  .hs-menu-foot { display: flex; justify-content: space-between; align-items: center; margin: 0; padding: 0 calc(100cqw / 60); height: calc(100cqw / 240 * 18); color: #000; background: #fffbf0; font-weight: 700; font-size: calc(100cqw / 240 * 11) !important; }
+  .hs-opt { padding: 0 0.4em; border: 1px solid #000; border-radius: 4px; font-weight: 400; }
+  .hs-live-st { pointer-events: none; position: absolute; left: 0; right: 0; bottom: 0; margin: 0; padding: 0.4em 0.6em; font-size: calc(100cqw / 240 * 11) !important; color: #fff; background: oklch(0.25 0.03 255 / 0.85); }
+  .hs-live-st:empty { display: none; }
+  .hs-live-box { position: absolute; left: 6%; right: 6%; top: 18%; display: grid; grid-template-columns: 1fr 1fr; gap: calc(100cqw / 60); padding: calc(100cqw / 40); background: #fff; border: 1px solid #000; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.35); z-index: 3; font-size: calc(100cqw / 240 * 11) !important; }
+  .hs-live-box[hidden] { display: none; }
+  .hs-live-box b { grid-column: 1 / -1; margin: calc(-100cqw / 40) calc(-100cqw / 40) 0; padding: 0.3em 0.6em; color: #fff; background: linear-gradient(oklch(0.48 0.15 258), oklch(0.32 0.14 262)); }
+  .hs-live-box p { grid-column: 1 / -1; margin: 0; }
+  .hs-live-box button { height: calc(100cqw / 10); font: inherit; background: linear-gradient(#fff, #e3e3e3); border: 1px solid #555; cursor: pointer; }
+  .hs-live-box button:focus-visible { outline: 2px solid #316ac5; outline-offset: 1px; }
+  @media (pointer: coarse) { .hs-menu { max-height: calc(100% - 3.4em); overflow-y: auto; overscroll-behavior: contain; } .hs-menu li, .hs-live-box button { min-height: 44px; } .hs-m-x { width: 44px; padding: 0 calc(22px - 100cqw / 240 * 8); } }
+  .hs-live-tip { max-width: 34ch; margin: 0 !important; text-align: center; font-size: 0.9375rem !important; color: var(--ink-2); }
+  /* His icons, placed into the device's own top bar by the script */
+  .hs-live-dev > .win-bar .hs-bar-ic { flex: none; width: 28px; height: 28px; margin: 0 -2px; padding: 4px; background: var(--bar) no-repeat; background-size: 400% 100%; background-origin: content-box; background-clip: content-box; border: 0; border-radius: 3px; cursor: pointer; image-rendering: pixelated; }
+  .hs-live-dev > .win-bar .hs-bar-ic[aria-expanded='true'] { box-shadow: inset 0 0 0 2px oklch(0.85 0.14 85); }
+  .hs-live-dev > .win-bar .hs-bar-x { flex: none; height: 24px; min-width: 24px; padding: 0 6px; font: 700 0.75rem/1 Tahoma, sans-serif; color: #fff; background: oklch(1 0 0 / 0.15); border: 1px solid oklch(1 0 0 / 0.6); border-radius: 50%; cursor: pointer; }
+  .hs-live-dev > .win-bar :is(.hs-bar-ic, .hs-bar-x):focus-visible { outline: 2px solid oklch(0.85 0.14 85); outline-offset: 1px; }
+  .hs-live-dev > .win-bar .hs-bar-ic::after { content: ""; position: absolute; inset: -8px; }
+  .hs-live-dev > .win-bar .hs-bar-x::after { content: ""; position: absolute; inset: -10px; }
+  .hs-live-dev > .win-bar :is(.hs-bar-ic, .hs-bar-x) { position: relative; }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { PROGS, reduce, type Prog } from './hs.ts';
+
+  document.querySelectorAll<HTMLElement & { hs?: boolean }>('[data-hslive]').forEach(root => {
+    if (root.hs) return;
+    root.hs = true;
+    const win = root.closest<HTMLElement>('.win')!, barEl = win.querySelector<HTMLElement>('.win-bar')!, title = win.querySelector<HTMLElement>('.win-title')!;
+    const menu = root.querySelector<HTMLElement>('[data-menu]')!, list = root.querySelector<HTMLElement>('[data-list]')!;
+    const st = root.querySelector<HTMLElement>('[data-st]')!, box = root.querySelector<HTMLElement>('[data-box]')!;
+    const today = root.querySelector<HTMLElement>('[data-today]')!, view = root.querySelector<HTMLElement>('[data-appview]')!;
+    const appIc = root.querySelector<HTMLElement>('[data-appic]')!, appName = root.querySelector<HTMLElement>('[data-appname]')!;
+    let running: Prog[] = [...PROGS], active: Prog | null = PROGS[0], busy = false;
+
+    // His icon and the (X) he takes over, inside the system bar
+    const ic = document.createElement('button');
+    ic.type = 'button'; ic.className = 'hs-bar-ic'; ic.setAttribute('aria-label', 'HandySwitcher'); ic.setAttribute('aria-expanded', 'false');
+    const x = document.createElement('button');
+    x.type = 'button'; x.className = 'hs-bar-x'; x.textContent = 'X'; x.setAttribute('aria-label', 'Close the active program');
+    barEl.insertBefore(ic, barEl.querySelector('.win-num'));
+    barEl.appendChild(x);
+
+    const say = (t: string) => { st.textContent = t; };
+    const show = (p: Prog | null) => {
+      active = p;
+      today.hidden = !!p; view.hidden = !p;
+      title.textContent = p ? p.name : 'Today';
+      if (p) { appIc.textContent = p.glyph; appIc.style.setProperty('--h', String(p.hue)); appName.textContent = p.name; }
+      list.querySelectorAll('li').forEach(li => li.classList.toggle('act', li.dataset.p === p?.id));
+    };
+    const open = (on: boolean) => {
+      root.classList.toggle('open', on);
+      ic.setAttribute('aria-expanded', String(on));
+      if (on) {
+        if (!reduce()) gsap.fromTo(menu, { scaleY: 0.2, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.22, ease: 'power2.out' });
+        menu.querySelector<HTMLElement>('button')?.focus();
+      }
+    };
+    const remove = (p: Prog) => {
+      running = running.filter(r => r !== p);
+      const li = list.querySelector<HTMLElement>(`[data-p="${p.id}"]`);
+      if (li) { if (reduce()) li.remove(); else gsap.to(li, { height: 0, minHeight: 0, opacity: 0, duration: 0.25, onComplete: () => li.remove() }); }
+      if (active === p) show(running[0] ?? null);
+    };
+    const wait = (ms: number) => new Promise(r => setTimeout(r, reduce() ? 0 : ms));
+    const ask = (p: Prog) => new Promise<boolean>(res => {
+      root.querySelector('[data-boxname]')!.textContent = p.name;
+      box.hidden = false;
+      box.querySelector<HTMLElement>('[data-yes]')!.focus();
+      const done = (v: boolean) => { box.hidden = true; res(v); };
+      box.querySelector<HTMLElement>('[data-yes]')!.onclick = () => done(true);
+      box.querySelector<HTMLElement>('[data-no]')!.onclick = () => done(false);
+    });
+    // The same order as his routine at 0x17D4C, sped up 4 times
+    const close = async (p: Prog) => {
+      list.querySelector(`[data-p="${p.id}"]`)?.classList.add('closing');
+      show(p);
+      if (p.kind === 'player') { say('Media Player: pressing its own Ctrl+Q'); await wait(300); }
+      say(`Asking ${p.name} to close...`);
+      await wait(250);
+      if (p.kind === 'polite' || p.kind === 'player') { remove(p); say(`${p.name} closed.`); return; }
+      if (p.kind === 'slow') { say(`${p.name} is saving. Waiting...`); await wait(700); remove(p); say(`${p.name} closed after 2.5 seconds.`); return; }
+      say(`${p.name} is not answering. Waiting up to 6 seconds...`);
+      await wait(1400);
+      if (await ask(p)) { remove(p); say(`${p.name} ended. Its memory is free again.`); }
+      else { list.querySelector(`[data-p="${p.id}"]`)?.classList.remove('closing'); say(`${p.name} is still running.`); }
+    };
+    const run = async (f: () => Promise<void>) => { if (busy) return; busy = true; try { await f(); } finally { busy = false; } };
+
+    ic.addEventListener('click', () => open(!root.classList.contains('open')));
+    x.addEventListener('click', () => run(async () => { if (active) await close(active); else say('Nothing to close: this is the Today screen.'); }));
+    root.addEventListener('click', e => {
+      const t = (e.target as Element).closest<HTMLElement>('button');
+      if (!t || box.contains(t)) return;
+      const p = PROGS.find(r => r.id === (t.dataset.go ?? t.dataset.x));
+      if (t.dataset.go && p) { show(p); open(false); say(`Switched to ${p.name}.`); }
+      else if (t.dataset.x && p) run(() => close(p));
+      else if (t.dataset.act === 'min') { show(null); open(false); say('Every program minimized. They keep running.'); }
+      else if (t.dataset.act === 'all') run(async () => { for (const r of [...running]) await close(r); });
+      else if (t.dataset.act === 'others') run(async () => { const keep = active; for (const r of [...running]) if (r !== keep) await close(r); if (keep) show(keep); });
+    });
+    root.addEventListener('keydown', e => { if (e.key === 'Escape' && root.classList.contains('open')) { open(false); ic.focus(); } });
+    root.classList.add('is-live');
+    win.parentElement!.querySelector<HTMLElement>('[data-tip]')!.hidden = false;
+    show(PROGS[0]);
+  });
+</script>

@@ -1,0 +1,167 @@
+<svg class="dg" viewBox="0 0 640 352" role="img" aria-labelledby="pm-calls-t">
+<title id="pm-calls-t">PESM's 16 calls: y position, color, the style keys before each string, and the bold, underline and italic switches they leave on. Each column counts 000 to 111.</title>
+<text class="t-cy" x="10" y="20">x = 600</text>
+<text x="10" y="46">y</text>
+<text x="60" y="46">ink</text>
+<text x="106" y="46">keys</text>
+<text x="178" y="46" text-anchor="middle">B</text>
+<text x="210" y="46" text-anchor="middle">U</text>
+<text x="242" y="46" text-anchor="middle">I</text>
+<text x="10" y="74">60</text>
+<rect class="box-bk" x="60" y="59" width="28" height="20" style="fill:#FFFFFF" />
+<text class="t-yl" x="106" y="74">-</text>
+<rect class="box-bk" x="170" y="60" width="16" height="18" />
+<rect class="box-bk" x="202" y="60" width="16" height="18" />
+<rect class="box-bk" x="234" y="60" width="16" height="18" />
+<text x="10" y="104">120</text>
+<rect class="box-bk" x="60" y="89" width="28" height="20" style="fill:#5555FF" />
+<text class="t-yl" x="106" y="104">@</text>
+<rect class="box-hi" x="170" y="90" width="16" height="18" />
+<rect class="box-bk" x="202" y="90" width="16" height="18" />
+<rect class="box-bk" x="234" y="90" width="16" height="18" />
+<text x="10" y="134">180</text>
+<rect class="box-bk" x="60" y="119" width="28" height="20" style="fill:#55FF55" />
+<text class="t-yl" x="106" y="134">@#</text>
+<rect class="box-bk" x="170" y="120" width="16" height="18" />
+<rect class="box-hi" x="202" y="120" width="16" height="18" />
+<rect class="box-bk" x="234" y="120" width="16" height="18" />
+<text x="10" y="164">240</text>
+<rect class="box-bk" x="60" y="149" width="28" height="20" style="fill:#55FFFF" />
+<text class="t-yl" x="106" y="164">@</text>
+<rect class="box-hi" x="170" y="150" width="16" height="18" />
+<rect class="box-hi" x="202" y="150" width="16" height="18" />
+<rect class="box-bk" x="234" y="150" width="16" height="18" />
+<text x="10" y="194">300</text>
+<rect class="box-bk" x="60" y="179" width="28" height="20" style="fill:#FF5555" />
+<text class="t-yl" x="106" y="194">@#!</text>
+<rect class="box-bk" x="170" y="180" width="16" height="18" />
+<rect class="box-bk" x="202" y="180" width="16" height="18" />
+<rect class="box-hi" x="234" y="180" width="16" height="18" />
+<text x="10" y="224">360</text>
+<rect class="box-bk" x="60" y="209" width="28" height="20" style="fill:#FFFF55" />
+<text class="t-yl" x="106" y="224">@</text>
+<rect class="box-hi" x="170" y="210" width="16" height="18" />
+<rect class="box-bk" x="202" y="210" width="16" height="18" />
+<rect class="box-hi" x="234" y="210" width="16" height="18" />
+<text x="10" y="254">420</text>
+<rect class="box-bk" x="60" y="239" width="28" height="20" style="fill:#FFFFFF" />
+<text class="t-yl" x="106" y="254">@#</text>
+<rect class="box-bk" x="170" y="240" width="16" height="18" />
+<rect class="box-hi" x="202" y="240" width="16" height="18" />
+<rect class="box-hi" x="234" y="240" width="16" height="18" />
+<text x="10" y="284">479</text>
+<rect class="box-bk" x="60" y="269" width="28" height="20" style="fill:#555555" />
+<text class="t-yl" x="106" y="284">@</text>
+<rect class="box-hi" x="170" y="270" width="16" height="18" />
+<rect class="box-hi" x="202" y="270" width="16" height="18" />
+<rect class="box-hi" x="234" y="270" width="16" height="18" />
+<text class="t-cy" x="330" y="20">x = 400, double size</text>
+<text x="330" y="46">y</text>
+<text x="380" y="46">ink</text>
+<text x="426" y="46">keys</text>
+<text x="498" y="46" text-anchor="middle">B</text>
+<text x="530" y="46" text-anchor="middle">U</text>
+<text x="562" y="46" text-anchor="middle">I</text>
+<text x="330" y="74">60</text>
+<rect class="box-bk" x="380" y="59" width="28" height="20" style="fill:#FFFFFF" />
+<text class="t-yl" x="426" y="74">*$</text>
+<rect class="box-bk" x="490" y="60" width="16" height="18" />
+<rect class="box-bk" x="522" y="60" width="16" height="18" />
+<rect class="box-bk" x="554" y="60" width="16" height="18" />
+<text x="330" y="104">120</text>
+<rect class="box-bk" x="380" y="89" width="28" height="20" style="fill:#5555FF" />
+<text class="t-yl" x="426" y="104">@</text>
+<rect class="box-hi" x="490" y="90" width="16" height="18" />
+<rect class="box-bk" x="522" y="90" width="16" height="18" />
+<rect class="box-bk" x="554" y="90" width="16" height="18" />
+<text x="330" y="134">180</text>
+<rect class="box-bk" x="380" y="119" width="28" height="20" style="fill:#55FF55" />
+<text class="t-yl" x="426" y="134">@#</text>
+<rect class="box-bk" x="490" y="120" width="16" height="18" />
+<rect class="box-hi" x="522" y="120" width="16" height="18" />
+<rect class="box-bk" x="554" y="120" width="16" height="18" />
+<text x="330" y="164">240</text>
+<rect class="box-bk" x="380" y="149" width="28" height="20" style="fill:#55FFFF" />
+<text class="t-yl" x="426" y="164">@</text>
+<rect class="box-hi" x="490" y="150" width="16" height="18" />
+<rect class="box-hi" x="522" y="150" width="16" height="18" />
+<rect class="box-bk" x="554" y="150" width="16" height="18" />
+<text x="330" y="194">300</text>
+<rect class="box-bk" x="380" y="179" width="28" height="20" style="fill:#FF5555" />
+<text class="t-yl" x="426" y="194">@#!</text>
+<rect class="box-bk" x="490" y="180" width="16" height="18" />
+<rect class="box-bk" x="522" y="180" width="16" height="18" />
+<rect class="box-hi" x="554" y="180" width="16" height="18" />
+<text x="330" y="224">360</text>
+<rect class="box-bk" x="380" y="209" width="28" height="20" style="fill:#FFFF55" />
+<text class="t-yl" x="426" y="224">@</text>
+<rect class="box-hi" x="490" y="210" width="16" height="18" />
+<rect class="box-bk" x="522" y="210" width="16" height="18" />
+<rect class="box-hi" x="554" y="210" width="16" height="18" />
+<text x="330" y="254">420</text>
+<rect class="box-bk" x="380" y="239" width="28" height="20" style="fill:#FFFF55" />
+<text class="t-yl" x="426" y="254">@#</text>
+<rect class="box-bk" x="490" y="240" width="16" height="18" />
+<rect class="box-hi" x="522" y="240" width="16" height="18" />
+<rect class="box-hi" x="554" y="240" width="16" height="18" />
+<text x="330" y="284">479</text>
+<rect class="box-bk" x="380" y="269" width="28" height="20" style="fill:#555555" />
+<text class="t-yl" x="426" y="284">@</text>
+<rect class="box-hi" x="490" y="270" width="16" height="18" />
+<rect class="box-hi" x="522" y="270" width="16" height="18" />
+<rect class="box-hi" x="554" y="270" width="16" height="18" />
+<text x="10" y="316">B bold, U underline, I italic. Each @ # ! flips one switch,</text>
+<text x="10" y="340">and switches stay on: each column counts 000 to 111.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 354" role="img" aria-labelledby="pm-calls-tn">
+<title id="pm-calls-tn">The first 8 calls count through the bold, underline and italic switches.</title>
+<text class="t-cy" x="10" y="18">Calls 1 to 8, x = 600</text>
+<text x="10" y="44">keys</text>
+<text x="108" y="44" text-anchor="middle">B</text>
+<text x="140" y="44" text-anchor="middle">U</text>
+<text x="172" y="44" text-anchor="middle">I</text>
+<text x="210" y="44">ink</text>
+<text class="t-yl" x="10" y="72">-</text>
+<rect class="box-bk" x="100" y="58" width="16" height="18" />
+<rect class="box-bk" x="132" y="58" width="16" height="18" />
+<rect class="box-bk" x="164" y="58" width="16" height="18" />
+<rect class="box-bk" x="210" y="57" width="28" height="20" style="fill:#FFFFFF" />
+<text class="t-yl" x="10" y="100">@</text>
+<rect class="box-hi" x="100" y="86" width="16" height="18" />
+<rect class="box-bk" x="132" y="86" width="16" height="18" />
+<rect class="box-bk" x="164" y="86" width="16" height="18" />
+<rect class="box-bk" x="210" y="85" width="28" height="20" style="fill:#5555FF" />
+<text class="t-yl" x="10" y="128">@#</text>
+<rect class="box-bk" x="100" y="114" width="16" height="18" />
+<rect class="box-hi" x="132" y="114" width="16" height="18" />
+<rect class="box-bk" x="164" y="114" width="16" height="18" />
+<rect class="box-bk" x="210" y="113" width="28" height="20" style="fill:#55FF55" />
+<text class="t-yl" x="10" y="156">@</text>
+<rect class="box-hi" x="100" y="142" width="16" height="18" />
+<rect class="box-hi" x="132" y="142" width="16" height="18" />
+<rect class="box-bk" x="164" y="142" width="16" height="18" />
+<rect class="box-bk" x="210" y="141" width="28" height="20" style="fill:#55FFFF" />
+<text class="t-yl" x="10" y="184">@#!</text>
+<rect class="box-bk" x="100" y="170" width="16" height="18" />
+<rect class="box-bk" x="132" y="170" width="16" height="18" />
+<rect class="box-hi" x="164" y="170" width="16" height="18" />
+<rect class="box-bk" x="210" y="169" width="28" height="20" style="fill:#FF5555" />
+<text class="t-yl" x="10" y="212">@</text>
+<rect class="box-hi" x="100" y="198" width="16" height="18" />
+<rect class="box-bk" x="132" y="198" width="16" height="18" />
+<rect class="box-hi" x="164" y="198" width="16" height="18" />
+<rect class="box-bk" x="210" y="197" width="28" height="20" style="fill:#FFFF55" />
+<text class="t-yl" x="10" y="240">@#</text>
+<rect class="box-bk" x="100" y="226" width="16" height="18" />
+<rect class="box-hi" x="132" y="226" width="16" height="18" />
+<rect class="box-hi" x="164" y="226" width="16" height="18" />
+<rect class="box-bk" x="210" y="225" width="28" height="20" style="fill:#FFFFFF" />
+<text class="t-yl" x="10" y="268">@</text>
+<rect class="box-hi" x="100" y="254" width="16" height="18" />
+<rect class="box-hi" x="132" y="254" width="16" height="18" />
+<rect class="box-hi" x="164" y="254" width="16" height="18" />
+<rect class="box-bk" x="210" y="253" width="28" height="20" style="fill:#555555" />
+<text x="10" y="298">Calls 9 to 16 start with *$</text>
+<text x="10" y="320">(reset, double size) and</text>
+<text x="10" y="342">count the same way.</text>
+</svg>

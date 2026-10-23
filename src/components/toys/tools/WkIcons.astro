@@ -1,0 +1,171 @@
+---
+// MENU2.DAT decoded for real: pick one of the 8 icons and watch his bytes paint it, run by run, with the shared
+// Scrubber. The bar on top is the whole 3,005-byte file. Without JS: the DOS logo, its bytes and all 8 thumbnails.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+import { fb, icon, tokens, ICONS, hex2 } from './wk.ts';
+import { menu2, png, b64 } from './wk-ssr.ts';
+
+const dat = menu2();
+const T = ICONS.map(i => tokens(dat, i.ofs));
+const thumb = (k: number) => { const f = fb(46, 30, 7); icon(f, T[k], 2, 2); return png(f); };
+const big = thumb(0);
+const toks = T[0];
+const runs = toks.filter(t => t.t === 'run').length;
+// The file, in byte order: the offset table, then the icons in the order they are stored
+const order = ICONS.map((ic, k) => ({ k, a: ic.ofs, b: T[k][T[k].length - 1].at + 1 })).sort((p, q) => p.a - q.a);
+const pct = (v: number) => `${((v / dat.length) * 100).toFixed(3)}%`;
+const fmt = (n: number) => n.toLocaleString('en-US');
+---
+
+<div class="wk-ic" data-wkicons data-dat={b64(dat)}>
+  <div class="wk-ic-file" aria-label={`MENU2.DAT, ${fmt(dat.length)} bytes: a table of 8 offsets, then the 8 icons`} role="img">
+    <span class="wk-ic-seg wk-ic-head" style={`left:0;width:${pct(16)}`}></span>
+    {order.map(o => <span class:list={['wk-ic-seg', { on: o.k === 0 }]} data-k={o.k} style={`left:${pct(o.a)};width:${pct(o.b - o.a)}`}></span>)}
+    <span class="wk-ic-at" data-at style={`left:${pct(toks[toks.length - 1].at)}`}></span>
+  </div>
+  <p class="wk-ic-filecap" aria-hidden="true"><span>0000 offsets</span><span>MENU2.DAT · {fmt(dat.length)} bytes</span><span>{(dat.length - 1).toString(16).toUpperCase().padStart(4, '0')}</span></p>
+  <div class="wk-ic-body">
+    <Window title="MENU2.DAT  pick an icon" kind="panel" class="wk-ic-pick">
+      <div class="wk-ic-list" role="radiogroup" aria-label="Icon">
+        {ICONS.map((ic, k) => (
+          <button type="button" role="radio" class="wk-ic-btn" data-k={k} aria-checked={String(k === 0)} tabindex={k === 0 ? 0 : -1}>
+            <img src={thumb(k)} width="46" height="30" alt="" />
+            <span><b>{ic.name}</b><i>at {ic.ofs.toString(16).toUpperCase().padStart(4, '0')}h · {T[k][T[k].length - 1].at + 1 - ic.ofs} bytes</i></span>
+          </button>
+        ))}
+      </div>
+    </Window>
+    <Window title="ICON  his bytes, one run at a time" kind="editor" active class="wk-ic-view">
+      <div class="wk-ic-stage">
+        <img class="wk-ic-big" src={big} width="46" height="30" alt="The DOS logo from MENU2.DAT: the letters D, O and S in light red, magenta and yellow, on the gray button face." />
+        <canvas class="wk-ic-big" width="368" height="240" aria-hidden="true" hidden></canvas>
+      </div>
+      <p class="wk-ic-bytes" data-bytes role="region" tabindex="0" aria-label="The icon's bytes">
+        {toks.map((t, i) => <span data-k={i} class={`wk-ic-b wk-ic-b--${t.t}`}>{t.b.map(hex2).join(' ')}</span>)}
+      </p>
+      <p class="wk-ic-say" data-say aria-live="polite">The DOS logo: {fmt(toks[toks.length - 1].at + 1 - ICONS[0].ofs)} bytes, {runs} runs. Press Run to watch his loop paint it.</p>
+      <Scrubber n={toks.length} at={toks.length - 1} label="Step through the icon's bytes" />
+    </Window>
+  </div>
+</div>
+
+<style is:global>
+  .wk-ic { display: grid; gap: 8px; }
+  .wk-ic-file { position: relative; height: 26px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .wk-ic-seg { position: absolute; top: 3px; bottom: 3px; background: color-mix(in oklch, var(--accent-2) 45%, transparent); box-shadow: inset -1px 0 0 var(--surface); transition: background-color 0.2s; }
+  .wk-ic-head { background: var(--ink-2); }
+  .wk-ic-seg.on { background: var(--accent); }
+  .wk-ic-at { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); translate: -1px 0; }
+  .wk-ic-filecap { display: flex; justify-content: space-between; gap: 8px; margin: 0 0 14px !important; font: 500 12px/1.3 var(--font-code) !important; color: var(--ink-2) !important; }
+  .wk-ic-body { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); gap: 22px 26px; align-items: start; }
+  .wk-ic-list { display: grid; gap: 4px; }
+  .wk-ic-btn { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 12px; align-items: center; min-height: 44px; padding: 5px 8px; text-align: left; color: var(--ink); background: none; border: 0; box-shadow: inset 0 0 0 1px transparent; cursor: pointer; }
+  .wk-ic-btn img { width: 46px; height: 30px; image-rendering: pixelated; }
+  .wk-ic-btn span { display: grid; gap: 1px; min-width: 0; }
+  .wk-ic-btn b { font: 700 0.9375rem/1.2 var(--sans); }
+  .wk-ic-btn i { font: 500 11px/1.3 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .wk-ic-btn:hover { box-shadow: inset 0 0 0 1px var(--accent-2); }
+  .wk-ic-btn[aria-checked='true'] { background: var(--accent-2); color: var(--surface); }
+  .wk-ic-btn[aria-checked='true'] i { color: var(--surface); }
+  .wk-ic-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .wk-ic-stage { display: grid; place-items: center; padding: 10px 0; background: var(--vga-7); }
+  .wk-ic-big { display: block; width: min(100%, 368px); aspect-ratio: 46 / 30; height: auto; image-rendering: pixelated; }
+  .wk-ic-bytes { display: flex; flex-wrap: wrap; gap: 3px 6px; max-height: 128px; overflow: auto; margin: 14px 0 0 !important; padding: 8px; background: var(--surface-2); font: 500 12px/1.5 var(--font-code) !important; color: var(--ink-2) !important; overscroll-behavior: contain; max-width: none !important; }
+  .wk-ic-b { padding: 0 3px; white-space: nowrap; }
+  .wk-ic-b--size, .wk-ic-b--color { color: var(--accent); }
+  .wk-ic-b--up, .wk-ic-b--new, .wk-ic-b--end { color: var(--accent-2); }
+  .wk-ic-b.now { color: var(--surface); background: var(--accent); }
+  .wk-ic-b.future { opacity: 0.45; }
+  .wk-ic-say { margin: 12px 0 14px !important; font-size: 1rem !important; line-height: 1.5 !important; min-height: 3em; }
+  @media (max-width: 1023px) { .wk-ic-body { grid-template-columns: minmax(0, 1fr); } .wk-ic-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 480px) { .wk-ic-list { grid-template-columns: minmax(0, 1fr); } .wk-ic-filecap span:first-child { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .wk-ic-seg { transition: none; } }
+</style>
+
+<script>
+  import { tokens, ICONS, EGA, COLOR_NAMES, hex2, bytesOf, reduce, type Tok } from './wk.ts';
+  import { scrubber } from '../scrubber';
+
+  const S = 8, PAD = 2;
+  document.querySelectorAll<HTMLElement & { wk?: boolean }>('[data-wkicons]').forEach(root => {
+    if (root.wk) return;
+    root.wk = true;
+    const dat = bytesOf(root), T = ICONS.map(i => tokens(dat, i.ofs));
+    const cv = root.querySelector('canvas')!, ctx = cv.getContext('2d')!;
+    const bytesEl = root.querySelector<HTMLElement>('[data-bytes]')!, say = root.querySelector('[data-say]')!;
+    const atEl = root.querySelector<HTMLElement>('[data-at]')!, segs = [...root.querySelectorAll<HTMLElement>('.wk-ic-seg[data-k]')];
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('.wk-ic-btn')];
+    let k = 0, toks: Tok[] = T[0], spans: HTMLElement[] = [];
+
+    const fill = (bytes: Tok[]) => {
+      bytesEl.innerHTML = bytes.map((t, i) => `<span data-k="${i}" class="wk-ic-b wk-ic-b--${t.t}">${t.b.map(hex2).join(' ')}</span>`).join('');
+      spans = [...bytesEl.querySelectorAll<HTMLElement>('span')];
+    };
+    const words = (t: Tok, i: number) => {
+      switch (t.t) {
+        case 'size': return `<b>${hex2(t.b[0])} ${hex2(t.b[1])}</b>: the icon is ${t.w} × ${t.h}. Drawing starts from its bottom-right corner.`;
+        case 'color': return `<b>${hex2(t.b[0])} ${hex2(t.b[1])}</b>: color ${t.c}, ${COLOR_NAMES[t.c]}, starting ${t.b[1]} row${t.b[1] === 1 ? '' : 's'} up from the bottom.`;
+        case 'up': return `<b>EF</b>: one row up. Every run is counted from the right edge again.`;
+        case 'run': return `<b>${hex2(t.skip)} ${hex2(t.n)}</b>: skip ${t.skip} pixel${t.skip === 1 ? '' : 's'} from the right edge, then paint ${t.n} to the left.`;
+        case 'new': return `<b>FC</b>: a new color comes next.`;
+        default: return `<b>${hex2(t.b[0])}</b>: the end. ${toks.filter(x => x.t === 'run').length} runs in ${t.at + 1 - ICONS[k].ofs} bytes. As a plain bitmap it would take 546.`;
+      }
+    };
+    const draw = (step: number) => {
+      ctx.fillStyle = '#1b1b1b'; ctx.fillRect(0, 0, cv.width, cv.height);
+      for (let y = 0; y < 30; y++) for (let x = 0; x < 46; x++) { ctx.fillStyle = EGA[7]; ctx.fillRect(x * S, y * S, S - 1, S - 1); }
+      let cur: Tok | null = null, row = -1;
+      toks.forEach((t, i) => {
+        if (i > step) return;
+        if (t.t === 'run') {
+          ctx.fillStyle = EGA[t.c];
+          for (let x = 0; x < t.n; x++) ctx.fillRect((t.x + x + PAD) * S, (t.y + PAD) * S, S - 1, S - 1);
+          row = t.y;
+        } else if (t.t === 'color' || t.t === 'up') row = t.row;
+        if (i === step) cur = t;
+      });
+      // The pen: the row being drawn, and the current run outlined
+      if (row >= 0 && step < toks.length - 1) { ctx.fillStyle = 'rgba(255,255,85,0.22)'; ctx.fillRect(0, (row + PAD) * S, cv.width, S - 1); }
+      const c = cur as Tok | null;
+      if (c && c.t === 'run') { ctx.strokeStyle = '#FFFF55'; ctx.lineWidth = 2; ctx.strokeRect((c.x + PAD) * S - 1, (c.y + PAD) * S - 1, c.n * S + 1, S + 1); }
+      // The right edge every run is measured from
+      const w = (toks[0] as { w: number }).w;
+      ctx.fillStyle = 'rgba(85,255,255,0.8)'; ctx.fillRect((w + PAD) * S + S - 2, 0, 2, cv.height);
+    };
+    const show = (i: number, how: string) => {
+      draw(i);
+      spans.forEach((s, j) => { s.classList.toggle('now', j === i); s.classList.toggle('future', j > i); });
+      const s = spans[i];
+      if (s && bytesEl.scrollHeight > bytesEl.clientHeight) bytesEl.scrollTo({ top: s.offsetTop - bytesEl.clientHeight / 2, behavior: how === 'play' && !reduce() ? 'smooth' : 'auto' });
+      atEl.style.left = `${(toks[i].at / dat.length) * 100}%`;
+      say.innerHTML = words(toks[i], i);
+    };
+    const scrub = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 0.05 });
+
+    const pick = (b: HTMLButtonElement, play: boolean) => {
+      btns.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+      k = +b.dataset.k!; toks = T[k];
+      segs.forEach(s => s.classList.toggle('on', +s.dataset.k! === k));
+      cv.setAttribute('aria-label', ICONS[k].name);
+      fill(toks);
+      if (play && !reduce()) { scrub.resize(toks.length, 0); scrub.play(); }
+      else scrub.resize(toks.length, toks.length - 1);
+    };
+    btns.forEach((b, i) => {
+      b.addEventListener('click', () => pick(b, true));
+      b.addEventListener('keydown', e => {
+        const d = e.key === 'ArrowDown' || e.key === 'ArrowRight' ? 1 : e.key === 'ArrowUp' || e.key === 'ArrowLeft' ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        const t = btns[(i + d + btns.length) % btns.length];
+        pick(t, false); t.focus();
+      });
+    });
+
+    root.querySelector<HTMLImageElement>('img.wk-ic-big')!.hidden = true;
+    cv.hidden = false;
+    spans = [...bytesEl.querySelectorAll<HTMLElement>('span')];
+    show(scrub.i, 'jump');
+  });
+</script>

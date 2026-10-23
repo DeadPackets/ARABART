@@ -1,0 +1,95 @@
+---
+// His IP Helper, rebuilt from dialog 507 in HandyMenu.exe 3.7. Release and Renew play the conversation the Pocket PC
+// has with the network's DHCP server. The addresses are made-up private ones.
+import Window from '../../shell/Window.astro';
+import { renderDialog } from '../ds-handyswitcher/pocket.ts';
+import '../ds-handyswitcher/pocket.css';
+import ui from './ui.json';
+
+const D = (ui as any)['37'].dialogs['507'];
+const ADDR = { 1057: '192.168.1.37', 1058: '192.168.1.1', 1059: '192.168.1.1', 1060: '0.0.0.0', 1061: '0.0.0.0' };
+const html = renderDialog(D, {
+  1053: { options: ['WLAN adapter', 'USB (ActiveSync)'], value: 'Interface' },
+  1055: { attrs: 'data-renew' }, 1056: { attrs: 'data-release' },
+  ...Object.fromEntries(Object.entries(ADDR).map(([k, v]) => [k, { value: v, attrs: 'data-addr' }])),
+}, 'hmip');
+---
+
+<div class="hm-ip" data-hm-ip>
+  <Window title="IP Helper" kind="device" num="9:41" class="hm-dev2" aria-label="HandyMenu's IP Helper">
+    <div class="ppc hm-ip-scr">
+      <div class="hm-ip-dlg" set:html={html} />
+    </div>
+    <p slot="status" class="hm-soft"><span>ok</span><span></span></p>
+  </Window>
+  <div class="hm-ip-net">
+    <svg class="hm-ip-svg" viewBox="0 0 320 120" role="img" aria-labelledby="hm-ip-t">
+      <title id="hm-ip-t">The Pocket PC on the left talks to the network's DHCP server on the right.</title>
+      <rect x="4" y="30" width="96" height="60" rx="8" class="hm-ip-box" /><text x="52" y="56" text-anchor="middle">Pocket PC</text><text x="52" y="76" text-anchor="middle" class="hm-ip-sm" data-me>192.168.1.37</text>
+      <rect x="220" y="30" width="96" height="60" rx="8" class="hm-ip-box" /><text x="268" y="56" text-anchor="middle">DHCP</text><text x="268" y="76" text-anchor="middle" class="hm-ip-sm">server</text>
+      <line x1="104" y1="60" x2="216" y2="60" class="hm-ip-wire" />
+      <g data-msg opacity="0"><rect x="-38" y="-12" width="76" height="24" rx="12" class="hm-ip-chip" /><text x="0" y="5" text-anchor="middle" class="hm-ip-sm" data-msgt>DISCOVER</text></g>
+    </svg>
+    <ol class="hm-ip-log" aria-live="polite" data-log>
+      <li><b>REQUEST</b> I would like 192.168.1.37.</li>
+      <li><b>ACK</b> It is yours, for the length of the lease.</li>
+    </ol>
+  </div>
+</div>
+
+<style is:global>
+  .hm-ip { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 24px 36px; align-items: center; margin-block: 32px; }
+  .hm-ip-scr { height: 100%; }
+  .hm-ip-net { display: grid; gap: 14px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .hm-ip-svg { width: 100%; height: auto; font: 600 13px var(--sans); fill: var(--ink); }
+  .hm-ip-box { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+  .hm-ip-wire { stroke: var(--ink-2); stroke-width: 2; stroke-dasharray: 4 4; }
+  .hm-ip-chip { fill: var(--accent); }
+  .hm-ip-sm { font: 600 10px var(--font-code); }
+  [data-msg] .hm-ip-sm { fill: #fff; }
+  .hm-ip-log { margin: 0 !important; padding-left: 1.4em !important; display: grid; gap: 6px; }
+  .hm-ip-log li { font-size: 0.9375rem !important; line-height: 1.45 !important; color: var(--ink) !important; max-width: none !important; }
+  .hm-ip-log b { font-family: var(--font-code); color: var(--accent); margin-right: 6px; }
+  .ppc-dlg [data-addr] { font-family: var(--font-code, monospace); }
+  @media (max-width: 760px) { .hm-ip { grid-template-columns: minmax(0, 1fr); justify-items: center; } .hm-ip-net { width: 100%; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { reduce } from './hm.ts';
+
+  const IP = ['192.168.1.37', '192.168.1.1', '192.168.1.1', '0.0.0.0', '0.0.0.0'];
+  const SAY: Record<string, string> = {
+    RELEASE: 'I am done with 192.168.1.37. You can give it to someone else.',
+    DISCOVER: 'Is there a DHCP server on this network? (sent to everyone)',
+    OFFER: 'Yes. You can have 192.168.1.37.',
+    REQUEST: 'I would like 192.168.1.37.',
+    ACK: 'It is yours, for the length of the lease.',
+  };
+  document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-ip]').forEach(root => {
+    if (root.hm) return;
+    root.hm = true;
+    const addr = [...root.querySelectorAll<HTMLElement>('[data-addr]')], msg = root.querySelector<SVGGElement>('[data-msg]')!;
+    const msgT = root.querySelector<SVGTextElement>('[data-msgt]')!, log = root.querySelector<HTMLElement>('[data-log]')!, me = root.querySelector<SVGTextElement>('[data-me]')!;
+    const btns = [root.querySelector<HTMLButtonElement>('[data-renew]')!, root.querySelector<HTMLButtonElement>('[data-release]')!];
+    let tl: gsap.core.Timeline | null = null;
+    const set = (on: boolean) => { addr.forEach((a, i) => (a.textContent = on ? IP[i] : '0.0.0.0')); me.textContent = on ? IP[0] : '0.0.0.0'; };
+    const play = (msgs: string[], end: () => void) => {
+      tl?.kill();
+      log.innerHTML = '';
+      btns.forEach(b => (b.disabled = true));
+      const done = () => { end(); btns.forEach(b => (b.disabled = false)); };
+      const add = (m: string) => { const li = document.createElement('li'); li.innerHTML = `<b>${m}</b> ${SAY[m]}`; log.append(li); };
+      if (reduce()) { msgs.forEach(add); done(); return; }
+      tl = gsap.timeline({ onComplete: done });
+      msgs.forEach(m => {
+        const out = m !== 'OFFER' && m !== 'ACK';
+        tl!.call(() => { msgT.textContent = m; add(m); })
+          .fromTo(msg, { x: out ? 140 : 180, y: 60, opacity: 1 }, { x: out ? 180 : 140, duration: 0.9, ease: 'power1.inOut' })
+          .set(msg, { opacity: 0 });
+      });
+    };
+    btns[1].addEventListener('click', () => play(['RELEASE'], () => set(false)));
+    btns[0].addEventListener('click', () => { set(false); play(['DISCOVER', 'OFFER', 'REQUEST', 'ACK'], () => set(true)); });
+  });
+</script>

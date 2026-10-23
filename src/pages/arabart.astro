@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Arabart from '../writeups/arabart.astro';
+import BytesMap from '../components/BytesMap.astro';
+---
+
+<BaseLayout
+  title="ARABART · Yasser Awad"
+  description="Type Arabic on Yasser Awad's own 1993 engine, then watch how his 1,448 bytes of assembly join every letter."
+  era="dos"
+>
+  <Arabart />
+  <div class="ab-bytes"><BytesMap id="arabart" /></div>
+</BaseLayout>
+
+<style>
+  .ab-bytes { width: 100%; max-width: 1360px; margin: clamp(72px, 9vw, 120px) auto 0; padding-inline: var(--gut); }
+</style>

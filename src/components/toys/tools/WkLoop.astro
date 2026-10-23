@@ -1,0 +1,137 @@
+---
+// His run loop (WINKEY.EXE 0000:02D0..0337) beside the same loop in C, driving a picture of the two screen bytes it
+// paints: the first run of the DOS logo, 9 pixels in 2 writes.
+import CodeStepper from '../CodeStepper.astro';
+import { loopSteps, EGA } from './wk.ts';
+
+const steps = loopSteps();
+const end = steps[steps.length - 1];
+const XS = Array.from({ length: 16 }, (_, k) => 24 + k);
+const ASM = [
+  { off: '02D0', label: 'up', code: 'dec  bx', note: 'one row up' },
+  { off: '02D1', code: 'xor  ah,ah' },
+  { off: '02D3', label: 'run', code: 'mov  dx,[bp+6]', note: 'the right edge' },
+  { off: '02D6', code: 'lodsb', note: 'next byte' },
+  { off: '02D7', code: 'cmp  al,0EFh / je up', note: 'EFh: row up' },
+  { off: '02DB', code: 'cmp  al,0FCh / je color', note: 'FCh: new color' },
+  { off: '02DF', code: 'ja   done', note: 'FDh+: the end' },
+  { off: '02E1', code: 'sub  dx,ax', note: 'skip pixels' },
+  { off: '02E3', code: 'lodsb', note: 'how many' },
+  { off: '02E7', code: 'mov  ax,bx', note: 'the row' },
+  { off: '02EB', code: 'mov  bx,50h / mul bx', note: '× 80 bytes' },
+  { off: '02F0', code: 'mov  di,ax', note: 'row start' },
+  { off: '02F4', code: 'mov  cx,3 / xor bx,bx', note: '3 times:' },
+  { off: '02F9', label: 'rev', code: 'shr  dx,1 / rcl bx,1', note: 'a bit into BX' },
+  { off: '02FD', code: 'loop rev' },
+  { off: '02FF', code: 'add  di,dx', note: 'the byte' },
+  { off: '0301', code: 'mov  cl,cs:[bx+033Dh]', note: 'x mod 8' },
+  { off: '0308', code: 'mov  bx,cx / mov cx,ax', note: 'pixel, count' },
+  { off: '030C', code: 'mov  dx,3CEh / mov al,8', note: 'the card' },
+  { off: '0311', code: 'out  dx,al', note: 'pick Bit Mask' },
+  { off: '0312', code: 'inc  dx / xor ax,ax', note: 'empty mask' },
+  { off: '0315', label: 'pix', code: 'or   al,cs:[bx+0345h]', note: 'add the pixel' },
+  { off: '031A', code: 'cmp  bx,0 / jne more', note: 'left end?' },
+  { off: '031F', code: 'out  dx,al', note: 'set the mask' },
+  { off: '0320', code: 'mov  al,es:[di]', note: 'read: latches' },
+  { off: '0323', code: 'mov  es:[di],al', note: 'write: paint' },
+  { off: '0326', code: 'dec  di', note: 'byte to the left' },
+  { off: '0327', code: 'mov  bx,8 / xor al,al', note: 'new mask' },
+  { off: '032C', label: 'more', code: 'dec  bx / loop pix', note: 'next pixel' },
+  { off: '032F', code: 'out  dx,al', note: 'the last mask' },
+  { off: '0330', code: 'mov  al,es:[di]', note: 'read' },
+  { off: '0333', code: 'mov  es:[di],al', note: 'write' },
+  { off: '0336', code: 'pop  bx / jmp 02D1', note: 'next run' },
+];
+const C = [
+  { code: 'for (;;) {' },
+  { code: '  int b = *p++;', note: 'next byte' },
+  { code: '  if (b == 0xEF) { row--; continue; }' },
+  { code: '  if (b == 0xFC) newColor();' },
+  { code: '  if (b > 0xFC) break;', note: 'the end' },
+  { code: '  int x = right - b;', note: 'skip b' },
+  { code: '  int n = *p++;', note: 'paint n' },
+  { code: '  char *v = vga + row*80 + x/8;' },
+  { code: '  int bit = x % 8;' },
+  { code: '  unsigned char mask = 0;' },
+  { code: '  while (n--) {' },
+  { code: '    mask |= 0x80 >> bit;' },
+  { code: '    if (bit == 0) {', note: 'left end' },
+  { code: '      bitMask(mask);' },
+  { code: '      *v = *v;', note: 'read, write' },
+  { code: '      v--; bit = 8; mask = 0;' },
+  { code: '    }' },
+  { code: '    bit--;' },
+  { code: '  }' },
+  { code: '  bitMask(mask); *v = *v;' },
+  { code: '}' },
+];
+---
+
+<CodeStepper id="wk-loop" title="WINKEY.EXE  the run loop" asm={ASM} c={C} steps={steps} speed={0.32}>
+  <div slot="visual" class="wk-lp" data-wkloop>
+    <div class="wk-lp-bytes" aria-hidden="true">
+      <span>byte 3,523</span><span>byte 3,524</span>
+    </div>
+    <ol class="wk-lp-px" aria-label="Pixels 24 to 39 of row 44: 9 of them painted light red in 2 writes">
+      {XS.map(x => (
+        <li data-x={x} class:list={{ on: end.painted.includes(x) }} style={`--on:${EGA[12]};--off:${EGA[7]}`}><span>{x}</span></li>
+      ))}
+    </ol>
+    <p class="wk-lp-read">
+      <span>Bit Mask <b data-mask>00000000</b></span>
+      <span>Writes <b data-writes>{end.writes}</b></span>
+      <span>Pixels painted <b data-count>{end.painted.length}</b></span>
+    </p>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .wk-lp { display: grid; gap: 8px; padding: 16px; background: var(--vga-0); box-shadow: inset 0 0 0 1px var(--rule); }
+  .wk-lp-bytes { display: grid; grid-template-columns: 1fr 1fr; font: 600 12px/1.2 var(--font-code); color: var(--vga-11); text-align: center; }
+  .wk-lp-bytes span { border-bottom: 2px solid var(--vga-11); padding-bottom: 4px; }
+  ol.wk-lp-px { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 3px; margin: 0 !important; padding: 0 !important; list-style: none !important; }
+  .wk-lp-px li { position: relative; display: grid; place-items: end center; aspect-ratio: 1 / 1.25; background: var(--off); font: 500 10px/1 var(--font-code) !important; color: #000 !important; max-width: none !important; transition: background-color 0.18s; }
+  .wk-lp-px li::marker { content: none; }
+  .wk-lp-px li:nth-child(8) { margin-right: 6px; }
+  .wk-lp-px li span { padding-bottom: 3px; }
+  .wk-lp-px li.on { background: var(--on); }
+  .wk-lp-px li.mask { box-shadow: inset 0 0 0 3px var(--vga-14); }
+  .wk-lp-px li.cur::after { content: ''; position: absolute; left: 50%; bottom: -12px; translate: -50% 0; border: 6px solid transparent; border-bottom-color: var(--vga-14); }
+  .wk-lp-read { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 10px 0 0 !important; font: 500 13px/1.4 var(--font-code) !important; color: var(--vga-7) !important; }
+  .wk-lp-read b { color: var(--vga-14); font-weight: 700; font-variant-numeric: tabular-nums; }
+  @media (max-width: 520px) {
+    .wk-lp { padding: 12px 10px; }
+    .wk-lp-bytes { display: none; }
+    ol.wk-lp-px { grid-template-columns: repeat(8, minmax(0, 1fr)); row-gap: 22px; }
+    .wk-lp-px li:nth-child(8) { margin-right: 0; }
+    .wk-lp-px li:nth-child(1)::before, .wk-lp-px li:nth-child(9)::before { position: absolute; left: 0; top: -13px; font: 600 10px/1 var(--font-code); color: var(--vga-11); white-space: nowrap; }
+    .wk-lp-px li:nth-child(1)::before { content: 'byte 3,523'; }
+    .wk-lp-px li:nth-child(9)::before { content: 'byte 3,524'; }
+    ol.wk-lp-px { margin-top: 14px !important; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wk-lp-px li { transition: none; } }
+</style>
+
+<script>
+  import type { LoopStep } from './wk.ts';
+  document.querySelectorAll<HTMLElement & { wk?: boolean }>('[data-wkloop]').forEach(vis => {
+    if (vis.wk) return;
+    vis.wk = true;
+    const root = vis.closest('[data-stepper]')!;
+    const px = [...vis.querySelectorAll<HTMLElement>('li[data-x]')];
+    const mask = vis.querySelector('[data-mask]')!, writes = vis.querySelector('[data-writes]')!, count = vis.querySelector('[data-count]')!;
+    root.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as LoopStep;
+      const inMask = (x: number) => s.mask && Math.floor(x / 8) * 8 === (s.di - 3520) * 8 && (s.mask & (0x80 >> (x % 8)));
+      for (const li of px) {
+        const x = +li.dataset.x!;
+        li.classList.toggle('on', s.painted.includes(x));
+        li.classList.toggle('mask', !!inMask(x) && !s.painted.includes(x));
+        li.classList.toggle('cur', x === s.cur);
+      }
+      mask.textContent = s.mask.toString(2).padStart(8, '0');
+      writes.textContent = String(s.writes);
+      count.textContent = String(s.painted.length);
+    });
+  });
+</script>

@@ -1,0 +1,199 @@
+{
+ "file": "SCREEN/SCREEN.COM",
+ "regions": [
+  {
+   "start": 0,
+   "end": 8,
+   "kind": "code",
+   "label": "Start",
+   "note": "Points SI at the script and switches to EGA graphics, 640 by 350 in 16 colors.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-gift"
+  },
+  {
+   "start": 8,
+   "end": 46,
+   "kind": "code",
+   "label": "Header reader",
+   "note": "Copies the line's 5 header bytes into the player's own instructions, then reads where the line starts.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-header"
+  },
+  {
+   "start": 46,
+   "end": 75,
+   "kind": "code",
+   "label": "Command decoder",
+   "note": "Reads one script byte: a stroke, or x, w, y and { for left, right, new line and end of picture.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-strokes"
+  },
+  {
+   "start": 75,
+   "end": 111,
+   "kind": "code",
+   "label": "End of frame",
+   "note": "Asks DOS if a key is waiting. If not, adds 1 to the ink byte inside his code and draws line 3 again.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-cycle"
+  },
+  {
+   "start": 111,
+   "end": 149,
+   "kind": "code",
+   "label": "Stroke drawer",
+   "note": "Paints each pixel of a stroke through the BIOS, then its shadow 2 right and 2 down.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-strokes"
+  },
+  {
+   "start": 149,
+   "end": 156,
+   "kind": "code",
+   "label": "Key pressed",
+   "note": "A key ends the show: text mode, then the exit code.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 156,
+   "end": 1101,
+   "kind": "image",
+   "label": "Script, line 1",
+   "note": "محافظة بورسعيد: header 4B 43 00 07 04, 340 strokes, gray with a red shadow.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-strokes"
+  },
+  {
+   "start": 1101,
+   "end": 2454,
+   "kind": "image",
+   "label": "Script, line 2",
+   "note": "مركز المعلومات و التوثيق: header 4B 43 0D 0E 0E, 476 strokes in yellow.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-size"
+  },
+  {
+   "start": 2454,
+   "end": 3417,
+   "kind": "image",
+   "label": "Script, line 3",
+   "note": "إدارة الحاسب الآلى: header 4B 43 0D 03 0E, 319 strokes, drawn again in a new color every frame. Ends with {.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-cycle"
+  },
+  {
+   "start": 3417,
+   "end": 3418,
+   "kind": "data",
+   "label": "End byte z",
+   "note": "z, the end command of his next player, the one in TAHER and DEMO.COM.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 3418,
+   "end": 3429,
+   "kind": "code",
+   "label": "Exit",
+   "note": "Text mode, his credit printed by DOS, then back to DOS.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 3429,
+   "end": 3494,
+   "kind": "text",
+   "label": "Credit",
+   "note": "\"K E M Y A M Software Corp., <C>1991 YASSER MOHAMED ALI.\" in plain text.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "#scr-gift"
+  },
+  {
+   "start": 3494,
+   "end": 3504,
+   "kind": "unused",
+   "label": "More script bytes",
+   "note": "10 more bytes of x commands and strokes after his credit.",
+   "by": "yasser",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 8,
+   "end": 46,
+   "name": "read_header",
+   "note": "Writes each line's settings into the player's own code.",
+   "link": "#scr-header",
+   "lines": [
+    {
+     "off": 11,
+     "note": "The opcode for x goes to 013B"
+    },
+    {
+     "off": 17,
+     "note": "The opcode for w goes to 0143"
+    },
+    {
+     "off": 23,
+     "note": "The shadow jump goes to 0180"
+    },
+    {
+     "off": 29,
+     "note": "The ink color goes to 0179"
+    },
+    {
+     "off": 35,
+     "note": "The shadow color goes to 0182"
+    }
+   ]
+  },
+  {
+   "start": 46,
+   "end": 149,
+   "name": "draw_script",
+   "note": "The whole drawing engine.",
+   "link": "#scr-strokes",
+   "lines": [
+    {
+     "off": 49,
+     "note": "Below 70h: a stroke"
+    },
+    {
+     "off": 59,
+     "note": "x: one column (the header wrote this opcode)"
+    },
+    {
+     "off": 86,
+     "note": "Is a key waiting? INT 21h, AH=0Bh"
+    },
+    {
+     "off": 92,
+     "note": "The next ink, inside the code"
+    },
+    {
+     "off": 120,
+     "note": "Plot: AH=0Ch, AL from the header"
+    },
+    {
+     "off": 127,
+     "note": "The shadow switch, from the header"
+    },
+    {
+     "off": 129,
+     "note": "The shadow pixel, 2 right and 2 down"
+    }
+   ]
+  }
+ ]
+}

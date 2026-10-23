@@ -1,5 +1,5 @@
 {
-  "name": "dosarchive",
+  "name": "arabart",
   "version": "2.0.0",
   "type": "module",
   "description": "A web archive of Yasser Awad's DOS programs from the 1990s",
@@ -10,9 +10,13 @@
     "bundles": "node scripts/build-bundles.mjs"
   },
   "dependencies": {
-    "astro": "^5.4.0"
+    "astro": "^5.4.0",
+    "gsap": "3.13.0",
+    "lenis": "1.3.26",
+    "ogl": "1.0.11"
   },
   "devDependencies": {
+    "@types/node": "26.6.5",
     "archiver": "^7.0.1"
   }
 }

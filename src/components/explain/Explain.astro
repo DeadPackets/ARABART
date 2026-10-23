@@ -1,0 +1,85 @@
+---
+import { glossary } from '../../data/glossary';
+import '../../styles/explain.css';
+
+const base = import.meta.env.BASE_URL;
+const data = JSON.stringify(glossary).replace(/</g, '\\u003c');
+---
+
+<script type="application/json" id="glossary-data" set:html={data} />
+<div id="gpop" popover data-base={base}></div>
+
+<svg class="dg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <marker id="d-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="d-arrow" />
+    </marker>
+    <marker id="d-arrow-hi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" class="d-arrow-hi" />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  type Entry = { term: string; short: string; now?: string };
+  const pop = document.getElementById('gpop') as HTMLElement & { showPopover(): void; hidePopover(): void };
+  const terms: Record<string, Entry> = JSON.parse(document.getElementById('glossary-data')!.textContent!);
+  const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  const hover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  let anchor: HTMLElement | null = null;
+  let byHover = false;
+  let timer = 0;
+
+  function place(el: HTMLElement) {
+    const r = el.getBoundingClientRect();
+    const w = pop.offsetWidth, h = pop.offsetHeight;
+    const x = Math.min(Math.max(12, r.left), innerWidth - w - 12);
+    const below = r.bottom + 10 + h < innerHeight;
+    pop.style.left = `${x}px`;
+    pop.style.top = `${below ? r.bottom + 10 : Math.max(12, r.top - h - 10)}px`;
+  }
+
+  function show(el: HTMLElement, viaHover: boolean) {
+    const t = terms[el.dataset.term!];
+    if (!t) return;
+    pop.innerHTML =
+      `<p class="gp-t">${esc(t.term)}</p><p>${esc(t.short)}</p>` +
+      (t.now ? `<p class="gp-now"><b>In 2026:</b> ${esc(t.now)}</p>` : '') +
+      `<a href="${pop.dataset.base}/glossary/#${el.dataset.term}">Open the glossary</a>`;
+    anchor?.setAttribute('aria-expanded', 'false');
+    anchor = el;
+    byHover = viaHover;
+    el.setAttribute('aria-expanded', 'true');
+    if (!pop.matches(':popover-open')) pop.showPopover();
+    place(el);
+  }
+
+  pop.addEventListener('toggle', (e: Event) => {
+    if ((e as ToggleEvent).newState === 'closed') { anchor?.setAttribute('aria-expanded', 'false'); anchor = null; }
+  });
+
+  document.addEventListener('click', e => {
+    const el = (e.target as Element).closest<HTMLElement>('.term[data-term]');
+    if (!el) return;
+    e.preventDefault();
+    if (anchor === el && !byHover) pop.hidePopover();
+    else show(el, false);
+  });
+
+  if (hover) {
+    document.addEventListener('pointerover', e => {
+      const el = (e.target as Element).closest<HTMLElement>('.term[data-term]');
+      if (el) { clearTimeout(timer); timer = window.setTimeout(() => show(el, true), 250); }
+      else if ((e.target as Element).closest('#gpop')) clearTimeout(timer);
+    });
+    document.addEventListener('pointerout', e => {
+      const from = (e.target as Element).closest('.term[data-term], #gpop');
+      const to = (e.relatedTarget as Element | null)?.closest('.term[data-term], #gpop');
+      if (!from || to) return;
+      clearTimeout(timer);
+      if (byHover) timer = window.setTimeout(() => pop.matches(':popover-open') && pop.hidePopover(), 200);
+    });
+  }
+
+  addEventListener('scroll', () => anchor && place(anchor), { passive: true });
+</script>

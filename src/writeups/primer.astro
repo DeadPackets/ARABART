@@ -1,0 +1,251 @@
+---
+// DOS for modern developers. Every idea starts from something a web developer knows, and every idea is a toy.
+// Facts: research/arabart.md, research/programs.md, the unpacked binaries in research/artifacts/programs/unpacked,
+// public/bytes/files.json. Toys: src/components/toys/primer/.
+import Window from '../components/shell/Window.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Term from '../components/explain/Term.astro';
+import MemoryArray from '../components/toys/primer/MemoryArray.astro';
+import SegmentAdder from '../components/toys/primer/SegmentAdder.astro';
+import HandlerTable from '../components/toys/primer/HandlerTable.astro';
+import Resident from '../components/toys/primer/Resident.astro';
+import Planes from '../components/toys/primer/Planes.astro';
+import ExeLoader from '../components/toys/primer/ExeLoader.astro';
+import Unpack from '../components/toys/primer/Unpack.astro';
+
+const base = import.meta.env.BASE_URL;
+const prog = (id: string) => `${base}/program/${id}/`;
+const MAP = [
+  { href: '#memory', now: 'new Uint8Array(1048576)', then: 'Memory', act: 'drag' },
+  { href: '#segments', now: 'base + index', then: 'Segment:offset', act: 'slide' },
+  { href: '#interrupts', now: 'addEventListener, syscalls', then: 'Interrupts', act: 'press' },
+  { href: '#resident', now: 'A background service', then: 'TSR', act: 'run' },
+  { href: '#planes', now: 'Layers in a design tool', then: 'VGA planes', act: 'flip' },
+  { href: '#exe', now: 'package.json + bundle', then: 'EXE file', act: 'load' },
+  { href: '#packer', now: 'A self-extracting zip', then: 'DIET', act: 'unzip' },
+];
+const RUN = [
+  { href: prog('kvc-antivirus'), name: 'KVC', say: 'The interrupt table at work: a virus caught by asking it a question only it answers.' },
+  { href: `${base}/arabart/`, name: 'ARABART', say: 'A background service that every program calls to write Arabic.' },
+  { href: prog('arabic-basmallah'), name: 'Arabic Basmallah', say: 'The 640 × 480 screen and its four color layers, written by hand in 1991.' },
+  { href: prog('portsaid-it-screensaver'), name: 'Port Said IT Department', say: 'A COM file that draws every pixel through the video BIOS.' },
+  { href: prog('formula-solver'), name: 'Formula Solver', say: 'Pure assembly and the text screen, in 3,546 bytes on disk.' },
+  { href: prog('brave-sun'), name: 'The Brave Sun', say: 'Borland C++, and 1,746 fix-ups for DOS to apply.' },
+  { href: `${base}/bytes/`, name: 'Every Byte', say: 'All of his files, packed and unpacked, down to the single byte.' },
+];
+---
+
+<article class="pr">
+  <section class="pr-hero" aria-labelledby="pr-h1">
+    <div class="pr-hero-text">
+      <h1 id="pr-h1">DOS for modern developers</h1>
+      <p class="pr-lead">Yasser wrote his programs for a PC with no browser, no app store and no internet. If you build for the web today, you already know most of the ideas. In 1993 they had other names.</p>
+      <p class="pr-hint">Seven ideas. Each one starts from something you use every day, and each one is a toy you can drive.</p>
+    </div>
+    <Window title={'C:\\IDEAS'} kind="panel" active num="1" class="pr-nc">
+      <div class="pr-nc-head" aria-hidden="true"><span>You know</span><span>In 1993</span><span>Toy</span></div>
+      <ol class="pr-nc-rows">
+        {MAP.map(m => (
+          <li><a href={m.href}><code>{m.now}</code><b>{m.then}</b><span>{m.act}</span></a></li>
+        ))}
+      </ol>
+      <p slot="status" class="pr-nc-foot">7 ideas · 1,048,576 bytes · 16 colors</p>
+    </Window>
+  </section>
+
+  <section class="pr-sec" id="memory" aria-labelledby="h-memory">
+    <div class="pr-text pr-text--wide">
+      <h2 id="h-memory">Memory is one big array</h2>
+      <p class="pr-big-lead">Picture the whole PC as one JavaScript array of 1,048,576 bytes. Your program, DOS, the screen and the <Term id="bios">BIOS</Term> all live in it, and any of them can write anywhere.</p>
+    </div>
+    <div class="pr-cols">
+      <p>There are no tabs and no sandbox. A browser keeps every tab in its own box. A DOS PC runs one program at a time, in <Term id="real-mode">real mode</Term>, and lets it touch everything. Drag the white pointer from 0 to 1 <Term id="kilobyte">MB</Term>, then press Write. No error, no permission prompt: one changed <Term id="byte">byte</Term>.</p>
+      <p>That freedom is what made his programs fast. ARABART paints letters by writing straight into the screen’s memory, the <Term id="video-memory">video memory</Term>, which starts 640 KB into that array. KVC rewrites the table DOS uses to route its calls, to cut a virus off. The rule was simple: know exactly what lives where.</p>
+    </div>
+    <MemoryArray />
+    <ThenNow
+      rows={[
+        { then: 'One array of 1 MB, shared by everyone', now: 'Each app gets its own private memory', why: 'Today the operating system keeps programs apart.' },
+        { then: 'Write to A0000h and the screen changes', now: 'Write into a canvas’s <code>ImageData</code>', why: 'Pixels are numbers in an array that becomes the picture.' },
+        { then: '640 KB for DOS and your program', now: 'The memory one browser tab may use', why: 'IBM kept the top 384 KB for the screen and the chips.' },
+      ]}
+    />
+  </section>
+
+  <section class="pr-sec" id="segments" aria-labelledby="h-segments">
+    <div class="pr-pair pr-pair--flip">
+      <div class="pr-text">
+        <h2 id="h-segments">Two numbers make one address</h2>
+        <p class="pr-lead2">The processor’s numbers stop at 65,535. Memory goes past a million. So every address is two numbers: a base, and an <Term id="segment">offset</Term> from that base.</p>
+      </div>
+      <div class="pr-text pr-text--side">
+        <p>Think of <code>buffer.subarray(base * 16)</code>, then an index into that slice. The base is the <Term id="segment">segment</Term>. The processor multiplies it by 16, which in <Term id="hex">hex</Term> just adds a zero at the end, and adds the offset.</p>
+        <p>So A000h becomes A0000h, plus 1F4Ch is A1F4Ch: the byte that holds pixel (100, 100) on his 640 × 480 screen. Many pairs reach the same byte, the way two relative paths can name one file. Drag both sliders and watch the address form.</p>
+      </div>
+    </div>
+    <SegmentAdder />
+    <Deep title="For engineers: near and far pointers in his programs">
+      <p>One segment is a 64 KB window. A near pointer is 2 bytes, only the offset: an index inside one array. A <Term id="far-pointer">far pointer</Term> is 4 bytes, segment and offset: a reference to any array plus an index into it. Borland C chose the defaults for a whole program with its <Term id="memory-model">memory model</Term>.</p>
+      <ul>
+        <li><b>Tiny</b>, one segment for everything: the Port Said Computer Systems boot screen.</li>
+        <li><b>Small</b>, one segment of code and one of data: WINKEY.</li>
+        <li><b>Compact</b>, near code and far data: KVC.</li>
+        <li><b>Large</b>, far code and far data: The Brave Sun, Digi-Test and both editors. EDITOR.EXE keeps up to 601 lines of 204 bytes, 122,604 bytes of text, more than one window can hold.</li>
+      </ul>
+      <p>The step from segment to segment is 16 bytes, a <Term id="paragraph">paragraph</Term>. So <code>B800:0000</code> and <code>B000:8000</code> are the same byte, B8000h: the first letter of the color text screen.</p>
+    </Deep>
+  </section>
+
+  <section class="pr-sec" id="interrupts" aria-labelledby="h-interrupts">
+    <div class="pr-text pr-text--wide">
+      <h2 id="h-interrupts">Event handlers, built into the chip</h2>
+      <p class="pr-big-lead">You know <code>addEventListener</code>. The PC has the same idea in hardware. A table of 256 handlers sits at the very start of memory, with a number for every kind of event.</p>
+    </div>
+    <div class="pr-cols">
+      <p>When a key goes down, the keyboard chip fires <Term id="interrupt">interrupt</Term> 9. The processor drops what it is doing, looks up entry 9 in the <Term id="ivt">interrupt table</Term>, runs the code it finds there, and comes back. Your program never notices.</p>
+      <p>Programs use the same table to ask for help. Put a function number in a <Term id="cpu-register">register</Term> and run <code>int 21h</code>: a system call into DOS, like a <code>fetch()</code> to the operating system. <Term id="int-10h">INT 10h</Term> asks the video <Term id="bios">BIOS</Term>, <Term id="int-16h">INT 16h</Term> the keyboard. Press a button and follow the yellow chip.</p>
+    </div>
+    <HandlerTable />
+    <ThenNow
+      rows={[
+        { then: 'Interrupt 9, a key press', now: 'A <code>keydown</code> event', why: 'The hardware calls your handler. Nobody has to keep checking.' },
+        { then: '<code>int 21h</code> with a function number', now: 'A system call', why: 'One numbered door into the operating system.' },
+        { then: 'The interrupt table', now: 'A map from event names to handlers', why: 'Change an entry, and a different function answers.' },
+      ]}
+    />
+    <Deep title="For engineers: what int n does, step by step">
+      <p><code>int n</code> pushes three values on the <Term id="stack">stack</Term>: the flags, CS and IP, which together say where your program was. Then it loads CS:IP from the 4 bytes at <code>0000:(n × 4)</code>, offset first, then segment. <code>iret</code> pops all three back. It is a function call through a pointer table, with the return address saved for you.</p>
+      <p>DOS function 35h reads an entry and function 25h writes one, so a program can hook a service politely. To stay in memory after it ends, a program calls DOS function 31h or the older <Term id="int-27h">INT 27h</Term>. ARABART uses INT 27h.</p>
+    </Deep>
+  </section>
+
+  <section class="pr-sec" id="resident" aria-labelledby="h-resident">
+    <div class="pr-text">
+      <h2 id="h-resident" class="pr-h-big">A program that ends, and stays</h2>
+      <p class="pr-lead2">DOS runs one program at a time. So how do you run a background service? You write a <Term id="tsr">TSR</Term>: a program that ends, but stays in memory.</p>
+    </div>
+    <div class="pr-cols">
+      <p>A TSR starts, writes its own address into the interrupt table, then ends. DOS keeps its code in memory. From then on, every program that calls that interrupt reaches the TSR first. Today we would call it a daemon, or middleware in front of an API: it can answer, or call <code>next()</code>.</p>
+      <p>His <a href={`${base}/arabart/`}>ARABART</a> is one. Run it once and 30,110 bytes stay in memory, five fonts included, in front of the video service. A call for its own function, number 36h, gets Arabic. Any other call passes on, untouched, in three instructions. Run it below, run DEMO.EXE, then try to run ARABART twice.</p>
+    </div>
+    <Resident />
+    <p class="pr-after">Before it loads, ARABART reads the video service’s entry and looks for its own name tag, <code>DALYASSER</code>. If the tag is already there, it prints “This utility is already active in your RAM.” and stops. One copy is enough. In modern terms, that is a single-instance lock.</p>
+  </section>
+
+  <section class="pr-sec" id="planes" aria-labelledby="h-planes">
+    <div class="pr-pair pr-pair--flip">
+      <div class="pr-text">
+        <h2 id="h-planes">Sixteen colors, four layers</h2>
+        <p class="pr-lead2">On a canvas, a pixel is four bytes: red, green, blue and alpha. On his <Term id="vga">VGA</Term> screen, a pixel is four bits, and each bit lives in a different layer.</p>
+      </div>
+      <div class="pr-text pr-text--side">
+        <p>The 640 × 480 mode shows 307,200 pixels in 16 colors. The card keeps them as four <Term id="bit-planes">bit planes</Term> of 38,400 bytes: blue, green, red, and one that makes a color bright. All four answer at the same address, A0000h, like four layers of one image in a design tool. Stack the four bits of a pixel and you get its color number, from 0 to 15.</p>
+      </div>
+    </div>
+    <Planes />
+    <div class="pr-cols pr-after">
+      <p>The word is drawn by his own ARABART engine, ported pixel for pixel. Flip a color’s bits and watch which planes carry it. Switch a plane off and every color on the screen loses that bit at once.</p>
+      <p>Planes are also why his drawing code is fast. A program can tell the card one color for all four planes, then paint up to eight pixels with a single write. ARABART does exactly that, with the card’s <Term id="set-reset">Set/Reset</Term> register. <a href={`${base}/arabart/#small`}>See it on the ARABART page</a>.</p>
+    </div>
+  </section>
+
+  <section class="pr-sec" id="exe" aria-labelledby="h-exe">
+    <div class="pr-text pr-text--wide">
+      <h2 id="h-exe">An EXE is a manifest, the code, and a list of fixes</h2>
+      <p class="pr-big-lead">A <Term id="com-file">.COM file</Term> is raw code that DOS copies into memory and runs, like a plain script. An <Term id="exe-file">.EXE</Term> starts with a header: a small manifest, much like <code>package.json</code>.</p>
+    </div>
+    <div class="pr-cols">
+      <p>The <Term id="mz-header">header</Term> says where the program starts, where its stack goes and how much memory it wants. Then it lists fix-ups. A program cannot know where DOS will put it, yet some instructions need real addresses. So the <Term id="linker">linker</Term> writes down every spot that holds one, and DOS adds the real <Term id="load-segment">load address</Term> to each. A browser does the same when it resolves a relative URL against the page.</p>
+      <p>Here is his antivirus, KVC.EXE, unpacked. Seven of its instructions hold the same number, 0378h: where its data starts, counted from its own first byte. Step through the load, then drag the load address and watch all seven follow. Bigger programs have more to fix: The Brave Sun lists 1,746. And every Windows .exe you download today still begins with the same two letters, MZ.</p>
+    </div>
+    <ExeLoader />
+  </section>
+
+  <section class="pr-sec" id="packer" aria-labelledby="h-packer">
+    <div class="pr-text pr-text--wide">
+      <h2 id="h-packer">Zip for programs, unzipped in memory</h2>
+      <p class="pr-big-lead">Every one of his program files is packed with <Term id="diet">DIET 1.00</Term>: compressed, with a small unpacker at the front. Run it, and the unpacker rebuilds the real program in memory, then jumps to its first instruction.</p>
+    </div>
+    <div class="pr-cols">
+      <p>Think of a self-extracting zip that never touches the disk, or gzip on a JavaScript bundle where the code unzips itself. The method is the classic <Term id="lz77">LZ77</Term> kind: store a byte as it is, or say “go back this far and copy that many”. Every repeat becomes one small instruction.</p>
+      <p>Step through it on the Basmallah, stored the way his program PESM stores it: in the keys of an Arabic keyboard, so <code>fsl</code> is <span lang="ar" dir="rtl">بسم</span>. His engine draws the Arabic as each key comes back. On floppy disks of 360 KB to 1.44 MB, every byte saved was room for more.</p>
+    </div>
+    <Unpack />
+    <p class="pr-after">This is also why the site had to unpack each program before it could read it. <a href={`${base}/bytes/`}>Every Byte</a> shows both layers of every file: the packed bytes on the disk, and the program DIET rebuilds in memory.</p>
+  </section>
+
+  <section class="pr-sec" id="run" aria-labelledby="h-run">
+    <div class="pr-text">
+      <h2 id="h-run">See every idea at work</h2>
+      <p class="pr-lead2">Each idea on this page runs inside one of his programs, and every program runs in your browser.</p>
+    </div>
+    <Window title={'C:\\YASSER'} kind="panel" active class="pr-run">
+      <ol class="pr-run-rows">
+        {RUN.map(r => <li><a href={r.href}><b>{r.name}</b><span>{r.say}</span></a></li>)}
+      </ol>
+    </Window>
+  </section>
+</article>
+
+<style>
+  .pr { display: grid; gap: clamp(96px, 12vw, 168px); padding-bottom: 24px; }
+  .pr > section { width: 100%; max-width: 1360px; margin-inline: auto; padding-inline: var(--gut); min-width: 0; }
+  .pr h2 { font-size: clamp(2.25rem, 2.6vw + 1rem, 3.75rem); font-stretch: 78%; color: var(--ink); max-width: 20ch; text-wrap: balance; }
+  .pr p, .pr li { font-size: 1.0625rem; line-height: 1.7; color: var(--ink); text-wrap: pretty; }
+  .pr code { font: 500 0.9em var(--font-code); color: var(--accent); }
+  .pr [lang='ar'] { font: 700 1.15em var(--font-ar); color: var(--accent); }
+  .pr a:not(.button) { color: var(--accent-2); text-underline-offset: 3px; }
+  .pr a:not(.button):hover { color: var(--accent); }
+  .pr-text { display: grid; gap: 14px; margin-bottom: clamp(24px, 3vw, 36px); align-content: start; }
+  .pr-text p { max-width: 62ch; }
+  .pr-text--wide h2 { max-width: 24ch; }
+  .pr-big-lead { margin-top: 10px; max-width: 46ch !important; font-size: clamp(1.25rem, 0.9vw + 1rem, 1.75rem) !important; line-height: 1.45 !important; font-weight: 500; }
+  .pr-lead2 { font-size: clamp(1.1875rem, 0.5vw + 1rem, 1.4375rem) !important; line-height: 1.5 !important; font-weight: 500; }
+  .pr-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 56px); margin-bottom: 32px; align-items: start; }
+  .pr-cols p { max-width: 62ch; }
+  .pr-after { margin-top: 32px; max-width: 72ch; }
+  .pr-cols.pr-after { max-width: none; }
+  .pr-pair { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 0 clamp(28px, 4vw, 64px); align-items: start; }
+  .pr-pair--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: end; margin-bottom: 8px; }
+  .pr-text--side p { max-width: 58ch; }
+  .pr-h-big { font-size: clamp(2.75rem, 4.5vw + 1rem, 5.25rem) !important; line-height: 0.95; max-width: 14ch !important; color: var(--accent) !important; }
+  .pr :global(.tn) { margin-top: 40px; }
+  .pr :global(.deep) { margin-top: 32px; }
+
+  /* Hero: the title beside a Norton Commander panel of the seven ideas */
+  .pr-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 32px clamp(32px, 5vw, 80px); align-items: center; padding-top: clamp(28px, 5vw, 72px); }
+  .pr-hero h1 { font-size: clamp(3rem, 5.4vw + 1rem, 6.5rem); font-stretch: 72%; line-height: 0.88; letter-spacing: -0.02em; color: var(--accent); max-width: 9ch; }
+  .pr-lead { margin-top: 26px; max-width: 40ch; font-size: clamp(1.1875rem, 0.6vw + 1rem, 1.5rem) !important; line-height: 1.5 !important; font-weight: 500; }
+  .pr-hint { margin-top: 14px; max-width: 46ch; color: var(--ink-2) !important; font-size: 1rem !important; }
+  .pr-nc-head, .pr-nc-rows a { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) 5ch; gap: 0 14px; align-items: center; }
+  .pr-nc-head { padding: 0 10px 6px; font: 400 16px/1.4 var(--font-dos); color: var(--vga-14); border-bottom: 1px solid var(--rule); }
+  .pr-nc-rows { margin: 4px 0 0; padding: 0; list-style: none; }
+  .pr-nc-rows a { min-height: 44px; padding: 4px 10px; text-decoration: none; color: var(--ink); }
+  .pr-nc-rows code { font: 500 0.875rem/1.3 var(--font-code); color: var(--vga-11); overflow-wrap: anywhere; }
+  .pr-nc-rows b { font: 400 16px/1.2 var(--font-dos); color: var(--vga-15); }
+  .pr-nc-rows span { font: 400 16px/1.2 var(--font-dos); color: var(--vga-7); text-align: right; }
+  .pr-nc-rows a:hover, .pr-nc-rows a:focus-visible { background: var(--vga-3); outline: 0; }
+  .pr-nc-rows a:is(:hover, :focus-visible) :is(code, b, span) { color: var(--vga-0); }
+  .pr-nc-foot { margin: 0; font: 400 16px/1.4 var(--font-dos) !important; color: var(--vga-11) !important; }
+
+  .pr-run-rows { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; }
+  .pr-run-rows a { display: grid; gap: 2px; min-height: 44px; padding: 10px 10px; text-decoration: none; }
+  .pr-run-rows b { font: 400 16px/1.3 var(--font-dos); color: var(--vga-15); }
+  .pr-run-rows span { font: 500 0.9375rem/1.5 var(--sans); color: var(--vga-11); }
+  .pr-run-rows a:hover, .pr-run-rows a:focus-visible { background: var(--vga-3); outline: 0; }
+  .pr-run-rows a:is(:hover, :focus-visible) :is(b, span) { color: var(--vga-0); }
+
+  @media (max-width: 1100px) {
+    .pr-hero { grid-template-columns: minmax(0, 1fr); }
+    .pr-pair, .pr-pair--flip { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .pr-cols { grid-template-columns: minmax(0, 1fr); }
+    .pr-run-rows { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .pr-nc-head, .pr-nc-rows a { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); }
+    .pr-nc-head span:last-child, .pr-nc-rows span { display: none; }
+  }
+</style>

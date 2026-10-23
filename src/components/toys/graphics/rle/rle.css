@@ -1,0 +1,19 @@
+/* Shared by the KemYam and Port Said toys: his screen as a sharp, scaled canvas over the server-drawn picture. */
+.g-win .win-body { min-width: 0; }
+.g-crt { position: relative; aspect-ratio: 8 / 5; background: #000; overflow: hidden; }
+.g-crt > img, .g-crt > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.g-crt > [hidden] { display: none; }
+.g-chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.g-chips .k-btn { padding: 0 12px; }
+.g-note { margin: 0 !important; font: 500 0.875rem/1.5 var(--font-code) !important; color: var(--ink-2) !important; max-width: none !important; }
+.g-say { margin: 0 !important; font: 500 1rem/1.55 var(--sans) !important; color: var(--ink) !important; max-width: none !important; min-height: 3.1em; }
+.g-say b { color: var(--accent); }
+
+/* explain.css styles every list and code inside .writeup; the CodeStepper's code panes are lists too */
+.writeup .k-cs ol.k-code { display: block; margin: 0; padding: 0; list-style: none; }
+.writeup .k-cs .k-code li { max-width: none; font-size: inherit; line-height: inherit; }
+.writeup .k-cs .k-code code { font: inherit; color: inherit; }
+.writeup .k-cs .k-code li.exec :is(.op, .num) { color: var(--surface); }
+
+/* Controls that need JS are not shown without it; every toy's picture is complete on its own */
+@media (scripting: none) { .g-js { display: none !important; } }

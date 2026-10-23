@@ -1,0 +1,123 @@
+---
+// The card routine (MAIN.EXE 2529:0B23..0B5F, inline assembly inside his C++): reverse the 8 test bits with SHR and
+// RCL, write them to port 301h, write port 300h, then read port 300h 2,000 times and keep the last reading.
+// Set the pattern with the bits, then step: the bits fall out of AX into the carry flag and into BX from the other end.
+import CodeStepper from '../CodeStepper.astro';
+import BitField from '../BitField.astro';
+import { cardSteps } from './dt-card';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const ASM = [
+  { off: '0B23', code: 'mov  ax,es:[bx]', note: 'the test pattern' },
+  { off: '0B2C', code: 'mov  ah,0', note: 'keep 8 bits, one per input' },
+  { off: '0B2E', code: 'mov  cx,8', note: 'his inline assembly starts here' },
+  { off: '0B31', code: 'xor  bx,bx', note: 'BX = 0: the reversed byte' },
+  { off: '0B33', code: 'shr  ax,1', label: 'rev', note: 'lowest bit out, into the carry flag' },
+  { off: '0B35', code: 'rcl  bx,1', note: 'carry in, at the other end' },
+  { off: '0B37', code: 'loop 0B33', note: '8 times' },
+  { off: '0B39', code: 'mov  ax,bx' },
+  { off: '0B3B', code: 'mov  dx,301h', note: 'the card' },
+  { off: '0B3E', code: 'out  dx,al', note: '8 bits to the circuit’s inputs' },
+  { off: '0B3F', code: 'xchg al,ah' },
+  { off: '0B41', code: 'shr  ax,1' },
+  { off: '0B43', code: 'mov  dx,300h' },
+  { off: '0B46', code: 'out  dx,al', note: 'a second write, to port 300h' },
+  { off: '0B4B', code: 'mov  dx,300h', label: 'read' },
+  { off: '0B4E', code: 'in   al,dx', note: 'read the circuit’s outputs' },
+  { off: '0B52', code: 'inc  si / cmp si,7D0h', note: '2,000 times' },
+  { off: '0B5F', code: 'mov  es:[bx],ax', note: 'keep the last reading' },
+];
+const C = [
+  { code: 'unsigned char p = pattern;', note: 'a bit per input' },
+  { code: 'unsigned char r = 0;' },
+  { code: 'for (i = 0; i < 8; i++) {' },
+  { code: '  carry = p & 1;  p >>= 1;', note: 'shr' },
+  { code: '  r = (r << 1) | carry;', note: 'rcl' },
+  { code: '}' },
+  { code: 'outportb(0x301, r);', note: 'set the inputs' },
+  { code: 'outportb(0x300, r << 7);' },
+  { code: 'for (i = 0; i < 2000; i++)', note: 'let it settle' },
+  { code: '  answer = inportb(0x300);' },
+];
+const start = 0x0f;
+const steps = cardSteps(start);
+---
+
+<div class="dtk" data-dtcard>
+  <CodeStepper id={id} title="MAIN.EXE  the card routine" asm={ASM} c={C} steps={steps} speed={0.45}>
+    <div slot="visual" class="dtk-vis">
+      <BitField label="The test pattern, one bit per circuit input" value={start} groups={[{ bits: 8, label: 'the test pattern: flip any bit' }]} />
+      <div class="dtk-regs" aria-hidden="true">
+        <div class="dtk-row" data-row="ax"><span class="dtk-name">AX</span><span class="dtk-cells" data-cells>{Array.from({ length: 8 }, () => <i>0</i>)}</span></div>
+        <div class="dtk-row dtk-carry"><span class="dtk-name">carry</span><span class="dtk-cells">{Array.from({ length: 7 }, () => <i class="ghost"></i>)}<i data-carry>0</i></span></div>
+        <div class="dtk-row" data-row="bx"><span class="dtk-name">BX</span><span class="dtk-cells" data-cells>{Array.from({ length: 8 }, () => <i>0</i>)}</span></div>
+        <div class="dtk-port" data-port><span class="dtk-name">port 301h</span><b data-portv>F0</b><span>to the card</span></div>
+      </div>
+    </div>
+  </CodeStepper>
+</div>
+
+<style is:global>
+  .dtk-vis { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; container-type: inline-size; }
+  .dtk-regs { display: grid; gap: 8px; padding: 12px 14px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); font-family: var(--font-code); }
+  .dtk-row, .dtk-port { display: flex; align-items: center; gap: 10px; }
+  .dtk-name { min-width: 4.6em; font: 600 0.8125rem/1 var(--font-code); color: var(--accent-2); }
+  .dtk-cells { display: flex; gap: 3px; }
+  .dtk-cells i { display: grid; place-items: center; width: 26px; height: 30px; font: 700 15px/1 var(--font-code); font-style: normal; color: var(--ink-2); background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .dtk-cells i.ghost { visibility: hidden; }
+  .dtk-cells i.one { color: var(--surface); background: var(--accent-2); box-shadow: none; }
+  .dtk-cells i.gone { opacity: 0.25; }
+  .dtk-carry i.hot { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dtk-port { margin-top: 4px; }
+  .dtk-port b { padding: 4px 10px; font: 700 1.125rem/1 var(--font-code); color: var(--ink-2); background: var(--surface); box-shadow: inset 0 0 0 1px var(--rule); }
+  .dtk-port.on b { color: var(--surface); background: var(--accent); box-shadow: none; }
+  .dtk-port > span:last-child { font: 500 0.75rem/1.2 var(--font-code); color: var(--ink-2); }
+  @media (max-width: 760px) {
+    .dtk-cells i { width: 24px; height: 28px; }
+    .dtk-name { min-width: 3.6em; }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { cardSteps } from './dt-card';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type Stepper = HTMLElement & { stepper?: { load(s: unknown[], at?: number): void; i: number } };
+  type Vis = { ax: number; bx: number; carry: number; axn: number; bxn: number; shift: '' | 'ax' | 'bx'; port: number | null };
+
+  document.querySelectorAll<HTMLElement & { dtk?: boolean }>('[data-dtcard]').forEach(root => {
+    if (root.dtk) return;
+    root.dtk = true;
+    const cs = root.querySelector<Stepper>('[data-stepper]')!;
+    const bf = root.querySelector<HTMLElement & { bitfield?: { value: number } }>('[data-bitfield]')!;
+    const rows = { ax: [...root.querySelectorAll<HTMLElement>('[data-row="ax"] i')], bx: [...root.querySelectorAll<HTMLElement>('[data-row="bx"] i')] };
+    const carry = root.querySelector<HTMLElement>('[data-carry]')!, port = root.querySelector<HTMLElement>('[data-port]')!, pv = root.querySelector<HTMLElement>('[data-portv]')!;
+    let last = -1;
+
+    const draw = (v: Vis, i: number, how: string) => {
+      (['ax', 'bx'] as const).forEach(r => rows[r].forEach((c, j) => {
+        const b = 7 - j, val = r === 'ax' ? v.ax : v.bx;
+        c.textContent = String((val >> b) & 1);
+        c.classList.toggle('one', !!((val >> b) & 1));
+        // AX loses a bit on the left each turn; BX fills from the right
+        c.classList.toggle('gone', r === 'ax' ? b >= 8 - v.axn : b >= v.bxn);
+      }));
+      carry.textContent = String(v.carry); carry.classList.toggle('one', !!v.carry); carry.classList.toggle('hot', v.shift !== '');
+      port.classList.toggle('on', v.port !== null);
+      pv.textContent = (v.port ?? 0).toString(16).padStart(2, '0').toUpperCase() + 'h';
+      // One step forward: slide the row that shifted, so the eye sees the bit travel
+      if (v.shift && i === last + 1 && how !== 'jump' && !reduce()) {
+        const w = rows[v.shift][0].offsetWidth + 3;
+        gsap.fromTo(rows[v.shift], { x: v.shift === 'ax' ? -w : w }, { x: 0, duration: 0.3, ease: 'power2.out' });
+        gsap.fromTo(carry, { scale: 1.35 }, { scale: 1, duration: 0.35, ease: 'back.out(3)' });
+      }
+      last = i;
+    };
+    cs.addEventListener('stepper', e => { const d = (e as CustomEvent).detail; draw(d.step.vis, d.i, d.how); });
+    bf.addEventListener('bitfield', e => { const s = cardSteps((e as CustomEvent).detail.value); cs.stepper?.load(s, s.length - 1); });
+    const ready = () => { if (cs.stepper) { const s = cardSteps(bf.bitfield?.value ?? 15); cs.stepper.load(s, s.length - 1); } else requestAnimationFrame(ready); };
+    ready();
+  });
+</script>

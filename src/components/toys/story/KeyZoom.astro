@@ -1,0 +1,146 @@
+---
+// Linked to a KeyBuilder (prop `for`): the 32-bit key space zoomed level by level. Each row is the range of one
+// container; its child is a slice, and the next row is that slice, magnified. The chosen level's row is the one
+// range the database reads: a read head jumps to its first key and sweeps to its last. Plus the same key as an IP.
+import Window from '../../shell/Window.astro';
+import { FIELDS, pack } from '../key';
+
+interface Props { for: string; values?: number[]; level?: number }
+const { for: kb, values = [5, 2, 3, 1, 17], level = 2 } = Astro.props;
+const n = (x: number) => x.toLocaleString('en-US');
+
+// rows: 0 = every key; r = the container down to field r-1
+function rowsOf(v: number[]) {
+  let shift = 32, lo = 0;
+  return [0, 1, 2, 3, 4].map(r => {
+    if (r > 0) { shift -= FIELDS[r - 1][1]; lo += v[r - 1] * 2 ** shift; }
+    const size = 2 ** shift, w = FIELDS[r][1], child = v[r];
+    return { r, lo, hi: lo + size, x: (child / 2 ** w) * 100, w: (1 / 2 ** w) * 100 };
+  });
+}
+const rows = rowsOf(values);
+const name = (r: number) => r === 0 ? 'Every possible key' : FIELDS.slice(0, r).map(([f], i) => `${f} ${values[i]}`).join(' › ');
+const ip = (k: number) => [24, 16, 8, 0].map(s => Math.floor(k / 2 ** s) % 256).join('.');
+const key = pack(values);
+const prefix = FIELDS.slice(0, level).reduce((s, f) => s + f[1], 0);
+---
+
+<div class="kz" data-keyzoom data-for={kb} data-level={level}>
+  <Window title="The key space, zoomed in" kind="editor" class="kz-win">
+    <ol class="kz-rows">
+      {rows.map(row => (
+        <li class:list={['kz-row', { sel: row.r === level, inside: row.r > level }]} data-r={row.r}>
+          <p class="kz-lab"><span data-name>{name(row.r)}</span><span class="kz-rng" data-rng>{n(row.lo)} to {n(row.hi - 1)}</span></p>
+          <div class="kz-bar">
+            <span class="kz-scan" aria-hidden="true"></span>
+            <span class="kz-slice" style={`left:${row.x}%;width:max(${row.w}%, 5px)`} aria-hidden="true"></span>
+          </div>
+          {row.r < 4 && (
+            <svg class="kz-fun" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true">
+              <polygon points={`${row.x},0 ${row.x + row.w},0 100,24 0,24`} />
+            </svg>
+          )}
+        </li>
+      ))}
+    </ol>
+    <p class="kz-port">Port {values[4]} sits at <b data-key>{n(key)}</b>, inside every range above it.</p>
+  </Window>
+  <Window title="Read" kind="help" class="kz-read">
+    <p class="kz-say" aria-live="polite" data-say>The database jumps once, to <b>{n(rows[level].lo)}</b>, then reads forward to <b>{n(rows[level].hi - 1)}</b>. One stretch of the index, {n(rows[level].hi - rows[level].lo)} numbers long, and nothing outside it.</p>
+    <p class="kz-head" aria-hidden="true">read head <b data-head>{n(rows[level].hi - 1)}</b></p>
+    <p class="kz-ip">As an IP address, port {values[4]} is <b data-ip>{ip(key)}</b>. The chosen part is the network <b data-net>{ip(rows[level].lo)}/{prefix}</b>: every key that starts with the same <span data-pre>{prefix}</span> bits.</p>
+    <button type="button" class="button k-btn" data-scan hidden>Scan again</button>
+  </Window>
+</div>
+
+<style>
+  .kz { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+  .kz-rows { list-style: none; margin: 0; padding: 0; }
+  .kz-lab { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 12px; font: 500 0.8125rem/1.5 var(--font-code); color: var(--ink-2); }
+  .kz-lab [data-name] { color: var(--ink); font-weight: 700; }
+  .kz-rng { font-variant-numeric: tabular-nums; }
+  .kz-bar { position: relative; height: 26px; background: repeating-linear-gradient(90deg, #e2e2e2 0 3px, #d0d0d0 3px 4px); box-shadow: inset 0 0 0 1px var(--w-gray); overflow: hidden; }
+  .kz-row.sel .kz-bar, .kz-row.inside .kz-bar { background: repeating-linear-gradient(90deg, color-mix(in oklch, var(--accent-2) 30%, white) 0 3px, color-mix(in oklch, var(--accent-2) 45%, white) 3px 4px); }
+  .kz-row.sel .kz-bar { box-shadow: inset 0 0 0 2px var(--accent); }
+  .kz-row.sel .kz-lab [data-name]::after { content: '  ◄ one read'; color: var(--hot); }
+  .kz-slice { position: absolute; top: 0; bottom: 0; background: var(--accent); }
+  .kz-row:last-child .kz-slice { background: var(--hot); }
+  .kz-scan { position: absolute; inset: 0 auto 0 0; width: 0; background: color-mix(in oklch, var(--accent) 35%, transparent); }
+  .kz-fun { display: block; width: 100%; height: 24px; }
+  .kz-fun polygon { fill: color-mix(in oklch, var(--accent-2) 22%, transparent); stroke: var(--accent-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .kz-port { margin-top: 12px; font: 500 0.875rem/1.5 var(--font-code); color: var(--ink); }
+  .kz-port b, .kz-say b, .kz-ip b, .kz-head b { color: var(--accent); font-variant-numeric: tabular-nums; }
+  .kz-say { font: 500 1rem/1.55 var(--sans); color: var(--ink); min-height: 6.2em; }
+  .kz-head { margin-top: 10px; font: 500 0.875rem/1.4 var(--font-code); color: var(--ink-2); }
+  .kz-head b { font-size: 1.25rem; }
+  .kz-ip { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule); font: 500 0.9375rem/1.55 var(--sans); color: var(--ink); }
+  .kz-read .button { margin-top: 14px; }
+  @media (max-width: 1000px) { .kz { grid-template-columns: minmax(0, 1fr); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { FIELDS } from '../key';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const n = (x: number) => x.toLocaleString('en-US');
+  const ip = (k: number) => [24, 16, 8, 0].map(s => Math.floor(k / 2 ** s) % 256).join('.');
+  const unpack = (key: number) => { let k = key; return [7, 5, 5, 5, 10].map(w => { const x = k % 2 ** w; k = Math.floor(k / 2 ** w); return x; }).reverse(); };
+
+  document.querySelectorAll<HTMLElement>('[data-keyzoom]').forEach(root => {
+    const kb = document.getElementById(root.dataset.for!);
+    if (!kb) return;
+    const rows = [...root.querySelectorAll<HTMLElement>('.kz-row')];
+    const say = root.querySelector<HTMLElement>('[data-say]')!, head = root.querySelector<HTMLElement>('[data-head]')!;
+    const btn = root.querySelector<HTMLButtonElement>('[data-scan]')!;
+    const st = { lo: 0, hi: 0, level: +root.dataset.level! };
+    let tl: gsap.core.Timeline | null = null;
+
+    const scan = () => {
+      tl?.kill();
+      const bar = rows[st.level].querySelector<HTMLElement>('.kz-scan')!;
+      rows.forEach(r => gsap.set(r.querySelector('.kz-scan'), { width: 0 }));
+      if (reduce()) { gsap.set(bar, { width: '100%' }); head.textContent = n(st.hi - 1); return; }
+      const c = { k: st.lo };
+      tl = gsap.timeline()
+        .fromTo(bar, { width: 0 }, { width: '100%', duration: 1.4, ease: 'none' }, 0.15)
+        .fromTo(c, { k: st.lo }, { k: st.hi - 1, duration: 1.4, ease: 'none', onUpdate: () => { head.textContent = n(Math.round(c.k)); } }, 0.15);
+    };
+
+    kb.addEventListener('keybuilder', e => {
+      const d = (e as CustomEvent).detail as { key: number; lo: number; hi: number; level: number };
+      const v = unpack(d.key);
+      Object.assign(st, { lo: d.lo, hi: d.hi, level: d.level });
+      let shift = 32, lo = 0;
+      rows.forEach((row, r) => {
+        if (r > 0) { shift -= FIELDS[r - 1][1]; lo += v[r - 1] * 2 ** shift; }
+        const w = FIELDS[r][1], x = (v[r] / 2 ** w) * 100, sw = (1 / 2 ** w) * 100;
+        row.classList.toggle('sel', r === d.level);
+        row.classList.toggle('inside', r > d.level);
+        row.querySelector('[data-name]')!.textContent = r === 0 ? 'Every possible key' : FIELDS.slice(0, r).map(([f], i) => `${f} ${v[i]}`).join(' › ');
+        row.querySelector('[data-rng]')!.textContent = `${n(lo)} to ${n(lo + 2 ** shift - 1)}`;
+        const slice = row.querySelector<HTMLElement>('.kz-slice')!;
+        gsap.to(slice, { left: `${x}%`, duration: reduce() ? 0 : 0.5, ease: 'expo.out' });
+        slice.style.width = `max(${sw}%, 5px)`;
+        row.querySelector('polygon')?.setAttribute('points', `${x},0 ${x + sw},0 100,24 0,24`);
+      });
+      const prefix = FIELDS.slice(0, d.level).reduce((s, f) => s + f[1], 0);
+      root.querySelector('[data-key]')!.textContent = n(d.key);
+      root.querySelector('[data-ip]')!.textContent = ip(d.key);
+      root.querySelector('[data-net]')!.textContent = `${ip(d.lo)}/${prefix}`;
+      root.querySelector('[data-pre]')!.textContent = String(prefix);
+      say.innerHTML = `The database jumps once, to <b>${n(d.lo)}</b>, then reads forward to <b>${n(d.hi - 1)}</b>. One stretch of the index, ${n(d.hi - d.lo)} numbers long, and nothing outside it.`;
+      scan();
+    });
+    btn.hidden = false;
+    btn.addEventListener('click', scan);
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const lv = rows[st.level].querySelector('[data-rng]')!.textContent!.split(' to ').map(t => +t.replace(/,/g, ''));
+      Object.assign(st, { lo: lv[0], hi: lv[1] + 1 });
+      scan();
+    }, { threshold: 0.5 });
+    io.observe(root);
+  });
+</script>

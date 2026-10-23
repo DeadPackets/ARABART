@@ -1,0 +1,226 @@
+{
+ "file": "SUN/ARAB-ART.EXE",
+ "regions": [
+  {
+   "start": 0,
+   "end": 28,
+   "kind": "header",
+   "label": "MZ header",
+   "note": "The DOS EXE header, rebuilt by the museum's unpacker after removing the DIET compression.",
+   "by": "dos",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 28,
+   "end": 32,
+   "kind": "unused",
+   "label": "Header gap",
+   "note": "Four zero bytes before the relocation table.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 32,
+   "end": 36,
+   "kind": "reloc",
+   "label": "Relocation table",
+   "note": "One address: the word at 0621h, where the handler keeps its own segment.",
+   "by": "borland",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 36,
+   "end": 48,
+   "kind": "unused",
+   "label": "Header padding",
+   "note": "Zeros that round the header up to a 16-byte paragraph.",
+   "by": "dos",
+   "evidence": "measured"
+  },
+  {
+   "start": 48,
+   "end": 100,
+   "kind": "code",
+   "label": "Font file loader",
+   "note": "Opens ARAB-ART.FNT and reads exactly 4F28h bytes to 06C3h; on an error it prints a message and exits.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 100,
+   "end": 160,
+   "kind": "code",
+   "label": "Install check and hook",
+   "note": "The same DALYASSER check and INT 10h hook as version 4.15.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 160,
+   "end": 172,
+   "kind": "code",
+   "label": "DALYASSER tag",
+   "note": "The handler entry: EB 0A 90 \"DALYASSER\".",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 172,
+   "end": 1608,
+   "kind": "code",
+   "label": "Handler",
+   "note": "The 4.15 engine with its addresses moved.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 1608,
+   "end": 1748,
+   "kind": "data",
+   "label": "State",
+   "note": "Colors, font, cursor and style flags.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 1748,
+   "end": 1761,
+   "kind": "text",
+   "label": "File name",
+   "note": "\"ARAB-ART.FNT\", the font file the loader opens.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 1761,
+   "end": 1779,
+   "kind": "table",
+   "label": "VGA tables",
+   "note": "Segment A000h, the bit-reversal table and the pixel masks, as in 4.15.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 1779,
+   "end": 1907,
+   "kind": "data",
+   "label": "Placeholder",
+   "note": "128 bytes that the font file overwrites; 17 spaces where the file has \"YASSER DOT DESIGN\".",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 1907,
+   "end": 21869,
+   "kind": "font",
+   "label": "Space for the fonts",
+   "note": "Zeros in the EXE. At start-up ARAB-ART.FNT fills it with the key table and fonts, at the same addresses.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 21869,
+   "end": 21941,
+   "kind": "text",
+   "label": "Banner",
+   "note": "The 7.15 banner, printed if the font file cannot be loaded.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 21941,
+   "end": 21981,
+   "kind": "unused",
+   "label": "Zeros",
+   "note": "Inside the space the font file overwrites.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 21981,
+   "end": 22025,
+   "kind": "text",
+   "label": "Load error",
+   "note": "\"Error in loading ARAB-ART.FNT font file\".",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 22025,
+   "end": 22043,
+   "kind": "unused",
+   "label": "Zeros",
+   "note": "The last bytes the font file overwrites.",
+   "by": "yasser",
+   "evidence": "measured"
+  },
+  {
+   "start": 22043,
+   "end": 22085,
+   "kind": "code",
+   "label": "Banner and exit",
+   "note": "Prints the banner from 54FBh, text that only the font file provides, then stays resident.",
+   "by": "yasser",
+   "evidence": "measured",
+   "link": "/arabart/#path"
+  },
+  {
+   "start": 22085,
+   "end": 22240,
+   "kind": "unused",
+   "label": "Zeros",
+   "note": "Zero bytes at the end of the image.",
+   "by": "yasser",
+   "evidence": "measured"
+  }
+ ],
+ "routines": [
+  {
+   "start": 48,
+   "end": 100,
+   "name": "load_fnt",
+   "note": "Reads the font file into its own memory.",
+   "link": "/arabart/#path",
+   "lines": [
+    {
+     "off": 48,
+     "note": "Open ARAB-ART.FNT"
+    },
+    {
+     "off": 62,
+     "note": "Read 4F28h bytes, the exact file size"
+    },
+    {
+     "off": 83,
+     "note": "Error: print and exit"
+    }
+   ]
+  },
+  {
+   "start": 22043,
+   "end": 22085,
+   "name": "stay_resident",
+   "note": "Banner and INT 27h.",
+   "link": "/arabart/#path",
+   "lines": [
+    {
+     "off": 22053,
+     "note": "Banner at 54FBh, filled from the font file"
+    }
+   ]
+  }
+ ]
+}

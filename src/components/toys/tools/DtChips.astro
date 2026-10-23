@@ -1,0 +1,269 @@
+---
+// Chips and gates are data. A chip is a 138-byte .IC file: 4 bytes per pin (which gate, input or output or power,
+// its place in the gate) and the name of its gate type. A gate type is a .GAT file whose two bytes that matter are
+// the controlling value and the inversion. One evaluator reads them all; a new chip needs a new file, not new code.
+import Window from '../../shell/Window.astro';
+import { chips, gates } from './dt-data';
+import { evaluate, NAME, O, Z } from './dt-sim';
+
+interface Props { id: string }
+const { id } = Astro.props;
+const PICK = ['7400', '7408', '7432', '7402', '7404', '7410', '7411', '7427', '7430'];
+const lib = chips(), gat = gates();
+const C = PICK.map(p => lib.find(c => c.part === p)!).map(c => ({ part: c.part, file: c.file, type: c.type, gates: c.gates, pins: c.pins, bytes: c.bytes, name: [...c.type.padEnd(12, '\0')].map(ch => ch.charCodeAt(0)) }));
+const first = C[0];
+const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
+const KIND: Record<number, string> = { 0x20: 'in', 0x40: 'out', 0x10: 'GND', 0x02: 'VCC' };
+// Top view of a 14-pin chip: pin 1 bottom left, pin 14 top left
+const px = (p: number) => (p <= 7 ? 40 + (p - 1) * 44 : 40 + (14 - p) * 44);
+const py = (p: number) => (p <= 7 ? 150 : 22);
+const G4 = ['AND', 'NAND', 'OR', 'NOR'].map((k, i) => gat.find(g => g.ins === 2 && g.ctrl === (i < 2 ? Z : O) && g.inv === (i % 2 ? O : Z))!);
+const SHAPE = { and: 'M12 4H30A16 16 0 0 1 30 36H12Z', or: 'M10 4Q21 20 10 36Q34 36 46 20Q34 4 10 4Z' };
+const g0 = G4[1];
+const tt = (ctrl: number, inv: number) => [[Z, Z], [Z, O], [O, Z], [O, O]].map(r => evaluate(ctrl, inv, r).out);
+const t0 = tt(g0.ctrl, g0.inv);
+const data = JSON.stringify({ chips: C, gat: G4.map(g => ({ name: g.name, bytes: g.bytes, ctrl: g.ctrl, inv: g.inv })) });
+---
+
+<div class="dtc" id={id} data-dtchips>
+  <script type="application/json" set:html={data.replace(/</g, '\\u003c')} />
+  <Window title="CHIP LIBRARY  one file per chip" kind="dialog" class="dtc-lib">
+    <div class="dtc-list" role="radiogroup" aria-label="Pick a chip">
+      {C.map((c, i) => (
+        <button type="button" role="radio" class="dtc-pick" data-i={i} aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1}>
+          <b>{c.part}</b><span>{c.type}</span>
+        </button>
+      ))}
+    </div>
+    <div class="dtc-chip">
+      <svg class="dtc-svg" viewBox="0 0 352 172" role="img" aria-label="The chip from the top, its pins colored by gate" data-svg>
+        <rect class="dtc-body" x="22" y="34" width="308" height="104" rx="3" />
+        <path class="dtc-notch" d="M22 74a12 12 0 0 1 0 24z" />
+        {Array.from({ length: 14 }, (_, k) => k + 1).map(p => {
+          const [g, t] = first.pins[p - 1];
+          return (
+            <g class="dtc-pin" data-pin={p} data-g={t === 0x20 || t === 0x40 ? g : ''} data-t={KIND[t] ?? 'nc'}>
+              <rect x={px(p) - 11} y={p <= 7 ? 138 : 12} width="22" height="22" />
+              <text x={px(p)} y={p <= 7 ? 168 : 8} text-anchor="middle" class="dtc-num">{p}</text>
+              <text x={px(p)} y={p <= 7 ? 153 : 27} text-anchor="middle" class="dtc-k">{t === 0x40 ? 'out' : t === 0x02 ? '+5' : t === 0x10 ? '0V' : ''}</text>
+            </g>
+          );
+        })}
+        <text x="176" y="80" text-anchor="middle" class="dtc-part" data-part>{first.part}</text>
+        <text x="176" y="108" text-anchor="middle" class="dtc-type" data-type>{first.type} × {first.gates}</text>
+      </svg>
+      <p class="dtc-say" aria-live="polite" data-say>{first.part}: {first.gates} gates of type {first.type}, from {first.file}.</p>
+    </div>
+    <div class="dtc-bytes" aria-label="The chip's file, 4 bytes per pin" data-bytes>
+      <p class="dtc-row dtc-head"><span>pin</span><span>gate</span><span>kind</span><span>at</span><span></span></p>
+      {first.pins.map((pin, k) => (
+        <p class="dtc-row" data-pin={k + 1}><span>{k + 1}</span>{[pin[0], pin[1], pin[3], pin[2]].map(b => <code>{hex(b)}</code>)}</p>
+      ))}
+      <p class="dtc-row dtc-name"><span>type</span><code data-name>{first.type}</code></p>
+    </div>
+  </Window>
+
+  <Window title="GATE FILE  FIL0.GAT and friends" kind="editor" active class="dtc-gate">
+    <div class="dtc-g">
+      <div class="dtc-ctl">
+        <div role="radiogroup" aria-label="Controlling value" class="dtc-seg" data-seg="ctrl">
+          <span>Controlling value</span>
+          <button type="button" role="radio" aria-checked="true" data-v={Z} class="dtc-opt">0</button>
+          <button type="button" role="radio" aria-checked="false" data-v={O} class="dtc-opt" tabindex="-1">1</button>
+        </div>
+        <div role="radiogroup" aria-label="Inverts the answer" class="dtc-seg" data-seg="inv">
+          <span>Inverts</span>
+          <button type="button" role="radio" aria-checked="false" data-v={Z} class="dtc-opt" tabindex="-1">no</button>
+          <button type="button" role="radio" aria-checked="true" data-v={O} class="dtc-opt">yes</button>
+        </div>
+      </div>
+      <div class="dtc-sym">
+        <svg viewBox="0 0 64 40" class="dtc-gsvg" role="img" aria-label="The gate symbol" data-gsvg>
+          <path class="dtc-leg" d="M0 12H14M0 28H14" />
+          <path class="dtc-shape" d={SHAPE.and} data-shape />
+          <path class="dtc-leg" d="M52 20H64" />
+          <circle class="dtc-bub" cx="49.5" cy="20" r="3.5" data-bub />
+        </svg>
+        <p class="dtc-gname"><b data-gname>NAND</b> <span data-gfile>{g0.name}</span></p>
+      </div>
+      <p class="dtc-gbytes" aria-label="The gate's 6 bytes" data-gbytes>
+        <span><code>{hex(g0.bytes[0])}</code><i>inputs</i></span>
+        <span><code>{hex(g0.bytes[1])}</code><i>outputs</i></span>
+        <span class="hot"><code data-b="ctrl">{hex(g0.ctrl)}</code><i>controlling value</i></span>
+        <span class="hot"><code data-b="inv">{hex(g0.inv)}</code><i>inverts</i></span>
+        <span><code>00 00</code><i>second output</i></span>
+      </p>
+      <table class="dtc-tt">
+        <caption>His evaluator on all four rows</caption>
+        <thead><tr><th scope="col">A</th><th scope="col">B</th><th scope="col">out</th></tr></thead>
+        <tbody data-tt>{[[0, 0], [0, 1], [1, 0], [1, 1]].map((r, k) => <tr><td>{r[0]}</td><td>{r[1]}</td><td>{NAME[t0[k]]}</td></tr>)}</tbody>
+      </table>
+    </div>
+  </Window>
+</div>
+
+<style is:global>
+  .dtc { display: grid; gap: 22px; }
+  .dtc-lib :is(.dtc-list, .dtc-chip, .dtc-bytes) { min-width: 0; }
+  .dtc-lib { --dtc-cols: 150px minmax(0, 1fr) 190px; }
+  .dtc-lib > .win-body { display: grid; grid-template-columns: var(--dtc-cols); gap: 18px; align-items: start; }
+  .dtc-list { display: grid; gap: 4px; }
+  .dtc-pick { display: grid; grid-template-columns: 4ch 1fr; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; text-align: left; font: inherit; color: var(--ink); background: none; border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; }
+  .dtc-pick b { font: 700 0.9375rem/1 var(--font-code); }
+  .dtc-pick span { font: 500 0.75rem/1.2 var(--font-code); color: var(--ink-2); }
+  .dtc-pick[aria-checked='true'] { background: var(--ink); color: var(--surface); box-shadow: none; }
+  .dtc-pick[aria-checked='true'] span { color: var(--surface); }
+  .dtc-pick:focus-visible, .dtc-opt:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .dtc-svg { display: block; width: 100%; max-width: 440px; margin-inline: auto; height: auto; font-family: var(--font-code); }
+  .dtc-body { fill: #111; }
+  .dtc-notch { fill: #444; }
+  .dtc-pin rect { fill: #c8c8c8; transition: fill 0.25s; }
+  .dtc-num { font-size: 12px; font-weight: 600; fill: var(--ink-2); }
+  .dtc-k { font-size: 9px; font-weight: 700; fill: #000; }
+  .dtc-pin[data-g='0'] rect { fill: #ffff55; } .dtc-pin[data-g='1'] rect { fill: #55ffff; } .dtc-pin[data-g='2'] rect { fill: #ff55ff; }
+  .dtc-pin[data-g='3'] rect { fill: #55ff55; } .dtc-pin[data-g='4'] rect { fill: #ff9955; } .dtc-pin[data-g='5'] rect { fill: #aaaaff; }
+  .dtc-pin[data-t='VCC'] rect { fill: #aa0000; } .dtc-pin[data-t='GND'] rect { fill: #555; }
+  .dtc-pin[data-t='VCC'] .dtc-k, .dtc-pin[data-t='GND'] .dtc-k { fill: #fff; }
+  .dtc-pin[data-t='out'] rect { stroke: #fff; stroke-width: 3; }
+  .dtc-pin.hl rect { stroke: var(--focus); stroke-width: 3; }
+  .dtc-part { font: 800 30px var(--font-display); fill: #ddd; letter-spacing: 1px; }
+  .dtc-type { font-size: 14px; fill: #999; }
+  .dtc-say { margin: 8px 0 0 !important; font-size: 0.9375rem !important; color: var(--ink-2) !important; }
+  .dtc-bytes { display: grid; gap: 0; font: 500 12.5px/1.65 var(--font-code); }
+  .dtc-row { display: grid; grid-template-columns: 3.5ch repeat(4, 4ch); gap: 0 6px; margin: 0 !important; max-width: none !important; font: inherit !important; color: var(--ink) !important; cursor: default; }
+  .dtc-row span { color: var(--ink-2); }
+  .dtc-row code { font: inherit !important; color: var(--ink) !important; }
+  .dtc-row.hl { background: var(--accent-2); }
+  .dtc-row.hl :is(span, code) { color: var(--surface) !important; }
+  .dtc-head { font-size: 10.5px !important; color: var(--accent-2) !important; }
+  .dtc-head span { color: var(--accent-2); }
+  .dtc-name { grid-template-columns: 4ch 1fr; margin-top: 6px !important; }
+  .dtc-name code { color: var(--accent) !important; font-weight: 700 !important; }
+  .dtc-bytes code.chg { animation: dtc-chg 0.9s ease-out; }
+  @keyframes dtc-chg { from { background: var(--accent); color: var(--surface); } }
+
+  .dtc-g { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; grid-template-areas: 'ctl sym tt' 'bytes bytes tt'; gap: 18px 28px; align-items: center; }
+  .dtc-ctl { grid-area: ctl; display: grid; gap: 12px; }
+  .dtc-seg { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .dtc-seg > span { min-width: 9.5em; font: 600 0.8125rem/1.2 var(--font-code); color: var(--accent-2); }
+  .dtc-opt { min-width: 52px; min-height: 44px; font: 700 1rem/1 var(--font-code); color: var(--ink); background: var(--surface-2); border: 0; box-shadow: inset 0 0 0 1px var(--accent-2); cursor: pointer; }
+  .dtc-opt[aria-checked='true'] { background: var(--accent); color: var(--surface); box-shadow: none; }
+  .dtc-sym { grid-area: sym; display: grid; justify-items: center; gap: 6px; }
+  .dtc-gsvg { width: min(220px, 100%); height: auto; overflow: visible; }
+  .dtc-shape { fill: var(--surface-2); stroke: var(--accent); stroke-width: 1.6; }
+  .dtc-leg { stroke: var(--accent); stroke-width: 1.6; fill: none; }
+  .dtc-bub { fill: var(--surface-2); stroke: var(--accent); stroke-width: 1.6; transform-box: fill-box; transform-origin: center; }
+  .dtc-gname { margin: 0 !important; font: 500 0.875rem/1.2 var(--font-code) !important; color: var(--ink-2) !important; }
+  .dtc-gname b { font: 800 1.75rem/1 var(--font-display); color: var(--accent); margin-right: 8px; }
+  .dtc-gbytes { grid-area: bytes; display: flex; flex-wrap: wrap; gap: 8px; margin: 0 !important; max-width: none !important; }
+  .dtc-gbytes span { display: grid; gap: 4px; padding: 6px 10px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .dtc-gbytes .hot { box-shadow: inset 0 0 0 2px var(--accent); }
+  .dtc-gbytes code { font: 700 1.125rem/1 var(--font-code) !important; color: var(--ink) !important; }
+  .dtc-gbytes .hot code { color: var(--accent) !important; }
+  .dtc-gbytes i { font: 500 11px/1.2 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .dtc-tt { grid-area: tt; border-collapse: collapse; font: 600 0.9375rem/1 var(--font-code); }
+  .dtc-tt caption { caption-side: bottom; padding-top: 8px; font: 500 11px/1.3 var(--font-code); color: var(--ink-2); max-width: 12ch; }
+  .dtc-tt th { padding: 6px 12px; color: var(--accent-2); border-bottom: 2px solid var(--accent-2); }
+  .dtc-tt td { padding: 7px 12px; text-align: center; color: var(--ink); border-bottom: 1px solid var(--rule); }
+  .dtc-tt td:last-child { color: var(--accent); font-weight: 800; }
+  .dtc-tt tr.flip td:last-child { animation: dtc-chg 0.7s ease-out; }
+  @media (max-width: 1023px) {
+    .dtc-lib { --dtc-cols: minmax(0, 1fr); }
+    .dtc-list { grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); }
+    .dtc-bytes { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
+    .dtc-head { display: none !important; }
+    .dtc-name { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    .dtc-g { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'sym' 'ctl' 'bytes' 'tt'; }
+    .dtc-tt { justify-self: start; }
+    .dtc-bytes { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (prefers-reduced-motion: reduce) { .dtc-pin rect { transition: none; } .dtc-bytes code.chg, .dtc-tt tr.flip td:last-child { animation: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
+  import { evaluate, NAME, O, Z } from './dt-sim';
+
+  gsap.registerPlugin(MorphSVGPlugin);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
+  const KIND: Record<number, string> = { 0x20: 'in', 0x40: 'out', 0x10: 'GND', 0x02: 'VCC' };
+  const SHAPE = { and: 'M12 4H30A16 16 0 0 1 30 36H12Z', or: 'M10 4Q21 20 10 36Q34 36 46 20Q34 4 10 4Z' };
+  type Chip = { part: string; file: string; type: string; gates: number; pins: number[][]; name: number[] };
+
+  // Arrow keys move through a radio group, as native radios do
+  function radios(group: Element, pick: (b: HTMLButtonElement) => void) {
+    const bs = [...group.querySelectorAll<HTMLButtonElement>('[role=radio]')];
+    bs.forEach(b => b.addEventListener('click', () => pick(b)));
+    group.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key, i = bs.indexOf(document.activeElement as HTMLButtonElement);
+      if (i < 0 || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(k)) return;
+      e.preventDefault();
+      const b = bs[(i + (k === 'ArrowUp' || k === 'ArrowLeft' ? bs.length - 1 : 1)) % bs.length];
+      b.focus(); pick(b);
+    });
+    return (b: HTMLButtonElement) => bs.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
+  }
+
+  document.querySelectorAll<HTMLElement & { dtc?: boolean }>('[data-dtchips]').forEach(root => {
+    if (root.dtc) return;
+    root.dtc = true;
+    const S: { chips: Chip[]; gat: { name: string; bytes: number[]; ctrl: number; inv: number }[] } = JSON.parse(root.querySelector('script[type="application/json"]')!.textContent!);
+    const say = root.querySelector<HTMLElement>('[data-say]')!;
+    const rows = [...root.querySelectorAll<HTMLElement>('.dtc-row[data-pin]')], pins = [...root.querySelectorAll<SVGGElement>('.dtc-pin')];
+    let cur = S.chips[0];
+
+    const mark = radios(root.querySelector('.dtc-list')!, b => {
+      const next = S.chips[+b.dataset.i!];
+      mark(b);
+      let changed = 0;
+      next.pins.forEach((p, k) => {
+        const [g, t] = p, el = pins[k];
+        el.dataset.g = t === 0x20 || t === 0x40 ? String(g) : '';
+        el.dataset.t = KIND[t] ?? 'nc';
+        el.querySelector('.dtc-k')!.textContent = t === 0x40 ? 'out' : t === 0x02 ? '+5' : t === 0x10 ? '0V' : '';
+        const codes = rows[k].querySelectorAll('code'), now = [p[0], p[1], p[3], p[2]], old = [cur.pins[k][0], cur.pins[k][1], cur.pins[k][3], cur.pins[k][2]];
+        codes.forEach((c, j) => { c.textContent = hex(now[j]); if (now[j] !== old[j]) { changed++; if (!reduce()) { c.classList.remove('chg'); void c.offsetWidth; c.classList.add('chg'); } } });
+      });
+      const nameChanged = next.name.filter((c, k) => c !== cur.name[k]).length;
+      const nm = root.querySelector<HTMLElement>('[data-name]')!;
+      nm.textContent = next.type;
+      if (nameChanged && !reduce()) { nm.classList.remove('chg'); void nm.offsetWidth; nm.classList.add('chg'); }
+      root.querySelector('[data-part]')!.textContent = next.part;
+      root.querySelector('[data-type]')!.textContent = `${next.type} × ${next.gates}`;
+      say.textContent = next === cur ? `${next.part}: ${next.gates} gates of type ${next.type}, from ${next.file}.`
+        : !changed ? `${next.part} has the same pins as the ${cur.part}. Only the gate type in its file changes: ${nameChanged} bytes. No code changes at all.`
+        : `${next.part}: ${next.gates} gates of type ${next.type}. ${changed} pin bytes differ from the ${cur.part}.`;
+      if (!reduce()) gsap.fromTo(root.querySelectorAll('[data-part], [data-type]'), { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.05 });
+      cur = next;
+    });
+    // Point at a pin or a row to light both
+    const light = (p: string | null) => { rows.forEach(r => r.classList.toggle('hl', r.dataset.pin === p)); pins.forEach(g => g.classList.toggle('hl', g.dataset.pin === p)); };
+    for (const el of [...rows, ...pins]) { el.addEventListener('pointerenter', () => light(el.dataset.pin!)); el.addEventListener('pointerleave', () => light(null)); }
+
+    // The gate file: two bytes choose AND, NAND, OR or NOR
+    let ctrl = Z, inv = O;
+    const shape = root.querySelector<SVGPathElement>('[data-shape]')!, bub = root.querySelector<SVGCircleElement>('[data-bub]')!;
+    const gate = () => {
+      const g = S.gat.find(x => x.ctrl === ctrl && x.inv === inv)!;
+      root.querySelector('[data-gname]')!.textContent = ['AND', 'NAND', 'OR', 'NOR'][(ctrl === Z ? 0 : 2) + (inv === O ? 1 : 0)];
+      root.querySelector('[data-gfile]')!.textContent = g.name;
+      root.querySelector('[data-b="ctrl"]')!.textContent = hex(ctrl);
+      root.querySelector('[data-b="inv"]')!.textContent = hex(inv);
+      const d = ctrl === Z ? SHAPE.and : SHAPE.or, k = reduce() ? 0 : 0.5;
+      gsap.to(shape, { morphSVG: d, duration: k, ease: 'power3.inOut' });
+      gsap.to(bub, { scale: inv === O ? 1 : 0, opacity: inv === O ? 1 : 0, duration: k * 0.8, ease: 'back.out(2)' });
+      const tt = [[Z, Z], [Z, O], [O, Z], [O, O]].map(r => evaluate(ctrl, inv, r).out);
+      root.querySelectorAll<HTMLTableRowElement>('[data-tt] tr').forEach((tr, i) => {
+        const td = tr.lastElementChild!, was = td.textContent;
+        td.textContent = NAME[tt[i]];
+        if (was !== td.textContent && !reduce()) { tr.classList.remove('flip'); void tr.offsetWidth; tr.classList.add('flip'); }
+      });
+    };
+    const segC = radios(root.querySelector('[data-seg="ctrl"]')!, b => { ctrl = +b.dataset.v!; segC(b); gate(); });
+    const segI = radios(root.querySelector('[data-seg="inv"]')!, b => { inv = +b.dataset.v!; segI(b); gate(); });
+  });
+</script>

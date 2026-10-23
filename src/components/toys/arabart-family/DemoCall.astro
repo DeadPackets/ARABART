@@ -1,0 +1,228 @@
+---
+// His C binding for ARABART (DEMO_EXE.img 206B-2162) in the CodeStepper, beside the C it does, with a linked view
+// of the call travelling main() -> binding -> INT 10h -> ARABART and the line it draws.
+import CodeStepper from '../CodeStepper.astro';
+import Window from '../../shell/Window.astro';
+
+interface Props { id?: string }
+const { id = 'democall' } = Astro.props;
+
+type L = { k: string; off?: string; label?: string; code: string; note?: string };
+const ASM: L[] = [
+  { k: 'c0', off: '206B', code: 'push bp', note: 'ar_color(c)' },
+  { k: 'c1', off: '2079', code: 'push ax', note: 'save registers' },
+  { k: 'c2', off: '207D', code: 'mov  ax,3601h', note: 'colors' },
+  { k: 'c3', off: '2080', code: 'mov  cx,[bp+6]', note: 'the color' },
+  { k: 'c4', off: '2083', code: 'int  10h', note: 'call ARABART' },
+  { k: 'c5', off: '2085', code: 'pop  dx', note: 'restore them' },
+  { k: 'c6', off: '208A', code: 'retf' },
+  { k: 'f0', off: '208B', code: 'push bp', note: 'ar_font(f)' },
+  { k: 'f1', off: '2099', code: 'push ax', note: 'save registers' },
+  { k: 'f2', off: '209D', code: 'mov  ax,3603h', note: 'pick a font' },
+  { k: 'f3', off: '20A0', code: 'mov  cx,[bp+6]', note: 'the font' },
+  { k: 'f4', off: '20A3', code: 'int  10h', note: 'call ARABART' },
+  { k: 'f5', off: '20A5', code: 'pop  dx', note: 'restore' },
+  { k: 'f6', off: '20AA', code: 'retf' },
+  { k: 'w0', off: '20AB', code: 'enter 2,0', note: 'ar_width(s)' },
+  { k: 'w1', off: '20BF', code: 'lds  dx,[bp+6]', note: 'the text' },
+  { k: 'w2', off: '20C2', code: 'mov  ax,3605h', note: 'measure' },
+  { k: 'w3', off: '20C5', code: 'int  10h', note: 'call ARABART' },
+  { k: 'w4', off: '20C8', code: 'mov  [bp-2],cx', note: 'the width' },
+  { k: 'w5', off: '20CF', code: 'mov  ax,[bp-2]', note: 'return it' },
+  { k: 'h0', off: '20D6', code: 'enter 4,0', note: 'ar_height(s)' },
+  { k: 'h1', off: '20EC', code: 'mov  ax,3604h', note: 'font info' },
+  { k: 'h2', off: '20EF', code: 'int  10h', note: 'call ARABART' },
+  { k: 'h3', off: '20F1', code: 'mov  [bp-2],dx', note: 'h = height' },
+  { k: 'h4', off: '20F8', code: 'les  bx,[bp+6]', note: 'the text' },
+  { k: 'h5', off: '2103', label: 'next', code: 'cmp  byte [bp-3],24h', note: 'a $?' },
+  { k: 'h6', off: '2107', code: 'jne  2114h' },
+  { k: 'h7', off: '210F', code: 'imul dx', note: 'h * 2' },
+  { k: 'h8', off: '2114', code: 'inc  si', note: 'next key' },
+  { k: 'h9', off: '211E', code: 'cmp  byte [bp-3],0', note: 'the end?' },
+  { k: 'h10', off: '2122', code: 'jne  next' },
+  { k: 'h11', off: '2124', code: 'mov  ax,[bp-2]', note: 'return h' },
+  { k: 't0', off: '212C', code: 'push bp', note: 'ar_text(x, y, s)' },
+  { k: 't1', off: '2141', code: 'call 20D6h', note: 'ar_height(s)' },
+  { k: 't2', off: '2146', code: 'add  [bp+8],ax', note: 'y += h' },
+  { k: 't3', off: '214E', code: 'mov  cx,[bp+6]', note: 'x, right edge' },
+  { k: 't4', off: '2151', code: 'mov  bx,[bp+8]', note: 'y, line bottom' },
+  { k: 't5', off: '2154', code: 'lds  dx,[bp+0Ah]', note: 'the text' },
+  { k: 't6', off: '2157', code: 'mov  ax,3607h', note: 'draw' },
+  { k: 't7', off: '215A', code: 'int  10h', note: 'call ARABART' },
+  { k: 't8', off: '2162', code: 'retf' },
+];
+const C: L[] = [
+  { k: 'm0', code: 'for (font = 1; font <= 3; font++) {' },
+  { k: 'm1', code: '  for (y = 0, c = 1; c < 13; c++) {' },
+  { k: 'm2', code: '    ar_font(font);' },
+  { k: 'm3', code: '    ar_color(c + 3);', note: '4 to 15' },
+  { k: 'm4', code: '    ar_text(x, y, s1);' },
+  { k: 'm5', code: '    y += ar_height(s1);' },
+  { k: 'm6', code: '  }' },
+  { k: 'm7', code: '  x -= ar_width(s1);', note: 'next column' },
+  { k: 'm8', code: '}' },
+  { k: 'k0', code: 'void ar_color(int c) {' },
+  { k: 'k1', code: '  _AX = 0x3601; _CX = c;' },
+  { k: 'k2', code: '  geninterrupt(0x10);' },
+  { k: 'k3', code: '}' },
+  { k: 'g0', code: 'void ar_font(int f) {' },
+  { k: 'g1', code: '  _AX = 0x3603; _CX = f;' },
+  { k: 'g2', code: '  geninterrupt(0x10);' },
+  { k: 'g3', code: '}' },
+  { k: 'W0', code: 'int ar_width(char far *s) {' },
+  { k: 'W1', code: '  _DS = FP_SEG(s); _DX = FP_OFF(s);' },
+  { k: 'W2', code: '  _AX = 0x3605; geninterrupt(0x10);' },
+  { k: 'W3', code: '  return _CX;' },
+  { k: 'W4', code: '}' },
+  { k: 'H0', code: 'int ar_height(char far *s) {' },
+  { k: 'H1', code: '  _AX = 0x3604; geninterrupt(0x10);' },
+  { k: 'H2', code: '  int h = _DX;' },
+  { k: 'H3', code: '  for (; *s; s++)' },
+  { k: 'H4', code: '    if (*s == \'$\') h *= 2;' },
+  { k: 'H5', code: '  return h;' },
+  { k: 'H6', code: '}' },
+  { k: 'T0', code: 'void ar_text(int x, int y, char far *s) {' },
+  { k: 'T1', code: '  y += ar_height(s);', note: 'top to bottom' },
+  { k: 'T2', code: '  _CX = x; _BX = y;' },
+  { k: 'T3', code: '  _DS = FP_SEG(s); _DX = FP_OFF(s);' },
+  { k: 'T4', code: '  _AX = 0x3607; geninterrupt(0x10);' },
+  { k: 'T5', code: '}' },
+];
+const ai = (k: string | null) => (k ? ASM.findIndex(l => l.k === k) : -1);
+const ci = (k: string) => C.findIndex(l => l.k === k);
+
+type R = [string, string, string];
+const reg = (rs: R[], prev: R[] = []) => rs.map(([name, value, means]) => ({ name, value, means, changed: !prev.some(p => p[0] === name && p[1] === value) }));
+// [asm, c, say, hop (0 main, 1 binding, 2 the call, 3 ARABART), fn, regs, packet, lines drawn, answer]
+type S = [string | null, string, string, number, string, R[], string?, number?, string?];
+const M = (x: string, y: string): R[] => [['x', x, 'the right edge of this column'], ['y', y, 'the top of the next line']];
+const RAW: S[] = [
+  [null, 'm0', 'His demo starts a column in <b>font 1</b>, with its right edge at x = 630.', 0, '', M('630', '0')],
+  [null, 'm2', 'First it calls <b>ar_font(1)</b>, one of his five small functions. Today you would write <code>sdk.setFont(1)</code>.', 0, 'ar_font(1)', M('630', '0')],
+  ['f0', 'g0', 'ar_font begins, like any C function.', 1, 'ar_font(1)', M('630', '0')],
+  ['f1', 'g0', 'It saves the registers main is using. Registers are the processor’s handful of built-in variables.', 1, 'ar_font(1)', []],
+  ['f2', 'g1', '<b>AX = 3603h.</b> 36h says “this is for ARABART”. 03h says “pick a font”. Like the route of an API call.', 1, 'ar_font(1)', [['AX', '3603h', 'ARABART, function 3']]],
+  ['f3', 'g1', '<b>CX = 1</b>, the font number main passed in. Like the body of the request.', 1, 'ar_font(1)', [['AX', '3603h', 'ARABART, function 3'], ['CX', '1', 'font 1']], 'AX 3603h · CX 1'],
+  ['f4', 'g2', '<b>int 10h</b> rings the PC’s video service. ARABART waits in front of it, sees 36h and takes the call: font 1 from now on.', 3, 'ar_font(1)', [['AX', '3603h', 'ARABART, function 3'], ['CX', '1', 'font 1']], 'AX 3603h · CX 1', 0, 'font 1 set'],
+  ['f6', 'g3', 'It puts every register back and returns. main never sees a register.', 1, 'ar_font(1)', []],
+  [null, 'm3', 'Next, <b>ar_color(c + 3)</b>. c is 1, so color 4: red.', 0, 'ar_color(4)', M('630', '0')],
+  ['c3', 'k1', 'The same pattern: <b>AX = 3601h</b>, set the colors, and <b>CX = 4</b>.', 1, 'ar_color(4)', [['AX', '3601h', 'ARABART, function 1'], ['CX', '4', 'red']], 'AX 3601h · CX 4'],
+  ['c4', 'k2', 'Ring ARABART. It remembers red for the next text it draws.', 3, 'ar_color(4)', [['AX', '3601h', 'ARABART, function 1'], ['CX', '4', 'red']], 'AX 3601h · CX 4', 0, 'red'],
+  ['c6', 'k3', 'Back to main.', 1, 'ar_color(4)', []],
+  [null, 'm4', 'Now the line itself: <b>ar_text(630, 0, s1)</b>. Top right corner at x 630, y 0.', 0, 'ar_text(630, 0, s1)', M('630', '0')],
+  ['t0', 'T0', 'ar_text begins.', 1, 'ar_text(630, 0, s1)', []],
+  ['t1', 'T1', 'Before it draws, it measures: it calls <b>ar_height</b>.', 1, 'ar_height(s1)', []],
+  ['h1', 'H1', '<b>AX = 3604h</b>: “tell me about the current font”.', 1, 'ar_height(s1)', [['AX', '3604h', 'ARABART, function 4']]],
+  ['h2', 'H1', 'ARABART answers in DX: the font is <b>18 pixels</b> tall.', 3, 'ar_height(s1)', [['AX', '3604h', 'ARABART, function 4'], ['DX', '18', 'the line height']], 'AX 3604h', 0, 'DX = 18'],
+  ['h3', 'H2', 'Keep it: h = 18.', 1, 'ar_height(s1)', [['DX', '18', 'the line height']]],
+  ['h5', 'H4', 'Then it reads the text key by key, looking for <b>$</b>, the double-size key. Every $ doubles the height.', 1, 'ar_height(s1)', [['DX', '18', 'the line height']]],
+  ['h10', 'H3', 'No $ in this line. The zero at the end of the string stops the loop.', 1, 'ar_height(s1)', []],
+  ['h11', 'H5', 'Return 18.', 1, 'ar_height(s1)', [['AX', '18', 'the height, returned']]],
+  ['t2', 'T1', '<b>y = 0 + 18.</b> Borland’s graphics think in the top of a line. ARABART wants its bottom, the line the letters sit on. The binding converts for you, the way a good SDK does.', 1, 'ar_text(630, 18, s1)', [['AX', '18', 'the height']]],
+  ['t3', 'T2', '<b>CX = 630</b>, the right edge. Arabic starts at the right.', 1, 'ar_text(630, 18, s1)', [['CX', '630', 'right edge']]],
+  ['t4', 'T2', '<b>BX = 18</b>, the bottom of the line.', 1, 'ar_text(630, 18, s1)', [['CX', '630', 'right edge'], ['BX', '18', 'line bottom']]],
+  ['t5', 'T3', '<b>DS:DX</b> = where the text is: s1, 27 keys typed on an English keyboard.', 1, 'ar_text(630, 18, s1)', [['CX', '630', 'right edge'], ['BX', '18', 'line bottom'], ['DX', '0092h', 's1, the text']]],
+  ['t6', 'T4', '<b>AX = 3607h</b>: draw.', 1, 'ar_text(630, 18, s1)', [['AX', '3607h', 'ARABART, function 7'], ['CX', '630', 'right edge'], ['BX', '18', 'line bottom'], ['DX', '0092h', 's1, the text']]],
+  ['t7', 'T4', 'Ring ARABART. It turns the keys into letters, joins them and draws them in red. <b>The first line appears.</b>', 3, 'ar_text(630, 18, s1)', [['AX', '3607h', 'ARABART, function 7'], ['CX', '630', 'right edge'], ['BX', '18', 'line bottom'], ['DX', '0092h', 's1, the text']], 'AX 3607h · CX 630 · BX 18 · DS:DX s1', 1, 'drawn'],
+  ['t8', 'T5', 'Put everything back and return to main.', 1, 'ar_text(630, 18, s1)', [], undefined, 1],
+  [null, 'm5', '<b>y += ar_height(s1)</b>: the next line goes 18 pixels lower. The loop runs eleven more times, one color each.', 0, '', M('630', '216'), undefined, 12],
+  [null, 'm7', 'After twelve lines: <b>ar_width(s1)</b>, how wide is this line?', 0, 'ar_width(s1)', M('630', '216'), undefined, 12],
+  ['w2', 'W2', '<b>AX = 3605h</b>: measure, without drawing.', 1, 'ar_width(s1)', [['AX', '3605h', 'ARABART, function 5']], undefined, 12],
+  ['w3', 'W2', 'ARABART runs the same loop it draws with, but only adds up the widths: <b>CX = 164</b> pixels.', 3, 'ar_width(s1)', [['AX', '3605h', 'ARABART, function 5'], ['CX', '164', 'the width']], 'AX 3605h · DS:DX s1', 12, 'CX = 164'],
+  ['w5', 'W3', 'Return 164.', 1, 'ar_width(s1)', [['AX', '164', 'the width, returned']], undefined, 12],
+  [null, 'm7', '<b>x = 630 − 164 = 466.</b> The next column starts exactly where this one ends. No position on any screen is typed in by hand: ARABART measures, his loop places.', 0, '', M('466', '0'), undefined, 13],
+];
+let prev: R[] = [];
+const steps = RAW.map(([a, c, say, hop, fn, regs, packet = '', lines, ans = '']) => {
+  const r = reg(regs, prev); prev = regs;
+  return { a: ai(a), c: ci(c), say, regs: r, hop, fn, packet, lines: lines ?? -1, ans };
+});
+// Lines drawn on the mini screen: carry forward
+let drawn = 0;
+for (const s of steps) { if ((s.lines as number) >= 0) drawn = s.lines as number; s.lines = drawn; }
+const asm = ASM.map(({ k, ...l }) => l), c = C.map(({ k, ...l }) => l);
+---
+
+<CodeStepper id={id} title="DEMO.EXE  his ARABART binding" cTitle="The same in C" asm={asm} c={c} steps={steps} at={0} speed={0.9}>
+  <div slot="visual" class="dc" data-democall data-for={id}>
+    <Window title="ONE CALL, end to end" kind="panel" num="4" class="dc-win">
+      <div class="dc-chain" role="list">
+        <div role="listitem" data-hop="0"><b>main()</b><span>his demo, in C</span></div>
+        <div role="listitem" data-hop="1"><b data-fn>ar_font(1)</b><span>his binding</span></div>
+        <div role="listitem" data-hop="2"><b>INT 10h</b><span>the video service</span></div>
+        <div role="listitem" data-hop="3"><b>ARABART</b><span>waiting in memory</span></div>
+      </div>
+      <div class="dc-packet"><span>Sent</span> <code data-packet>nothing yet</code> <span>Back</span> <code data-ans>nothing yet</code></div>
+    </Window>
+    <Window title="VGA  the top right corner" kind="screen" class="dc-scr">
+      <div class="dc-screen"><canvas width="240" height="240" aria-hidden="true"></canvas><svg viewBox="400 0 240 240" aria-hidden="true" data-mark></svg></div>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .dc { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
+  .dc-chain { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 26px; margin: 0; padding: 0; list-style: none; }
+  .dc-chain > div { position: relative; display: grid; align-content: start; gap: 4px; min-height: 84px; padding: 10px 10px 8px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: background-color 0.25s var(--quart), box-shadow 0.25s var(--quart); }
+  .dc-chain > div + li::before { content: '►'; position: absolute; left: -21px; top: 50%; translate: 0 -50%; font: 700 14px/1 var(--font-code); color: var(--ink-2); transition: color 0.25s; }
+  .dc-chain b { font: 700 0.9375rem/1.25 var(--font-code); color: var(--ink); overflow-wrap: anywhere; }
+  .dc-chain span { font: 500 0.8125rem/1.35 var(--sans); color: var(--ink-2); }
+  .dc-chain > div.on { background: color-mix(in oklch, var(--accent-2) 22%, var(--surface-2)); box-shadow: inset 0 0 0 2px var(--accent-2); }
+  .dc-chain > div.on + li::before, .dc-chain > div.lit + li::before { color: var(--accent); }
+  .dc-chain > div.now { background: var(--accent); box-shadow: none; }
+  .dc-chain > div.now b, .dc-chain > div.now span { color: var(--surface); }
+  .dc-packet { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin-top: 16px; font: 500 0.875rem/1.5 var(--sans); color: var(--ink-2); }
+  .dc-packet code { font: 600 0.875rem/1.5 var(--font-code); color: var(--accent); overflow-wrap: anywhere; }
+  .dc-screen { position: relative; aspect-ratio: 1; background: var(--vga-0); }
+  .dc-screen canvas, .dc-screen svg { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .dc-screen svg text { font: 600 13px var(--font-code); fill: var(--vga-14); paint-order: stroke; stroke: var(--vga-0); stroke-width: 4px; }
+  .dc-screen svg path { fill: none; stroke: var(--vga-14); stroke-width: 1.5; }
+  @media (max-width: 1023px) { .dc { grid-template-columns: minmax(0, 1fr); } .dc-scr { max-width: 360px; } }
+  @media (max-width: 640px) {
+    .dc-chain { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 22px; }
+    .dc-chain > div:nth-child(3)::before { left: auto; right: calc(100% - 50%); top: -19px; translate: 50% 0; rotate: 90deg; }
+  }
+  @media (prefers-reduced-motion: reduce) { .dc-chain > div, .dc-chain > div::before { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { fonts, render } from '../arabart/core.ts';
+  import { S1 } from './demo.ts';
+  import { frame, stamp, show, reduce } from './vga.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-democall]').forEach(async vis => {
+    const bin = await fonts();
+    const root = document.getElementById(vis.dataset.for!)!;
+    const hops = [...vis.querySelectorAll<HTMLElement>('[data-hop]')];
+    const fn = vis.querySelector<HTMLElement>('[data-fn]')!, packet = vis.querySelector<HTMLElement>('[data-packet]')!, ans = vis.querySelector<HTMLElement>('[data-ans]')!;
+    const canvas = vis.querySelector<HTMLCanvasElement>('canvas')!, mark = vis.querySelector<SVGSVGElement>('[data-mark]')!;
+    // The first column of screen 1, as his loop draws it: font 1, colors 4 to 15
+    const imgs = Array.from({ length: 12 }, (_, i) => render(bin, S1, { font: 1, color: i + 4, x: 630 }));
+    const f = frame(640, 240), view = frame(240, 240);
+    let lines = -1, lastHop = -1;
+    const paint = (n: number) => {
+      f.data.fill(0);
+      imgs.slice(0, Math.min(n, 12)).forEach((img, i) => stamp(f, img, 630, 18 * (i + 1)));
+      for (let y = 0; y < 240; y++) view.data.set(f.data.subarray(y * 640 + 400, y * 640 + 640), y * 240);
+      show(canvas, view);
+      mark.innerHTML = n >= 13 ? `<path d="M466 222 V232 H630 V222"/><text x="548" y="226" text-anchor="middle">164 px</text><text x="470" y="200">x = 466: next column</text>` : '';
+    };
+    root.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail;
+      hops.forEach((h, i) => {
+        h.classList.toggle('now', i === step.hop);
+        h.classList.toggle('on', i < step.hop || (step.hop === 3 && i === 2));
+        h.classList.toggle('lit', i <= step.hop);
+      });
+      fn.textContent = step.fn || 'ar_…()';
+      packet.textContent = step.packet || '…';
+      ans.textContent = step.ans || '…';
+      if (step.lines !== lines) { lines = step.lines; paint(lines); }
+      if (step.hop !== lastHop && how !== 'jump' && !reduce()) gsap.fromTo(hops[step.hop], { scale: 0.96 }, { scale: 1, duration: 0.35, ease: 'back.out(3)' });
+      lastHop = step.hop;
+    });
+    const i = (root as HTMLElement & { stepper?: { i: number } }).stepper?.i ?? 0;
+    root.dispatchEvent(new CustomEvent('stepper', { detail: { i, step: JSON.parse(root.querySelector('[data-trace]')!.textContent!)[i], how: 'jump' } }));
+  });
+</script>

@@ -1,0 +1,105 @@
+---
+// SCREEN.COM running live: his real 3,262-byte script played by the JS port of his 156-byte player, stroke by stroke,
+// then line 3 again and again in the next color until a key is pressed. Without JS: the finished screen.
+import Window from '../../../shell/Window.astro';
+import { Player, SCRIPT, W, H } from './player.ts';
+import { memSync, png } from '../ssr.ts';
+import './player.css';
+
+const b = memSync('SCREEN_SCREEN.COM');
+const p = new Player(b, SCRIPT.screen);
+p.run();
+const still = png(p.pix, W, H);
+// His exit text, printed by DOS from 0E65 up to the '$'
+const at = 0xe65 - 0x100;
+const credit = String.fromCharCode(...b.slice(at, b.indexOf(0x24, at))).replace(/\r/g, '');
+---
+
+<div class="gp gp-live" data-gp-live>
+  <Window title={'C:\\SCREEN\\SCREEN.COM'} kind="screen" active>
+    <div class="gp-crt gp-box">
+      <img src={still} width={W} height={H} alt="His screen: محافظة بورسعيد, مركز المعلومات و التوثيق and إدارة الحاسب الآلى in three lines, red, yellow and cyan, on black." data-still />
+      <canvas hidden aria-hidden="true"></canvas>
+      <pre class="gp-text" hidden data-text>{credit}</pre>
+    </div>
+    <p slot="status" class="gp-stat" data-stat>Three lines, 1,135 strokes, drawn by 156 bytes of code.</p>
+  </Window>
+  <div class="gp-ctl" hidden>
+    <button type="button" class="button button--primary k-btn" data-act="run" aria-pressed="true"><span data-label>Pause</span></button>
+    <button type="button" class="button k-btn" data-act="again">Draw it again</button>
+    <button type="button" class="button k-btn" data-act="key">Press a key</button>
+  </div>
+</div>
+
+<script>
+  import { Player, SCRIPT } from './player.ts';
+  import { Screen, loop, reduce } from './screen.ts';
+  import { mem } from '../ega.ts';
+
+  document.querySelectorAll<HTMLElement>('[data-gp-live]').forEach(async root => {
+    const b = await mem('SCREEN_SCREEN.COM');
+    const canvas = root.querySelector('canvas')!, img = root.querySelector<HTMLImageElement>('[data-still]')!;
+    const text = root.querySelector<HTMLElement>('[data-text]')!, stat = root.querySelector<HTMLElement>('[data-stat]')!;
+    const runBtn = root.querySelector<HTMLButtonElement>('[data-act="run"]')!, label = runBtn.querySelector('[data-label]')!;
+    const scr = new Screen(canvas);
+    let p: Player, line = 1, frames = 0, phase: 'draw' | 'cycle' | 'text' = 'draw';
+    const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0') + 'h';
+    const fmt = (n: number) => n.toLocaleString('en-US');
+
+    const fresh = () => {
+      p = new Player(b, SCRIPT.screen);
+      p.onPlot = (x, y, c) => scr.set(x, y, c);
+      scr.clear(); scr.flush();
+      line = 1; frames = 0; phase = 'draw';
+      text.hidden = true;
+    };
+    const say = () => {
+      stat.textContent = phase === 'draw'
+        ? `Line ${line} of 3 · stroke ${fmt(p.strokes)} · byte ${fmt(p.si - SCRIPT.screen)} of 3,262`
+        : phase === 'cycle' ? `Line 3 again, color ${hex(p.p.color)} · frame ${frames} · waiting for a key` : 'K E M Y A M: his name, printed when you press a key';
+    };
+    // Runs n strokes; returns true when a frame ended
+    const advance = (n: number) => {
+      while (n > 0) {
+        const e = p.step();
+        if (!e) return true;
+        if (e.t === 'header') line++;
+        if (e.t === 'stroke') n--;
+        if (e.t === 'frame') { frames++; if (phase === 'draw') phase = 'cycle'; return true; }
+      }
+      return false;
+    };
+    const anim = loop(root, () => {
+      if (phase === 'text') return false;
+      advance(phase === 'draw' ? 7 : 12);
+      scr.flush(); say();
+    });
+    const setRun = (on: boolean) => {
+      runBtn.setAttribute('aria-pressed', String(on));
+      label.textContent = reduce() ? 'Next color' : on ? 'Pause' : 'Run';
+      on ? anim.start() : anim.stop();
+    };
+    const finishFirstPass = () => { while (phase === 'draw') advance(Infinity); scr.flush(); say(); };
+
+    fresh();
+    canvas.hidden = false; img.hidden = true;
+    root.querySelector<HTMLElement>('.gp-ctl')!.hidden = false;
+    if (reduce()) { finishFirstPass(); setRun(false); } else setRun(true);
+
+    root.addEventListener('click', e => {
+      const act = (e.target as Element).closest<HTMLElement>('[data-act]')?.dataset.act;
+      if (act === 'run') {
+        if (phase === 'text') fresh();
+        if (reduce()) { if (phase === 'draw') finishFirstPass(); else { advance(Infinity); scr.flush(); say(); } return; }
+        setRun(!anim.on);
+      } else if (act === 'again') {
+        fresh();
+        if (reduce()) finishFirstPass(); else setRun(true);
+      } else if (act === 'key') {
+        setRun(false);
+        phase = 'text'; text.hidden = false; say();
+        label.textContent = reduce() ? 'Next color' : 'Run';
+      }
+    });
+  });
+</script>

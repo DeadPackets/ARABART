@@ -1,0 +1,128 @@
+---
+// What a bilingual text displayer does: Arabic runs right to left, English left to right, and one line mixes both.
+// Memory keeps words in the order they were typed; the screen shows them in reading order. Step through the typing
+// and watch each word fly to its place on the screen. Word order follows the Unicode bidi rules for these lines.
+import Window from '../../shell/Window.astro';
+import Scrubber from '../Scrubber.astro';
+
+type Tok = [string, 'R' | 'L'];
+const LINES: { label: string; en: string; toks: Tok[] }[] = [
+  { label: 'Hello from Cairo', en: 'Hello, Yasser Awad, from Cairo', toks: [['مرحبا', 'R'], ['Yasser', 'L'], ['Awad', 'L'], ['من', 'R'], ['القاهرة', 'R']] },
+  { label: 'Windows in Arabic', en: 'Write in Arabic on Windows 3.1', toks: [['اكتب', 'R'], ['بالعربي', 'R'], ['على', 'R'], ['Windows', 'L'], ['3.1', 'L']] },
+  { label: 'Ready to print', en: 'The file report.doc is ready to print', toks: [['الملف', 'R'], ['report.doc', 'L'], ['جاهز', 'R'], ['للطباعة', 'R']] },
+];
+// Right-to-left line: runs of one direction swap places; inside an Arabic run the words also read right to left
+function visual(toks: Tok[], k: number) {
+  const idx = toks.slice(0, k).map((t, i) => ({ i, d: t[1] }));
+  const runs: { d: string; is: number[] }[] = [];
+  for (const t of idx) (runs.at(-1)?.d === t.d ? runs.at(-1)!.is.push(t.i) : runs.push({ d: t.d, is: [t.i] }));
+  return runs.reverse().flatMap(r => (r.d === 'R' ? [...r.is].reverse() : r.is));
+}
+const L0 = LINES[0];
+const order = visual(L0.toks, L0.toks.length);
+---
+
+<div class="bd" data-bidi data-lines={JSON.stringify(LINES)}>
+  <div class="bd-pick" role="radiogroup" aria-label="Pick a line">
+    {LINES.map((l, i) => <button type="button" role="radio" class="button k-btn" aria-checked={String(i === 0)} tabindex={i === 0 ? 0 : -1} data-line={i}>{l.label}</button>)}
+  </div>
+  <Window title="In memory: the order you typed" kind="editor" class="bd-mem">
+    <ol class="bd-row bd-row--mem" data-mem>
+      {L0.toks.map(([w, d], i) => <li class:list={['bd-w', d]} data-i={i}><small>{i + 1}</small><span lang={d === 'R' ? 'ar' : 'en'} dir={d === 'R' ? 'rtl' : 'ltr'}>{w}</span></li>)}
+    </ol>
+  </Window>
+  <Window title="On screen: how the line reads" kind="editor" active class="bd-scr">
+    <ol class="bd-row bd-row--scr" data-scr>
+      {order.map(i => { const [w, d] = L0.toks[i]; return <li class:list={['bd-w', d]} data-i={i}><small>{i + 1}</small><span lang={d === 'R' ? 'ar' : 'en'} dir={d === 'R' ? 'rtl' : 'ltr'}>{w}</span></li>; })}
+    </ol>
+    <p class="bd-en" data-en>“{L0.en}”. Read it from the right. Arabic words go right to left; the English words keep their own order inside.</p>
+  </Window>
+  <Scrubber n={L0.toks.length + 1} at={L0.toks.length} label="Type the line one word at a time" />
+</div>
+
+<style>
+  .bd { display: grid; gap: 16px; }
+  .bd-pick { display: flex; flex-wrap: wrap; gap: 10px; }
+  .bd-row { list-style: none; margin: 0; padding: 4px 0; display: flex; flex-wrap: wrap; gap: 8px; min-height: 64px; align-items: stretch; }
+  .bd-row--scr { justify-content: flex-end; }
+  .bd-w { position: relative; display: grid; place-items: center; min-width: 56px; padding: 14px 12px 8px; border: 1px solid var(--w-black); }
+  .bd-w.R { background: #ffffc0; }
+  .bd-w.L { background: #c0e0ff; }
+  .bd-w span { font: 600 1.25rem/1.2 var(--sans); color: var(--w-black); }
+  .bd-w span[lang='ar'] { font: 700 1.375rem/1.2 var(--ar); }
+  .bd-w small { position: absolute; top: 2px; left: 4px; font: 600 10px/1 var(--font-code); color: oklch(0.4 0 0); }
+  .bd-w.gone { display: none; }
+  .bd-en { margin-top: 12px; font: 400 0.9375rem/1.5 var(--sans); color: var(--ink-2); }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { Flip } from 'gsap/Flip';
+  import { scrubber, type How } from '../scrubber';
+
+  gsap.registerPlugin(Flip);
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  type Tok = [string, 'R' | 'L'];
+  function visual(toks: Tok[], k: number) {
+    const runs: { d: string; is: number[] }[] = [];
+    toks.slice(0, k).forEach((t, i) => (runs.at(-1)?.d === t[1] ? runs.at(-1)!.is.push(i) : runs.push({ d: t[1], is: [i] })));
+    return runs.reverse().flatMap(r => (r.d === 'R' ? [...r.is].reverse() : r.is));
+  }
+  const chip = ([w, d]: Tok, i: number) =>
+    `<li class="bd-w ${d}" data-i="${i}" data-flip-id="${i}"><small>${i + 1}</small><span lang="${d === 'R' ? 'ar' : 'en'}" dir="${d === 'R' ? 'rtl' : 'ltr'}">${w}</span></li>`;
+
+  document.querySelectorAll<HTMLElement>('[data-bidi]').forEach(root => {
+    const LINES = JSON.parse(root.dataset.lines!) as { label: string; en: string; toks: Tok[] }[];
+    const mem = root.querySelector<HTMLElement>('[data-mem]')!, scr = root.querySelector<HTMLElement>('[data-scr]')!;
+    const en = root.querySelector<HTMLElement>('[data-en]')!;
+    const radios = [...root.querySelectorAll<HTMLButtonElement>('[data-line]')];
+    let line = 0;
+    // Copy the scoped-style attribute onto chips built in the browser
+    const scope = [...mem.attributes].find(a => a.name.startsWith('data-astro-cid'))?.name;
+
+    const build = () => {
+      const toks = LINES[line].toks;
+      mem.innerHTML = toks.map(chip).join('');
+      scr.innerHTML = toks.map(chip).join('');
+      if (scope) root.querySelectorAll('.bd-w, .bd-w *').forEach(el => el.setAttribute(scope, ''));
+      en.textContent = `“${LINES[line].en}”. Read it from the right. Arabic words go right to left; the English words keep their own order inside.`;
+    };
+    const show = (k: number, how: How) => {
+      const toks = LINES[line].toks;
+      const state = Flip.getState(scr.querySelectorAll('.bd-w'));
+      mem.querySelectorAll<HTMLElement>('.bd-w').forEach((el, i) => el.classList.toggle('gone', i >= k));
+      const order = visual(toks, k);
+      const items = [...scr.querySelectorAll<HTMLElement>('.bd-w')];
+      items.forEach(el => el.classList.toggle('gone', !order.includes(+el.dataset.i!)));
+      order.forEach(i => scr.append(items.find(el => +el.dataset.i! === i)!));
+      if (how !== 'jump' && !reduce()) Flip.from(state, { duration: 0.5, ease: 'power3.inOut', onEnter: els => gsap.fromTo(els, { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.35 }) });
+    };
+
+    build();
+    const s = scrubber(root.querySelector<HTMLElement>('[data-scrub]')!, show, { speed: 0.8 });
+    const pick = (i: number) => {
+      line = i;
+      radios.forEach((r, k) => { r.setAttribute('aria-checked', String(k === i)); r.tabIndex = k === i ? 0 : -1; });
+      build();
+      s.resize(LINES[i].toks.length + 1, 0);
+      if (!reduce()) s.play(); else s.go(LINES[i].toks.length, 'jump');
+    };
+    radios.forEach((r, i) => {
+      r.addEventListener('click', () => pick(i));
+      r.addEventListener('keydown', e => {
+        const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (!d) return;
+        e.preventDefault();
+        const t = (i + d + radios.length) % radios.length;
+        pick(t); radios[t].focus();
+      });
+    });
+    show(s.i, 'jump');
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      if (!reduce()) { s.go(0, 'jump'); s.play(); }
+    }, { threshold: 0.6 });
+    io.observe(root);
+  });
+</script>

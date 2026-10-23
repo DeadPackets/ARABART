@@ -1,0 +1,66 @@
+<svg class="dg" viewBox="0 0 640 326" role="img" aria-labelledby="scr-patch-t">
+<title id="scr-patch-t">The five header bytes of line 1 and the five places in the player code where they are written: two step opcodes, a jump offset and two colors.</title>
+<text class="t-cy" x="10" y="22">Line 1 header</text>
+<text class="t-cy" x="150" y="22">written into the player</text>
+<rect class="box-hi" x="10" y="36" width="56" height="30" />
+<text class="t-bk" x="38" y="57" text-anchor="middle">4B</text>
+<path class="wire-hi arrow" d="M66 51 H138" />
+<text x="150" y="57">013B</text>
+<text x="206" y="57">dec bx</text>
+<text class="t-cy" x="360" y="57">'x': one column left</text>
+<rect class="box-hi" x="10" y="78" width="56" height="30" />
+<text class="t-bk" x="38" y="99" text-anchor="middle">43</text>
+<path class="wire-hi arrow" d="M66 93 H138" />
+<text x="150" y="99">0143</text>
+<text x="206" y="99">inc bx</text>
+<text class="t-cy" x="360" y="99">'w': one column right</text>
+<rect class="box-hi" x="10" y="120" width="56" height="30" />
+<text class="t-bk" x="38" y="141" text-anchor="middle">00</text>
+<path class="wire-hi arrow" d="M66 135 H138" />
+<text x="150" y="141">0180</text>
+<text x="206" y="141">jmp +00</text>
+<text class="t-cy" x="360" y="141">draw the shadow</text>
+<rect class="box-hi" x="10" y="162" width="56" height="30" />
+<text class="t-bk" x="38" y="183" text-anchor="middle">07</text>
+<path class="wire-hi arrow" d="M66 177 H138" />
+<text x="150" y="183">0179</text>
+<text x="206" y="183">mov ax,0C07h</text>
+<text class="t-cy" x="360" y="183">stroke color 7</text>
+<rect class="box-hi" x="10" y="204" width="56" height="30" />
+<text class="t-bk" x="38" y="225" text-anchor="middle">04</text>
+<path class="wire-hi arrow" d="M66 219 H138" />
+<text x="150" y="225">0182</text>
+<text x="206" y="225">mov ax,0C04h</text>
+<text class="t-cy" x="360" y="225">shadow color 4</text>
+<text x="10" y="262">Line 2: 4B 43 0D 0E 0E  shadow off, yellow</text>
+<text x="10" y="288">Line 3: 4B 43 0D 03 0E  shadow off, cyan</text>
+<text class="t-yl" x="10" y="314">0Dh makes the jump skip the shadow code.</text>
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 410" role="img" aria-labelledby="scr-patch-tn">
+<title id="scr-patch-tn">Each header byte and the instruction it changes.</title>
+<text class="t-cy" x="10" y="18">Line 1 header, and where</text>
+<text class="t-cy" x="10" y="40">each byte goes</text>
+<rect class="box-hi" x="10" y="54" width="44" height="28" />
+<text class="t-bk" x="32" y="74" text-anchor="middle">4B</text>
+<text x="66" y="74">013B: dec bx</text>
+<text class="t-cy" x="66" y="96">x: one column left</text>
+<rect class="box-hi" x="10" y="110" width="44" height="28" />
+<text class="t-bk" x="32" y="130" text-anchor="middle">43</text>
+<text x="66" y="130">0143: inc bx</text>
+<text class="t-cy" x="66" y="152">w: one column right</text>
+<rect class="box-hi" x="10" y="166" width="44" height="28" />
+<text class="t-bk" x="32" y="186" text-anchor="middle">00</text>
+<text x="66" y="186">0180: jmp +00</text>
+<text class="t-cy" x="66" y="208">draw the shadow</text>
+<rect class="box-hi" x="10" y="222" width="44" height="28" />
+<text class="t-bk" x="32" y="242" text-anchor="middle">07</text>
+<text x="66" y="242">0179: mov ax,0C07h</text>
+<text class="t-cy" x="66" y="264">stroke color 7</text>
+<rect class="box-hi" x="10" y="278" width="44" height="28" />
+<text class="t-bk" x="32" y="298" text-anchor="middle">04</text>
+<text x="66" y="298">0182: mov ax,0C04h</text>
+<text class="t-cy" x="66" y="320">shadow color 4</text>
+<text x="10" y="350">Line 2: 4B 43 0D 0E 0E</text>
+<text x="10" y="374">Line 3: 4B 43 0D 03 0E</text>
+<text class="t-yl" x="10" y="398">0Dh skips the shadow.</text>
+</svg>

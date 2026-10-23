@@ -1,0 +1,87 @@
+---
+import Term from '../components/explain/Term.astro';
+import Figure from '../components/explain/Figure.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Listing from '../components/explain/Listing.astro';
+import Deep from '../components/explain/Deep.astro';
+// Offsets in the unpacked PESM.EXE: 48-byte header, then segment 0
+const map = (at: number) => `/DOSArchive/bytes/?f=PESM_PESM.EXE&layer=memory&at=${(0x30 + at).toString(16)}`;
+---
+
+<section id="pm-tldr">
+  <ul class="tldr">
+    <li>PESM.EXE draws بسم الله الرحمن الرحيم ("In the name of God, the Most Gracious, the Most Merciful") 16 times, in every mix of bold, underline and italic, at two sizes.</li>
+    <li>It carries its own copy of his ARABART Arabic engine, so it runs with nothing installed first.</li>
+    <li>That copy matches ARABART 4.15 (1993) byte for byte in its letter shapes and shaping code.</li>
+  </ul>
+</section>
+
+<section id="pm-engine">
+  <h2>Where does PESM get its Arabic from?</h2>
+  <p class="lead">From a copy of the ARABART engine built into the program itself, not from the ARABART driver in memory.</p>
+  <Figure title="PESM.EXE next to ARABART.EXE" caption="Measured: the yellow blocks are identical in both files. Lines join each block to its twin.">
+    @@pm-shared@@
+  </Figure>
+  <p>ARABART normally runs as a <Term id="tsr">TSR</Term>: you load it once, and programs call it through <Term id="int-10h">INT 10h</Term> with <code>AH = 36h</code>. PESM sets up the same registers (<code>AH = 36h</code>, <code>AL</code> color, <code>CX</code> x, <code>BX</code> y, <code>DS:DX</code> text) and then makes a plain <code>CALL</code> to its own copy at 0284. That is <Term id="static-linking">static linking</Term>, done by hand in Assembly.</p>
+  <p>Why it matters: PESM runs on any VGA PC with nothing loaded first, which is why the museum runs it without ARABART. It also dates the engine. The museum's notes date PESM to 1991; if that is right, his letter shapes and shaping code were finished by 1991 and did not change a byte by ARABART 4.15 in 1993.</p>
+</section>
+
+<section id="pm-shaping">
+  <h2>How do typed keys become joined Arabic?</h2>
+  <p class="lead">The text is stored as the keys of an Arabic keyboard. A table turns each key into a glyph code whose top two bits say which sides can join, and one pass clears the bits where a neighbor cannot join.</p>
+  <Figure title="fsl hggi: keys to letter forms" caption="Codes from PESM's table at CS:09FB and from its shaper. The forms row shows each letter's joined shape.">
+    @@pm-keys@@
+  </Figure>
+  <p><code>fsl hggi</code> is بسم الله typed on a US keyboard as if it had Arabic key caps: f is ب, s is س, l is م. The table stores each letter in its most-joining form. Then two neighbors stay joined only if the first can reach left (bit 80h) and the next can reach right (bit 40h); otherwise both lose that bit. The two bits left over pick the start, middle, end or alone form of each <Term id="glyph">glyph</Term>. This is <Term id="auto-shaping">auto-shaping</Term> in one short loop, explained in full on the <a href="/ARABART/arabart/">ARABART page</a>.</p>
+  <Deep title="For engineers: the entry point PESM calls">
+    <Listing
+      title="PESM.EXE 0000:0284"
+      lines={[
+        { off: '0284', code: 'mov  cs:[05B9h], ds / mov cs:[05BBh], dx', note: 'where the text is' },
+        { off: '028E', code: 'mov  cs:[05C7h], al', note: 'color' },
+        { off: '0292', code: 'mov  cs:[05BFh], bx / mov cs:[05BDh], cx', note: 'y and x' },
+        { off: '02A7', code: 'mov  dl, [di] / cmp dl, 0 / je 02BD', note: 'each key, up to the 0 byte' },
+        { off: '02AE', code: 'mov  si, dx / sub si, 20h' },
+        { off: '02B3', code: 'mov  al, cs:[si+09FBh]', note: 'key to glyph code', hi: true },
+        { off: '02B8', code: 'mov  [di], al / inc di', note: 'written back over the text' },
+        { off: '02C4', code: '(136 bytes identical to ARABART 0238)', note: 'the shaping pass' },
+      ]}
+      foot="The engine overwrites each string with glyph codes as it draws, so the same string cannot simply be drawn twice."
+    />
+    <p>Pixels go straight into VGA memory (mode 12h, 640 by 480) through the <Term id="graphics-controller">graphics controller</Term>: <Term id="set-reset">Set/Reset</Term> holds the color and the <Term id="bit-mask">bit mask</Term> picks the pixel. <a href={map(0x284)}>See the engine in the map</a>.</p>
+  </Deep>
+</section>
+
+<section id="pm-calls">
+  <h2>Why 16 copies of the same sentence?</h2>
+  <p class="lead">PESM is a test card. Each column draws all 8 mixes of bold, underline and italic: normal size on the right, double size on the left.</p>
+  <Figure title="The 16 calls in PESM's main code" caption="y position, color (AL), the style keys in front of each string and the switches they leave on. Measured from the code at 0000:0007 to 00F7.">
+    @@pm-calls@@
+  </Figure>
+  <p>Style keys sit inside the text: <code>@</code> flips bold, <code>#</code> underline, <code>!</code> italic, <code>$</code> double size and <code>*</code> resets. The switches stay set from one call to the next, so the prefixes <code>@</code>, <code>@#</code>, <code>@</code>, <code>@#!</code>, <code>@</code>, <code>@#</code>, <code>@</code> count in binary from 000 to 111. The second column starts with <code>*$</code> and counts again at double size.</p>
+  <p>The main code is 16 copies of the same five instructions (set DX, AX, CX, BX, then call), with no loop. Call 15 uses yellow (0Eh) where its twin, call 7, uses white (0Fh), likely a slip.</p>
+</section>
+
+<section id="pm-now">
+  <h2>What would this be in 2026?</h2>
+  <p class="lead">A statically linked text renderer and a visual test page.</p>
+  <ThenNow
+    rows={[
+      { then: 'The ARABART engine copied into PESM.EXE', now: 'Static linking, as in Go and Rust programs', why: 'One file that runs anywhere, at the cost of a copy in every program.' },
+      { then: 'The same AH = 36h registers for the driver and the built-in copy', now: 'One API with two backends', why: 'Code written for one works with the other after a one-instruction change: CALL or INT 10h.' },
+      { then: 'Arabic typed as keyboard keys, shaped with 2 bits per letter', now: 'Unicode text shaped by HarfBuzz with OpenType tables', why: "Same job: choose each letter's joined form from its neighbors." },
+      { then: 'Every style mix drawn once on one screen', now: 'A visual regression test, or a font specimen page', why: 'Draw every combination and look for the broken one.' },
+    ]}
+  />
+</section>
+
+<section id="pm-him">
+  <h2>What this tells us about him</h2>
+  <p class="lead">He built his Arabic engine early, carried it from program to program, and tested it systematically.</p>
+  <ul>
+    <li><strong>Engine first:</strong> the same letter shapes and shaper appear here and in ARABART 4.15, byte for byte.</li>
+    <li><strong>Systematic testing:</strong> 16 calls that walk through every style mix at two sizes.</li>
+    <li><strong>Direct hardware work:</strong> pixels through the VGA graphics controller, not through the BIOS.</li>
+    <li><strong>Weak spots:</strong> it exits without going back to text mode, so the DOS prompt prints over the picture; a dead <code>RET</code> follows the exit call; there is no stack segment; two strings in the data area (his name and "مركز النور للكومبيوتر") are never drawn, likely left from another program.</li>
+  </ul>
+</section>

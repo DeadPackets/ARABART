@@ -1,0 +1,136 @@
+---
+// WINKEY.EXE + MENU2.DAT (1992): the first demo of his window toolkit. Facts: research/programs.md (section 6),
+// research/artifacts/programs/editors/NOTES.txt and winkey_all.asm, programs/WINKEY/MENU2.DAT. Every screen on this
+// page is redrawn from his button table (CS:09B2) and MENU2.DAT by src/components/toys/tools/wk.ts.
+import Term from '../components/explain/Term.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Listing from '../components/explain/Listing.astro';
+import WkPanel from '../components/toys/tools/WkPanel.astro';
+import WkBevel from '../components/toys/tools/WkBevel.astro';
+import WkWrite from '../components/toys/tools/WkWrite.astro';
+import WkLoop from '../components/toys/tools/WkLoop.astro';
+import WkIcons from '../components/toys/tools/WkIcons.astro';
+import WkMod8 from '../components/toys/tools/WkMod8.astro';
+import '../components/toys/tools/tools.css';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<section id="wk-button" class="wk-sec">
+  <h2>Eight buttons that press themselves</h2>
+  <p class="lead">In 1992 Yasser began his own window toolkit for DOS, inspired by the new look of Windows. This is its first demo: a panel of 8 icon buttons, and each one presses itself 11 times.</p>
+  <p>DOS programs had no buttons with depth, so he drew his own. The bevels, the icons and the press are all his code, talking straight to the <Term id="ega">EGA</Term> graphics card: 640 × 350 pixels in 16 colors. Run the demo, or press a button yourself.</p>
+  <div class="wk-toy"><WkPanel /></div>
+  <div class="wk-cols">
+    <p>Every press is two calls in his <code>main</code>: draw the button in its pressed style, then draw its icon 2 pixels lower and 2 pixels to the right. Then the raised style, and the icon back in place. That small shift is the whole trick. The eye reads it as a key going down, the same thing a web page does with <code>:active {'{'} translate: 2px 2px {'}'}</code>.</p>
+    <p>The screen above is not a screenshot. Your browser redraws it from his button table and his icon file, and it matches the screen his own program draws, pixel for pixel. 177 buttons in all: the panel, then 8 buttons pressed and raised 11 times each.</p>
+  </div>
+</section>
+
+<section id="wk-made" class="wk-sec">
+  <h2>Light from the top left</h2>
+  <p class="lead">A flat screen shows depth with two colors: light on the top and left edges, shadow on the bottom and right. Swap them, and the button sinks.</p>
+  <div class="wk-toy"><WkBevel /></div>
+  <div class="wk-cols">
+    <p>His button routine reads a small table stored inside WINKEY.EXE. It holds 6 styles. Each style is a list of rings from the outside in. Each ring is 2 bytes: the color for the top and left edges, then the color for the bottom and right. A byte of <Term id="hex">10h</Term> ends the list, and one fill paints the face. A whole look is a few bytes of data, like a CSS rule: <code>border-style: outset</code> raises a box and <code>inset</code> sinks it.</p>
+    <p>Pick another face color and the light follows. His routine moves every ring color except black and dark gray by the same step as the face. So white turns into the bright version of the face color. One table serves a gray button, a blue one or a green one.</p>
+  </div>
+  <h3>A toolkit in 15 routines</h3>
+  <p>WINKEY is a C program, built with <Term id="turbo-c">Turbo C++</Term>. Its library is 15 small C functions whose insides are his own assembly, <Term id="inline-asm">written inline</Term>. The compiler adds the first and last lines of each one, and everything in between is Yasser talking to the card. The library already holds routines for menus and selections that this demo does not need yet. It can save the screen under a menu and put it back. It can draw an <Term id="xor-drawing">XOR</Term> highlight, fill a checkerboard, outline a rectangle and work out the size of a saved area.</p>
+  <ThenNow
+    title="His library, and the same jobs in a browser"
+    era="1992"
+    rows={[
+      { then: '<b>bar</b>: fill a rectangle with one color', now: '<code>ctx.fillRect()</code> on a canvas', why: 'Set the color once, then paint an area.' },
+      { then: '<b>save</b> and <b>restore</b> an area of the screen', now: '<code>getImageData()</code> and <code>putImageData()</code>', why: 'Keep the pixels under a menu, put them back when it closes.' },
+      { then: '<b>icon</b>: a picture from MENU2.DAT', now: '<code>drawImage()</code> from a sprite sheet', why: 'The art lives in its own file, loaded once.' },
+      { then: '<b>XOR highlight</b>', now: '<code>globalCompositeOperation = "difference"</code>', why: 'Draw it twice and the screen is back as it was.' },
+      { then: '<b>button</b>: rings of light and shadow, then the face', now: 'CSS <code>border-style: outset</code> and <code>inset</code>', why: 'The same light-and-shadow idea, now one line.' },
+    ]}
+  />
+  <Deep title="For engineers: the 15 routines">
+    <Listing
+      title="WINKEY.EXE, his library (offsets in the code segment)"
+      lines={[
+        { off: '0239', code: 'load MENU2.DAT', note: 'DOS open, read 4,000 bytes, close' },
+        { off: '027C', code: 'icon', note: 'runs from MENU2.DAT, one write per byte', hi: true },
+        { off: '0353', code: 'reset the Graphics Controller', note: 'Set/Reset off, Bit Mask FFh' },
+        { off: '0363', code: 'color', note: 'Set/Reset = the color, all 4 planes' },
+        { off: '037B', code: 'area size', note: 'bytes to save a rectangle: w × h ÷ 2 + 10' },
+        { off: '03BE', code: 'allocate', note: 'DOS memory, bytes rounded up to 16' },
+        { off: '03EA', code: 'save area', note: 'copies each of the 4 planes out' },
+        { off: '047B', code: 'restore area', note: 'writes them back, plane by plane' },
+        { off: '04D7', code: 'free', note: 'DOS memory' },
+        { off: '04E3', code: 'XOR highlight', note: 'flips the brightness plane' },
+        { off: '05BA', code: 'bar', note: 'a filled rectangle' },
+        { off: '066F', code: 'checkerboard', note: 'every other pixel' },
+        { off: '0765', code: 'line', note: 'horizontal or vertical' },
+        { off: '085C', code: 'rectangle', note: 'four lines' },
+        { off: '08A3', code: 'button', note: 'rings from the table at 09B2, then a bar', hi: true },
+      ]}
+      foot="The names are plain descriptions of what each routine does. The style table at 09B2 holds 16 bytes per style: 10h flat, 20h sunken, 30h raised, 40h panel, 50h pressed, 60h released."
+    />
+  </Deep>
+</section>
+
+<section id="wk-pixels" class="wk-sec">
+  <h2>One write, up to eight pixels</h2>
+  <p class="lead">On the EGA card a pixel lives in four places at once. Yasser makes the card do the four-way work for him, eight pixels at a time.</p>
+  <div class="wk-cols">
+    <p>The card keeps the screen in 4 layers called <Term id="bit-planes">bit planes</Term>: one for blue, one for green, one for red and one for brightness. Think of 4 sheets of tracing paper over one drawing. A pixel's color is one bit from each sheet, and each byte of a sheet covers 8 pixels side by side.</p>
+    <p>So he sets the card up once. Its <Term id="set-reset">Set/Reset</Term> setting holds the color for all 4 sheets. Its <Term id="bit-mask">Bit Mask</Term> says which of the 8 pixels may change, like a stencil. Then he reads the byte, so the card keeps a copy of what is already there in its <Term id="latches">latches</Term>, and writes it back. Every pixel inside the stencil takes the color, on all 4 sheets, and the rest stay as they were. Try both ways below.</p>
+  </div>
+  <div class="wk-toy"><WkWrite /></div>
+  <h3>His loop, line by line</h3>
+  <p>This is the loop that paints every icon. Here it runs on the first run of the DOS logo: skip 25 pixels from the right edge, then paint 9 in light red. It walks left, adds each pixel to the mask, and writes only when it reaches the left end of a byte. Step through it, or press Run.</p>
+  <div class="wk-toy"><WkLoop /></div>
+  <Deep title="For engineers: setting up the card">
+    <Listing
+      title="WINKEY.EXE, the icon routine (0000:02AC), on every new color"
+      lines={[
+        { off: '02AC', code: 'mov  al,[si] / inc si', note: 'the color byte from MENU2.DAT' },
+        { off: '02B2', code: 'mov  dx,3CEh', note: 'the Graphics Controller' },
+        { off: '02B5', code: 'mov  al,1 / out dx,al', note: 'register 1: Enable Set/Reset' },
+        { off: '02B8', code: 'inc  dx / mov al,0Fh / out dx,al', note: 'all 4 planes take the Set/Reset color', hi: true },
+        { off: '02BC', code: 'dec  dx / xor al,al / out dx,al', note: 'register 0: Set/Reset' },
+        { off: '02C0', code: 'inc  dx / mov al,[bp-1] / out dx,al', note: 'the color itself', hi: true },
+        { off: '030C', code: 'mov  dx,3CEh / mov al,8 / out dx,al', note: 'register 8: the Bit Mask, set once per byte' },
+      ]}
+      foot="Port 3CEh picks a register and 3CFh takes its value. After this, the bytes the CPU writes no longer matter: the card paints the Set/Reset color through the mask. His ARABART engine sets up the card the same way."
+    />
+  </Deep>
+</section>
+
+<section id="wk-icons" class="wk-sec">
+  <h2 class="wk-big">Eight icons, 3,005 bytes</h2>
+  <p class="lead">The pictures on the buttons are not inside the program. They live in MENU2.DAT, a separate file, so new icons need no new code.</p>
+  <p>The file opens with a table of 8 addresses, one per icon, like the index of a sprite sheet. Each icon is a list of runs: skip this many pixels from the right edge, then paint that many to the left. The byte <code>EF</code> moves up one row, <code>FC</code> starts a new color, and <code>FD</code> or more ends the icon. Pick an icon and watch his bytes paint it.</p>
+  <div class="wk-toy"><WkIcons /></div>
+  <div class="wk-cols">
+    <p>The DOS logo takes 251 bytes. As a plain bitmap, 42 × 26 pixels at 4 bits each, it would take 546. The program loads the whole file with three DOS calls, open, read and close, and draws every icon from memory. On the web the same idea is an SVG sprite sheet: one file of pictures, loaded once, each picture found by name.</p>
+    <p>His Arabic engine stores its letters the same way: <Term id="run-length-encoding">runs</Term> counted from the right edge, rows from the bottom up, and the same <code>EF</code> for one row up. Watch a letter paint itself on the <a href={`${base}/arabart/#fonts`}>ARABART page</a>.</p>
+  </div>
+</section>
+
+<section id="wk-fingerprint" class="wk-sec">
+  <h2>A fingerprint of his hand</h2>
+  <p class="lead">To find a pixel, a program needs two numbers from its x: which byte holds it, x ÷ 8, and which bit inside that byte, x mod 8. Yasser gets both from six instructions of his own.</p>
+  <div class="wk-toy"><WkMod8 /></div>
+  <div class="wk-cols">
+    <p>A textbook writes <code>and bx,7</code>, the <code>x &amp; 7</code> of JavaScript. Yasser shifts the 3 low bits out of x, one at a time. Each one falls into the <Term id="carry-flag">carry flag</Term> and slides into a second <Term id="cpu-register">register</Term>, so they arrive in reverse order. His 8-byte table, <code>00 04 02 06 01 05 03 07</code>, turns them back. The same three shifts leave x ÷ 8 behind, so one small loop gives both answers.</p>
+    <p>WINKEY uses it in 5 of its routines: the icon, the bar, the line, the checkerboard and the highlight. The same bytes appear in his Arabic engine, ARABART 4.15, in ARAB-ART 7.15 and in PESM, and in no other program in this archive. Carried from project to project, it marks his code as surely as a signature. <a href={`${base}/arabart/`}>See it at work in ARABART.</a></p>
+  </div>
+</section>
+
+
+<style>
+  .wk-sec .lead { max-width: 52ch; }
+  .wk-toy { margin-top: clamp(24px, 3vw, 36px); }
+  .wk-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(24px, 4vw, 48px); margin-top: 28px; align-items: start; }
+  .wk-cols p { margin-top: 0 !important; }
+  .wk-sec :global(.tn) { margin-top: 28px; }
+  .wk-sec h3 { margin-top: clamp(48px, 6vw, 72px); }
+  .wk-big { font-size: clamp(2.75rem, 4.5vw + 1rem, 5rem) !important; line-height: 0.95 !important; color: var(--accent) !important; max-width: 12ch; }
+  @media (max-width: 760px) { .wk-cols { grid-template-columns: minmax(0, 1fr); } .wk-cols p + p { margin-top: 1em !important; } }
+</style>

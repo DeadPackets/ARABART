@@ -1,0 +1,77 @@
+---
+// TAHER.COM (1991): a calligraphy splash for Dr. Taher Ibrahim El-Sarafy. Facts: research/programs.md section 10,
+// src/data/programs.ts (the family's account) and his unpacked file public/bytes/files/TAHER_TAHER.COM.mem. The name is
+// drawn by src/components/toys/graphics/player/player.ts, which matches his screen pixel for pixel.
+import PenScrub from '../components/toys/graphics/player/PenScrub.astro';
+import SlideShow from '../components/toys/graphics/player/SlideShow.astro';
+import CreditStepper from '../components/toys/graphics/player/CreditStepper.astro';
+import ThenNow from '../components/explain/ThenNow.astro';
+import Deep from '../components/explain/Deep.astro';
+import Listing from '../components/explain/Listing.astro';
+import Term from '../components/explain/Term.astro';
+
+const base = import.meta.env.BASE_URL;
+const screen = `${base}/program/portsaid-it-screensaver/`;
+---
+
+<section id="th-gift">
+  <h2>A name, written by hand in bytes</h2>
+  <p class="lead">Dr. Taher Ibrahim El-Sarafy hired Yasser to write the software that printed his lab's results. Yasser added something nobody asked for: a splash screen with the doctor's name in calligraphy.</p>
+  <p class="th-name" lang="ar" dir="rtl">طاهر ابراهيم الصرفي</p>
+  <p>The name is not a picture file. It is 901 strokes in 2,109 bytes of script, drawn by the same tiny player he wrote for the <a href={screen}>Port Said Governorate screen</a>. Each stroke is a thin line of pixels. Each pixel gets a twin 2 to the right and 2 down, so the letters stand out in red and silver. The pen starts at the right and walks left 297 times, the way Arabic is written. Drag the pen back and forth, or run it.</p>
+  <PenScrub />
+</section>
+
+<section id="th-words">
+  <h2>Two new words</h2>
+  <div class="th-pair">
+    <p class="lead">For this job his player learned two commands. <code>88h</code> clears the screen for the next picture. <code>z</code> ends the show.</p>
+    <p>Both start with the same short pause: 4,096 calls to DOS's “is a key waiting?”, a beat for the eye before the screen changes. Then <code>88h</code> sets the video mode again. That wipes the screen, like clearing a canvas, and the player reads the next picture's header. <code>z</code> goes back to text mode and prints his name. TAHER uses one picture and a <code>z</code>. In the same year he used the same player for a <a href={`${base}/program/arabart-commercial/`}>15-picture advertisement</a> for a Port Said computer center: 14 times <code>88h</code>, then <code>z</code>. Play both.</p>
+  </div>
+  <SlideShow />
+  <p class="th-after">The two programs share their first 241 bytes: the player, the new commands and the signature below. One engine, two scripts, like one slide-show app opening two different decks.</p>
+</section>
+
+<section id="th-sign">
+  <h2>His signature, folded</h2>
+  <p class="lead">Before it draws anything, TAHER runs 19 bytes of code that unfold his name from 65 stored bytes. Each byte, minus a key that starts at 4 and grows by one, becomes a letter.</p>
+  <p>Search the file for YASSER and you find nothing: on disk the name reads <code>4F 25 4B 27 55 29</code>. Only in memory, as the program starts, do the bytes turn into “K E M Y A M Software Corp., &lt;c&gt;1991 YASSER MOHAMED ALI.” DOS prints them when the show ends. This is <Term id="obfuscation">obfuscation</Term>: a string folded so a text search cannot see it, the way a modern app hides strings in its compiled code. Step through it, byte by byte.</p>
+  <CreditStepper />
+  <ThenNow
+    rows={[
+      { then: 'A calligraphy splash and a 15-picture advert on one player', now: 'One slide-show app, many decks', why: 'The engine is written once; every new job is just a new file.' },
+      { then: 'A name stored as bytes minus 4, 5, 6 and on', now: 'A string obfuscated in a compiled app', why: 'Text that a search cannot find, until the program runs.' },
+      { then: 'One command: wait, set the video mode, read the next header', now: 'Clear the canvas and load the next slide', why: 'A fresh screen for every picture.' },
+    ]}
+  />
+  <Deep title="For engineers: the new commands">
+    <Listing
+      title="TAHER.COM 0141 to 01A9"
+      lines={[
+        { off: '0141', code: 'mov  dl,[si] / inc si', note: 'the next script byte, as in SCREEN.COM' },
+        { off: '0144', code: "cmp  dl,'x' ... cmp dl,'y'", note: 'the same x, w and y' },
+        { off: '0159', code: "cmp  dl,'z' / je 0194h", note: 'z: the end', hi: true },
+        { off: '015E', code: 'cmp  dl,88h / je 0189h', note: '88h: the next picture', hi: true },
+        { off: '0163', code: 'mov  dh,0 / add dx,di ...', note: 'anything else is a stroke' },
+        { off: '0189', code: 'mov  cx,1000h', note: '4,096 times:' },
+        { off: '018C', code: 'mov  ah,0Bh / int 21h / loop 018Ch', note: 'is a key waiting?' },
+        { off: '0192', code: 'jmp  0116h', note: 'mode 10h again: a clean screen, then the next header' },
+        { off: '0194', code: 'mov  cx,1000h / ... loop 0197h', note: 'the same pause' },
+        { off: '019D', code: 'mov  ax,3 / int 10h', note: 'text mode' },
+        { off: '01A2', code: 'mov  ah,9 / mov dx,01ABh / int 21h', note: 'print the unfolded signature' },
+        { off: '01A9', code: 'int  20h', note: 'back to DOS' },
+      ]}
+      foot="TAHER.COM is a .COM file, loaded at 0100h. The script starts at 01ECh with the header 4B 43 00 07 04, the same as the first line of the governorate screen."
+    />
+    <p>His x and w moves are swapped in the code itself, <code>inc bx</code> for x and <code>dec bx</code> for w, but the header writes over both before the first stroke, so the pen still walks left. See how the header rewrites the player on the <a href={`${screen}#scr-header`}>governorate screen's page</a>.</p>
+  </Deep>
+</section>
+
+<style>
+  .th-name { margin: 22px 0 8px; font: 700 clamp(2.25rem, 4vw + 1rem, 3.75rem)/1.3 var(--font-ar); color: var(--accent); max-width: none; }
+  .th-pair { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 16px clamp(24px, 4vw, 48px); align-items: start; margin-top: 16px; }
+  .th-pair .lead { margin-top: 0; }
+  .th-pair p + p { margin-top: 0; }
+  .th-after { margin-top: 24px; }
+  @media (max-width: 860px) { .th-pair { grid-template-columns: minmax(0, 1fr); } }
+</style>

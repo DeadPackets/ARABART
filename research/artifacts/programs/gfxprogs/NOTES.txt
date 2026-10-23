@@ -1,0 +1,243 @@
+FORK C NOTES - SUN.EXE, PORTSAID.EXE, NAMES.COM (input for research/programs.md)
+All offsets are in the unpacked images (scratchpad/re/programs/unpacked/), seg:off relative to load segment 0.
+Emulation harness: gfxprogs/ega.py (EGA/VGA planar memory: map mask, write modes 0/1/2/3, read modes 0/1,
+latches, rotate/function, palette + DAC) and gfxprogs/machine.py (IVT with F000 BIOS stubs so programs can hook
+and chain vectors; TSR support; INT 10h AH=0Ch/0Dh pixel I/O). Re-run after the parent's relocation-header fix:
+results unchanged.
+
+==================================================================================================
+NAMES.COM  (Kemyam group splash, 1993)
+==================================================================================================
+GLANCE: Pure hand-written Assembly COM, EGA 320x200x16, plays a sequence of RLE-compressed planar bitmaps
+with wipe effects and introduces the five KEMYAM members, then a text-mode credit with a sparkle.
+
+Toolchain / model [Verified]
+- DIET 1.00 COM; unpacked 59,402 bytes (packed 13,090). Entry 0100: JMP 056F over a 1,048-byte zero block
+  (0(hidden)A) that holds variables and the stack.
+- No C runtime, no compiler string, no c0 startup. README's "C, Assembly" is not supported by the binary:
+  the code is ~1,100 bytes of hand-written 8086 asm (056F-09B7), the rest (~58 KB) is image data.
+- Own stack: 056F  mov ax,cs / mov ss,ax / mov sp,0500h  (stack inside its own zero block).
+- Buffer segment computed from a hard-coded program end: 057D mov bx,0E90Ah ; add 0Fh ; shr x4 ; add ax,bx
+  -> decode buffer placed right after the program in memory (no DOS allocation, no check).
+
+Video / rendering [Verified by emulation + static]
+- INT 10h AX=000Dh (EGA 320x200x16). Writes A000 directly, plane by plane via sequencer map mask (3C4/3C5 idx 2).
+- Images are stored as four separate bitplanes, RLE-compressed. RLE format (decoder 0899):
+    literal bytes; 37h n v = n copies of v; 37h 00 = end, followed by a WORD = plane stride (bytes per plane).
+  Catalogue (names_rle.py): 10 images. Background tile 612->800 B; KEMYAM logo 9930->9920; "Computer Group"
+  5924->5920; logo arc 5272->5264; blue KemYam box 9992->9984; five name boxes 5088->9984 each (ratio 0.51).
+  RLE barely helps the busy pictures (ratio ~1.00, even slight expansion when literal 37h must be escaped);
+  DIET does the real compression (59,402 -> 13,090).
+- Blit 0981: for each plane (map mask 1,2,4,8) rep movsb a rectangle from the buffer, source += plane stride.
+- Timing 0885: waits CX vertical retraces on port 3DAh bit 3 (hardware-timed, CPU independent). Two other
+  delays are CPU-speed busy loops: 0816 mov cx,18FFh/loop $ ; 0920 mov cx,2FFFh / inc ax / inc ax / loop.
+- Effects: 08C4 venetian/strip reveal using a row table; 0904 split reveal from centre; 082E/07B7/0747 slides.
+- Sequence (rendered, names_sequence.png): tile background, KEMYAM, "Computer Group", logo, blue "KemYam" box,
+  then the box alternates with name cards: YASSER MOHAMED ALI, MOHAMED ASAAD FOUDA, KHALID ZAKARIA MOUSTAFA,
+  HATEM MOHAMED MOUSTAFA, EBRAHEM EL-SYED EL-ETR. Names exist only as bitmaps (not in strings).
+  (EBRAHEM may be the "Ibrahim" co-author of KVC: Speculation.)
+- End: INT 16h AH=11h poll (enhanced keyboard BIOS call), INT 16h AH=0, mode 3, prints
+  "    YASSER DOT DESIGN.    " and "<c>1993 YASSER MOHAMED ALI" via INT 21h AH=09h, then sparkles each character
+  by writing attribute 0Fh into B800 for one retrace and restoring it. INT 20h exit.
+  Dead code: 0743 "$",00,CD 20 after the string (unreachable INT 20h).
+
+Interrupts: INT 10h (00,02,0F), INT 16h (00,11), INT 21h (09), INT 20h. No hooks.
+ARABART: none (no INT 10h AH=36h; emulation log shows zero calls). needsArabart:true is not required.
+
+Fragility: INT 16h AH=11h needs an AT-class enhanced-keyboard BIOS (on an XT BIOS the call is unsupported);
+CPU-speed busy loops for two effects; no memory check before using the segment above the program.
+
+Excerpt NAMES 0899-08C3 (RLE decoder) and 0981-09B7 (plane blit):
+  08A3 lodsb            ; next byte
+  08A4 cmp al,37h       ; '7' is the escape byte
+  08A6 je 08AB
+  08A8 stosb            ; ordinary byte: copy it
+  08A9 jmp 08A3
+  08AB lodsb            ; escape: read count
+  08AC cmp al,0         ; count 0 = end of image
+  08AE je 08B9
+  08B0 xor ch,ch / mov cl,al
+  08B4 lodsb            ; value to repeat
+  08B5 rep stosb        ; write it 'count' times
+  08B7 jmp 08A3
+  0996 mov dx,3C4h / mov al,2 / out dx,al / inc dx / mov al,1 / out dx,al   ; select plane 0
+  099F push cx/si/di ; rep movsb ; pop ; add si,[0511] ; shl al,1 ; cmp al,10h ; jne 099F  ; planes 1,2,4,8
+
+==================================================================================================
+PORTSAID.EXE  (Port-Said Computer Systems boot screen, 1993)
+==================================================================================================
+GLANCE: Turbo C++ 1.0 tiny-model C program whose functions are mostly inline Assembly; the same RLE/plane-blit
+routines as NAMES.COM, six bitmaps embedded inside the code segment, and floating-point fly-in animation.
+
+Toolchain / model [Verified]
+- String "Turbo C++ - Copyright 1990 Borland Intl." at image B2D4 (Turbo C++ 1.0).
+- Entry 0000:0100 with SS:SP 0:0 = Turbo C tiny-model startup c0t (0100 mov dx,cs ; mov cs:[030D],dx = DGROUP@
+  equals CS; INT 21h AH=30h; INT 1Ah tick; hooks INT 0/4/5/6 at 023D like every TC program; calls main at 01F6).
+- Why an EXE and not a COM: the 10 relocations are all inside Borland's 8087 emulator (6DFC onward: it saves
+  INT 34h-3Eh (11 vectors, loop at 6E4E AX=3534h CX=0Bh) and INT 75h, installs its handlers). Segment
+  relocations make TLINK /t (COM output) impossible, so a tiny-model program had to ship as an EXE. [Strong
+  inference for motive; relocation placement Verified.] The census "INT 21h AH=25h x11" is the emulator plus
+  RTL, not his own hooks.
+- Code is 8086-compatible (no 186 opcodes seen in user code).
+
+Layout of the 47,152-byte image [Verified]
+- 0(hidden)F c0t ; 0311-0A07 user functions ; 0A08-2EC0 image (Arabic banner 640x58) ; 2EC1-2F06 user fn ;
+  2F07-44CD image (English "PORT-SAID COMPUTER SYSTEMS" 448x33) ; 44CE-45BF user fn ; 45C0-6CE6 four logo tiles
+  (64x79 each) ; 6CE7-6DC5 main + credits ; 6DFC.. 8087 emulator then Turbo C RTL ; data near B2D4.
+- User code ~2.3 KB; embedded images 24,993 bytes (6 RLE images, ps_images.py); library ~17.6 KB.
+- Images live inside the code segment and are addressed as CS-relative far pointers:
+    44D4 push cs / pop ax / mov [bp-2],ax / mov ax,6375h / xor dx,dx / mov bx,10h / div bx / add [bp-2],ax /
+    mov [bp-4],dx      ; normalise CS:6375 into seg:off
+- Image header: WORD width-in-bytes, WORD height, then RLE planes (decoder skips 4 bytes: 0372 add si,4).
+
+User functions [Verified]
+- 0311 delay(n): n x (poll 3DAh until not in retrace, 256 polls) then wait for retrace start. Inline asm.
+- 0338 DOS free (AH=49h), 0346 DOS alloc (AH=48h; returns 0 on failure).
+- 0360 RLE decode: identical inner loop to NAMES 08A3 (22 identical bytes).
+- 039C plane blit: identical to NAMES 0996 (18 identical bytes).
+- 03D6 curtain/split reveal; 04FA/0546 row blits; 0592/06EC fly-in: x,y interpolated with doubles
+  (INT 3Bh=FILD, INT 39h=FLD, INT 3Dh=FWAIT emulator opcodes; _ftol at 74F3), 100 steps.
+- 0676/07D3 load image: read header, alloc w*h*4/16+1 paragraphs, decode, run effect, free.
+- main 6CE7: inline asm mov ax,10h / int 10h (EGA 640x350x16); 44CE (logo tiles fly-in); delay(10);
+  0853 (Arabic banner); 2EC1 (English line); inline asm INT 16h AH=11h/AH=0 wait; mode 3; credits 6D10.
+- Credits 6D10 = the NAMES.COM sign-off rewritten as a C function with inline asm, with delay(1) instead of the
+  retrace routine. The text "    YASSER DOT DESIGN.    $<c>1993 YASSER MOHAMED ALI$" sits inside the function
+  body and is jumped over (6D89 jmp 6DC1).
+- Shared bytes with NAMES (shared.py): 153 bytes of identical machine code/data in 7 runs (key wait 15,
+  credit sparkle 24+12, credit text 54, retrace wait 8, RLE loop 22, blit 18).
+
+Rendering [Verified by emulation; portsaid_final.png matches public/images/portsaid-splash.png]
+- The Arabic "بورسعيد للحاسبات" and the English line are pre-rendered bitmaps. No ARABART calls (zero INT 10h
+  AH=36h in the run). needsArabart:true is not required.
+- Animation timing: fly-ins call delay(0) (0592 receives 0 as its delay argument) so their speed depends only on
+  CPU + float speed (emulated floats on a machine without 8087 make it visibly slow, a fast PC makes it instant).
+
+Bugs / fragility
+- [Verified] 0346 returns 0 when DOS cannot allocate; all three callers (04BD, 06A3, 0800) use the result
+  directly as the RLE destination segment -> on low memory the decoder would write over 0000:0000 (the IVT).
+- [Verified] INT 16h AH=11h (enhanced BIOS) for the key wait.
+- [Strong inference] Floating point used only for straight-line motion; it pulled in ~10 KB of emulator and
+  forced the EXE format.
+
+==================================================================================================
+SUN.EXE  (The Brave Sun / الشمس الجريئة, educational, Sept 1993)
+==================================================================================================
+GLANCE: ~33.6 KB of compiled Borland C++ (large model, 80186 code) driving BGI VGA graphics, his own
+ARABART TSR for Arabic text, hand-coordinated vector drawings, palette tricks, and trig-driven orbit animations.
+
+Toolchain / model [Verified]
+- "Borland C++ - Copyright 1991 Borland Intl." (BC++ 2.0/3.0 era RTL).
+- Large model: c0 calls main far (00FC lcall 0302:0007) and pushes far argv/envp (5 words); every user function
+  is far (retf), DS = DGROUP 11ADh fixed (not huge).
+- Compiled for 80186+: ENTER/LEAVE and PUSH imm8 throughout (e.g. 02DE:0005 enter 8,0 ; push 1). Will not run on
+  an 8088/8086 PC.
+- Stack checking on (-N): every function starts cmp [2F14h],sp / ja / lcall 0:2DD9 ("Stack overflow!").
+- Floating point: Borland emulator (INT 34h-3Dh); FPU fix-up/exception module 0D89 (INT 34h-3Dh vectors point to
+  0D89:0306 after start-up); software emulator body 0B120-0D88F (~10 KB).
+
+Image layout (86,768 bytes) [Verified by far-call map farmap.py / sunmods.py / IVT dump]
+  0000-2DDF c0 + RTL (11.7 KB) | 2DE0-B112 user code, 8 modules (33.6 KB) | B120-D88F float emulator (10 KB) |
+  D890-DE5F 8087 fix-up | DE60-11ACF BGI GRAPHICS.LIB (~15.5 KB) | 11AD0- DGROUP data (~14 KB, all texts).
+User modules (by code segment): 02DE help pop-up (576 B) ; 0302 main (160 B) ; 030C "Sun in the Quran" section
+  (6,816 B) ; 04B6 ARABART binding (576 B) ; 04DA UI kit: init, getkey, menu, frames, exit (5,360 B) ;
+  0629 intro screens (2,704 B) ; 06D2 "Sun and nature" incl. solar-system orbits (5,536 B) ;
+  082C "Cycle of life" (11,858 B).
+- RTL calls identified: 2DD9 stack overflow, 1EAA bioskey, 0E7B double->int (sets RC=truncate), 0C43 sin,
+  046F cos (both use FSIN/FCOS when a 387 is present), 2A86 farmalloc, 29A0 farfree, 2D86 far memcpy,
+  1571 printf, 2086 getch, 10CC exit. No delay(), no rand().
+- BGI entries (seg 0DE6) and inferred names [Strong inference from arguments/context; first five Verified by
+  behaviour in emulation]: 096A initgraph(&gd,&gm,"") ; 030D graphresult ; 0193 grapherrormsg ; 0E53 closegraph ;
+  0EFD cleardevice ; 1517 imagesize ; 20BC getimage ; 1548 putimage(x,y,buf,op) ; 1F80 outtextxy (Latin text in
+  help) ; 1C88 bar ; 1DB2 setcolor ; 1230 setfillstyle(SOLID,c) ; 1E82 setrgbpalette(i,r,g,b) (88 calls) ;
+  14F8 getpalette(&pal) (18-byte local) ; 1024 moveto ; 10F9 lineto (87) ; 1C25 line (86) ; 1F0B putpixel ;
+  1326 circle ; 1D1C fillellipse ; 1CEC ellipse/sector (6 args e.g. x,y,0,180,40,40).
+- Init 04DA:0D0F is Borland's manual example almost verbatim: initgraph(&gd=DETECT,&gm,""); r=graphresult();
+  if (r) { printf("Graphics error: %s\n", grapherrormsg(r)); printf("Press any key to halt:"); getch(); exit(1); }
+
+Main 0302:0007 [Verified]
+  0017 lcall 04B6:000B        ; ARABART installed?
+  001E cmp di,1 / je 0032
+  0023 printf("ARABIC-ART is not active please run ARAB-ART.EXE first.")
+  002E mov ah,4Ch / int 21h   ; raw DOS exit from C (inline asm)
+  0032.. init graphics, verse screen, title, poem (0629:0939), then loop: cleardevice, draw menu 04DA:0E06,
+       choice 04DA:1080, jump table at 00A0 -> 06D2:150D, 082C:2DAC, 030C:10C5, (help), 04DA:13F3 exit.
+- Exit 04DA:13F3: cleardevice, credits card (04DA:12F4), wait key, closegraph, mov ah,4Ch / int 21h without
+  setting AL -> DOS errorlevel is whatever closegraph left in AL [Verified, minor bug].
+- Keys: F1 (3B00h) help pop-up (02DE:0005 saves background with getimage, restores with putimage), Alt-X (2D00h)
+  exit from anywhere, Esc (011Bh) back, arrows + Enter in menu. getkey 04DA:0001 flushes the BIOS buffer first:
+  while (bioskey(1)) bioskey(0); return bioskey(0);
+
+ARABART binding, segment 04B6 [Verified]
+  000B ar_installed(): push regs ; mov ax,3600h ; int 10h ; sub ax,5943h ; return  (=1 when TSR answers 'YD' 5944h)
+  0034 AL=01 CX=arg (attribute/colour) ; 0054 AL=03 CX=arg ; 0074 AL=05 DS:DX=str -> CX (text width)
+  009F AL=04 -> DX, then walks the string doubling the width for every '$' (size-up marker)
+  00F5 AL=07 draw string (CX=x, BX=y+width adj, DS:DX=str) ; 012C AL=08 draw string variant
+  0163 shadow text: colour 8 at (x+6,y+6), then real colour at (x,y)
+  01B4 outline text: 4 diagonal copies at (+-1,+-1) in colour A, centre in colour B
+- Subfunctions used by SUN: AL = 0,1,3,4,5,7,8.
+
+Dependency on SUN/ARAB-ART.EXE (v7.15) [Verified by emulation]
+- ARAB-ART 7.15 loads ARAB-ART.FNT (opens "ARAB-ART.FNT", reads 4F28h = 20,264 bytes = exact file size) from the
+  current directory, hooks INT 10h, stays resident (INT 27h). Missing font -> "Error in loading ARAB-ART.FNT".
+- Both 7.15 and 4.15 answer AX=3600h with AX=5944h BX=040Fh (7.15 never bumped the version word) and both start
+  their INT 10h handler with the same 12 bytes EB 0A 90 "DALYASSER", which is what the installer compares.
+- RUN.BAT loads ARABART 4.15 first. Emulated that order: ARAB-ART 7.15 prints "This utility is already active
+  in your RAM." and exits; SUN then runs on 4.15's built-in fonts. CORRECTED after a pixel diff (fontdiff.py): on
+  17 screens the only difference is 8 pixels, the full stop ('>') at the end of the red poem line, which 4.15
+  draws and 7.15 does not. The earlier "wraps differently" note was a misread of the contact sheet.
+- Without any ARABART: SUN prints the English error and exits.
+- needsArabart: true is correct for SUN (it is the only one of my three that needs it).
+
+How Arabic text is stored [Verified: decodes cleanly, Quran references match]
+- As Latin keystrokes of the standard Arabic keyboard layout: h=ا g=ل a=ش l=م s=س ... "hgals" = الشمس,
+  "s,vm hGkuhl - hBdi vrl @69" = "سورة الأنعام - الآيه رقم 96". Digit strings are stored reversed for
+  right-to-left output (3991 -> 1993). Shift-J (tatweel ـ) is used for calligraphic stretching ("hgalJs").
+  Markup: '#' toggles underline (visible under "الشمس" in every verse card), '$' marks large text (width x2 in the
+  binding), '$!' title style, '@' and '~' are ARABART-specific (leave to ARABART analyst).
+- Decoder: gfxprogs/arkbd.py ; full decoded content: gfxprogs/sun_strings_decoded.txt (291 lines).
+
+Content [Verified by decode + render]
+- Opening card: Ya-Sin 36:38. Title "الشمس الجريئة", "برنامج تعليمى للناشئين المتحدثين باللغة العربية",
+  "تصميم وتنفيذ مهندس / ياسر محمد على", "الاصدار الأول {سبتمبر 1993}". A prose poem to the sun over a night scene.
+- Menu: الشمس و الطبيعة / دورة الحياة / الشمس فى القرآن / مساعدة / انهاء البرنامج.
+- Sun and nature: solar system (animated orbits of the 4 inner planets), temperature, sunspots, gravity, escape
+  velocity, distance (8 min 18 s light time), fusion, energy output, size vs Earth, mass and density (balance
+  scale picture), "sun pulse" (oscillation every 2 h 40 min).
+- Cycle of life: Sun and Earth (day/night, orbit, seasons, solstices/equinoxes with dates), Sun and Moon (8 phases,
+  Hijri calendar), Sun and the water cycle (6 stages).
+- Sun in the Quran: intro (the sun is named 30 times), 15 verse references (14 surahs) with surah/ayah (Al-An'am 96, Al-A'raf 54,
+  Yunus 5, Ar-Ra'd 2, Ibrahim 33, An-Nahl 12, Al-Isra 78, Al-Anbiya 33, Al-Hajj 18, Al-Furqan 45,
+  Al-Ankabut 61, Luqman 29, Fatir 13, Ya-Sin 38 and 40).
+- Exit card: "برمجة مهندس / ياسر محمد على", "مصر - بورسعيد - ص.ب. 104", a phone number.
+
+Rendering and animation [Verified]
+- VGA 640x480x16 (mode 12h, BGI autodetect, EGAVGA.BGI loaded from disk at run time; no driver linked in, no
+  .CHR fonts). Coordinates up to y=410 assume 480 lines.
+- Pictures are hand-coded vector drawings: hundreds of moveto/lineto/line calls with literal coordinates.
+- Palette: getpalette + setrgbpalette (custom 6-bit DAC values 3Fh/30h/2Fh/21h/10h; sets colours to black to draw
+  hidden, then reveals). Requires VGA.
+- Sprites: planets drawn once with BGI, captured with getimage, erased with putimage XOR_PUT, then moved with
+  putimage COPY_PUT (black margin overwrites the previous frame) [06D2:0C5F-0C7B].
+- Orbits (06D2:0A35): x = cx + R*cos(t), y = cy + r*sin(t), elliptical radii 70/80, 50/60, 35/20...;
+  angle step per frame pi/80 for Mercury, then scaled by real orbital periods: *88/225 (Venus), *88/356
+  (Earth), *88/687 (Mars). Constants at DS:1991-19CD. pi is computed as 22.0/7.0 (school approximation) even
+  though Borland's math.h has M_PI.
+- BUG [Verified]: Earth's period constant is 356.0 (DS:19C9) while the on-screen text says 365.25 days: digit swap,
+  Earth orbits ~2.5% too fast.
+- Timing: animation loops are `while (!bioskey(1)) { draw; update angles; }` with no delay() or retrace wait, so
+  speed = CPU + FPU/emulator speed. This explains the museum repo's DOSBox cycles experiments for brave-sun.
+- No direct port I/O in user code (apparent IN/OUT in a naive disassembly are mis-decoded emulator opcodes).
+
+Fragility
+- Needs 186+ CPU, VGA, ARABART TSR, EGAVGA.BGI and ARAB-ART.FNT in the current directory.
+- CPU-speed-dependent animation; raw INT 21h exit skips RTL cleanup (harmless here) and leaves a random errorlevel.
+- Harness limitation (not a program bug): the title-screen ball/streaks render unfilled in my emulator while the
+  museum screenshot shows them filled (fill path not fully emulated).
+
+Artifacts (all in scratchpad/re/programs/gfxprogs/):
+  names_final.png (matches public/images/kemyam-splash.png), names_sequence.png (12 stages incl. 5 name cards)
+  portsaid_final.png (matches public/images/portsaid-splash.png), portsaid_sequence.png
+  sun_intro.png, sun_nature.png, sun_cycle.png, sun_quran.png (key-scripted runs), sun_with_arabart415.png
+  sun_strings_decoded.txt ; scripts: ega.py machine.py sunrun.py sun_415.py run_names*.py run_portsaid*.py
+  names_rle.py ps_images.py shared.py arkbd.py emudis.py farmap.py sunmods.py bgiargs.py
+Re-run example: cd gfxprogs && uv run --quiet --with unicorn python -I sunrun.py ENT,ENT,ENT,DN,DN,ENT,SP out.png

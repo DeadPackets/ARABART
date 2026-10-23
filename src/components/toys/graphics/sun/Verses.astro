@@ -1,0 +1,98 @@
+---
+// "The sun in the Quran": his fifteen verse cards, each laid out by his own numbers (030C:11CA on) and drawn by his
+// engine. A Norton Commander panel lists them; the screen shows the card, line by line as his program draws it.
+import Window from '../../../shell/Window.astro';
+import { png } from '../ssr.ts';
+import { ssrBin } from '../../arabart/ssr.ts';
+import { CARDS, cardScreen } from './sun.ts';
+
+const bin = ssrBin();
+const first = cardScreen(bin, CARDS[0]);
+const still = png(first.px, 640, 480, first.rgb());
+---
+
+<div class="vs" data-verses>
+  <Window title="C:\SUN  the sun in the Quran" kind="panel" active class="vs-list">
+    <div class="vs-cols" aria-hidden="true"><span>Surah</span><span>Verse</span></div>
+    <div class="vs-tabs" role="listbox" aria-label="His fifteen verse cards" tabindex="0" aria-activedescendant="vs-o0">
+      {CARDS.map((c, i) => (
+        <div role="option" id={`vs-o${i}`} class="vs-opt" data-i={i} aria-selected={String(i === 0)}>
+          <span class="vs-name">{c.name}</span><span class="vs-ar" lang="ar" dir="rtl">{c.ar}</span><span class="vs-ref">{c.ref}</span>
+        </div>
+      ))}
+    </div>
+  </Window>
+  <Window title="SUN.EXE  640 × 480" kind="screen" class="vs-win">
+    <div class="vs-scr">
+      <img class="vs-still" src={still} width="640" height="480" alt={`His card for ${CARDS[0].name} ${CARDS[0].ref}: the verse in yellow Arabic letters outlined in black on a blue-gray card.`} />
+      <canvas class="vs-cv" width="640" height="480" hidden role="img" aria-label="His verse card, drawn by his engine."></canvas>
+    </div>
+    <p class="vs-cap" aria-live="polite" data-cap>Surah {CARDS[0].name}, verse {CARDS[0].ref}: {CARDS[0].lines.length} lines.</p>
+  </Window>
+</div>
+
+<style is:global>
+  .vs { display: grid; grid-template-columns: minmax(250px, 0.7fr) minmax(0, 1.6fr); gap: 22px; align-items: start; }
+  .vs-cols { display: grid; grid-template-columns: 1fr auto; padding: 0 8px 4px; font: 700 12px/1.4 var(--font-code); color: var(--accent); }
+  .vs-tabs { display: grid; max-height: 470px; overflow-y: auto; overscroll-behavior: contain; outline: none; }
+  .vs-tabs:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .vs-opt {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 10px; min-height: 44px; padding: 2px 8px;
+    font: 500 13px/1.3 var(--font-code); color: var(--ink); cursor: pointer;
+  }
+  .vs-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vs-ar { font: 700 0.9375rem/1.2 var(--font-ar); color: var(--ink-2); white-space: nowrap; }
+  .vs-ref { min-width: 5ch; text-align: right; color: var(--accent-2); font-variant-numeric: tabular-nums; }
+  .vs-opt:hover { background: color-mix(in oklch, var(--accent-2) 18%, transparent); }
+  .vs-opt[aria-selected='true'] { color: var(--surface); background: var(--accent-2); }
+  .vs-opt[aria-selected='true'] :is(.vs-ar, .vs-ref) { color: var(--surface); }
+  .vs-scr { position: relative; aspect-ratio: 4 / 3; background: var(--vga-0); }
+  .vs-scr :is(img, canvas) { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .vs-cap { margin: 10px 0 0 !important; font: 500 12px/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  @media (max-width: 860px) {
+    .vs { grid-template-columns: minmax(0, 1fr); }
+    .vs-list { order: 2; }
+    .vs-tabs { max-height: 280px; }
+  }
+  @media (max-width: 640px) { .vs-scr :is(img, canvas) { image-rendering: auto; } }
+</style>
+
+<script>
+  import { fonts } from '../../arabart/core.ts';
+  import { blit } from '../ega.ts';
+  import { CARDS, cardScreen } from './sun.ts';
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-verses]').forEach(async root => {
+    const bin = await fonts();
+    const cv = root.querySelector<HTMLCanvasElement>('.vs-cv')!, list = root.querySelector<HTMLElement>('.vs-tabs')!;
+    const opts = [...root.querySelectorAll<HTMLElement>('.vs-opt')], cap = root.querySelector<HTMLElement>('[data-cap]')!;
+    let at = 0, timer = 0;
+    // His program draws the card, then the verse one line at a time: so does this screen
+    const show = (i: number, animate: boolean) => {
+      at = i; clearTimeout(timer);
+      opts.forEach((o, j) => o.setAttribute('aria-selected', String(j === i)));
+      list.setAttribute('aria-activedescendant', opts[i].id);
+      if (animate) opts[i].scrollIntoView({ block: 'nearest' }); // not on the first draw: that would scroll the page down to here
+      const c = CARDS[i];
+      cap.textContent = `Surah ${c.name}, verse ${c.ref}: ${c.lines.length} lines.`;
+      let k = animate && !reduce() ? 0 : c.lines.length;
+      const step = () => {
+        const s = cardScreen(bin, c, k);
+        blit(cv, s.px, 640, 480, s.rgb());
+        if (k++ < c.lines.length) timer = window.setTimeout(step, 180);
+      };
+      step();
+    };
+    opts.forEach((o, i) => o.addEventListener('click', () => { show(i, true); list.focus({ preventScroll: true }); }));
+    list.addEventListener('keydown', e => {
+      const d = { ArrowDown: 1, ArrowUp: -1, Home: -99, End: 99 }[e.key];
+      if (d === undefined) return;
+      e.preventDefault();
+      show(Math.max(0, Math.min(CARDS.length - 1, at + d)), true);
+    });
+    show(0, false);
+    cv.hidden = false;
+    root.querySelector<HTMLElement>('.vs-still')!.hidden = true;
+  });
+</script>

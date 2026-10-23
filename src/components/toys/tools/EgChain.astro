@@ -1,0 +1,103 @@
+---
+// The visual for the key-loop CodeStepper: the loop, the application object, the window in front, its method table
+// and the code that runs. A switch swaps the window in front between his editor and a plain Digi-Test window,
+// so the same three instructions land in different code. Steps carry v (how far along the chain) and w (which window).
+interface Step { a: number; c: number; say: string; v: number; [k: string]: unknown }
+interface Props { editor: Step[]; plain: Step[] }
+const { editor, plain } = Astro.props;
+const T = {
+  ed: { name: 'His TextEditor object', size: '80 bytes', table: '00ADh', slots: ['02D1:03B9', '02D1:0C3E', '02D1:040D', '02D1:1A02', '02D1:1A12'], run: '02D1:040D', what: 'his key handler' },
+  dt: { name: 'A plain Digi-Test window', size: '42 bytes', table: '05EEh', slots: ['0B2D:07F2', '0473:047F', '0473:046F', '02D1:1A02', '02D1:1A12'], run: '0473:046F', what: 'Digi-Test’s key handler' },
+};
+const json = JSON.stringify({ editor, plain, T }).replace(/</g, '\\u003c');
+const v = editor[editor.length - 1].v;
+---
+
+<div class="eg-ch" data-egchain data-v={v} data-w="ed">
+  <script type="application/json" data-chain set:html={json} />
+  <div class="eg-ch-pick" role="radiogroup" aria-label="The window in front" hidden>
+    <button type="button" role="radio" class="button k-btn" data-w="ed" aria-checked="true">His editor in front</button>
+    <button type="button" role="radio" class="button k-btn" data-w="dt" aria-checked="false" tabindex="-1">A Digi-Test window in front</button>
+  </div>
+  <ol class="eg-ch-row">
+    <li data-v="1"><b>Key loop</b><span>0473:0257</span><em>key = <code>1E61h</code>, an a</em></li>
+    <li data-v="2"><b>The application</b><span>one object</span><em>field 2Ah → the window in front</em></li>
+    <li data-v="3"><b data-name>{T.ed.name}</b><span data-size>{T.ed.size}</span><em>field 28h → table <code data-table>{T.ed.table}</code></em></li>
+    <li data-v="4" class="eg-ch-table"><b>Method table <code data-table>{T.ed.table}</code></b>
+      <ol start="0">{T.ed.slots.map((s, i) => <li data-slot={i}><span>{i}</span><code>{s}</code><i>{i === 0 ? 'draw' : i === 2 ? 'key' : ''}</i></li>)}</ol>
+    </li>
+    <li data-v="5" class="eg-ch-run"><b>Runs</b><code data-run>{T.ed.run}</code><em data-what>{T.ed.what}</em></li>
+  </ol>
+</div>
+
+<style is:global>
+  .eg-ch { display: grid; gap: 14px; margin-bottom: 4px; }
+  .eg-ch-pick { display: flex; flex-wrap: wrap; gap: 10px; }
+  .eg-ch-pick .k-btn { min-height: 44px; }
+  .eg-ch ol.eg-ch-row, .writeup .eg-ch ol.eg-ch-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0 26px; margin: 0; padding: 0; list-style: none; counter-reset: none; }
+  .eg-ch-row > li { position: relative; display: grid; align-content: start; gap: 4px; padding: 12px; max-width: none !important; background: var(--surface-2); box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent-2) 40%, transparent); font-size: 0.875rem !important; line-height: 1.4 !important; opacity: 0.45; transition: opacity 0.25s, box-shadow 0.25s, background-color 0.25s; }
+  .eg-ch-row > li::marker { content: none; }
+  .eg-ch-row > li + li::before { content: '→'; position: absolute; left: -21px; top: 18px; font: 700 16px/1 var(--font-code); color: var(--accent-2); }
+  .eg-ch-row b { font: 700 0.9375rem/1.25 var(--sans); color: var(--ink); }
+  .eg-ch-row > li > span { font: 500 11px/1.3 var(--font-code); color: var(--ink-2); }
+  .eg-ch-row em { font-style: normal; color: var(--ink); }
+  .eg-ch-row code { font: 600 0.92em var(--font-code); color: var(--accent); }
+  .eg-ch-row > li.on { opacity: 1; }
+  .eg-ch-row > li.now { box-shadow: inset 0 0 0 2px var(--accent); background: color-mix(in oklch, var(--accent) 14%, var(--surface-2)); }
+  .eg-ch .eg-ch-table ol, .writeup .eg-ch .eg-ch-table ol { display: grid; gap: 2px; margin: 4px 0 0; padding: 0; list-style: none; }
+  .eg-ch-table ol li { display: grid; grid-template-columns: 1.5ch auto 1fr; gap: 0.8ch; padding: 1px 4px; max-width: none !important; font: 500 11.5px/1.5 var(--font-code) !important; color: var(--ink-2); }
+  .eg-ch-table ol li::marker { content: none; }
+  .eg-ch-table ol li code { color: var(--ink); font-size: 1em; }
+  .eg-ch-table ol li i { font-style: normal; color: var(--ink-2); white-space: nowrap; }
+  .eg-ch[data-v='4'] .eg-ch-table li[data-slot='2'], .eg-ch[data-v='5'] .eg-ch-table li[data-slot='2'] { background: var(--accent); }
+  .eg-ch[data-v='4'] .eg-ch-table li[data-slot='2'] *, .eg-ch[data-v='5'] .eg-ch-table li[data-slot='2'] * { color: var(--surface); }
+  .eg-ch-run code { font-size: 1.05rem !important; }
+  @media (max-width: 1100px) {
+    .eg-ch ol.eg-ch-row, .writeup .eg-ch ol.eg-ch-row { grid-template-columns: minmax(0, 1fr); gap: 22px; }
+    .eg-ch-row > li + li::before { content: '↓'; left: 12px; top: -20px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .eg-ch-row > li { transition: none; } }
+</style>
+
+<script>
+  type Step = { v: number };
+  document.querySelectorAll<HTMLElement & { live?: boolean }>('[data-egchain]').forEach(root => {
+    if (root.live) return;
+    root.live = true;
+    const data = JSON.parse(root.querySelector('[data-chain]')!.textContent!) as { editor: Step[]; plain: Step[]; T: Record<string, { name: string; size: string; table: string; slots: string[]; run: string; what: string }> };
+    const stepper = root.closest<HTMLElement & { stepper?: { i: number; load(s: unknown[], at?: number): void } }>('[data-stepper]')!;
+    const boxes = [...root.querySelectorAll<HTMLElement>('.eg-ch-row > li')];
+    const radios = [...root.querySelectorAll<HTMLButtonElement>('[role=radio]')];
+    let trace = data.editor;
+
+    const paint = (v: number) => {
+      root.dataset.v = String(v);
+      boxes.forEach(b => { const k = +b.dataset.v!; b.classList.toggle('on', k <= v); b.classList.toggle('now', k === v); });
+    };
+    stepper.addEventListener('stepper', e => paint((e as CustomEvent).detail.step.v));
+
+    function pick(w: string) {
+      const t = data.T[w];
+      radios.forEach(r => { const on = r.dataset.w === w; r.setAttribute('aria-checked', String(on)); r.tabIndex = on ? 0 : -1; });
+      root.dataset.w = w;
+      root.querySelector('[data-name]')!.textContent = t.name;
+      root.querySelector('[data-size]')!.textContent = t.size;
+      root.querySelectorAll('[data-table]').forEach(x => (x.textContent = t.table));
+      root.querySelectorAll<HTMLElement>('[data-slot]').forEach((x, i) => (x.querySelector('code')!.textContent = t.slots[i]));
+      root.querySelector('[data-run]')!.textContent = t.run;
+      root.querySelector('[data-what]')!.textContent = t.what;
+      trace = w === 'ed' ? data.editor : data.plain;
+      stepper.stepper?.load(trace, stepper.stepper.i);
+    }
+    radios.forEach(r => r.addEventListener('click', () => pick(r.dataset.w!)));
+    root.querySelector('[role=radiogroup]')!.addEventListener('keydown', e => {
+      const k = (e as KeyboardEvent).key;
+      if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(k)) return;
+      e.preventDefault();
+      const next = radios.find(r => r.getAttribute('aria-checked') !== 'true')!;
+      pick(next.dataset.w!); next.focus();
+    });
+    root.querySelector<HTMLElement>('[role=radiogroup]')!.hidden = false;
+    paint(stepper.stepper ? trace[stepper.stepper.i].v : +root.dataset.v!);
+  });
+</script>

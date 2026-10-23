@@ -6,69 +6,26 @@ interface Props {
 }
 
 const { controls } = Astro.props;
+// "SHIFT + Q,W,E,R" -> [["Shift"], ["Q", "W", "E", "R"]]
+const keys = (combo: string) =>
+  combo.split('+').map(part => part.split(',').map(k => k.trim().replace(/^SHIFT$/, 'Shift').replace(/-/g, '–')));
 ---
 
 {controls.length > 0 && (
-  <div class="controls-table-wrap">
-    <table class="controls-table">
-      <thead>
-        <tr>
-          <th scope="col">Key</th>
-          <th scope="col">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {controls.map(ctrl => (
-          <tr>
-            <td class="controls-key">
-              <kbd>{ctrl.key}</kbd>
-            </td>
-            <td>{ctrl.action}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+  <dl class="controls">
+    {controls.map(ctrl => (
+      <div class="row">
+        <dt>{keys(ctrl.key).map((group, i) => <>{i > 0 && <span class="plus">+</span>}{group.map(k => <kbd>{k}</kbd>)}</>)}</dt>
+        <dd>{ctrl.action}</dd>
+      </div>
+    ))}
+  </dl>
 )}
 
 <style>
-  .controls-table-wrap {
-    overflow-x: auto;
-  }
-
-  .controls-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85rem;
-  }
-
-  .controls-table th {
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    color: var(--color-phosphor);
-    text-align: left;
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--color-phosphor-dim);
-    letter-spacing: 0.05em;
-  }
-
-  .controls-table td {
-    padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--color-border);
-    color: var(--color-text);
-  }
-
-  .controls-table tr:last-child td {
-    border-bottom: none;
-  }
-
-  .controls-key kbd {
-    font-family: var(--font-display);
-    font-size: 1rem;
-    color: var(--color-amber);
-    background: var(--color-surface);
-    border: 1px solid var(--color-border-bright);
-    padding: 0.1rem 0.5rem;
-    display: inline-block;
-  }
+  .controls { display: grid; gap: 16px; }
+  .row { display: grid; gap: 8px; }
+  dt { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .plus { font-size: 0.875rem; color: var(--cyan); }
+  dd { font-size: 0.9375rem; color: var(--ink-2); }
 </style>

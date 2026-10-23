@@ -1,0 +1,119 @@
+---
+// The 15-day trial record: MemMaidSetup.dll writes the install date as 14 bytes (every part twice, odd bytes plus one,
+// a checksum), MemMaid reads it back at every start. Pick the dates; tap a byte to tamper with it.
+import Window from '../../shell/Window.astro';
+
+const enc = (y: number, m: number, d: number) => {
+  const w = [2 * m + 3, y + 7, y + 21, 2 * d + 5, 2 * m + 1, 2 * d + 4];
+  const b = w.flatMap(v => [v & 255, v >> 8]);
+  const sum = b.reduce((a, x) => a + x, 0);
+  return [...b.map((x, i) => (x + (i % 2)) & 255), sum % 31, 0];
+};
+const bytes = enc(2008, 6, 20);
+const LAB = ['month', 'month', 'year', 'year', 'year', 'year', 'day', 'day', 'month', 'month', 'day', 'day', 'check', 'check'];
+const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
+---
+
+<div class="mtr" data-mm-trial>
+  <Window title={String.raw`HKEY_CLASSES_ROOT\TapHelp  Ready2`} kind="dialog" active>
+    <div class="mtr-dates">
+      <label>Installed <input type="date" data-inst value="2008-06-20" min="2003-06-16" max="2030-12-31" /></label>
+      <label>Today <input type="date" data-today value="2008-06-23" min="2003-06-16" max="2030-12-31" /></label>
+    </div>
+    <ol class="mtr-bytes" data-bytes aria-label="The 14 bytes MemMaid stores. Tap one to change it.">
+      {bytes.map((b, i) => (
+        <li><button type="button" data-b={i} aria-label={`Byte ${i + 1}, ${LAB[i]}: ${hex(b)}. Tap to change it.`}><b>{hex(b)}</b><small>{LAB[i]}</small></button></li>
+      ))}
+    </ol>
+    <p class="mtr-read" data-read>Month 6, read twice: (15 − 3) ÷ 2 and (13 − 1) ÷ 2. Year 2008: 2015 − 7 and 2029 − 21. Day 20: (45 − 5) ÷ 2 and (44 − 4) ÷ 2.</p>
+    <p class="mtr-verdict" data-verdict aria-live="polite"><b>12 days left.</b> “The trial period will expire after 12 day(s)”</p>
+    <button type="button" class="button k-btn" data-reset>Put the bytes back</button>
+  </Window>
+</div>
+
+<style is:global>
+  .mtr-dates { display: flex; flex-wrap: wrap; gap: 12px 20px; }
+  .mtr-dates label { display: grid; gap: 4px; font-size: 0.875rem; color: var(--ink-2); }
+  .mtr-dates input { min-height: 44px; padding: 0 10px; font: 600 1rem var(--font-code); color: var(--ink); background: #fff; border: 1px solid var(--rule); border-radius: 3px; }
+  .mtr-bytes { display: grid; grid-template-columns: repeat(14, minmax(0, 1fr)); gap: 3px; margin: 16px 0 0; padding: 0; list-style: none; }
+  .mtr-bytes button { display: grid; justify-items: center; gap: 4px; width: 100%; min-height: 52px; padding: 6px 0; font: inherit; color: var(--ink); background: var(--surface-2); border: 0; border-radius: 3px; cursor: pointer; box-shadow: inset 0 0 0 1px var(--rule); }
+  .mtr-bytes button:hover { box-shadow: inset 0 0 0 2px var(--accent); }
+  .mtr-bytes button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+  .mtr-bytes b { font: 700 clamp(0.75rem, 0.6vw + 0.5rem, 1rem)/1 var(--font-code); }
+  .mtr-bytes small { font-size: 0.625rem; color: var(--ink-2); }
+  .mtr-bytes li:nth-child(-n + 2) button, .mtr-bytes li:nth-child(n + 9):nth-child(-n + 10) button { background: color-mix(in oklch, var(--accent) 16%, var(--surface-2)); }
+  .mtr-bytes li:nth-child(n + 3):nth-child(-n + 6) button { background: color-mix(in oklch, var(--accent-2) 18%, var(--surface-2)); }
+  .mtr-bytes li:nth-child(n + 13) button { background: color-mix(in oklch, var(--hot) 14%, var(--surface-2)); }
+  .mtr-bytes button.is-bad { box-shadow: inset 0 0 0 2px var(--hot); }
+  .mtr-read { margin-top: 14px !important; font: 500 0.8125rem/1.6 var(--font-code) !important; color: var(--ink-2) !important; }
+  .mtr-verdict { margin: 10px 0 14px !important; font-size: 1rem !important; color: var(--ink) !important; }
+  .mtr-verdict b { color: var(--good); }
+  .mtr-verdict.is-over b { color: var(--hot); }
+  @media (max-width: 640px) { .mtr-bytes { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const enc = (y: number, m: number, d: number) => {
+    const w = [2 * m + 3, y + 7, y + 21, 2 * d + 5, 2 * m + 1, 2 * d + 4];
+    const b = w.flatMap(v => [v & 255, v >> 8]);
+    const sum = b.reduce((a, x) => a + x, 0);
+    return [...b.map((x, i) => (x + (i % 2)) & 255), sum % 31, 0];
+  };
+  // MemMaid's reader (2.3: 6AD14): undo the +1, check the sum, read every part twice; any mismatch and the date is no good
+  const dec = (raw: number[]) => {
+    const b = raw.slice(0, 12).map((x, i) => (x - (i % 2) + 256) & 255);
+    const sum = b.reduce((a, x) => a + x, 0);
+    const w = [0, 2, 4, 6, 8, 10].map(i => b[i] | (b[i + 1] << 8));
+    const ok = (raw[12] | (raw[13] << 8)) === sum % 31 && w[2] - 21 === w[1] - 7 && ((w[0] - 3) >> 1) === ((w[4] - 1) >> 1) && ((w[3] - 5) >> 1) === ((w[5] - 4) >> 1);
+    return ok ? { y: w[2] - 21, m: (w[0] - 3) >> 1, d: (w[3] - 5) >> 1, w } : null;
+  };
+  const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-mm-trial]').forEach(root => {
+    const $ = (s: string) => root.querySelector<HTMLElement>(s)!;
+    const inst = $('[data-inst]') as HTMLInputElement, today = $('[data-today]') as HTMLInputElement;
+    const btns = [...root.querySelectorAll<HTMLButtonElement>('[data-b]')];
+    const read = $('[data-read]'), verdict = $('[data-verdict]');
+    let bytes: number[] = [], good: number[] = [];
+    const parse = (v: string) => { const [y, m, d] = v.split('-').map(Number); return { y, m, d }; };
+    const paint = () => {
+      btns.forEach((b, i) => {
+        b.querySelector('b')!.textContent = hex(bytes[i]);
+        b.classList.toggle('is-bad', bytes[i] !== good[i]);
+      });
+      const r = dec(bytes), t = parse(today.value);
+      if (!r) {
+        read.textContent = 'The two copies no longer agree, or the checksum is wrong.';
+        verdict.classList.add('is-over');
+        verdict.innerHTML = '<b>Trial over.</b> MemMaid trusts no date it cannot read twice, and writes junk over the record.';
+        return;
+      }
+      const [w0, w1, w2, w3, w4, w5] = r.w;
+      read.textContent = `Month ${r.m}, read twice: (${w0} − 3) ÷ 2 and (${w4} − 1) ÷ 2. Year ${r.y}: ${w1} − 7 and ${w2} − 21. Day ${r.d}: (${w3} − 5) ÷ 2 and (${w5} − 4) ÷ 2.`;
+      // His day count: (year × 12 + month) × 31 + day, so every month is 31 days long
+      const n = (y: number, m: number, d: number) => (y * 12 + m) * 31 + d;
+      const now = n(t.y, t.m, t.d), from = n(r.y, r.m, r.d), left = from - now + 15;
+      const over = now > from + 15 || now < from;
+      verdict.classList.toggle('is-over', over);
+      verdict.innerHTML = over ? '<b>Trial over.</b> “This trial period has expired, please register.”' : `<b>${left} day${left === 1 ? '' : 's'} left.</b> “The trial period will expire after ${left} day(s)”`;
+    };
+    const fresh = () => {
+      const i = parse(inst.value);
+      if (!i.y) return;
+      good = enc(i.y, i.m, i.d); bytes = [...good];
+      paint();
+    };
+    btns.forEach((b, i) => b.addEventListener('click', () => {
+      bytes[i] = (bytes[i] + 1) & 255;
+      paint();
+      if (!reduce()) gsap.fromTo(b, { y: -4 }, { y: 0, duration: 0.3, ease: 'back.out(3)' });
+    }));
+    inst.addEventListener('input', fresh);
+    today.addEventListener('input', paint);
+    $('[data-reset]').addEventListener('click', fresh);
+    fresh();
+  });
+</script>

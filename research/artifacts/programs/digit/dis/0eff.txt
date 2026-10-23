@@ -1,0 +1,1122 @@
+0eff:0000 55             push bp
+0eff:0001 8bec           mov bp, sp
+0eff:0003 39265c16       cmp word ptr [0x165c], sp
+0eff:0007 7705           ja 0xe
+0eff:0009 9aac290000     lcall 0, 0x29ac
+0eff:000e 8b4606         mov ax, word ptr [bp + 6]
+0eff:0011 0b4608         or ax, word ptr [bp + 8]
+0eff:0014 7402           je 0x18
+0eff:0016 eb0e           jmp 0x26
+0eff:0018 6a1c           push 0x1c
+0eff:001a 9a5f00ac1e     lcall 0x1eac, 0x5f
+0eff:001f 59             pop cx
+0eff:0020 895608         mov word ptr [bp + 8], dx
+0eff:0023 894606         mov word ptr [bp + 6], ax
+0eff:0026 8b4606         mov ax, word ptr [bp + 6]
+0eff:0029 0b4608         or ax, word ptr [bp + 8]
+0eff:002c 7508           jne 0x36
+0eff:002e 8b5608         mov dx, word ptr [bp + 8]
+0eff:0031 8b4606         mov ax, word ptr [bp + 6]
+0eff:0034 eb58           jmp 0x8e
+0eff:0036 ff7610         push word ptr [bp + 0x10]
+0eff:0039 ff760e         push word ptr [bp + 0xe]
+0eff:003c 8a460c         mov al, byte ptr [bp + 0xc]
+0eff:003f 50             push ax
+0eff:0040 8a460a         mov al, byte ptr [bp + 0xa]
+0eff:0043 50             push ax
+0eff:0044 ff7608         push word ptr [bp + 8]
+0eff:0047 ff7606         push word ptr [bp + 6]
+0eff:004a 9abb0aff0e     lcall 0xeff, 0xabb
+0eff:004f 83c40c         add sp, 0xc
+0eff:0052 895608         mov word ptr [bp + 8], dx
+0eff:0055 894606         mov word ptr [bp + 6], ax
+0eff:0058 c45e06         les bx, ptr [bp + 6]
+0eff:005b 26c7073503     mov word ptr es:[bx], 0x335
+0eff:0060 c45e06         les bx, ptr [bp + 6]
+0eff:0063 8a4612         mov al, byte ptr [bp + 0x12]
+0eff:0066 26884718       mov byte ptr es:[bx + 0x18], al
+0eff:006a c45e06         les bx, ptr [bp + 6]
+0eff:006d 26c6470e01     mov byte ptr es:[bx + 0xe], 1
+0eff:0072 c45e06         les bx, ptr [bp + 6]
+0eff:0075 8a4614         mov al, byte ptr [bp + 0x14]
+0eff:0078 26884719       mov byte ptr es:[bx + 0x19], al
+0eff:007c c45e06         les bx, ptr [bp + 6]
+0eff:007f 8b4616         mov ax, word ptr [bp + 0x16]
+0eff:0082 2689471a       mov word ptr es:[bx + 0x1a], ax
+0eff:0086 8b5608         mov dx, word ptr [bp + 8]
+0eff:0089 8b4606         mov ax, word ptr [bp + 6]
+0eff:008c eb00           jmp 0x8e
+0eff:008e 5d             pop bp
+0eff:008f cb             retf 
+0eff:0090 55             push bp
+0eff:0091 8bec           mov bp, sp
+0eff:0093 39265c16       cmp word ptr [0x165c], sp
+0eff:0097 7705           ja 0x9e
+0eff:0099 9aac290000     lcall 0, 0x29ac
+0eff:009e 8b4606         mov ax, word ptr [bp + 6]
+0eff:00a1 0b4608         or ax, word ptr [bp + 8]
+0eff:00a4 7402           je 0xa8
+0eff:00a6 eb0e           jmp 0xb6
+0eff:00a8 6a1c           push 0x1c
+0eff:00aa 9a5f00ac1e     lcall 0x1eac, 0x5f
+0eff:00af 59             pop cx
+0eff:00b0 895608         mov word ptr [bp + 8], dx
+0eff:00b3 894606         mov word ptr [bp + 6], ax
+0eff:00b6 8b4606         mov ax, word ptr [bp + 6]
+0eff:00b9 0b4608         or ax, word ptr [bp + 8]
+0eff:00bc 7508           jne 0xc6
+0eff:00be 8b5608         mov dx, word ptr [bp + 8]
+0eff:00c1 8b4606         mov ax, word ptr [bp + 6]
+0eff:00c4 eb58           jmp 0x11e
+0eff:00c6 1e             push ds
+0eff:00c7 68d802         push 0x2d8
+0eff:00ca 6a00           push 0
+0eff:00cc 6a00           push 0
+0eff:00ce ff7608         push word ptr [bp + 8]
+0eff:00d1 ff7606         push word ptr [bp + 6]
+0eff:00d4 9abb0aff0e     lcall 0xeff, 0xabb
+0eff:00d9 83c40c         add sp, 0xc
+0eff:00dc 895608         mov word ptr [bp + 8], dx
+0eff:00df 894606         mov word ptr [bp + 6], ax
+0eff:00e2 c45e06         les bx, ptr [bp + 6]
+0eff:00e5 26c7073503     mov word ptr es:[bx], 0x335
+0eff:00ea c45e06         les bx, ptr [bp + 6]
+0eff:00ed 26c6470e01     mov byte ptr es:[bx + 0xe], 1
+0eff:00f2 ff760c         push word ptr [bp + 0xc]
+0eff:00f5 ff760a         push word ptr [bp + 0xa]
+0eff:00f8 8b4606         mov ax, word ptr [bp + 6]
+0eff:00fb 40             inc ax
+0eff:00fc 40             inc ax
+0eff:00fd ff7608         push word ptr [bp + 8]
+0eff:0100 50             push ax
+0eff:0101 9a821b0000     lcall 0, 0x1b82
+0eff:0106 83c408         add sp, 8
+0eff:0109 ff7608         push word ptr [bp + 8]
+0eff:010c ff7606         push word ptr [bp + 6]
+0eff:010f 9a1408ff0e     lcall 0xeff, 0x814
+0eff:0114 59             pop cx
+0eff:0115 59             pop cx
+0eff:0116 8b5608         mov dx, word ptr [bp + 8]
+0eff:0119 8b4606         mov ax, word ptr [bp + 6]
+0eff:011c eb00           jmp 0x11e
+0eff:011e 5d             pop bp
+0eff:011f cb             retf 
+0eff:0120 c8080000       enter 8, 0
+0eff:0124 56             push si
+0eff:0125 57             push di
+0eff:0126 8b760a         mov si, word ptr [bp + 0xa]
+0eff:0129 39265c16       cmp word ptr [0x165c], sp
+0eff:012d 7705           ja 0x134
+0eff:012f 9aac290000     lcall 0, 0x29ac
+0eff:0134 c646ff00       mov byte ptr [bp - 1], 0
+0eff:0138 c646fe00       mov byte ptr [bp - 2], 0
+0eff:013c c646fd00       mov byte ptr [bp - 3], 0
+0eff:0140 c646fc00       mov byte ptr [bp - 4], 0
+0eff:0144 c646fb00       mov byte ptr [bp - 5], 0
+0eff:0148 c646fa00       mov byte ptr [bp - 6], 0
+0eff:014c 0bf6           or si, si
+0eff:014e 7e0f           jle 0x15f
+0eff:0150 56             push si
+0eff:0151 ff7608         push word ptr [bp + 8]
+0eff:0154 ff7606         push word ptr [bp + 6]
+0eff:0157 9a54068d0d     lcall 0xd8d, 0x654
+0eff:015c 83c406         add sp, 6
+0eff:015f c45e06         les bx, ptr [bp + 6]
+0eff:0162 26806716f7     and byte ptr es:[bx + 0x16], 0xf7
+0eff:0167 c45e06         les bx, ptr [bp + 6]
+0eff:016a 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:016e 50             push ax
+0eff:016f 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:0174 59             pop cx
+0eff:0175 8846f9         mov byte ptr [bp - 7], al
+0eff:0178 c45e06         les bx, ptr [bp + 6]
+0eff:017b 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:017f 8a46ff         mov al, byte ptr [bp - 1]
+0eff:0182 b400           mov ah, 0
+0eff:0184 ba0600         mov dx, 6
+0eff:0187 f7ea           imul dx
+0eff:0189 03d8           add bx, ax
+0eff:018b 268a00         mov al, byte ptr es:[bx + si]
+0eff:018e 8846f8         mov byte ptr [bp - 8], al
+0eff:0191 c45e06         les bx, ptr [bp + 6]
+0eff:0194 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:0198 3a46f8         cmp al, byte ptr [bp - 8]
+0eff:019b 7506           jne 0x1a3
+0eff:019d c646fe01       mov byte ptr [bp - 2], 1
+0eff:01a1 eb2b           jmp 0x1ce
+0eff:01a3 8a46f8         mov al, byte ptr [bp - 8]
+0eff:01a6 3a46f9         cmp al, byte ptr [bp - 7]
+0eff:01a9 7505           jne 0x1b0
+0eff:01ab fe46fc         inc byte ptr [bp - 4]
+0eff:01ae eb1e           jmp 0x1ce
+0eff:01b0 8a46f8         mov al, byte ptr [bp - 8]
+0eff:01b3 b400           mov ah, 0
+0eff:01b5 3d0600         cmp ax, 6
+0eff:01b8 7407           je 0x1c1
+0eff:01ba 3d0900         cmp ax, 9
+0eff:01bd 7407           je 0x1c6
+0eff:01bf eb0a           jmp 0x1cb
+0eff:01c1 fe46fb         inc byte ptr [bp - 5]
+0eff:01c4 eb08           jmp 0x1ce
+0eff:01c6 fe46fa         inc byte ptr [bp - 6]
+0eff:01c9 eb03           jmp 0x1ce
+0eff:01cb fe46fd         inc byte ptr [bp - 3]
+0eff:01ce 807efb00       cmp byte ptr [bp - 5], 0
+0eff:01d2 740a           je 0x1de
+0eff:01d4 807efa00       cmp byte ptr [bp - 6], 0
+0eff:01d8 7404           je 0x1de
+0eff:01da c646fe01       mov byte ptr [bp - 2], 1
+0eff:01de fe46ff         inc byte ptr [bp - 1]
+0eff:01e1 c45e06         les bx, ptr [bp + 6]
+0eff:01e4 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:01e8 3a46ff         cmp al, byte ptr [bp - 1]
+0eff:01eb 7609           jbe 0x1f6
+0eff:01ed 8a46fe         mov al, byte ptr [bp - 2]
+0eff:01f0 b400           mov ah, 0
+0eff:01f2 0bc0           or ax, ax
+0eff:01f4 7482           je 0x178
+0eff:01f6 807efe00       cmp byte ptr [bp - 2], 0
+0eff:01fa 740c           je 0x208
+0eff:01fc c45e06         les bx, ptr [bp + 6]
+0eff:01ff 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:0203 8846f8         mov byte ptr [bp - 8], al
+0eff:0206 eb5c           jmp 0x264
+0eff:0208 c45e06         les bx, ptr [bp + 6]
+0eff:020b 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:020f 3a46fc         cmp al, byte ptr [bp - 4]
+0eff:0212 7508           jne 0x21c
+0eff:0214 8a46f9         mov al, byte ptr [bp - 7]
+0eff:0217 8846f8         mov byte ptr [bp - 8], al
+0eff:021a eb48           jmp 0x264
+0eff:021c 8a46fd         mov al, byte ptr [bp - 3]
+0eff:021f b400           mov ah, 0
+0eff:0221 0bc0           or ax, ax
+0eff:0223 7402           je 0x227
+0eff:0225 eb12           jmp 0x239
+0eff:0227 807efb00       cmp byte ptr [bp - 5], 0
+0eff:022b 7406           je 0x233
+0eff:022d c646f806       mov byte ptr [bp - 8], 6
+0eff:0231 eb04           jmp 0x237
+0eff:0233 c646f809       mov byte ptr [bp - 8], 9
+0eff:0237 eb2b           jmp 0x264
+0eff:0239 c45e06         les bx, ptr [bp + 6]
+0eff:023c 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:0240 3a46fd         cmp al, byte ptr [bp - 3]
+0eff:0243 741c           je 0x261
+0eff:0245 807efb00       cmp byte ptr [bp - 5], 0
+0eff:0249 7506           jne 0x251
+0eff:024b 807efa00       cmp byte ptr [bp - 6], 0
+0eff:024f 7410           je 0x261
+0eff:0251 c45e06         les bx, ptr [bp + 6]
+0eff:0254 268a4716       mov al, byte ptr es:[bx + 0x16]
+0eff:0258 0c01           or al, 1
+0eff:025a c45e06         les bx, ptr [bp + 6]
+0eff:025d 26884716       mov byte ptr es:[bx + 0x16], al
+0eff:0261 e9c800         jmp 0x32c
+0eff:0264 c45e06         les bx, ptr [bp + 6]
+0eff:0267 268a4719       mov al, byte ptr es:[bx + 0x19]
+0eff:026b 50             push ax
+0eff:026c 8a46f8         mov al, byte ptr [bp - 8]
+0eff:026f 50             push ax
+0eff:0270 9a3003ff0e     lcall 0xeff, 0x330
+0eff:0275 59             pop cx
+0eff:0276 59             pop cx
+0eff:0277 8846f8         mov byte ptr [bp - 8], al
+0eff:027a c45e06         les bx, ptr [bp + 6]
+0eff:027d 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0281 06             push es
+0eff:0282 c47e06         les di, ptr [bp + 6]
+0eff:0285 268a4513       mov al, byte ptr es:[di + 0x13]
+0eff:0289 b400           mov ah, 0
+0eff:028b ba0600         mov dx, 6
+0eff:028e f7ea           imul dx
+0eff:0290 03d8           add bx, ax
+0eff:0292 07             pop es
+0eff:0293 268a00         mov al, byte ptr es:[bx + si]
+0eff:0296 3a46f8         cmp al, byte ptr [bp - 8]
+0eff:0299 7503           jne 0x29e
+0eff:029b e98600         jmp 0x324
+0eff:029e 56             push si
+0eff:029f 8a46f8         mov al, byte ptr [bp - 8]
+0eff:02a2 50             push ax
+0eff:02a3 c45e06         les bx, ptr [bp + 6]
+0eff:02a6 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:02aa 50             push ax
+0eff:02ab ff7608         push word ptr [bp + 8]
+0eff:02ae ff7606         push word ptr [bp + 6]
+0eff:02b1 9a25078d0d     lcall 0xd8d, 0x725
+0eff:02b6 83c40a         add sp, 0xa
+0eff:02b9 c45e06         les bx, ptr [bp + 6]
+0eff:02bc 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:02c0 06             push es
+0eff:02c1 c47e06         les di, ptr [bp + 6]
+0eff:02c4 268a4513       mov al, byte ptr es:[di + 0x13]
+0eff:02c8 b400           mov ah, 0
+0eff:02ca ba0600         mov dx, 6
+0eff:02cd f7ea           imul dx
+0eff:02cf 03d8           add bx, ax
+0eff:02d1 07             pop es
+0eff:02d2 26804f0540     or byte ptr es:[bx + 5], 0x40
+0eff:02d7 c45e06         les bx, ptr [bp + 6]
+0eff:02da 26837f1a00     cmp word ptr es:[bx + 0x1a], 0
+0eff:02df 7443           je 0x324
+0eff:02e1 56             push si
+0eff:02e2 8a46f8         mov al, byte ptr [bp - 8]
+0eff:02e5 50             push ax
+0eff:02e6 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:02eb 59             pop cx
+0eff:02ec 50             push ax
+0eff:02ed c45e06         les bx, ptr [bp + 6]
+0eff:02f0 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:02f4 fec0           inc al
+0eff:02f6 50             push ax
+0eff:02f7 ff7608         push word ptr [bp + 8]
+0eff:02fa ff7606         push word ptr [bp + 6]
+0eff:02fd 9a25078d0d     lcall 0xd8d, 0x725
+0eff:0302 83c40a         add sp, 0xa
+0eff:0305 c45e06         les bx, ptr [bp + 6]
+0eff:0308 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:030c 06             push es
+0eff:030d c47e06         les di, ptr [bp + 6]
+0eff:0310 268a4513       mov al, byte ptr es:[di + 0x13]
+0eff:0314 b400           mov ah, 0
+0eff:0316 40             inc ax
+0eff:0317 ba0600         mov dx, 6
+0eff:031a f7ea           imul dx
+0eff:031c 03d8           add bx, ax
+0eff:031e 07             pop es
+0eff:031f 26804f0540     or byte ptr es:[bx + 5], 0x40
+0eff:0324 c45e06         les bx, ptr [bp + 6]
+0eff:0327 26806716fa     and byte ptr es:[bx + 0x16], 0xfa
+0eff:032c 5f             pop di
+0eff:032d 5e             pop si
+0eff:032e c9             leave 
+0eff:032f cb             retf 
+0eff:0330 55             push bp
+0eff:0331 8bec           mov bp, sp
+0eff:0333 39265c16       cmp word ptr [0x165c], sp
+0eff:0337 7705           ja 0x33e
+0eff:0339 9aac290000     lcall 0, 0x29ac
+0eff:033e 8a4606         mov al, byte ptr [bp + 6]
+0eff:0341 50             push ax
+0eff:0342 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:0347 59             pop cx
+0eff:0348 50             push ax
+0eff:0349 8a4608         mov al, byte ptr [bp + 8]
+0eff:034c 50             push ax
+0eff:034d 9a4c038d0d     lcall 0xd8d, 0x34c
+0eff:0352 59             pop cx
+0eff:0353 59             pop cx
+0eff:0354 50             push ax
+0eff:0355 8a4606         mov al, byte ptr [bp + 6]
+0eff:0358 50             push ax
+0eff:0359 8a4608         mov al, byte ptr [bp + 8]
+0eff:035c 50             push ax
+0eff:035d 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:0362 59             pop cx
+0eff:0363 50             push ax
+0eff:0364 9a4c038d0d     lcall 0xd8d, 0x34c
+0eff:0369 59             pop cx
+0eff:036a 59             pop cx
+0eff:036b 50             push ax
+0eff:036c 9ae3038d0d     lcall 0xd8d, 0x3e3
+0eff:0371 59             pop cx
+0eff:0372 59             pop cx
+0eff:0373 eb00           jmp 0x375
+0eff:0375 5d             pop bp
+0eff:0376 cb             retf 
+0eff:0377 c8060000       enter 6, 0
+0eff:037b 56             push si
+0eff:037c 39265c16       cmp word ptr [0x165c], sp
+0eff:0380 7705           ja 0x387
+0eff:0382 9aac290000     lcall 0, 0x29ac
+0eff:0387 16             push ss
+0eff:0388 8d46fc         lea ax, [bp - 4]
+0eff:038b 50             push ax
+0eff:038c 9a064f8b04     lcall 0x48b, 0x4f06
+0eff:0391 59             pop cx
+0eff:0392 59             pop cx
+0eff:0393 8a460a         mov al, byte ptr [bp + 0xa]
+0eff:0396 8846fc         mov byte ptr [bp - 4], al
+0eff:0399 c45e06         les bx, ptr [bp + 6]
+0eff:039c 268a4719       mov al, byte ptr es:[bx + 0x19]
+0eff:03a0 50             push ax
+0eff:03a1 8a460e         mov al, byte ptr [bp + 0xe]
+0eff:03a4 50             push ax
+0eff:03a5 0e             push cs
+0eff:03a6 e887ff         call 0x330
+0eff:03a9 59             pop cx
+0eff:03aa 59             pop cx
+0eff:03ab c45e06         les bx, ptr [bp + 6]
+0eff:03ae 263a4718       cmp al, byte ptr es:[bx + 0x18]
+0eff:03b2 757b           jne 0x42f
+0eff:03b4 33f6           xor si, si
+0eff:03b6 c45e06         les bx, ptr [bp + 6]
+0eff:03b9 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:03bd 8846fe         mov byte ptr [bp - 2], al
+0eff:03c0 c746fa0000     mov word ptr [bp - 6], 0
+0eff:03c5 eb3f           jmp 0x406
+0eff:03c7 c45e06         les bx, ptr [bp + 6]
+0eff:03ca 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:03ce 8b46fa         mov ax, word ptr [bp - 6]
+0eff:03d1 ba0600         mov dx, 6
+0eff:03d4 f7ea           imul dx
+0eff:03d6 03d8           add bx, ax
+0eff:03d8 26803f0f       cmp byte ptr es:[bx], 0xf
+0eff:03dc 751e           jne 0x3fc
+0eff:03de 8a46fa         mov al, byte ptr [bp - 6]
+0eff:03e1 8846fd         mov byte ptr [bp - 3], al
+0eff:03e4 ff76fa         push word ptr [bp - 6]
+0eff:03e7 ff7608         push word ptr [bp + 8]
+0eff:03ea ff7606         push word ptr [bp + 6]
+0eff:03ed 9a250bff0e     lcall 0xeff, 0xb25
+0eff:03f2 83c406         add sp, 6
+0eff:03f5 0bc0           or ax, ax
+0eff:03f7 7503           jne 0x3fc
+0eff:03f9 be0100         mov si, 1
+0eff:03fc 83fe01         cmp si, 1
+0eff:03ff 7502           jne 0x403
+0eff:0401 eb11           jmp 0x414
+0eff:0403 ff46fa         inc word ptr [bp - 6]
+0eff:0406 c45e06         les bx, ptr [bp + 6]
+0eff:0409 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:040d b400           mov ah, 0
+0eff:040f 3b46fa         cmp ax, word ptr [bp - 6]
+0eff:0412 7fb3           jg 0x3c7
+0eff:0414 ff7612         push word ptr [bp + 0x12]
+0eff:0417 ff7610         push word ptr [bp + 0x10]
+0eff:041a 16             push ss
+0eff:041b 8d46fc         lea ax, [bp - 4]
+0eff:041e 50             push ax
+0eff:041f ff7608         push word ptr [bp + 8]
+0eff:0422 ff7606         push word ptr [bp + 6]
+0eff:0425 9ad3088d0d     lcall 0xd8d, 0x8d3
+0eff:042a 83c40c         add sp, 0xc
+0eff:042d eb5f           jmp 0x48e
+0eff:042f c45e06         les bx, ptr [bp + 6]
+0eff:0432 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:0436 50             push ax
+0eff:0437 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:043c 59             pop cx
+0eff:043d 8846fe         mov byte ptr [bp - 2], al
+0eff:0440 c746fa0000     mov word ptr [bp - 6], 0
+0eff:0445 eb39           jmp 0x480
+0eff:0447 c45e06         les bx, ptr [bp + 6]
+0eff:044a 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:044e 8b46fa         mov ax, word ptr [bp - 6]
+0eff:0451 ba0600         mov dx, 6
+0eff:0454 f7ea           imul dx
+0eff:0456 03d8           add bx, ax
+0eff:0458 26803f0f       cmp byte ptr es:[bx], 0xf
+0eff:045c 751f           jne 0x47d
+0eff:045e 8a46fa         mov al, byte ptr [bp - 6]
+0eff:0461 8846fd         mov byte ptr [bp - 3], al
+0eff:0464 ff7612         push word ptr [bp + 0x12]
+0eff:0467 ff7610         push word ptr [bp + 0x10]
+0eff:046a 16             push ss
+0eff:046b 8d46fc         lea ax, [bp - 4]
+0eff:046e 50             push ax
+0eff:046f ff7608         push word ptr [bp + 8]
+0eff:0472 ff7606         push word ptr [bp + 6]
+0eff:0475 9ad3088d0d     lcall 0xd8d, 0x8d3
+0eff:047a 83c40c         add sp, 0xc
+0eff:047d ff46fa         inc word ptr [bp - 6]
+0eff:0480 c45e06         les bx, ptr [bp + 6]
+0eff:0483 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:0487 b400           mov ah, 0
+0eff:0489 3b46fa         cmp ax, word ptr [bp - 6]
+0eff:048c 7fb9           jg 0x447
+0eff:048e 5e             pop si
+0eff:048f c9             leave 
+0eff:0490 cb             retf 
+0eff:0491 c8080000       enter 8, 0
+0eff:0495 56             push si
+0eff:0496 39265c16       cmp word ptr [0x165c], sp
+0eff:049a 7705           ja 0x4a1
+0eff:049c 9aac290000     lcall 0, 0x29ac
+0eff:04a1 c646ff00       mov byte ptr [bp - 1], 0
+0eff:04a5 c45e06         les bx, ptr [bp + 6]
+0eff:04a8 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:04ac 06             push es
+0eff:04ad c47606         les si, ptr [bp + 6]
+0eff:04b0 268a4413       mov al, byte ptr es:[si + 0x13]
+0eff:04b4 b400           mov ah, 0
+0eff:04b6 ba0600         mov dx, 6
+0eff:04b9 f7ea           imul dx
+0eff:04bb 03d8           add bx, ax
+0eff:04bd 07             pop es
+0eff:04be 268a07         mov al, byte ptr es:[bx]
+0eff:04c1 8846fd         mov byte ptr [bp - 3], al
+0eff:04c4 807efd06       cmp byte ptr [bp - 3], 6
+0eff:04c8 7504           jne 0x4ce
+0eff:04ca c646fd02       mov byte ptr [bp - 3], 2
+0eff:04ce 807efd09       cmp byte ptr [bp - 3], 9
+0eff:04d2 7504           jne 0x4d8
+0eff:04d4 c646fd01       mov byte ptr [bp - 3], 1
+0eff:04d8 c45e06         les bx, ptr [bp + 6]
+0eff:04db 268a4719       mov al, byte ptr es:[bx + 0x19]
+0eff:04df 50             push ax
+0eff:04e0 8a46fd         mov al, byte ptr [bp - 3]
+0eff:04e3 50             push ax
+0eff:04e4 0e             push cs
+0eff:04e5 e848fe         call 0x330
+0eff:04e8 59             pop cx
+0eff:04e9 59             pop cx
+0eff:04ea 8846fe         mov byte ptr [bp - 2], al
+0eff:04ed 807e0a00       cmp byte ptr [bp + 0xa], 0
+0eff:04f1 7404           je 0x4f7
+0eff:04f3 c646ff01       mov byte ptr [bp - 1], 1
+0eff:04f7 c45e06         les bx, ptr [bp + 6]
+0eff:04fa 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:04fe 50             push ax
+0eff:04ff 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:0504 59             pop cx
+0eff:0505 3a46fe         cmp al, byte ptr [bp - 2]
+0eff:0508 7403           je 0x50d
+0eff:050a e9ed00         jmp 0x5fa
+0eff:050d c746fa0000     mov word ptr [bp - 6], 0
+0eff:0512 e9d400         jmp 0x5e9
+0eff:0515 c45e06         les bx, ptr [bp + 6]
+0eff:0518 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:051c 8b46fa         mov ax, word ptr [bp - 6]
+0eff:051f ba0600         mov dx, 6
+0eff:0522 f7ea           imul dx
+0eff:0524 03d8           add bx, ax
+0eff:0526 8a46ff         mov al, byte ptr [bp - 1]
+0eff:0529 b400           mov ah, 0
+0eff:052b 03d8           add bx, ax
+0eff:052d 26803f0f       cmp byte ptr es:[bx], 0xf
+0eff:0531 751f           jne 0x552
+0eff:0533 8a46ff         mov al, byte ptr [bp - 1]
+0eff:0536 b400           mov ah, 0
+0eff:0538 50             push ax
+0eff:0539 8a46fe         mov al, byte ptr [bp - 2]
+0eff:053c 50             push ax
+0eff:053d 8a46fa         mov al, byte ptr [bp - 6]
+0eff:0540 50             push ax
+0eff:0541 ff7608         push word ptr [bp + 8]
+0eff:0544 ff7606         push word ptr [bp + 6]
+0eff:0547 9a25078d0d     lcall 0xd8d, 0x725
+0eff:054c 83c40a         add sp, 0xa
+0eff:054f e99400         jmp 0x5e6
+0eff:0552 c646f900       mov byte ptr [bp - 7], 0
+0eff:0556 c746fa0000     mov word ptr [bp - 6], 0
+0eff:055b eb59           jmp 0x5b6
+0eff:055d c45e06         les bx, ptr [bp + 6]
+0eff:0560 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0564 8b46fa         mov ax, word ptr [bp - 6]
+0eff:0567 ba0600         mov dx, 6
+0eff:056a f7ea           imul dx
+0eff:056c 03d8           add bx, ax
+0eff:056e 8a46ff         mov al, byte ptr [bp - 1]
+0eff:0571 b400           mov ah, 0
+0eff:0573 03d8           add bx, ax
+0eff:0575 26803f0f       cmp byte ptr es:[bx], 0xf
+0eff:0579 750b           jne 0x586
+0eff:057b fe46f9         inc byte ptr [bp - 7]
+0eff:057e 8a46fa         mov al, byte ptr [bp - 6]
+0eff:0581 8846f8         mov byte ptr [bp - 8], al
+0eff:0584 eb2d           jmp 0x5b3
+0eff:0586 8a46ff         mov al, byte ptr [bp - 1]
+0eff:0589 b400           mov ah, 0
+0eff:058b 50             push ax
+0eff:058c c45e06         les bx, ptr [bp + 6]
+0eff:058f 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0593 8b46fa         mov ax, word ptr [bp - 6]
+0eff:0596 ba0600         mov dx, 6
+0eff:0599 f7ea           imul dx
+0eff:059b 03d8           add bx, ax
+0eff:059d 268a07         mov al, byte ptr es:[bx]
+0eff:05a0 50             push ax
+0eff:05a1 8a46fa         mov al, byte ptr [bp - 6]
+0eff:05a4 50             push ax
+0eff:05a5 ff7608         push word ptr [bp + 8]
+0eff:05a8 ff7606         push word ptr [bp + 6]
+0eff:05ab 9a25078d0d     lcall 0xd8d, 0x725
+0eff:05b0 83c40a         add sp, 0xa
+0eff:05b3 ff46fa         inc word ptr [bp - 6]
+0eff:05b6 c45e06         les bx, ptr [bp + 6]
+0eff:05b9 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:05bd b400           mov ah, 0
+0eff:05bf 3b46fa         cmp ax, word ptr [bp - 6]
+0eff:05c2 7f99           jg 0x55d
+0eff:05c4 807ef901       cmp byte ptr [bp - 7], 1
+0eff:05c8 751c           jne 0x5e6
+0eff:05ca 8a46ff         mov al, byte ptr [bp - 1]
+0eff:05cd b400           mov ah, 0
+0eff:05cf 50             push ax
+0eff:05d0 8a46fe         mov al, byte ptr [bp - 2]
+0eff:05d3 50             push ax
+0eff:05d4 8a46f8         mov al, byte ptr [bp - 8]
+0eff:05d7 50             push ax
+0eff:05d8 ff7608         push word ptr [bp + 8]
+0eff:05db ff7606         push word ptr [bp + 6]
+0eff:05de 9a25078d0d     lcall 0xd8d, 0x725
+0eff:05e3 83c40a         add sp, 0xa
+0eff:05e6 ff46fa         inc word ptr [bp - 6]
+0eff:05e9 c45e06         les bx, ptr [bp + 6]
+0eff:05ec 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:05f0 b400           mov ah, 0
+0eff:05f2 3b46fa         cmp ax, word ptr [bp - 6]
+0eff:05f5 7e03           jle 0x5fa
+0eff:05f7 e91bff         jmp 0x515
+0eff:05fa 5e             pop si
+0eff:05fb c9             leave 
+0eff:05fc cb             retf 
+0eff:05fd c8020000       enter 2, 0
+0eff:0601 56             push si
+0eff:0602 57             push di
+0eff:0603 39265c16       cmp word ptr [0x165c], sp
+0eff:0607 7705           ja 0x60e
+0eff:0609 9aac290000     lcall 0, 0x29ac
+0eff:060e c45e06         les bx, ptr [bp + 6]
+0eff:0611 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0615 06             push es
+0eff:0616 8e4608         mov es, word ptr [bp + 8]
+0eff:0619 53             push bx
+0eff:061a 8b5e06         mov bx, word ptr [bp + 6]
+0eff:061d 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:0621 b400           mov ah, 0
+0eff:0623 ba0600         mov dx, 6
+0eff:0626 f7ea           imul dx
+0eff:0628 5b             pop bx
+0eff:0629 03d8           add bx, ax
+0eff:062b 07             pop es
+0eff:062c 268a07         mov al, byte ptr es:[bx]
+0eff:062f 8846fe         mov byte ptr [bp - 2], al
+0eff:0632 807efe06       cmp byte ptr [bp - 2], 6
+0eff:0636 7504           jne 0x63c
+0eff:0638 c646fe02       mov byte ptr [bp - 2], 2
+0eff:063c 807efe09       cmp byte ptr [bp - 2], 9
+0eff:0640 7504           jne 0x646
+0eff:0642 c646fe01       mov byte ptr [bp - 2], 1
+0eff:0646 c45e06         les bx, ptr [bp + 6]
+0eff:0649 268a4719       mov al, byte ptr es:[bx + 0x19]
+0eff:064d 50             push ax
+0eff:064e 8a46fe         mov al, byte ptr [bp - 2]
+0eff:0651 50             push ax
+0eff:0652 0e             push cs
+0eff:0653 e8dafc         call 0x330
+0eff:0656 59             pop cx
+0eff:0657 59             pop cx
+0eff:0658 8846ff         mov byte ptr [bp - 1], al
+0eff:065b 33ff           xor di, di
+0eff:065d c45e06         les bx, ptr [bp + 6]
+0eff:0660 268a4718       mov al, byte ptr es:[bx + 0x18]
+0eff:0664 3a46ff         cmp al, byte ptr [bp - 1]
+0eff:0667 7556           jne 0x6bf
+0eff:0669 33f6           xor si, si
+0eff:066b eb38           jmp 0x6a5
+0eff:066d c45e06         les bx, ptr [bp + 6]
+0eff:0670 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0674 8bc6           mov ax, si
+0eff:0676 ba0600         mov dx, 6
+0eff:0679 f7ea           imul dx
+0eff:067b 03d8           add bx, ax
+0eff:067d 268a07         mov al, byte ptr es:[bx]
+0eff:0680 c45e06         les bx, ptr [bp + 6]
+0eff:0683 263a4718       cmp al, byte ptr es:[bx + 0x18]
+0eff:0687 7504           jne 0x68d
+0eff:0689 33c0           xor ax, ax
+0eff:068b eb36           jmp 0x6c3
+0eff:068d c45e06         les bx, ptr [bp + 6]
+0eff:0690 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0694 8bc6           mov ax, si
+0eff:0696 ba0600         mov dx, 6
+0eff:0699 f7ea           imul dx
+0eff:069b 03d8           add bx, ax
+0eff:069d 26803f0f       cmp byte ptr es:[bx], 0xf
+0eff:06a1 7501           jne 0x6a4
+0eff:06a3 47             inc di
+0eff:06a4 46             inc si
+0eff:06a5 c45e06         les bx, ptr [bp + 6]
+0eff:06a8 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:06ac b400           mov ah, 0
+0eff:06ae 3bc6           cmp ax, si
+0eff:06b0 7fbb           jg 0x66d
+0eff:06b2 0bff           or di, di
+0eff:06b4 7504           jne 0x6ba
+0eff:06b6 33c0           xor ax, ax
+0eff:06b8 eb09           jmp 0x6c3
+0eff:06ba b80100         mov ax, 1
+0eff:06bd eb04           jmp 0x6c3
+0eff:06bf 33c0           xor ax, ax
+0eff:06c1 eb00           jmp 0x6c3
+0eff:06c3 5f             pop di
+0eff:06c4 5e             pop si
+0eff:06c5 c9             leave 
+0eff:06c6 cb             retf 
+0eff:06c7 c8020000       enter 2, 0
+0eff:06cb 56             push si
+0eff:06cc 8b760a         mov si, word ptr [bp + 0xa]
+0eff:06cf 39265c16       cmp word ptr [0x165c], sp
+0eff:06d3 7705           ja 0x6da
+0eff:06d5 9aac290000     lcall 0, 0x29ac
+0eff:06da 0bf6           or si, si
+0eff:06dc 7e0f           jle 0x6ed
+0eff:06de 56             push si
+0eff:06df ff7608         push word ptr [bp + 8]
+0eff:06e2 ff7606         push word ptr [bp + 6]
+0eff:06e5 9a54068d0d     lcall 0xd8d, 0x654
+0eff:06ea 83c406         add sp, 6
+0eff:06ed c45e06         les bx, ptr [bp + 6]
+0eff:06f0 26806716f7     and byte ptr es:[bx + 0x16], 0xf7
+0eff:06f5 c45e06         les bx, ptr [bp + 6]
+0eff:06f8 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:06fc 268a00         mov al, byte ptr es:[bx + si]
+0eff:06ff 8846ff         mov byte ptr [bp - 1], al
+0eff:0702 8a46ff         mov al, byte ptr [bp - 1]
+0eff:0705 50             push ax
+0eff:0706 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:070b 59             pop cx
+0eff:070c 8846ff         mov byte ptr [bp - 1], al
+0eff:070f c45e06         les bx, ptr [bp + 6]
+0eff:0712 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0716 83c306         add bx, 6
+0eff:0719 268a00         mov al, byte ptr es:[bx + si]
+0eff:071c 3a46ff         cmp al, byte ptr [bp - 1]
+0eff:071f 7427           je 0x748
+0eff:0721 807eff0f       cmp byte ptr [bp - 1], 0xf
+0eff:0725 7415           je 0x73c
+0eff:0727 56             push si
+0eff:0728 8a46ff         mov al, byte ptr [bp - 1]
+0eff:072b 50             push ax
+0eff:072c 6a01           push 1
+0eff:072e ff7608         push word ptr [bp + 8]
+0eff:0731 ff7606         push word ptr [bp + 6]
+0eff:0734 9a25078d0d     lcall 0xd8d, 0x725
+0eff:0739 83c40a         add sp, 0xa
+0eff:073c c45e06         les bx, ptr [bp + 6]
+0eff:073f 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0743 26804f0b40     or byte ptr es:[bx + 0xb], 0x40
+0eff:0748 5e             pop si
+0eff:0749 c9             leave 
+0eff:074a cb             retf 
+0eff:074b c8040000       enter 4, 0
+0eff:074f 39265c16       cmp word ptr [0x165c], sp
+0eff:0753 7705           ja 0x75a
+0eff:0755 9aac290000     lcall 0, 0x29ac
+0eff:075a 16             push ss
+0eff:075b 8d46fc         lea ax, [bp - 4]
+0eff:075e 50             push ax
+0eff:075f 9a064f8b04     lcall 0x48b, 0x4f06
+0eff:0764 59             pop cx
+0eff:0765 59             pop cx
+0eff:0766 8a460a         mov al, byte ptr [bp + 0xa]
+0eff:0769 8846fc         mov byte ptr [bp - 4], al
+0eff:076c c646fd00       mov byte ptr [bp - 3], 0
+0eff:0770 8a460e         mov al, byte ptr [bp + 0xe]
+0eff:0773 50             push ax
+0eff:0774 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:0779 59             pop cx
+0eff:077a 8846fe         mov byte ptr [bp - 2], al
+0eff:077d ff7612         push word ptr [bp + 0x12]
+0eff:0780 ff7610         push word ptr [bp + 0x10]
+0eff:0783 16             push ss
+0eff:0784 8d46fc         lea ax, [bp - 4]
+0eff:0787 50             push ax
+0eff:0788 ff7608         push word ptr [bp + 8]
+0eff:078b ff7606         push word ptr [bp + 6]
+0eff:078e 9ad3088d0d     lcall 0xd8d, 0x8d3
+0eff:0793 83c40c         add sp, 0xc
+0eff:0796 c9             leave 
+0eff:0797 cb             retf 
+0eff:0798 c8020000       enter 2, 0
+0eff:079c 39265c16       cmp word ptr [0x165c], sp
+0eff:07a0 7705           ja 0x7a7
+0eff:07a2 9aac290000     lcall 0, 0x29ac
+0eff:07a7 c646ff00       mov byte ptr [bp - 1], 0
+0eff:07ab c45e06         les bx, ptr [bp + 6]
+0eff:07ae 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:07b2 268a4706       mov al, byte ptr es:[bx + 6]
+0eff:07b6 8846fe         mov byte ptr [bp - 2], al
+0eff:07b9 807efe06       cmp byte ptr [bp - 2], 6
+0eff:07bd 7504           jne 0x7c3
+0eff:07bf c646fe02       mov byte ptr [bp - 2], 2
+0eff:07c3 807efe09       cmp byte ptr [bp - 2], 9
+0eff:07c7 7504           jne 0x7cd
+0eff:07c9 c646fe01       mov byte ptr [bp - 2], 1
+0eff:07cd 807e0a00       cmp byte ptr [bp + 0xa], 0
+0eff:07d1 7404           je 0x7d7
+0eff:07d3 c646ff01       mov byte ptr [bp - 1], 1
+0eff:07d7 8a46fe         mov al, byte ptr [bp - 2]
+0eff:07da 50             push ax
+0eff:07db 9a7a048d0d     lcall 0xd8d, 0x47a
+0eff:07e0 59             pop cx
+0eff:07e1 8846fe         mov byte ptr [bp - 2], al
+0eff:07e4 c45e06         les bx, ptr [bp + 6]
+0eff:07e7 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:07eb 8a46ff         mov al, byte ptr [bp - 1]
+0eff:07ee b400           mov ah, 0
+0eff:07f0 03d8           add bx, ax
+0eff:07f2 26803f0f       cmp byte ptr es:[bx], 0xf
+0eff:07f6 751a           jne 0x812
+0eff:07f8 8a46ff         mov al, byte ptr [bp - 1]
+0eff:07fb b400           mov ah, 0
+0eff:07fd 50             push ax
+0eff:07fe 8a46fe         mov al, byte ptr [bp - 2]
+0eff:0801 50             push ax
+0eff:0802 6a00           push 0
+0eff:0804 ff7608         push word ptr [bp + 8]
+0eff:0807 ff7606         push word ptr [bp + 6]
+0eff:080a 9a25078d0d     lcall 0xd8d, 0x725
+0eff:080f 83c40a         add sp, 0xa
+0eff:0812 c9             leave 
+0eff:0813 cb             retf 
+0eff:0814 c8400000       enter 0x40, 0
+0eff:0818 56             push si
+0eff:0819 57             push di
+0eff:081a 39265c16       cmp word ptr [0x165c], sp
+0eff:081e 7705           ja 0x825
+0eff:0820 9aac290000     lcall 0, 0x29ac
+0eff:0825 c45e06         les bx, ptr [bp + 6]
+0eff:0828 26c6471600     mov byte ptr es:[bx + 0x16], 0
+0eff:082d c45e06         les bx, ptr [bp + 6]
+0eff:0830 268a470e       mov al, byte ptr es:[bx + 0xe]
+0eff:0834 50             push ax
+0eff:0835 8b4606         mov ax, word ptr [bp + 6]
+0eff:0838 40             inc ax
+0eff:0839 40             inc ax
+0eff:083a ff7608         push word ptr [bp + 8]
+0eff:083d 50             push ax
+0eff:083e b8d82a         mov ax, 0x2ad8
+0eff:0841 8ec0           mov es, ax
+0eff:0843 26ff360200     push word ptr es:[2]
+0eff:0848 26ff360000     push word ptr es:[0]
+0eff:084d 16             push ss
+0eff:084e 8d46f6         lea ax, [bp - 0xa]
+0eff:0851 50             push ax
+0eff:0852 9acc035c1c     lcall 0x1c5c, 0x3cc
+0eff:0857 83c40e         add sp, 0xe
+0eff:085a 807efa00       cmp byte ptr [bp - 6], 0
+0eff:085e 7405           je 0x865
+0eff:0860 33c0           xor ax, ax
+0eff:0862 e94401         jmp 0x9a9
+0eff:0865 8b46fd         mov ax, word ptr [bp - 3]
+0eff:0868 8b56fb         mov dx, word ptr [bp - 5]
+0eff:086b 8946f4         mov word ptr [bp - 0xc], ax
+0eff:086e 8956f2         mov word ptr [bp - 0xe], dx
+0eff:0871 6a2d           push 0x2d
+0eff:0873 ff76f4         push word ptr [bp - 0xc]
+0eff:0876 ff76f2         push word ptr [bp - 0xe]
+0eff:0879 16             push ss
+0eff:087a 8d46c0         lea ax, [bp - 0x40]
+0eff:087d 50             push ax
+0eff:087e 9a00180000     lcall 0, 0x1800
+0eff:0883 83c40a         add sp, 0xa
+0eff:0886 1e             push ds
+0eff:0887 68d902         push 0x2d9
+0eff:088a 16             push ss
+0eff:088b 8d46c0         lea ax, [bp - 0x40]
+0eff:088e 50             push ax
+0eff:088f 9a521b0000     lcall 0, 0x1b52
+0eff:0894 83c408         add sp, 8
+0eff:0897 0bc0           or ax, ax
+0eff:0899 7411           je 0x8ac
+0eff:089b b8d72a         mov ax, 0x2ad7
+0eff:089e 8ec0           mov es, ax
+0eff:08a0 26c70600000000 mov word ptr es:[0], 0
+0eff:08a7 33c0           xor ax, ax
+0eff:08a9 e9fd00         jmp 0x9a9
+0eff:08ac b8d72a         mov ax, 0x2ad7
+0eff:08af 8ec0           mov es, ax
+0eff:08b1 26c70600000100 mov word ptr es:[0], 1
+0eff:08b8 8b46f4         mov ax, word ptr [bp - 0xc]
+0eff:08bb 8b56f2         mov dx, word ptr [bp - 0xe]
+0eff:08be 83c232         add dx, 0x32
+0eff:08c1 8946f4         mov word ptr [bp - 0xc], ax
+0eff:08c4 8956f2         mov word ptr [bp - 0xe], dx
+0eff:08c7 c45e06         les bx, ptr [bp + 6]
+0eff:08ca 06             push es
+0eff:08cb c47ef2         les di, ptr [bp - 0xe]
+0eff:08ce 268a05         mov al, byte ptr es:[di]
+0eff:08d1 07             pop es
+0eff:08d2 26884713       mov byte ptr es:[bx + 0x13], al
+0eff:08d6 ff46f2         inc word ptr [bp - 0xe]
+0eff:08d9 c45e06         les bx, ptr [bp + 6]
+0eff:08dc 06             push es
+0eff:08dd c47ef2         les di, ptr [bp - 0xe]
+0eff:08e0 268a05         mov al, byte ptr es:[di]
+0eff:08e3 07             pop es
+0eff:08e4 26884714       mov byte ptr es:[bx + 0x14], al
+0eff:08e8 ff46f2         inc word ptr [bp - 0xe]
+0eff:08eb c45e06         les bx, ptr [bp + 6]
+0eff:08ee 06             push es
+0eff:08ef c47ef2         les di, ptr [bp - 0xe]
+0eff:08f2 268a05         mov al, byte ptr es:[di]
+0eff:08f5 07             pop es
+0eff:08f6 26884718       mov byte ptr es:[bx + 0x18], al
+0eff:08fa ff46f2         inc word ptr [bp - 0xe]
+0eff:08fd c45e06         les bx, ptr [bp + 6]
+0eff:0900 06             push es
+0eff:0901 c47ef2         les di, ptr [bp - 0xe]
+0eff:0904 268a05         mov al, byte ptr es:[di]
+0eff:0907 07             pop es
+0eff:0908 26884719       mov byte ptr es:[bx + 0x19], al
+0eff:090c ff46f2         inc word ptr [bp - 0xe]
+0eff:090f c45e06         les bx, ptr [bp + 6]
+0eff:0912 06             push es
+0eff:0913 c47ef2         les di, ptr [bp - 0xe]
+0eff:0916 268a05         mov al, byte ptr es:[di]
+0eff:0919 b400           mov ah, 0
+0eff:091b 07             pop es
+0eff:091c 2689471a       mov word ptr es:[bx + 0x1a], ax
+0eff:0920 ff46f2         inc word ptr [bp - 0xe]
+0eff:0923 c45e06         les bx, ptr [bp + 6]
+0eff:0926 26c6471700     mov byte ptr es:[bx + 0x17], 0
+0eff:092b c45e06         les bx, ptr [bp + 6]
+0eff:092e 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:0932 b400           mov ah, 0
+0eff:0934 c45e06         les bx, ptr [bp + 6]
+0eff:0937 268a5714       mov dl, byte ptr es:[bx + 0x14]
+0eff:093b b600           mov dh, 0
+0eff:093d 03c2           add ax, dx
+0eff:093f ba0600         mov dx, 6
+0eff:0942 f7ea           imul dx
+0eff:0944 50             push ax
+0eff:0945 9aad220000     lcall 0, 0x22ad
+0eff:094a 59             pop cx
+0eff:094b c45e06         les bx, ptr [bp + 6]
+0eff:094e 26895711       mov word ptr es:[bx + 0x11], dx
+0eff:0952 2689470f       mov word ptr es:[bx + 0xf], ax
+0eff:0956 33f6           xor si, si
+0eff:0958 eb2a           jmp 0x984
+0eff:095a c45e06         les bx, ptr [bp + 6]
+0eff:095d 268b470f       mov ax, word ptr es:[bx + 0xf]
+0eff:0961 53             push bx
+0eff:0962 06             push es
+0eff:0963 50             push ax
+0eff:0964 8bc6           mov ax, si
+0eff:0966 ba0600         mov dx, 6
+0eff:0969 f7ea           imul dx
+0eff:096b 5a             pop dx
+0eff:096c 03d0           add dx, ax
+0eff:096e 07             pop es
+0eff:096f 5b             pop bx
+0eff:0970 26ff7711       push word ptr es:[bx + 0x11]
+0eff:0974 52             push dx
+0eff:0975 68f12a         push 0x2af1
+0eff:0978 68e20c         push 0xce2
+0eff:097b b90600         mov cx, 6
+0eff:097e 9a32290000     lcall 0, 0x2932
+0eff:0983 46             inc si
+0eff:0984 c45e06         les bx, ptr [bp + 6]
+0eff:0987 268a4713       mov al, byte ptr es:[bx + 0x13]
+0eff:098b b400           mov ah, 0
+0eff:098d c45e06         les bx, ptr [bp + 6]
+0eff:0990 268a5714       mov dl, byte ptr es:[bx + 0x14]
+0eff:0994 b600           mov dh, 0
+0eff:0996 03c2           add ax, dx
+0eff:0998 3bc6           cmp ax, si
+0eff:099a 7fbe           jg 0x95a
+0eff:099c ff76f4         push word ptr [bp - 0xc]
+0eff:099f ff76f2         push word ptr [bp - 0xe]
+0eff:09a2 9a71220000     lcall 0, 0x2271
+0eff:09a7 59             pop cx
+0eff:09a8 59             pop cx
+0eff:09a9 5f             pop di
+0eff:09aa 5e             pop si
+0eff:09ab c9             leave 
+0eff:09ac cb             retf 
+0eff:09ad c8060000       enter 6, 0
+0eff:09b1 39265c16       cmp word ptr [0x165c], sp
+0eff:09b5 7705           ja 0x9bc
+0eff:09b7 9aac290000     lcall 0, 0x29ac
+0eff:09bc c45e06         les bx, ptr [bp + 6]
+0eff:09bf 268a470e       mov al, byte ptr es:[bx + 0xe]
+0eff:09c3 50             push ax
+0eff:09c4 8b4606         mov ax, word ptr [bp + 6]
+0eff:09c7 40             inc ax
+0eff:09c8 40             inc ax
+0eff:09c9 ff7608         push word ptr [bp + 8]
+0eff:09cc 50             push ax
+0eff:09cd b8d82a         mov ax, 0x2ad8
+0eff:09d0 8ec0           mov es, ax
+0eff:09d2 26ff360200     push word ptr es:[2]
+0eff:09d7 26ff360000     push word ptr es:[0]
+0eff:09dc 16             push ss
+0eff:09dd 8d46fc         lea ax, [bp - 4]
+0eff:09e0 50             push ax
+0eff:09e1 9a85015c1c     lcall 0x1c5c, 0x185
+0eff:09e6 83c40e         add sp, 0xe
+0eff:09e9 807efe00       cmp byte ptr [bp - 2], 0
+0eff:09ed 7405           je 0x9f4
+0eff:09ef 33c0           xor ax, ax
+0eff:09f1 e9c500         jmp 0xab9
+0eff:09f4 6a2d           push 0x2d
+0eff:09f6 1e             push ds
+0eff:09f7 680703         push 0x307
+0eff:09fa ff76fc         push word ptr [bp - 4]
+0eff:09fd 9aad100000     lcall 0, 0x10ad
+0eff:0a02 83c408         add sp, 8
+0eff:0a05 c646fb1a       mov byte ptr [bp - 5], 0x1a
+0eff:0a09 6a01           push 1
+0eff:0a0b 16             push ss
+0eff:0a0c 8d46fb         lea ax, [bp - 5]
+0eff:0a0f 50             push ax
+0eff:0a10 ff76fc         push word ptr [bp - 4]
+0eff:0a13 9aad100000     lcall 0, 0x10ad
+0eff:0a18 83c408         add sp, 8
+0eff:0a1b 6a00           push 0
+0eff:0a1d 6a00           push 0
+0eff:0a1f 6a32           push 0x32
+0eff:0a21 ff76fc         push word ptr [bp - 4]
+0eff:0a24 9a26160000     lcall 0, 0x1626
+0eff:0a29 83c408         add sp, 8
+0eff:0a2c 6a01           push 1
+0eff:0a2e 8b4606         mov ax, word ptr [bp + 6]
+0eff:0a31 051300         add ax, 0x13
+0eff:0a34 ff7608         push word ptr [bp + 8]
+0eff:0a37 50             push ax
+0eff:0a38 ff76fc         push word ptr [bp - 4]
+0eff:0a3b 9aad100000     lcall 0, 0x10ad
+0eff:0a40 83c408         add sp, 8
+0eff:0a43 6a01           push 1
+0eff:0a45 8b4606         mov ax, word ptr [bp + 6]
+0eff:0a48 051400         add ax, 0x14
+0eff:0a4b ff7608         push word ptr [bp + 8]
+0eff:0a4e 50             push ax
+0eff:0a4f ff76fc         push word ptr [bp - 4]
+0eff:0a52 9aad100000     lcall 0, 0x10ad
+0eff:0a57 83c408         add sp, 8
+0eff:0a5a 6a01           push 1
+0eff:0a5c 8b4606         mov ax, word ptr [bp + 6]
+0eff:0a5f 051800         add ax, 0x18
+0eff:0a62 ff7608         push word ptr [bp + 8]
+0eff:0a65 50             push ax
+0eff:0a66 ff76fc         push word ptr [bp - 4]
+0eff:0a69 9aad100000     lcall 0, 0x10ad
+0eff:0a6e 83c408         add sp, 8
+0eff:0a71 6a01           push 1
+0eff:0a73 8b4606         mov ax, word ptr [bp + 6]
+0eff:0a76 051900         add ax, 0x19
+0eff:0a79 ff7608         push word ptr [bp + 8]
+0eff:0a7c 50             push ax
+0eff:0a7d ff76fc         push word ptr [bp - 4]
+0eff:0a80 9aad100000     lcall 0, 0x10ad
+0eff:0a85 83c408         add sp, 8
+0eff:0a88 6a02           push 2
+0eff:0a8a 8b4606         mov ax, word ptr [bp + 6]
+0eff:0a8d 051a00         add ax, 0x1a
+0eff:0a90 ff7608         push word ptr [bp + 8]
+0eff:0a93 50             push ax
+0eff:0a94 ff76fc         push word ptr [bp - 4]
+0eff:0a97 9aad100000     lcall 0, 0x10ad
+0eff:0a9c 83c408         add sp, 8
+0eff:0a9f ff76fc         push word ptr [bp - 4]
+0eff:0aa2 b8d82a         mov ax, 0x2ad8
+0eff:0aa5 8ec0           mov es, ax
+0eff:0aa7 26ff360200     push word ptr es:[2]
+0eff:0aac 26ff360000     push word ptr es:[0]
+0eff:0ab1 9a88055c1c     lcall 0x1c5c, 0x588
+0eff:0ab6 83c406         add sp, 6
+0eff:0ab9 c9             leave 
+0eff:0aba cb             retf 
+0eff:0abb 55             push bp
+0eff:0abc 8bec           mov bp, sp
+0eff:0abe 39265c16       cmp word ptr [0x165c], sp
+0eff:0ac2 7705           ja 0xac9
+0eff:0ac4 9aac290000     lcall 0, 0x29ac
+0eff:0ac9 8b4606         mov ax, word ptr [bp + 6]
+0eff:0acc 0b4608         or ax, word ptr [bp + 8]
+0eff:0acf 7402           je 0xad3
+0eff:0ad1 eb0e           jmp 0xae1
+0eff:0ad3 6a18           push 0x18
+0eff:0ad5 9a5f00ac1e     lcall 0x1eac, 0x5f
+0eff:0ada 59             pop cx
+0eff:0adb 895608         mov word ptr [bp + 8], dx
+0eff:0ade 894606         mov word ptr [bp + 6], ax
+0eff:0ae1 8b4606         mov ax, word ptr [bp + 6]
+0eff:0ae4 0b4608         or ax, word ptr [bp + 8]
+0eff:0ae7 7508           jne 0xaf1
+0eff:0ae9 8b5608         mov dx, word ptr [bp + 8]
+0eff:0aec 8b4606         mov ax, word ptr [bp + 6]
+0eff:0aef eb32           jmp 0xb23
+0eff:0af1 ff7610         push word ptr [bp + 0x10]
+0eff:0af4 ff760e         push word ptr [bp + 0xe]
+0eff:0af7 8a460c         mov al, byte ptr [bp + 0xc]
+0eff:0afa 50             push ax
+0eff:0afb 8a460a         mov al, byte ptr [bp + 0xa]
+0eff:0afe 50             push ax
+0eff:0aff ff7608         push word ptr [bp + 8]
+0eff:0b02 ff7606         push word ptr [bp + 6]
+0eff:0b05 9a04008d0d     lcall 0xd8d, 4
+0eff:0b0a 83c40c         add sp, 0xc
+0eff:0b0d 895608         mov word ptr [bp + 8], dx
+0eff:0b10 894606         mov word ptr [bp + 6], ax
+0eff:0b13 c45e06         les bx, ptr [bp + 6]
+0eff:0b16 26c7078103     mov word ptr es:[bx], 0x381
+0eff:0b1b 8b5608         mov dx, word ptr [bp + 8]
+0eff:0b1e 8b4606         mov ax, word ptr [bp + 6]
+0eff:0b21 eb00           jmp 0xb23
+0eff:0b23 5d             pop bp
+0eff:0b24 cb             retf 
+0eff:0b25 55             push bp
+0eff:0b26 8bec           mov bp, sp
+0eff:0b28 39265c16       cmp word ptr [0x165c], sp
+0eff:0b2c 7705           ja 0xb33
+0eff:0b2e 9aac290000     lcall 0, 0x29ac
+0eff:0b33 c45e06         les bx, ptr [bp + 6]
+0eff:0b36 26c45f0f       les bx, ptr es:[bx + 0xf]
+0eff:0b3a 8b460a         mov ax, word ptr [bp + 0xa]
+0eff:0b3d ba0600         mov dx, 6
+0eff:0b40 f7ea           imul dx
+0eff:0b42 03d8           add bx, ax
+0eff:0b44 268a4705       mov al, byte ptr es:[bx + 5]
+0eff:0b48 b400           mov ah, 0
+0eff:0b4a 250800         and ax, 8
+0eff:0b4d 3d0800         cmp ax, 8
+0eff:0b50 7505           jne 0xb57
+0eff:0b52 b80100         mov ax, 1
+0eff:0b55 eb02           jmp 0xb59
+0eff:0b57 33c0           xor ax, ax
+0eff:0b59 eb00           jmp 0xb5b
+0eff:0b5b 5d             pop bp
+0eff:0b5c cb             retf 
+0eff:0b5d 55             push bp
+0eff:0b5e 8bec           mov bp, sp
+0eff:0b60 39265c16       cmp word ptr [0x165c], sp
+0eff:0b64 7705           ja 0xb6b
+0eff:0b66 9aac290000     lcall 0, 0x29ac
+0eff:0b6b 8b4606         mov ax, word ptr [bp + 6]
+0eff:0b6e 0b4608         or ax, word ptr [bp + 8]
+0eff:0b71 7432           je 0xba5
+0eff:0b73 8b4606         mov ax, word ptr [bp + 6]
+0eff:0b76 0b4608         or ax, word ptr [bp + 8]
+0eff:0b79 7412           je 0xb8d
+0eff:0b7b 6a00           push 0
+0eff:0b7d ff7608         push word ptr [bp + 8]
+0eff:0b80 ff7606         push word ptr [bp + 6]
+0eff:0b83 9a0e018d0d     lcall 0xd8d, 0x10e
+0eff:0b88 83c406         add sp, 6
+0eff:0b8b eb00           jmp 0xb8d
+0eff:0b8d f7460a0100     test word ptr [bp + 0xa], 1
+0eff:0b92 740f           je 0xba3
+0eff:0b94 ff7608         push word ptr [bp + 8]
+0eff:0b97 ff7606         push word ptr [bp + 6]
+0eff:0b9a 9a71220000     lcall 0, 0x2271
+0eff:0b9f 59             pop cx
+0eff:0ba0 59             pop cx
+0eff:0ba1 eb00           jmp 0xba3
+0eff:0ba3 eb00           jmp 0xba5
+0eff:0ba5 5d             pop bp
+0eff:0ba6 cb             retf 
+0eff:0ba7 55             push bp
+0eff:0ba8 8bec           mov bp, sp
+0eff:0baa 39265c16       cmp word ptr [0x165c], sp
+0eff:0bae 7705           ja 0xbb5
+0eff:0bb0 9aac290000     lcall 0, 0x29ac
+0eff:0bb5 8b4606         mov ax, word ptr [bp + 6]
+0eff:0bb8 0b4608         or ax, word ptr [bp + 8]
+0eff:0bbb 7428           je 0xbe5
+0eff:0bbd 6a00           push 0
+0eff:0bbf ff7608         push word ptr [bp + 8]
+0eff:0bc2 ff7606         push word ptr [bp + 6]
+0eff:0bc5 9a0e018d0d     lcall 0xd8d, 0x10e
+0eff:0bca 83c406         add sp, 6
+0eff:0bcd f7460a0100     test word ptr [bp + 0xa], 1
+0eff:0bd2 740f           je 0xbe3
+0eff:0bd4 ff7608         push word ptr [bp + 8]
+0eff:0bd7 ff7606         push word ptr [bp + 6]
+0eff:0bda 9a71220000     lcall 0, 0x2271
+0eff:0bdf 59             pop cx

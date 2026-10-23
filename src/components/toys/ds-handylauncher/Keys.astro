@@ -1,0 +1,116 @@
+---
+// The keys that open every copy: HandyLauncher.exe 3.4 sub_11F3C. After the device's own key, he makes a key from each of
+// five built-in names with the shared key engine and compares it with yours, letter by letter from the end.
+import CodeStepper from '../CodeStepper.astro';
+import './hl.css';
+import { compareSteps } from './hl.ts';
+import { dinarKey, groups, UNIVERSAL } from '../../../lib/dinarsoft/handyswitcher.ts';
+import { unlock } from '../../../lib/dinarsoft/handylauncher.ts';
+
+const KEY = unlock.generate({});
+const NAMES = [UNIVERSAL, 'GIVEAWAYVERSION1'];
+const ASM = [
+  { off: '11F8C', code: 'bl   lstrcmpW', note: 'the key for this device?' },
+  { off: '11F98', code: 'ldr  r1,=YASSERMOHAMEDALI', note: 'a built-in name' },
+  { off: '11FB8', code: 'bl   keyengine', note: 'with "HandyLauncher3"' },
+  { off: '11FC4', code: 'cmp  r4,r0', note: 'same length?' },
+  { off: '11FD8', label: 'next', code: 'add  r2,sp,#14h', note: 'from the last letter' },
+  { off: '11FEC', code: 'cmp  r2,r3', note: 'one letter' },
+  { off: '12088', code: 'mov  r0,#5', note: 'a letter differs' },
+  { off: '12000', code: 'mov  r0,#7', note: 'all the same' },
+  { off: '12004', code: 'rsb  r3,r0,#25 / cmp r3,#18', note: '25 - 7 = 18?' },
+];
+const C = [
+  { code: 'if (!lstrcmp(key(code), t)) ok();' },
+  { code: 'wcscpy(buf, NAMES[i]);' },
+  { code: 'key(buf, L"HandyLauncher3");' },
+  { code: 'if (wcslen(t) == wcslen(buf)) {' },
+  { code: '  int k = n;' },
+  { code: '  while (k && buf[k-1] == t[k-1]) k--;' },
+  { code: '  if (k) r0 = 5;', note: 'differs' },
+  { code: '  else r0 = 7;', note: 'all the same' },
+  { code: '  if (25 - r0 == 18) ok(); }' },
+];
+const steps = compareSteps(KEY, dinarKey(UNIVERSAL, 'HandyLauncher3'), UNIVERSAL);
+---
+
+<div class="hl-keys" data-hlkeys>
+  <div class="hl-row" data-ctl hidden>
+    <label class="hl-pick">Your key <input class="hl-key-in" data-typed value={KEY} maxlength="19" spellcheck="false" autocomplete="off" autocapitalize="characters" /></label>
+    <label class="hl-pick">Built-in name <select data-name>{NAMES.map(n => <option>{n}</option>)}</select></label>
+    <button type="button" class="button button--primary" data-go>Check it</button>
+  </div>
+  <CodeStepper id="hl-keycs" title="HandyLauncher.exe  the keys for every device" asm={ASM} c={C} steps={steps} speed={0.35}>
+    <div slot="visual" class="hl-kv" data-vis>
+      <div class="hl-kv-row"><span class="hl-kv-lab">typed</span><span class="hl-kv-cells" data-row="t">{[...KEY].map(ch => <i class="ok">{ch}</i>)}</span></div>
+      <div class="hl-kv-row"><span class="hl-kv-lab">made</span><span class="hl-kv-cells" data-row="m">{[...KEY].map(ch => <i class="ok">{ch}</i>)}</span></div>
+      <p class="hl-say" data-out aria-live="polite">All sixteen letters match: <b>registered</b>.</p>
+    </div>
+  </CodeStepper>
+  <div class="hl-free">
+    <p class="hl-free-key"><span>HandyLauncher 3.4, every device</span><b>{groups(KEY)}</b></p>
+    <p class="hl-say">In 2026, Yasser Awad released HandyLauncher as freeware. This key is made from his own name, YASSERMOHAMEDALI, by the same engine. Type it on the License Key page, four letters in each box. HandyLauncher’s own check, run on an emulated ARM processor, unlocks it with this key, and stays locked for a key that does not match.</p>
+  </div>
+</div>
+
+<style is:global>
+  .hl-keys { display: grid; gap: 14px; }
+  .hl-key-in { width: 25ch; max-width: 100%; min-height: 44px; padding: 0 10px; font: 600 1rem/1 var(--font-code); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink); background: var(--surface); border: 1px solid var(--xp-line, #7f9db9); }
+  .hl-key-in:focus-visible, .hl-pick select:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  .hl-kv { display: grid; gap: 10px; padding: 16px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); container-type: inline-size; }
+  .hl-kv-row { display: flex; align-items: center; gap: 10px; }
+  .hl-kv-lab { min-width: 6ch; font: 700 12px/1 var(--font-code); color: var(--ink-2); }
+  .hl-kv-cells { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; flex: 1; min-width: 0; }
+  .hl-kv-cells i { display: grid; place-items: center; height: clamp(26px, 6cqw, 36px); font: 700 clamp(11px, 2.6cqw, 16px)/1 var(--font-code); font-style: normal; color: #000; background: #fff; box-shadow: inset 0 0 0 1px var(--xp-line, #7f9db9); }
+  .hl-kv-cells i:nth-child(4n):not(:last-child) { margin-right: 4px; }
+  .hl-kv-cells i.ok { background: color-mix(in oklch, var(--good) 22%, white); }
+  .hl-kv-cells i.bad { color: #fff; background: var(--hot); }
+  .hl-kv-cells i.now { outline: 2px solid var(--accent); outline-offset: 1px; z-index: 1; }
+  .hl-free { display: grid; gap: 8px; padding: 16px 18px; background: #fff; border: 1px solid var(--xp-line, #7f9db9); box-shadow: inset 4px 0 0 #cf2f2f; }
+  .hl-free-key { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin: 0 !important; }
+  .hl-free-key span { font: 600 0.875rem/1.3 var(--sans); color: var(--ink-2); }
+  .hl-free-key b { font: 700 clamp(1.25rem, 2vw + 0.8rem, 1.75rem)/1.1 var(--font-code); letter-spacing: 0.04em; color: #000; }
+</style>
+
+<script>
+  import { compareSteps, type Step } from './hl.ts';
+  import { dinarKey } from '../../../lib/dinarsoft/handyswitcher.ts';
+
+  document.querySelectorAll<HTMLElement & { hl?: boolean }>('[data-hlkeys]').forEach(root => {
+    if (root.hl) return;
+    root.hl = true;
+    const cs = root.querySelector<HTMLElement & { stepper?: { load(s: Step[], at?: number): void } }>('[data-stepper]')!;
+    const typedIn = root.querySelector<HTMLInputElement>('[data-typed]')!, nameSel = root.querySelector<HTMLSelectElement>('[data-name]')!;
+    const rowT = root.querySelector<HTMLElement>('[data-row="t"]')!, rowM = root.querySelector<HTMLElement>('[data-row="m"]')!;
+    const out = root.querySelector<HTMLElement>('[data-out]')!;
+    let typed = typedIn.value.replace(/[^A-Z]/gi, '').toUpperCase(), made = dinarKey(nameSel.value, 'HandyLauncher3');
+
+    const cells = (el: HTMLElement, s: string, from: number, bad: number, now: number) => {
+      el.innerHTML = Array.from({ length: 16 }, (_, i) => `<i class="${i >= from ? (i === bad ? 'bad' : 'ok') : ''}${i === now ? ' now' : ''}">${s[i] ?? '·'}</i>`).join('');
+    };
+    cs.addEventListener('stepper', e => {
+      const s = (e as CustomEvent).detail.step as Step & { k: number; ok?: boolean; all?: boolean };
+      // k: the letter being compared (-1 before the loop, -2 after it)
+      if (s.k === -1) { cells(rowT, typed, 99, -1, -1); cells(rowM, s.a >= 2 ? made : '', 99, -1, -1); }
+      else if (s.k >= 0) { const bad = s.ok ? -1 : s.k; cells(rowT, typed, s.k, bad, s.k); cells(rowM, made, s.k, bad, s.k); }
+      else {
+        let from = 16; while (from > 0 && typed[from - 1] === made[from - 1]) from--;
+        const bad = s.all ? -1 : from - 1;
+        cells(rowT, typed, s.all ? 0 : from - 1, bad, -1); cells(rowM, made, s.all ? 0 : from - 1, bad, -1);
+        if (s.done) out.innerHTML = s.all ? 'All sixteen letters match: <b>registered</b>.' : `Letter ${from} from the left differs, so this name does not open it. He moves on to the next name.`;
+      }
+    });
+    const go = () => {
+      typed = typedIn.value.replace(/[^A-Z]/gi, '').toUpperCase().slice(0, 16);
+      made = dinarKey(nameSel.value, 'HandyLauncher3');
+      if (typed.length !== 16) { out.textContent = 'A key has sixteen letters.'; typedIn.focus(); return; }
+      out.textContent = 'Follow his code below.';
+      cs.stepper?.load(compareSteps(typed, made, nameSel.value), 0);
+      cs.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
+    };
+    root.querySelector('[data-go]')!.addEventListener('click', go);
+    typedIn.addEventListener('keydown', e => { if (e.key === 'Enter') go(); });
+    nameSel.addEventListener('change', go);
+    root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
+  });
+</script>

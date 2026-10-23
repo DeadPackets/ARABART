@@ -1,0 +1,47 @@
+<svg class="dg" viewBox="0 0 640 252" role="img" aria-labelledby="th-cmds-t">
+<title id="th-cmds-t">The script commands of the SCREEN player and of the TAHER and DEMO.COM player. TAHER adds 88h (wait, clear, next slide) and z (wait, credit, exit).</title>
+<text class="t-cy" x="10" y="22">Byte</text>
+<text class="t-cy" x="130" y="22">SCREEN (gift)</text>
+<text class="t-cy" x="400" y="22">TAHER, DEMO.COM</text>
+<text x="10" y="54">00-6F</text>
+<text x="130" y="54">stroke: start, length</text>
+<text x="400" y="54">same</text>
+<text x="10" y="84">78h x</text>
+<text x="130" y="84">one column</text>
+<text x="400" y="84">same</text>
+<text x="10" y="114">77h w</text>
+<text x="130" y="114">one column back</text>
+<text x="400" y="114">same</text>
+<text x="10" y="144">79h y</text>
+<text x="130" y="144">new line: header</text>
+<text x="400" y="144">same</text>
+<text x="10" y="174">7Bh &#123;</text>
+<text x="130" y="174">next color, redraw</text>
+<text x="400" y="174">(not used)</text>
+<text x="10" y="204">88h</text>
+<text x="130" y="204">-</text>
+<text class="t-yl" x="400" y="204">wait, clear, next</text>
+<rect class="wire-hi" x="392" y="183" width="236" height="30" />
+<text x="10" y="234">7Ah z</text>
+<text x="130" y="234">-</text>
+<text class="t-yl" x="400" y="234">wait, credit, exit</text>
+<rect class="wire-hi" x="392" y="213" width="236" height="30" />
+</svg>
+<svg slot="narrow" class="dg" viewBox="0 0 300 340" role="img" aria-labelledby="th-cmds-tn">
+<title id="th-cmds-tn">Script commands of the two players; TAHER adds 88h and z.</title>
+<text class="t-cy" x="10" y="18">Byte: SCREEN / TAHER</text>
+<text x="10" y="46">00-6F</text>
+<text class="t-cy" x="10" y="67">stroke: start, length</text>
+<text x="10" y="90">78h x</text>
+<text class="t-cy" x="10" y="111">one column</text>
+<text x="10" y="134">77h w</text>
+<text class="t-cy" x="10" y="155">one column back</text>
+<text x="10" y="178">79h y</text>
+<text class="t-cy" x="10" y="199">new line: header</text>
+<text x="10" y="222">7Bh &#123;</text>
+<text class="t-cy" x="10" y="243">SCREEN only: next color</text>
+<text x="10" y="266">88h</text>
+<text class="t-yl" x="10" y="287">TAHER: wait, clear, next</text>
+<text x="10" y="310">7Ah z</text>
+<text class="t-yl" x="10" y="331">TAHER: wait, credit, exit</text>
+</svg>

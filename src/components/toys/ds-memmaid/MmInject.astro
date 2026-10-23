@@ -1,0 +1,101 @@
+---
+// The heap compactor in the CodeStepper, with a linked view of two processes: MemMaid sends its helper DLL into
+// Pocket IE with PerformCallBack4, the helper compacts Pocket IE's own heap from inside, and leaves.
+import Window from '../../shell/Window.astro';
+import CodeStepper from '../CodeStepper.astro';
+import { INJECT_ASM, INJECT_C, INJECT_STEPS } from './steps';
+
+// A heap with gaps: 1 = a block in use, 0 = a hole
+const HEAP = [1, 0, 1, 1, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 0, 1];
+const used = HEAP.filter(Boolean).length;
+// Drawn in the last step's state: compacted, used blocks first, the freed ones handed back
+const order = [...HEAP.keys()].sort((a, b) => HEAP[b] - HEAP[a] || a - b);
+---
+
+<CodeStepper id="mmcs-inject" title="MemMaid.exe, and its helper inside the app" asm={INJECT_ASM} c={INJECT_C} steps={INJECT_STEPS} speed={1} cTitle="In C. Find: GetProcAddress. Map: MapPtrToProcess">
+  <div slot="visual" class="mij" data-mm-inject data-ph="10">
+    <Window title="MemMaid.exe" kind="panel" class="mij-p mij-me">
+      <p class="mij-tag"><b>coredll.dll</b> <span data-k="0">PerformCallBack4</span></p>
+      <div class="mij-dll mij-home" data-k="1">MemMaidSetup.dll<small>PerformInst</small></div>
+      <p class="mij-key is-off" data-k="2">system rights</p>
+    </Window>
+    <div class="mij-wire" aria-hidden="true"><span>PerformCallBack4</span></div>
+    <Window title="iexplore.exe  Pocket IE" kind="panel" active class="mij-p mij-app">
+      <div class="mij-dlls">
+        <span class="mij-com">COM</span><span class="mij-com mij-unused is-off">COM</span><span class="mij-com mij-unused is-off">COM</span>
+        <div class="mij-dll mij-there is-off" data-k="3">MemMaidSetup.dll<small>PerformInst</small></div>
+      </div>
+      <p class="mij-lab">its heap</p>
+      <ol class="mij-heap" data-heap aria-label={`A heap of ${HEAP.length} blocks, ${used} in use`}>
+        {order.map(i => <li class:list={['mij-b', HEAP[i] ? 'is-used' : 'is-back']} data-i={i}></li>)}
+      </ol>
+      <p class="mij-back">pages back to the system: <b data-back>{HEAP.length - used}</b></p>
+    </Window>
+  </div>
+</CodeStepper>
+
+<style is:global>
+  .mij { display: grid; grid-template-columns: minmax(0, 0.9fr) auto minmax(0, 1.4fr); gap: 16px; align-items: stretch; }
+  .mij-tag { display: flex; flex-wrap: wrap; gap: 6px; align-items: baseline; font: 500 0.8125rem/1.4 var(--font-code) !important; color: var(--ink-2) !important; }
+  .mij-tag b { color: var(--ink); }
+  .mij-tag span { padding: 2px 6px; border-radius: 3px; color: var(--surface); background: var(--accent); }
+  .mij-dll { display: grid; gap: 2px; width: max-content; max-width: 100%; margin-top: 14px; padding: 8px 10px; border-radius: 4px; font: 700 0.8125rem/1.2 var(--font-code); color: var(--surface); background: var(--accent-2); box-shadow: 0 2px 0 color-mix(in oklch, var(--ink) 30%, transparent); }
+  .mij-dll small { font-weight: 500; }
+  .mij-key { display: inline-block; margin-top: 14px !important; padding: 4px 8px; border-radius: 3px; font: 700 0.75rem/1 var(--font-code) !important; color: var(--surface) !important; background: var(--hot); }
+  .mij-wire { display: grid; place-items: center; writing-mode: vertical-rl; }
+  .mij-wire span { padding: 10px 4px; font: 700 0.75rem/1 var(--font-code); color: var(--accent); border-inline: 2px dashed var(--accent); }
+  .mij-dlls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; min-height: 52px; }
+  .mij-com { padding: 6px 8px; border-radius: 3px; font: 700 0.75rem/1 var(--font-code); color: var(--ink); background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
+  .mij-there { margin-top: 0; }
+  .mij-lab { margin-top: 14px !important; font-size: 0.8125rem !important; color: var(--ink-2) !important; }
+  .mij-heap { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 3px; margin: 6px 0 0; padding: 0; list-style: none; }
+  .mij-b { aspect-ratio: 1; border-radius: 2px; box-shadow: inset 0 0 0 1px var(--rule); }
+  .mij-b.is-used { background: var(--accent); box-shadow: none; }
+  .mij-b.is-back { background: none; box-shadow: inset 0 0 0 1px var(--good); opacity: 0.45; }
+  .mij-back { margin-top: 10px !important; font-size: 0.875rem !important; color: var(--ink-2) !important; }
+  .mij-back b { font: 700 1rem var(--font-code); color: var(--good); }
+  /* Parts that are not there yet are faint until their step */
+  .mij [data-k] { transition: opacity 0.3s; }
+  .mij [data-k].is-off { opacity: 0.12; }
+  @media (max-width: 1023px) { .mij { grid-template-columns: minmax(0, 1fr); } .mij-wire { writing-mode: horizontal-tb; } .mij-wire span { border-inline: 0; border-block: 2px dashed var(--accent); padding: 4px 10px; } }
+  @media (prefers-reduced-motion: reduce) { .mij [data-k] { transition: none; } }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { Flip } from 'gsap/Flip';
+  gsap.registerPlugin(Flip);
+
+  const reduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll<HTMLElement>('[data-mm-inject]').forEach(root => {
+    const host = root.closest<HTMLElement>('[data-stepper]')!;
+    const heap = root.querySelector<HTMLOListElement>('[data-heap]')!;
+    const blocks = [...heap.children] as HTMLElement[];
+    const back = root.querySelector<HTMLElement>('[data-back]')!;
+    const k = (n: number) => root.querySelector<HTMLElement>(`[data-k="${n}"]`)!;
+    const unused = [...root.querySelectorAll<HTMLElement>('.mij-unused')];
+    let compact = true;
+    const setHeap = (on: boolean, d: number) => {
+      if (on === compact) return;
+      compact = on;
+      const state = Flip.getState(blocks);
+      const order = on ? [...blocks].sort((a, b) => +b.classList.contains('is-used') - +a.classList.contains('is-used') || +a.dataset.i! - +b.dataset.i!) : [...blocks].sort((a, b) => +a.dataset.i! - +b.dataset.i!);
+      order.forEach(b => heap.appendChild(b));
+      blocks.forEach(b => b.classList.toggle('is-back', on && !b.classList.contains('is-used')));
+      back.textContent = on ? String(blocks.filter(b => !b.classList.contains('is-used')).length) : '0';
+      if (d) Flip.from(state, { duration: d, ease: 'power2.inOut', stagger: 0.015 });
+    };
+    host.addEventListener('stepper', e => {
+      const { step, how } = (e as CustomEvent).detail;
+      const ph = step.ph as number, d = how === 'jump' || reduce() ? 0 : 0.7;
+      k(0).classList.toggle('is-off', false);
+      k(1).classList.toggle('is-off', ph < 1);
+      k(2).classList.toggle('is-off', ph < 2 || ph > 9);
+      k(3).classList.toggle('is-off', ph < 4 || ph > 8);
+      unused.forEach(u => u.classList.toggle('is-off', ph >= 6));
+      setHeap(ph >= 8, d);
+      if (d && ph === 4) gsap.fromTo(k(3), { x: -80, opacity: 0 }, { x: 0, opacity: 1, duration: d, ease: 'power3.out' });
+      if (d && ph === 9) gsap.fromTo(k(3), { x: 0, opacity: 1 }, { x: 40, opacity: 0.12, duration: d, ease: 'power2.in', clearProps: 'x' });
+    });
+  });
+</script>
