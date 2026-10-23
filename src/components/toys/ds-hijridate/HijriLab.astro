@@ -37,7 +37,7 @@ const text = arText(ids(0, { y: r.hy, m: r.hm, d: r.hd, dow: 0 }, true));
     <caption>The same day in the Islamic calendars your browser knows</caption>
     <thead><tr><th scope="col">Calendar</th><th scope="col">Date</th></tr></thead>
     <tbody>
-      <tr class="is-his"><th scope="row">HijriDate 1.5, his engine</th><td>1 Ramadan 1427</td></tr>
+      <tr class="is-his"><th scope="row">HijriDate 1.5, its engine</th><td>1 Ramadan 1427</td></tr>
     </tbody>
   </table>
 </div>
@@ -105,14 +105,14 @@ const text = arText(ids(0, { y: r.hy, m: r.hm, d: r.hd, dow: 0 }, true));
       const local = jdDate(s.jd + 3 / 24), day1 = jdDate(Math.ceil(s.start - 0.5) + 0.5);
       const early = day1.getTime() - Date.UTC(local.getUTCFullYear(), local.getUTCMonth(), local.getUTCDate()) === 864e5;
       steps.innerHTML = [
-        `<b>Count the days.</b> ${a ? `With the adjustment at ${a > 0 ? '+' : ''}${a}, he first moves the date to ${gname(sy, sm, sd)}. ` : ''}${gname(sy, sm, sd)} at midnight, London time, is Julian day <code>${fmtNum(r.jd)}</code>: days since 4713 BC, the number astronomers use so dates subtract cleanly.`,
+        `<b>Count the days.</b> ${a ? `With the adjustment at ${a > 0 ? '+' : ''}${a}, it first moves the date to ${gname(sy, sm, sd)}. ` : ''}${gname(sy, sm, sd)} at midnight, London time, is Julian day <code>${fmtNum(r.jd)}</code>: days since 4713 BC, the number astronomers use so dates subtract cleanly.`,
         `<b>Estimate the new moon.</b> ${fmtNum(sy + (sm - 1) / 12 + sd / 365 - 1900, 1)} years since 1900, times 12.3685 new moons a year, gives new moon number <code>${r.guess}</code>.`,
-        `<b>Find its birth.</b> ${r.tried.length > 1 ? `${r.tried.slice(0, -1).map(t => `New moon ${t.k} is still ahead of this date, so he steps back one. `).join('')}` : ''}New moon ${s.k} is born on ${meccaTime(s.jd)} in Mecca. That is ${early ? 'before' : 'after'} 6:00 in the morning, so day 1 of the month is ${gname(day1.getUTCFullYear(), day1.getUTCMonth() + 1, day1.getUTCDate())}.`,
+        `<b>Find its birth.</b> ${r.tried.length > 1 ? `${r.tried.slice(0, -1).map(t => `New moon ${t.k} is still ahead of this date, so it steps back one. `).join('')}` : ''}New moon ${s.k} is born on ${meccaTime(s.jd)} in Mecca. That is ${early ? 'before' : 'after'} 6:00 in the morning, so day 1 of the month is ${gname(day1.getUTCFullYear(), day1.getUTCMonth() + 1, day1.getUTCDate())}.`,
         `<b>Name the month.</b> New moon 1048 opened Muharram 1405. ${r.lunation} is ${r.lunation - 1048} months ${r.lunation >= 1048 ? 'later' : 'earlier'}: ${Math.abs(years)} years and ${Math.abs(months)} months. Year ${r.hy}, month ${r.hm}: ${MONTHS[r.hm - 1]}.`,
         `<b>Count the day.</b> ${gname(sy, sm, sd)} is day ${r.hd} of that month: <b>${r.hd} ${MONTHS[r.hm - 1]} ${r.hy}</b>.`,
       ].map(h => `<li>${h}</li>`).join('');
       const t = new Date(Date.UTC(y, m - 1, d));
-      tbody.innerHTML = `<tr class="is-his"><th scope="row">HijriDate 1.5, his engine${a ? ` (adjustment ${a > 0 ? '+' : ''}${a})` : ''}</th><td>${r.hd} ${MONTHS[r.hm - 1]} ${r.hy}</td></tr>` +
+      tbody.innerHTML = `<tr class="is-his"><th scope="row">HijriDate 1.5, its engine${a ? ` (adjustment ${a > 0 ? '+' : ''}${a})` : ''}</th><td>${r.hd} ${MONTHS[r.hm - 1]} ${r.hy}</td></tr>` +
         fmts.map(({ name, f }) => {
           const parts = Object.fromEntries(f.formatToParts(t).map(x => [x.type, x.value]));
           const dd = +parts.day, mm = +parts.month, yy = parseInt(parts.relatedYear ?? parts.year);

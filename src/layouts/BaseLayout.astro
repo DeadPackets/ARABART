@@ -14,20 +14,46 @@ interface Props {
   keys?: { k: string; label: string; href?: string; act?: string }[];
   era?: Era;
   when?: [string, string];
+  /** schema.org nodes for this page, added to the site's graph */
+  schema?: Record<string, unknown>[];
+  /** the page's place under Home, as [name, path from the site root] */
+  crumbs?: [string, string][];
+  pageType?: 'WebPage' | 'AboutPage' | 'ProfilePage' | 'CollectionPage';
+  noindex?: boolean;
 }
 
 const {
   title,
   description,
-  image = '/ARABART/images/arabart-demo.png',
+  image = '/images/arabart-demo.png',
   hasEmulator = false,
   keys,
   era = 'dos',
   when,
+  schema = [],
+  crumbs,
+  pageType = 'WebPage',
+  noindex = false,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const canonicalURL = new URL(Astro.url.pathname.replace(/\/?$/, '/'), Astro.site);
 const imageURL = new URL(image, Astro.site);
+const home = new URL(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/`, Astro.site).href;
+const isHome = canonicalURL.href === home;
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'WebSite', '@id': `${home}#site`, name: 'ARABART', url: home, inLanguage: 'en', about: { '@id': `${home}#yasser` },
+      creator: { '@type': 'Person', name: 'Youssef Awad', url: 'https://github.com/DeadPackets' } },
+    { '@type': 'Person', '@id': `${home}#yasser`, name: 'Yasser Awad', alternateName: 'Yasser Mohamed Ali', jobTitle: 'Software engineer', url: home,
+      knowsAbout: ['Arabic computing', 'MS-DOS', 'Assembly language', 'Windows Mobile', 'Telecommunications network management'] },
+    { '@type': pageType, '@id': `${canonicalURL.href}#page`, url: canonicalURL.href, name: title, description, inLanguage: 'en',
+      isPartOf: { '@id': `${home}#site` }, about: { '@id': `${home}#yasser` }, primaryImageOfPage: imageURL.href,
+      ...(pageType === 'ProfilePage' && { mainEntity: { '@id': `${home}#yasser` } }) },
+    ...(crumbs ? [{ '@type': 'BreadcrumbList', itemListElement: [['Home', ''], ...crumbs].map(([name, path], i) => ({ '@type': 'ListItem', position: i + 1, name, item: home + path })) }] : []),
+    ...schema,
+  ],
+};
 const JSDOS = 'https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist';
 ---
 
@@ -40,8 +66,10 @@ const JSDOS = 'https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist';
   <meta name="theme-color" content={ERAS[era].theme} />
   <title>{title}</title>
   <meta name="description" content={description} />
+  {noindex && <meta name="robots" content="noindex" />}
 
-  <meta property="og:type" content="website" />
+  <meta property="og:type" content={isHome ? 'website' : 'article'} />
+  <meta property="og:locale" content="en_US" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:image" content={imageURL} />
@@ -53,7 +81,8 @@ const JSDOS = 'https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist';
   <meta name="twitter:image" content={imageURL} />
 
   <link rel="canonical" href={canonicalURL} />
-  <link rel="icon" type="image/x-icon" href={`${import.meta.env.BASE_URL}/favicon.ico`} />
+  <link rel="icon" type="image/x-icon" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.ico`} />
+  <script type="application/ld+json" set:html={JSON.stringify(ld).replace(/</g, '\\u003c')} />
 
   {/* JS is on: toys that fill in later can reserve their space from the first paint */}
   <script is:inline>document.documentElement.classList.add('js')</script>

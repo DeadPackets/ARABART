@@ -22,7 +22,7 @@ const lnk = (cmd: string) => `${cmd.length}#${cmd}`;
           <span class="mst-name">{it.name}</span>
           <button type="button" class="mst-ib" data-act="up" aria-label={`Move ${it.name} up`} disabled={i === 0}>▲</button>
           <button type="button" class="mst-ib" data-act="down" aria-label={`Move ${it.name} down`} disabled={i === ITEMS.length - 1}>▼</button>
-          <button type="button" class="mst-on" data-act="on" aria-pressed="true" aria-label={`Start ${it.name} with the device`}>On</button>
+          <button type="button" class="mst-on" data-act="on" aria-pressed="true" aria-label={`On: start ${it.name} with the device`}>On</button>
         </li>
       ))}
     </ol>

@@ -19,12 +19,12 @@ const html = renderDialog((ui as any)['37'].dialogs['105'], {
 ---
 
 <div class="hm-key" data-hm-key data-key={KEY}>
-  <Window title="License Key" kind="device" num="9:41" class="hm-dev2" aria-label="HandyMenu's License Key dialog">
+  <Window title="License Key" kind="device" wm="2003" num="11:08" ok="ok" sip class="hm-dev2" aria-label="HandyMenu's License Key dialog">
     <div class="ppc hm-key-scr">
       <div set:html={html} />
       <p class="hm-key-ok" aria-live="polite" data-ok></p>
     </div>
-    <p slot="status" class="hm-soft"><span>ok</span><span></span></p>
+    <Fragment slot="status"></Fragment>
   </Window>
   <div class="hm-key-side">
     <p class="hm-key-big"><span>The key for HandyMenu 3.7</span><b>{groups(KEY)}</b></p>

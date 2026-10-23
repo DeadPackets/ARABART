@@ -10,6 +10,7 @@ research/artifacts/**/unpacked/
 research/artifacts/**/*.unp.*
 research/artifacts/programs/strings/
 research/e2e/out/
+/e2e/
 __pycache__/
 # DinarSoft archive mirror: pages and captures hold a street address, phone/fax numbers and third-party emails,
 # and total ~100 MB. Publish only reviewed, blurred selections under public/dinarsoft/.
@@ -18,3 +19,8 @@ research/dinarsoft/captures/
 research/dinarsoft/downloads/
 research/dinarsoft/chip/
 research/dinarsoft/cdx/
+research/dinarsoft/magazines/raw/
+# Lossless sources of the magazine crops (28 MB); publish_hub.py turns them into public/dinarsoft/press/mag-*.webp
+research/dinarsoft/magazines/crops/
+# wrangler dev state
+.wrangler/

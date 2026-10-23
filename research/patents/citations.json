@@ -1,0 +1,2965 @@
+[
+  {
+    "number": "US10462010B2",
+    "title": "Detecting and managing recurring patterns in device and service configuration data",
+    "assignee": "Cisco",
+    "assignee_on_patent": "Cisco Technology Inc",
+    "current_assignee_google": [
+      "Cisco Technology Inc"
+    ],
+    "priority_date": "2017-06-13",
+    "publication_date": "2019-10-29",
+    "cited_by": "examiner",
+    "link": "family",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "CN110799942A, CN110799942B",
+    "same_invention_as": [
+      "CN110799942A",
+      "CN110799942B"
+    ],
+    "invention_group": "CN110799942A",
+    "own_cited_by": 2,
+    "own_families_citing": 11,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/US10462010B2/en",
+    "notable": true,
+    "rank": 1,
+    "why": "Cisco: a Chinese examiner cited his OSS patent (CN 101009591 A) against the Chinese version of this Cisco invention."
+  },
+  {
+    "number": "US10089344B2",
+    "title": "Listing data objects using a hierarchical dispersed storage index",
+    "assignee": "IBM",
+    "assignee_on_patent": "International Business Machines Corp",
+    "current_assignee_google": [
+      "Everpure Inc"
+    ],
+    "priority_date": "2012-03-02",
+    "publication_date": "2018-10-02",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20060288020A1"
+    ],
+    "cites_label": [
+      "US 2006/0288020 A1"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "US8930375B2"
+    ],
+    "invention_group": "US10089344B2",
+    "own_cited_by": 4,
+    "own_families_citing": 79,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10089344B2/en",
+    "notable": true,
+    "rank": 2,
+    "why": "IBM: the US examiner cited his database patent (US 2006/0288020) against this IBM storage-index patent."
+  },
+  {
+    "number": "US10360233B2",
+    "title": "In-memory key-value store for a multi-model database",
+    "assignee": "Oracle",
+    "assignee_on_patent": "Oracle International Corp",
+    "current_assignee_google": [
+      "Optinose Inc",
+      "Oracle International Corp"
+    ],
+    "priority_date": "2015-11-19",
+    "publication_date": "2019-07-23",
+    "cited_by": "examiner",
+    "link": "family",
+    "cites": [
+      "CN1892655A"
+    ],
+    "cites_label": [
+      "CN 1892655 A"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": "CN113961564A",
+    "same_invention_as": [
+      "CN113961564A"
+    ],
+    "invention_group": "CN113961564A",
+    "own_cited_by": 1,
+    "own_families_citing": 21,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/US10360233B2/en",
+    "notable": true,
+    "rank": 3,
+    "why": "Oracle: a Chinese examiner cited his database patent (CN 1892655 A) against the Chinese version of this Oracle database patent."
+  },
+  {
+    "number": "US11218423B2",
+    "title": "Method for service implementation in network function virtualization (NFV) system and communications unit",
+    "assignee": "Huawei",
+    "assignee_on_patent": "Huawei Technologies Co Ltd",
+    "current_assignee_google": [
+      "Huawei Technologies Co Ltd"
+    ],
+    "priority_date": "2014-03-24",
+    "publication_date": "2022-01-04",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "EP3116177B1",
+      "US10862823B2",
+      "US20190058670A1"
+    ],
+    "invention_group": "EP3116177B1",
+    "own_cited_by": 0,
+    "own_families_citing": 46,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11218423B2/en",
+    "notable": true,
+    "rank": 4,
+    "why": "Huawei: the US examiner cited his OSS patent against this Huawei network function virtualization patent."
+  },
+  {
+    "number": "US10013414B2",
+    "title": "System and method for metadata enhanced inventory management of a communications system",
+    "assignee": "Huawei",
+    "assignee_on_patent": "Futurewei (Huawei)",
+    "current_assignee_google": [
+      "FutureWei Technologies Inc"
+    ],
+    "priority_date": "2014-08-20",
+    "publication_date": "2018-07-03",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "EP1793529A1"
+    ],
+    "cites_label": [
+      "EP 1793529 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "EP3172866A4"
+    ],
+    "invention_group": "EP3172866A4",
+    "own_cited_by": 0,
+    "own_families_citing": 16,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10013414B2/en",
+    "notable": true,
+    "rank": 5,
+    "why": "Huawei (Futurewei): this inventory-management patent cites the European version of his OSS patent."
+  },
+  {
+    "number": "US9871702B2",
+    "title": "Service information model for managing a telecommunications network",
+    "assignee": "CENX (now Ericsson)",
+    "assignee_on_patent": "CENX (bought by Ericsson in 2018)",
+    "current_assignee_google": [
+      "Telefonaktiebolaget LM Ericsson AB"
+    ],
+    "priority_date": "2016-02-17",
+    "publication_date": "2018-01-16",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US20170237628A1"
+    ],
+    "invention_group": "US20170237628A1",
+    "own_cited_by": 1,
+    "own_families_citing": 4,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9871702B2/en",
+    "notable": true,
+    "rank": 6,
+    "why": "Ericsson (CENX, bought by Ericsson in 2018): the US examiner cited his OSS patent against this network model patent."
+  },
+  {
+    "number": "US11283691B1",
+    "title": "Model driven intent policy conflict detection and resolution through graph analysis",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2020-10-21",
+    "publication_date": "2022-03-22",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11652704B2",
+      "US11929886B2"
+    ],
+    "invention_group": "US11283691B1",
+    "own_cited_by": 14,
+    "own_families_citing": 7,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11283691B1/en",
+    "notable": true,
+    "rank": 7,
+    "why": "Juniper Networks: this intent-based networking patent cites his OSS patent; it has 14 later citations of its own."
+  },
+  {
+    "number": "US11805024B1",
+    "title": "Automatically generating an intent-based network model of an existing computer network",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2019-03-21",
+    "publication_date": "2023-10-31",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10992543B1"
+    ],
+    "invention_group": "US10992543B1",
+    "own_cited_by": 2,
+    "own_families_citing": 92,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11805024B1/en",
+    "notable": true,
+    "rank": 8,
+    "why": "Apstra (Juniper since 2021): its family is one of the most cited here, with 93 later citations on the first patent."
+  },
+  {
+    "number": "US8295199B2",
+    "title": "Methods and systems for maintaining diversity for telecommunication services",
+    "assignee": "AT&T",
+    "assignee_on_patent": "AT&T Intellectual Property I LP",
+    "current_assignee_google": [
+      "AT&T Intellectual Property I LP"
+    ],
+    "priority_date": "2007-09-26",
+    "publication_date": "2012-10-23",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US20090080343A1"
+    ],
+    "invention_group": "US20090080343A1",
+    "own_cited_by": 0,
+    "own_families_citing": 6,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US8295199B2/en",
+    "notable": true,
+    "rank": 9,
+    "why": "AT&T: the US examiner cited his OSS patent against this AT&T network patent."
+  },
+  {
+    "number": "US9569471B2",
+    "title": "Asset model import connector",
+    "assignee": "HP / HPE",
+    "assignee_on_patent": "Hewlett Packard Enterprise Development LP",
+    "current_assignee_google": [
+      "Micro Focus LLC"
+    ],
+    "priority_date": "2011-08-01",
+    "publication_date": "2017-02-14",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN103827810B",
+      "US20140156711A1"
+    ],
+    "invention_group": "CN103827810B",
+    "own_cited_by": 5,
+    "own_families_citing": 27,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9569471B2/en",
+    "notable": true,
+    "rank": 10,
+    "why": "Hewlett Packard Enterprise: the US examiner cited his OSS patent against this asset model patent."
+  },
+  {
+    "number": "US11750458B1",
+    "title": "Structured network change controls",
+    "assignee": "Arista Networks",
+    "assignee_on_patent": "Arista Networks Inc",
+    "current_assignee_google": [
+      "Arista Networks Inc"
+    ],
+    "priority_date": "2022-03-22",
+    "publication_date": "2023-09-05",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US11750458B1",
+    "own_cited_by": 1,
+    "own_families_citing": 0,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11750458B1/en",
+    "notable": true,
+    "rank": 11,
+    "why": "Arista Networks: the US examiner cited his OSS patent against this network change control patent."
+  },
+  {
+    "number": "US9716672B2",
+    "title": "Distributed configuration management for virtual cluster switching",
+    "assignee": "Brocade",
+    "assignee_on_patent": "Brocade Communications Systems LLC",
+    "current_assignee_google": [
+      "Avago Technologies International Sales Pte Ltd"
+    ],
+    "priority_date": "2010-05-28",
+    "publication_date": "2017-07-25",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20060288020A1"
+    ],
+    "cites_label": [
+      "US 2006/0288020 A1"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "US20110292947A1"
+    ],
+    "invention_group": "US20110292947A1",
+    "own_cited_by": 2,
+    "own_families_citing": 50,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9716672B2/en",
+    "notable": true,
+    "rank": 12,
+    "why": "Brocade: the US examiner cited his database patent against this switch configuration patent; its first publication has 50 later citations."
+  },
+  {
+    "number": "US9514182B2",
+    "title": "Techniques for managing data relationships",
+    "assignee": "Teradata",
+    "assignee_on_patent": "Teradata US Inc",
+    "current_assignee_google": [
+      "Teradata US Inc"
+    ],
+    "priority_date": "2009-12-08",
+    "publication_date": "2016-12-06",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US7603377B2"
+    ],
+    "cites_label": [
+      "US 7,603,377 B2"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "US20110137957A1"
+    ],
+    "invention_group": "US20110137957A1",
+    "own_cited_by": 2,
+    "own_families_citing": 1,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9514182B2/en",
+    "notable": true,
+    "rank": 13,
+    "why": "Teradata: this data-relationship patent cites US 7,603,377 by number; the examiner cited it on the application."
+  },
+  {
+    "number": "US10503754B2",
+    "title": "Bulk loading multiple hierarchical levels of relational data to a database",
+    "assignee": "Citrix",
+    "assignee_on_patent": "Citrix Systems Inc",
+    "current_assignee_google": [
+      "Citrix Systems Inc"
+    ],
+    "priority_date": "2017-05-18",
+    "publication_date": "2019-12-10",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US7603377B2"
+    ],
+    "cites_label": [
+      "US 7,603,377 B2"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US10503754B2",
+    "own_cited_by": 0,
+    "own_families_citing": 3,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10503754B2/en",
+    "notable": true,
+    "rank": 14,
+    "why": "Citrix: this patent on loading nested relational data cites US 7,603,377 by number."
+  },
+  {
+    "number": "US10326645B2",
+    "title": "System and methods for configuration management",
+    "assignee": "Level 3 Communications",
+    "assignee_on_patent": "Level 3 Communications LLC",
+    "current_assignee_google": [
+      "LG Display Co Ltd",
+      "Sandpiper Cdn LLC"
+    ],
+    "priority_date": "2011-11-11",
+    "publication_date": "2019-06-18",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US20130326029A1"
+    ],
+    "invention_group": "US10326645B2",
+    "own_cited_by": 0,
+    "own_families_citing": 24,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10326645B2/en",
+    "notable": true,
+    "rank": 15,
+    "why": "Level 3 Communications: the US examiner cited his OSS patent against this configuration-management patent."
+  },
+  {
+    "number": "CN102684894B",
+    "title": "Method and device for realizing northboundbound interface",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2011-03-07",
+    "publication_date": "2014-12-10",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN102684894A"
+    ],
+    "invention_group": "CN102684894A",
+    "own_cited_by": 0,
+    "own_families_citing": 6,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN102684894B/en",
+    "notable": true,
+    "rank": 16,
+    "why": "ZTE: a Chinese examiner cited his OSS patent against this ZTE northbound-interface patent."
+  },
+  {
+    "number": "US20230033609A1",
+    "title": "Method of managing at least one network element",
+    "assignee": "Rakuten Mobile",
+    "assignee_on_patent": "Rakuten Mobile Inc",
+    "current_assignee_google": [
+      "Rakuten Mobile Inc"
+    ],
+    "priority_date": "2021-07-30",
+    "publication_date": "2023-02-02",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "EP1793529A1"
+    ],
+    "cites_label": [
+      "EP 1793529 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US20230033609A1",
+    "own_cited_by": 0,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/US20230033609A1/en",
+    "notable": true,
+    "rank": 17,
+    "why": "Rakuten Mobile: an examiner cited the European version of his OSS patent against this application."
+  },
+  {
+    "number": "US20050232163A1",
+    "title": "Framework for template-based retrieval of information from managed entities in a communication network",
+    "assignee": "Alcatel",
+    "assignee_on_patent": "Alcatel SA",
+    "current_assignee_google": [
+      "Quarterhill Inc"
+    ],
+    "priority_date": "2004-04-15",
+    "publication_date": "2005-10-20",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US7403491B2"
+    ],
+    "invention_group": "US20050232163A1",
+    "own_cited_by": 11,
+    "own_families_citing": 3,
+    "second_source": "USPTO full text confirms family member US7403491B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20050232163A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "His own employer, Alcatel, citing him in a related Alcatel filing."
+  },
+  {
+    "number": "US7403491B2",
+    "title": "Framework for template-based retrieval of information from managed entities in a communication network",
+    "assignee": "Alcatel",
+    "assignee_on_patent": "Alcatel Lucent SAS",
+    "current_assignee_google": [
+      "Quarterhill Inc"
+    ],
+    "priority_date": "2004-04-15",
+    "publication_date": "2008-07-22",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US20050232163A1"
+    ],
+    "invention_group": "US20050232163A1",
+    "own_cited_by": 2,
+    "own_families_citing": 12,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US7403491B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "His own employer, Alcatel, citing him in a related Alcatel filing."
+  },
+  {
+    "number": "US20070274314A1",
+    "title": "System and method for creating application groups",
+    "assignee": "Net-Conex Developments",
+    "assignee_on_patent": "NET-CONEX DEVELOPMENTS Inc",
+    "current_assignee_google": [
+      "NET-CONEX DEVELOPMENTS Inc"
+    ],
+    "priority_date": "2006-05-23",
+    "publication_date": "2007-11-29",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US20070274314A1",
+    "own_cited_by": 15,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/US20070274314A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Net-Conex Developments: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US20090080343A1",
+    "title": "Methods and systems for maintaining diversity for telecommunication services",
+    "assignee": "AT&T",
+    "assignee_on_patent": "Individual (granted family member names AT&T)",
+    "current_assignee_google": [
+      "AT&T Intellectual Property I LP"
+    ],
+    "priority_date": "2007-09-26",
+    "publication_date": "2009-03-26",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US8295199B2"
+    ],
+    "invention_group": "US20090080343A1",
+    "own_cited_by": 6,
+    "own_families_citing": 0,
+    "second_source": "USPTO full text confirms family member US8295199B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20090080343A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "AT&T: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US8837491B2",
+    "title": "Regional virtual VPN",
+    "assignee": "Gluware",
+    "assignee_on_patent": "GLUE NETWORKS",
+    "current_assignee_google": [
+      "Gluware Ip LLC"
+    ],
+    "priority_date": "2008-05-27",
+    "publication_date": "2014-09-16",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US9780965B2",
+    "same_invention_as": [
+      "US9780965B2"
+    ],
+    "invention_group": "US8837491B2",
+    "own_cited_by": 6,
+    "own_families_citing": 48,
+    "second_source": "USPTO full text confirms family member US9780965B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US8837491B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Gluware: applicant citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US9780965B2",
+    "title": "Methods and systems for communicating using a virtual private network",
+    "assignee": "Gluware",
+    "assignee_on_patent": "GLUE NETWORKS",
+    "current_assignee_google": [
+      "Gluware Ip LLC"
+    ],
+    "priority_date": "2008-05-27",
+    "publication_date": "2017-10-03",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US8837491B2"
+    ],
+    "invention_group": "US8837491B2",
+    "own_cited_by": 4,
+    "own_families_citing": 50,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9780965B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Gluware: applicant citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "CN101631066A",
+    "title": "Method and system for realizing terminal quality of service of internet voice transmission system",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2008-07-14",
+    "publication_date": "2010-01-20",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "CN101631066A",
+    "own_cited_by": 5,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN101631066A/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN101674632B",
+    "title": "Cross-subnet circuit search method and device",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2009-09-29",
+    "publication_date": "2012-09-05",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "EP1793529A1"
+    ],
+    "cites_label": [
+      "EP 1793529 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "CN101674632B",
+    "own_cited_by": 0,
+    "own_families_citing": 1,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN101674632B/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN101667124A",
+    "title": "System and method for configuring monitoring device based on object model",
+    "assignee": "Baosight",
+    "assignee_on_patent": "Shanghai Baosight Software Co Ltd",
+    "current_assignee_google": [
+      "Shanghai Baosight Software Co Ltd"
+    ],
+    "priority_date": "2009-10-15",
+    "publication_date": "2010-03-10",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "CN101667124A",
+    "own_cited_by": 7,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN101667124A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Baosight: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US20110137957A1",
+    "title": "Techniques for managing data relationships",
+    "assignee": "Teradata",
+    "assignee_on_patent": "Teradata US Inc",
+    "current_assignee_google": [
+      "Teradata US Inc"
+    ],
+    "priority_date": "2009-12-08",
+    "publication_date": "2011-06-09",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US7603377B2"
+    ],
+    "cites_label": [
+      "US 7,603,377 B2"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "US9514182B2"
+    ],
+    "invention_group": "US20110137957A1",
+    "own_cited_by": 3,
+    "own_families_citing": 0,
+    "second_source": "USPTO full text confirms family member US9514182B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20110137957A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Teradata: examiner citation of his database patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US20110292947A1",
+    "title": "Distributed configuration management for virtual cluster switching",
+    "assignee": "Brocade",
+    "assignee_on_patent": "Brocade Communications Systems LLC",
+    "current_assignee_google": [
+      "Avago Technologies International Sales Pte Ltd"
+    ],
+    "priority_date": "2010-05-28",
+    "publication_date": "2011-12-01",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20060288020A1"
+    ],
+    "cites_label": [
+      "US 2006/0288020 A1"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "US9716672B2"
+    ],
+    "invention_group": "US20110292947A1",
+    "own_cited_by": 50,
+    "own_families_citing": 2,
+    "second_source": "USPTO full text confirms family member US9716672B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20110292947A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Brocade: examiner citation of his database patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN102684894A",
+    "title": "Method and device for realizing northboundbound interface",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2011-03-07",
+    "publication_date": "2012-09-19",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN102684894B"
+    ],
+    "invention_group": "CN102684894A",
+    "own_cited_by": 5,
+    "own_families_citing": 1,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN102684894A/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN103827810B",
+    "title": "Asset Model Import Connector",
+    "assignee": "HP / HPE",
+    "assignee_on_patent": "Hewlett Packard Development Co LP",
+    "current_assignee_google": [
+      "Weifosi Co ltd"
+    ],
+    "priority_date": "2011-08-01",
+    "publication_date": "2017-12-12",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US20140156711A1",
+      "US9569471B2"
+    ],
+    "invention_group": "CN103827810B",
+    "own_cited_by": 0,
+    "own_families_citing": 32,
+    "second_source": "USPTO full text confirms family member US9569471B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/CN103827810B/en",
+    "notable": false,
+    "rank": null,
+    "why": "HP / HPE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US20140156711A1",
+    "title": "Asset model import connector",
+    "assignee": "HP / HPE",
+    "assignee_on_patent": "Individual (granted family member names HP / HPE)",
+    "current_assignee_google": [
+      "Micro Focus LLC"
+    ],
+    "priority_date": "2011-08-01",
+    "publication_date": "2014-06-05",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN103827810B",
+      "US9569471B2"
+    ],
+    "invention_group": "CN103827810B",
+    "own_cited_by": 24,
+    "own_families_citing": 8,
+    "second_source": "USPTO full text confirms family member US9569471B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20140156711A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "HP / HPE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CA2854339A1",
+    "title": "Systems and methods for automatic replacement and repair of communications network devices",
+    "assignee": "Level 3 Communications",
+    "assignee_on_patent": "Level 3 Communications LLC",
+    "current_assignee_google": [
+      "Level 3 Communications LLC"
+    ],
+    "priority_date": "2011-11-11",
+    "publication_date": "2013-05-16",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US10592330B2, US9817709B2",
+    "same_invention_as": [
+      "US10592330B2",
+      "US9817709B2"
+    ],
+    "invention_group": "CA2854339A1",
+    "own_cited_by": 1,
+    "own_families_citing": 26,
+    "second_source": "USPTO full text confirms family member US10592330B2, US9817709B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/CA2854339A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Level 3 Communications: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10592330B2",
+    "title": "Systems and methods for automatic replacement and repair of communications network devices",
+    "assignee": "Level 3 Communications",
+    "assignee_on_patent": "Level 3 Communications LLC",
+    "current_assignee_google": [
+      "Sandpiper Cdn LLC"
+    ],
+    "priority_date": "2011-11-11",
+    "publication_date": "2020-03-17",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CA2854339A1",
+      "US9817709B2"
+    ],
+    "invention_group": "CA2854339A1",
+    "own_cited_by": 1,
+    "own_families_citing": 26,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10592330B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Level 3 Communications: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10997042B2",
+    "title": "Systems and methods for configuration management",
+    "assignee": "Level 3 Communications",
+    "assignee_on_patent": "Level 3 Communications LLC",
+    "current_assignee_google": [
+      "Sandpiper Cdn LLC"
+    ],
+    "priority_date": "2011-11-11",
+    "publication_date": "2021-05-04",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US10997042B2",
+    "own_cited_by": 1,
+    "own_families_citing": 3,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10997042B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Level 3 Communications: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US20130326029A1",
+    "title": "System and methods for configuration management",
+    "assignee": "Level 3 Communications",
+    "assignee_on_patent": "Level 3 Communications LLC",
+    "current_assignee_google": [
+      "LG Display Co Ltd",
+      "Sandpiper Cdn LLC"
+    ],
+    "priority_date": "2011-11-11",
+    "publication_date": "2013-12-05",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10326645B2"
+    ],
+    "invention_group": "US10326645B2",
+    "own_cited_by": 24,
+    "own_families_citing": 0,
+    "second_source": "USPTO full text confirms family member US10326645B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20130326029A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Level 3 Communications: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US9817709B2",
+    "title": "Systems and methods for automatic replacement and repair of communications network devices",
+    "assignee": "Level 3 Communications",
+    "assignee_on_patent": "Level 3 Communications LLC",
+    "current_assignee_google": [
+      "Sandpiper Cdn LLC"
+    ],
+    "priority_date": "2011-11-11",
+    "publication_date": "2017-11-14",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CA2854339A1",
+      "US10592330B2"
+    ],
+    "invention_group": "CA2854339A1",
+    "own_cited_by": 5,
+    "own_families_citing": 22,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9817709B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Level 3 Communications: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US8930375B2",
+    "title": "Splitting an index node of a hierarchical dispersed storage index",
+    "assignee": "IBM",
+    "assignee_on_patent": "Cleversafe (bought by IBM in 2015)",
+    "current_assignee_google": [
+      "Everpure Inc"
+    ],
+    "priority_date": "2012-03-02",
+    "publication_date": "2015-01-06",
+    "cited_by": "examiner",
+    "link": "family",
+    "cites": [
+      "US20060288020A1"
+    ],
+    "cites_label": [
+      "US 2006/0288020 A1"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": "US10089344B2",
+    "same_invention_as": [
+      "US10089344B2"
+    ],
+    "invention_group": "US10089344B2",
+    "own_cited_by": 6,
+    "own_families_citing": 77,
+    "second_source": "USPTO full text confirms family member US10089344B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US8930375B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "IBM: examiner citation of his database patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "WO2014114761A1",
+    "title": "Data management system",
+    "assignee": "Face Recording and Measurements",
+    "assignee_on_patent": "FACE RECORDING AND MEASUREMENTS Ltd",
+    "current_assignee_google": [
+      "FACE RECORDING AND MEASUREMENTS Ltd"
+    ],
+    "priority_date": "2013-01-25",
+    "publication_date": "2014-07-31",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "EP1736904A2"
+    ],
+    "cites_label": [
+      "EP 1736904 A2"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "WO2014114761A1",
+    "own_cited_by": 0,
+    "own_families_citing": 4,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/WO2014114761A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Face Recording and Measurements: examiner citation of his database patent; a smaller or less known company."
+  },
+  {
+    "number": "US9760528B1",
+    "title": "Methods and systems for creating a network",
+    "assignee": "Gluware",
+    "assignee_on_patent": "GLUE NETWORKS Inc",
+    "current_assignee_google": [
+      "Gluware Ip LLC"
+    ],
+    "priority_date": "2013-03-14",
+    "publication_date": "2017-09-12",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US9760528B1",
+    "own_cited_by": 6,
+    "own_families_citing": 0,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9760528B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Gluware: applicant citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US9928082B1",
+    "title": "Methods and systems for remote device configuration",
+    "assignee": "Gluware",
+    "assignee_on_patent": "Gluware Inc",
+    "current_assignee_google": [
+      "Gluware Ip LLC"
+    ],
+    "priority_date": "2013-03-19",
+    "publication_date": "2018-03-27",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US9928082B1",
+    "own_cited_by": 6,
+    "own_families_citing": 0,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9928082B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Gluware: applicant citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US11216293B2",
+    "title": "Command line interface",
+    "assignee": "Allied Telesis",
+    "assignee_on_patent": "Allied Telesis Holdings KK",
+    "current_assignee_google": [
+      "Allied Telesis Holdings KK"
+    ],
+    "priority_date": "2013-07-09",
+    "publication_date": "2022-01-04",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US12468563B2",
+      "US20150019199A1"
+    ],
+    "invention_group": "US11216293B2",
+    "own_cited_by": 3,
+    "own_families_citing": 10,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11216293B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Allied Telesis: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US12468563B2",
+    "title": "Command line interface",
+    "assignee": "Allied Telesis",
+    "assignee_on_patent": "Allied Telesis Holdings KK",
+    "current_assignee_google": [
+      "Allied Telesis Holdings KK"
+    ],
+    "priority_date": "2013-07-09",
+    "publication_date": "2025-11-11",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11216293B2",
+      "US20150019199A1"
+    ],
+    "invention_group": "US11216293B2",
+    "own_cited_by": 0,
+    "own_families_citing": 11,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US12468563B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Allied Telesis: applicant citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US20150019199A1",
+    "title": "Command line interface",
+    "assignee": "Allied Telesis",
+    "assignee_on_patent": "Allied Telesis Holdings KK",
+    "current_assignee_google": [
+      "Allied Telesis Holdings KK"
+    ],
+    "priority_date": "2013-07-09",
+    "publication_date": "2015-01-15",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11216293B2",
+      "US12468563B2"
+    ],
+    "invention_group": "US11216293B2",
+    "own_cited_by": 12,
+    "own_families_citing": 1,
+    "second_source": "USPTO full text confirms family member US11216293B2, US12468563B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20150019199A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Allied Telesis: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "EP3116177B1",
+    "title": "Service implementation method for nfv system, and communications unit",
+    "assignee": "Huawei",
+    "assignee_on_patent": "Huawei Technologies Co Ltd",
+    "current_assignee_google": [
+      "Huawei Technologies Co Ltd"
+    ],
+    "priority_date": "2014-03-24",
+    "publication_date": "2020-02-26",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US10862823B2, US11218423B2, US20190058670A1",
+    "same_invention_as": [
+      "US10862823B2",
+      "US11218423B2",
+      "US20190058670A1"
+    ],
+    "invention_group": "EP3116177B1",
+    "own_cited_by": 0,
+    "own_families_citing": 46,
+    "second_source": "USPTO full text confirms family member US10862823B2, US11218423B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/EP3116177B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Huawei: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10862823B2",
+    "title": "Method for service implementation in network function virtualization (NFV) system and communications unit",
+    "assignee": "Huawei",
+    "assignee_on_patent": "Huawei Technologies Co Ltd",
+    "current_assignee_google": [
+      "Huawei Technologies Co Ltd"
+    ],
+    "priority_date": "2014-03-24",
+    "publication_date": "2020-12-08",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "EP3116177B1",
+      "US11218423B2",
+      "US20190058670A1"
+    ],
+    "invention_group": "EP3116177B1",
+    "own_cited_by": 2,
+    "own_families_citing": 44,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10862823B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Huawei: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US20190058670A1",
+    "title": "Method for service implementation in network function virtualization (nfv) system and communications unit",
+    "assignee": "Huawei",
+    "assignee_on_patent": "Huawei Technologies Co Ltd",
+    "current_assignee_google": [
+      "Huawei Technologies Co Ltd"
+    ],
+    "priority_date": "2014-03-24",
+    "publication_date": "2019-02-21",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "EP3116177B1",
+      "US10862823B2",
+      "US11218423B2"
+    ],
+    "invention_group": "EP3116177B1",
+    "own_cited_by": 6,
+    "own_families_citing": 40,
+    "second_source": "USPTO full text confirms family member US10862823B2, US11218423B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20190058670A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Huawei: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "EP3172866A4",
+    "title": "System and method for metadata enhanced inventory management of a communications system",
+    "assignee": "Huawei",
+    "assignee_on_patent": "Huawei Technologies Co Ltd",
+    "current_assignee_google": [
+      "Huawei Technologies Co Ltd"
+    ],
+    "priority_date": "2014-08-20",
+    "publication_date": "2017-10-04",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "EP1793529A1"
+    ],
+    "cites_label": [
+      "EP 1793529 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10013414B2"
+    ],
+    "invention_group": "EP3172866A4",
+    "own_cited_by": 0,
+    "own_families_citing": 16,
+    "second_source": "USPTO full text confirms family member US10013414B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/EP3172866A4/en",
+    "notable": false,
+    "rank": null,
+    "why": "Huawei: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN105429774A",
+    "title": "Method and device for network management system to debug network element configuration",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2014-09-19",
+    "publication_date": "2016-03-23",
+    "cited_by": "examiner",
+    "link": "family",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "WO2016041387A1",
+    "same_invention_as": [
+      "WO2016041387A1"
+    ],
+    "invention_group": "CN105429774A",
+    "own_cited_by": 2,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN105429774A/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "WO2016041387A1",
+    "title": "Method and device used by network management system for debugging network element configuration",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2014-09-19",
+    "publication_date": "2016-03-24",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN105429774A"
+    ],
+    "invention_group": "CN105429774A",
+    "own_cited_by": 0,
+    "own_families_citing": 2,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/WO2016041387A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10389573B2",
+    "title": "Configuring a network",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2014-11-14",
+    "publication_date": "2019-08-20",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11223512B2",
+      "US11695615B2",
+      "WO2016077124A1"
+    ],
+    "invention_group": "US10389573B2",
+    "own_cited_by": 11,
+    "own_families_citing": 16,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10389573B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11223512B2",
+    "title": "Configuring a network",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2014-11-14",
+    "publication_date": "2022-01-11",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10389573B2",
+      "US11695615B2",
+      "WO2016077124A1"
+    ],
+    "invention_group": "US10389573B2",
+    "own_cited_by": 0,
+    "own_families_citing": 27,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11223512B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11695615B2",
+    "title": "Configuring a network",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Apstrktr Inc",
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2014-11-14",
+    "publication_date": "2023-07-04",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10389573B2",
+      "US11223512B2",
+      "WO2016077124A1"
+    ],
+    "invention_group": "US10389573B2",
+    "own_cited_by": 1,
+    "own_families_citing": 26,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11695615B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "WO2016077124A1",
+    "title": "Configuring a network",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Apstrktr Inc"
+    ],
+    "priority_date": "2014-11-14",
+    "publication_date": "2016-05-19",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10389573B2",
+      "US11223512B2",
+      "US11695615B2"
+    ],
+    "invention_group": "US10389573B2",
+    "own_cited_by": 0,
+    "own_families_citing": 27,
+    "second_source": "USPTO full text confirms family member US10389573B2, US11223512B2, US11695615B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/WO2016077124A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US9785412B1",
+    "title": "Methods and systems for object-oriented modeling of networks",
+    "assignee": "Gluware",
+    "assignee_on_patent": "GLUE NETWORKS Inc",
+    "current_assignee_google": [
+      "Gluware Ip LLC"
+    ],
+    "priority_date": "2015-02-27",
+    "publication_date": "2017-10-10",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US9785412B1",
+    "own_cited_by": 8,
+    "own_families_citing": 0,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US9785412B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Gluware: applicant citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "CN106301870A",
+    "title": "A kind of method and device realizing command lookup on network devices",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2015-06-25",
+    "publication_date": "2017-01-04",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "WO2016206546A1"
+    ],
+    "invention_group": "CN106301870A",
+    "own_cited_by": 2,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN106301870A/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "WO2016206546A1",
+    "title": "Method and device for searching command on network device",
+    "assignee": "ZTE",
+    "assignee_on_patent": "ZTE Corp",
+    "current_assignee_google": [
+      "ZTE Corp"
+    ],
+    "priority_date": "2015-06-25",
+    "publication_date": "2016-12-29",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN106301870A"
+    ],
+    "invention_group": "CN106301870A",
+    "own_cited_by": 0,
+    "own_families_citing": 2,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/WO2016206546A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "ZTE: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10063428B1",
+    "title": "Selectable declarative requirement levels",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2015-06-30",
+    "publication_date": "2018-08-28",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US11677619B2",
+    "same_invention_as": [
+      "US11677619B2"
+    ],
+    "invention_group": "US10063428B1",
+    "own_cited_by": 20,
+    "own_families_citing": 2,
+    "second_source": "USPTO full text confirms family member US11677619B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10063428B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11677619B2",
+    "title": "Selectable declarative requirement levels",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2015-06-30",
+    "publication_date": "2023-06-13",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10063428B1"
+    ],
+    "invention_group": "US10063428B1",
+    "own_cited_by": 0,
+    "own_families_citing": 22,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11677619B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN113961564A",
+    "title": "In-memory key-value storage for multi-model databases",
+    "assignee": "Oracle",
+    "assignee_on_patent": "Oracle International Corp",
+    "current_assignee_google": [
+      "Oracle International Corp"
+    ],
+    "priority_date": "2015-11-19",
+    "publication_date": "2022-01-21",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN1892655A"
+    ],
+    "cites_label": [
+      "CN 1892655 A"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "US10360233B2"
+    ],
+    "invention_group": "CN113961564A",
+    "own_cited_by": 0,
+    "own_families_citing": 22,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN113961564A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Oracle: examiner citation of his database patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10313206B1",
+    "title": "Verifying service status",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2015-12-23",
+    "publication_date": "2019-06-04",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US11323338B2, US11876699B2",
+    "same_invention_as": [
+      "US11323338B2",
+      "US11876699B2"
+    ],
+    "invention_group": "US10313206B1",
+    "own_cited_by": 12,
+    "own_families_citing": 5,
+    "second_source": "USPTO full text confirms family member US11323338B2, US11876699B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10313206B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11323338B2",
+    "title": "Verifying service status",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2015-12-23",
+    "publication_date": "2022-05-03",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10313206B1",
+      "US11876699B2"
+    ],
+    "invention_group": "US10313206B1",
+    "own_cited_by": 4,
+    "own_families_citing": 13,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11323338B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11876699B2",
+    "title": "Verifying service status",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2015-12-23",
+    "publication_date": "2024-01-16",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10313206B1",
+      "US11323338B2"
+    ],
+    "invention_group": "US10313206B1",
+    "own_cited_by": 1,
+    "own_families_citing": 16,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11876699B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN105429809A",
+    "title": "Router configuration system and router configuration method",
+    "assignee": "Shanghai Feixun Data Communication",
+    "assignee_on_patent": "Shanghai Feixun Data Communication Technology Co Ltd",
+    "current_assignee_google": [
+      "Shanghai Feixun Data Communication Technology Co Ltd"
+    ],
+    "priority_date": "2016-01-05",
+    "publication_date": "2016-03-23",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "CN105429809A",
+    "own_cited_by": 4,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN105429809A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Shanghai Feixun Data Communication: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US20170237628A1",
+    "title": "Service information model for managing a telecommunications network",
+    "assignee": "CENX (now Ericsson)",
+    "assignee_on_patent": "CENX (bought by Ericsson in 2018)",
+    "current_assignee_google": [
+      "Telefonaktiebolaget LM Ericsson AB"
+    ],
+    "priority_date": "2016-02-17",
+    "publication_date": "2017-08-17",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US9871702B2"
+    ],
+    "invention_group": "US20170237628A1",
+    "own_cited_by": 5,
+    "own_families_citing": 0,
+    "second_source": "USPTO full text confirms family member US9871702B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US20170237628A1/en",
+    "notable": false,
+    "rank": null,
+    "why": "CENX (now Ericsson): examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US10374872B2",
+    "title": "Configuring system resources for different reference architectures",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2016-05-24",
+    "publication_date": "2019-08-06",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US11088900B2, US11689413B2",
+    "same_invention_as": [
+      "US11088900B2",
+      "US11689413B2"
+    ],
+    "invention_group": "US10374872B2",
+    "own_cited_by": 18,
+    "own_families_citing": 29,
+    "second_source": "USPTO full text confirms family member US11088900B2, US11689413B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10374872B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11088900B2",
+    "title": "Configuring system resources for different reference architectures",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2016-05-24",
+    "publication_date": "2021-08-10",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10374872B2",
+      "US11689413B2"
+    ],
+    "invention_group": "US10374872B2",
+    "own_cited_by": 5,
+    "own_families_citing": 42,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11088900B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11689413B2",
+    "title": "Configuring system resources for different reference architectures",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2016-05-24",
+    "publication_date": "2023-06-27",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10374872B2",
+      "US11088900B2"
+    ],
+    "invention_group": "US10374872B2",
+    "own_cited_by": 1,
+    "own_families_citing": 46,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11689413B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11567994B2",
+    "title": "Configuration, telemetry, and analytics of a computer infrastructure using a graph model",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Apstra Inc"
+    ],
+    "priority_date": "2017-01-24",
+    "publication_date": "2023-01-31",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "US11567994B2",
+    "own_cited_by": 3,
+    "own_families_citing": 43,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11567994B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN110799942A",
+    "title": "Detecting and managing recurring patterns in device and service configuration data",
+    "assignee": "Cisco",
+    "assignee_on_patent": "Cisco Technology Inc",
+    "current_assignee_google": [
+      "Cisco Technology Inc"
+    ],
+    "priority_date": "2017-06-13",
+    "publication_date": "2020-02-14",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN110799942B",
+      "US10462010B2"
+    ],
+    "invention_group": "CN110799942A",
+    "own_cited_by": 2,
+    "own_families_citing": 11,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN110799942A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Cisco: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN110799942B",
+    "title": "Method, apparatus and computer readable medium for managing network devices and services",
+    "assignee": "Cisco",
+    "assignee_on_patent": "Cisco Technology Inc",
+    "current_assignee_google": [
+      "Cisco Technology Inc"
+    ],
+    "priority_date": "2017-06-13",
+    "publication_date": "2023-12-01",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN110799942A",
+      "US10462010B2"
+    ],
+    "invention_group": "CN110799942A",
+    "own_cited_by": 0,
+    "own_families_citing": 13,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN110799942B/en",
+    "notable": false,
+    "rank": null,
+    "why": "Cisco: examiner citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN107633097A",
+    "title": "Dynamic capacity expansion method and system for database table",
+    "assignee": "Mashang Consumer Finance",
+    "assignee_on_patent": "Mashang Consumer Finance Co Ltd",
+    "current_assignee_google": [
+      "Mashang Consumer Finance Co Ltd"
+    ],
+    "priority_date": "2017-10-16",
+    "publication_date": "2018-01-26",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "EP1736904A2"
+    ],
+    "cites_label": [
+      "EP 1736904 A2"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "CN107633097B"
+    ],
+    "invention_group": "CN107633097A",
+    "own_cited_by": 5,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN107633097A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Mashang Consumer Finance: examiner citation of his database patent; a smaller or less known company."
+  },
+  {
+    "number": "CN107633097B",
+    "title": "Dynamic capacity expansion method and system for database table",
+    "assignee": "Mashang Consumer Finance",
+    "assignee_on_patent": "Mashang Consumer Finance Co Ltd",
+    "current_assignee_google": [
+      "Mashang Consumer Finance Co Ltd"
+    ],
+    "priority_date": "2017-10-16",
+    "publication_date": "2018-09-25",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "EP1736904A2"
+    ],
+    "cites_label": [
+      "EP 1736904 A2"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "CN107633097A"
+    ],
+    "invention_group": "CN107633097A",
+    "own_cited_by": 0,
+    "own_families_citing": 5,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN107633097B/en",
+    "notable": false,
+    "rank": null,
+    "why": "Mashang Consumer Finance: examiner citation of his database patent; a smaller or less known company."
+  },
+  {
+    "number": "US10756983B2",
+    "title": "Intent-based analytics",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2017-12-08",
+    "publication_date": "2020-08-25",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US11451451B2",
+    "same_invention_as": [
+      "US11451451B2"
+    ],
+    "invention_group": "US10756983B2",
+    "own_cited_by": 77,
+    "own_families_citing": 69,
+    "second_source": "USPTO full text confirms family member US11451451B2",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10756983B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11451451B2",
+    "title": "Intent-based analytics",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2017-12-08",
+    "publication_date": "2022-09-20",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US10756983B2"
+    ],
+    "invention_group": "US10756983B2",
+    "own_cited_by": 4,
+    "own_families_citing": 141,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11451451B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN110275698A",
+    "title": "A method and device for generating embedded software code",
+    "assignee": "Putian Information Technology",
+    "assignee_on_patent": "Putian Information Technology Co Ltd",
+    "current_assignee_google": [
+      "Putian Information Technology Co Ltd"
+    ],
+    "priority_date": "2018-03-13",
+    "publication_date": "2019-09-24",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN101009591A"
+    ],
+    "cites_label": [
+      "CN 101009591 A"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [],
+    "invention_group": "CN110275698A",
+    "own_cited_by": 1,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN110275698A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Putian Information Technology: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US10992543B1",
+    "title": "Automatically generating an intent-based network model of an existing computer network",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2019-03-21",
+    "publication_date": "2021-04-27",
+    "cited_by": "applicant",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "US11805024B1",
+    "same_invention_as": [
+      "US11805024B1"
+    ],
+    "invention_group": "US10992543B1",
+    "own_cited_by": 93,
+    "own_families_citing": 2,
+    "second_source": "USPTO full text confirms family member US11805024B1",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US10992543B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11075805B1",
+    "title": "Business policy management for self-driving network",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2019-04-24",
+    "publication_date": "2021-07-27",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11444833B1",
+      "US11658872B1",
+      "US11973645B1",
+      "US12170593B1"
+    ],
+    "invention_group": "US11075805B1",
+    "own_cited_by": 7,
+    "own_families_citing": 1,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11075805B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11444833B1",
+    "title": "Business policy management for self-driving network",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2019-04-24",
+    "publication_date": "2022-09-13",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11075805B1",
+      "US11658872B1",
+      "US11973645B1",
+      "US12170593B1"
+    ],
+    "invention_group": "US11075805B1",
+    "own_cited_by": 2,
+    "own_families_citing": 6,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11444833B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11658872B1",
+    "title": "Business policy management for self-driving network",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2019-04-24",
+    "publication_date": "2023-05-23",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11075805B1",
+      "US11444833B1",
+      "US11973645B1",
+      "US12170593B1"
+    ],
+    "invention_group": "US11075805B1",
+    "own_cited_by": 2,
+    "own_families_citing": 6,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11658872B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11973645B1",
+    "title": "Business policy management for self-driving network",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2019-04-24",
+    "publication_date": "2024-04-30",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11075805B1",
+      "US11444833B1",
+      "US11658872B1",
+      "US12170593B1"
+    ],
+    "invention_group": "US11075805B1",
+    "own_cited_by": 1,
+    "own_families_citing": 7,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11973645B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US12170593B1",
+    "title": "Business policy management for self-driving network",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2019-04-24",
+    "publication_date": "2024-12-17",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11075805B1",
+      "US11444833B1",
+      "US11658872B1",
+      "US11973645B1"
+    ],
+    "invention_group": "US11075805B1",
+    "own_cited_by": 0,
+    "own_families_citing": 8,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US12170593B1/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "CN112559514A",
+    "title": "Information processing method and system",
+    "assignee": "Bilibili",
+    "assignee_on_patent": "Shanghai Bilibili Technology Co Ltd",
+    "current_assignee_google": [
+      "Shanghai Bilibili Technology Co Ltd"
+    ],
+    "priority_date": "2019-09-25",
+    "publication_date": "2021-03-26",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN1892655A"
+    ],
+    "cites_label": [
+      "CN 1892655 A"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "CN112559514B"
+    ],
+    "invention_group": "CN112559514A",
+    "own_cited_by": 4,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN112559514A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Bilibili (the Chinese video site): a Chinese examiner cited his database patent (CN 1892655 A)."
+  },
+  {
+    "number": "CN112559514B",
+    "title": "Information processing method and system",
+    "assignee": "Bilibili",
+    "assignee_on_patent": "Shanghai Bilibili Technology Co Ltd",
+    "current_assignee_google": [
+      "Shanghai Bilibili Technology Co Ltd"
+    ],
+    "priority_date": "2019-09-25",
+    "publication_date": "2023-04-25",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "CN1892655A"
+    ],
+    "cites_label": [
+      "CN 1892655 A"
+    ],
+    "his_patent": "US 7,603,377 (database key)",
+    "via": null,
+    "same_invention_as": [
+      "CN112559514A"
+    ],
+    "invention_group": "CN112559514A",
+    "own_cited_by": 0,
+    "own_families_citing": 4,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN112559514B/en",
+    "notable": false,
+    "rank": null,
+    "why": "Bilibili (the Chinese video site): a Chinese examiner cited his database patent (CN 1892655 A)."
+  },
+  {
+    "number": "CN112187482A",
+    "title": "Device management method, system, electronic device and storage medium",
+    "assignee": "Hangzhou Runzhou Optoelectronic",
+    "assignee_on_patent": "Hangzhou Runzhou Optoelectronic Technology Co ltd",
+    "current_assignee_google": [
+      "Hangzhou Runzhou Optoelectronic Technology Co ltd"
+    ],
+    "priority_date": "2020-09-04",
+    "publication_date": "2021-01-05",
+    "cited_by": "examiner",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "CN112187482B"
+    ],
+    "invention_group": "CN112187482A",
+    "own_cited_by": 0,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN112187482A/en",
+    "notable": false,
+    "rank": null,
+    "why": "Hangzhou Runzhou Optoelectronic: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "CN112187482B",
+    "title": "Device management method, system, electronic device and storage medium",
+    "assignee": "Hangzhou Runzhou Optoelectronic",
+    "assignee_on_patent": "Hangzhou Runzhou Optoelectronic Technology Co ltd",
+    "current_assignee_google": [
+      "Hangzhou Runzhou Optoelectronic Technology Co ltd"
+    ],
+    "priority_date": "2020-09-04",
+    "publication_date": "2023-04-25",
+    "cited_by": "examiner",
+    "link": "family",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": "CN112187482A",
+    "same_invention_as": [
+      "CN112187482A"
+    ],
+    "invention_group": "CN112187482A",
+    "own_cited_by": 0,
+    "own_families_citing": 0,
+    "second_source": null,
+    "confirmed_second_source": false,
+    "url": "https://patents.google.com/patent/CN112187482B/en",
+    "notable": false,
+    "rank": null,
+    "why": "Hangzhou Runzhou Optoelectronic: examiner citation of his OSS patent; a smaller or less known company."
+  },
+  {
+    "number": "US11652704B2",
+    "title": "Model driven intent policy conflict detection and resolution through graph analysis",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2020-10-21",
+    "publication_date": "2023-05-16",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11283691B1",
+      "US11929886B2"
+    ],
+    "invention_group": "US11283691B1",
+    "own_cited_by": 0,
+    "own_families_citing": 21,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11652704B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11929886B2",
+    "title": "Model driven intent policy conflict detection and resolution through graph analysis",
+    "assignee": "Juniper Networks",
+    "assignee_on_patent": "Juniper Networks Inc",
+    "current_assignee_google": [
+      "Juniper Networks Inc"
+    ],
+    "priority_date": "2020-10-21",
+    "publication_date": "2024-03-12",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11283691B1",
+      "US11652704B2"
+    ],
+    "invention_group": "US11283691B1",
+    "own_cited_by": 2,
+    "own_families_citing": 19,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11929886B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Juniper Networks: applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US11570055B2",
+    "title": "Connectivity templates",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2020-11-25",
+    "publication_date": "2023-01-31",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US12021708B2"
+    ],
+    "invention_group": "US11570055B2",
+    "own_cited_by": 3,
+    "own_families_citing": 19,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US11570055B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  },
+  {
+    "number": "US12021708B2",
+    "title": "Connectivity templates",
+    "assignee": "Apstra (Juniper)",
+    "assignee_on_patent": "Apstra (bought by Juniper Networks in 2021)",
+    "current_assignee_google": [
+      "Hewlett Packard Enterprise Development LP"
+    ],
+    "priority_date": "2020-11-25",
+    "publication_date": "2024-06-25",
+    "cited_by": "applicant",
+    "link": "direct",
+    "cites": [
+      "US20070130192A1"
+    ],
+    "cites_label": [
+      "US 2007/0130192 A1"
+    ],
+    "his_patent": "US 2007/0130192 (OSS script templates)",
+    "via": null,
+    "same_invention_as": [
+      "US11570055B2"
+    ],
+    "invention_group": "US11570055B2",
+    "own_cited_by": 0,
+    "own_families_citing": 22,
+    "second_source": "USPTO Patent Public Search full text names it",
+    "confirmed_second_source": true,
+    "url": "https://patents.google.com/patent/US12021708B2/en",
+    "notable": false,
+    "rank": null,
+    "why": "Apstra (Juniper): applicant citation of his OSS patent; another filing from a company already in the notable list."
+  }
+]

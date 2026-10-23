@@ -3,8 +3,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Window from '../components/shell/Window.astro';
 import Hero from '../components/shell/Hero.astro';
 import Programs from '../components/shell/Programs.astro';
+import Balloon from '../components/shell/Balloon.astro';
+import Explorer from '../components/toys/dinarsoft/Explorer.astro';
+import MmDevice from '../components/toys/ds-memmaid/MmDevice.astro';
+import LiveSwitcher from '../components/toys/ds-handyswitcher/LiveSwitcher.astro';
+import HmMenu from '../components/toys/ds-handymenu/HmMenu.astro';
+import Build from '../components/toys/ds-handylauncher/Build.astro';
+import TapPhone from '../components/toys/ds-taptext/TapPhone.astro';
+import TodayScreen from '../components/toys/ds-hijridate/TodayScreen.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
 const sakhr = [
   { id: 'print', name: 'Printing core', icon: 'print', text: 'Arabic on paper, exactly as it looks on the screen. His printing core laid out each page right to left and sent it to the printer. Think of the print engine inside your browser, written for Arabic.' },
@@ -19,17 +27,6 @@ const keyOf = (v: Record<string, number>) => FIELDS.reduce((k, [f, w]) => k * 2 
 const bits = FIELDS.map(([f, w]) => KEY[f].toString(2).padStart(w, '0'));
 const lo = Math.floor(keyOf(KEY) / 2 ** 17) * 2 ** 17;
 
-const apps = [
-  { id: 'memmaid', name: 'MemMaid', what: 'Cleans the phone: frees memory, manages the programs and services that start with it, and tidies the registry.', first: '1.0, June 2003', last: '2.3, June 2008', awards: 'Finalist four years running, 2005 to 2008', soft: ['Menu', 'Clean'] },
-  { id: 'handyswitcher', name: 'HandySwitcher', what: 'A task switcher with an X button that really closes programs, and Close All.', first: '1.0, September 2003', last: '3.1, April 2008', awards: 'Best Task Manager, 2007 and 2008', soft: ['Close all', 'Menu'] },
-  { id: 'handymenu', name: 'HandyMenu', what: 'A menu in the corner of the screen: power off, reset, screen capture, rotate the screen.', first: '1.0, July 2003', last: '3.6, March 2006', awards: 'Finalist, System and Registry, 2008', soft: ['Menu', 'Close'] },
-  { id: 'handylauncher', name: 'HandyLauncher', what: 'Opens programs and documents from the corner of the screen, each in the screen direction you choose.', first: '1.0, August 2003', last: '3.4, March 2006', awards: 'Nominee, 2007 and 2008', soft: ['Edit', 'Menu'] },
-  { id: 'taptext', name: 'TapText', what: 'Saved phrases and date stamps, typed into any program in two taps.', first: '1.0, March 2005', last: '1.3, February 2006', awards: 'Best Misc. Utility, 2007; finalist, 2008', soft: ['New', 'Menu'] },
-  { id: 'hijridate', name: 'HijriDate', what: 'Shows the Hijri and the Gregorian date on the Today screen, in Arabic or English.', first: '1.0, June 2003', last: '1.5', awards: '', soft: ['Calendar', 'Contacts'] },
-];
-const now = new Date();
-const hijriAr = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
-const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
 ---
 
 <BaseLayout
@@ -55,6 +52,7 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
       <div class="desk sk-desk" data-tabs>
         <Window kind="panel" title="Program Manager" class="pm">
           <p class="pm-group">Sakhr Arabic Office</p>
+          <div class="pm-wrap" data-balloon-host>
           <div class="pm-icons" role="tablist" aria-label="What he built at Sakhr">
             {sakhr.map((s, i) => (
               <button type="button" role="tab" id={`sk-t-${s.id}`} aria-controls={`sk-p-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
@@ -67,6 +65,8 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
                 <span>{s.name}</span>
               </button>
             ))}
+          </div>
+          <Balloon text="Open each icon to see what he built at Sakhr." class="pm-tip" />
           </div>
         </Window>
         {sakhr.map((s, i) => (
@@ -115,78 +115,18 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
     <div class="container">
       <div class="copy ds-copy">
         <h2 id="ds-h">Kanata, 2002. His own company.</h2>
-        <p>In November 2002 he founded DinarSoft and wrote six apps for Pocket PC and Windows Mobile phones, the smartphones of the day. Reviewers called MemMaid “the Swiss Army Knife of PPC utilities”. <cite>Smartphone &amp; Pocket PC</cite> magazine named HandySwitcher the best task manager in 2007 and again in 2008, and TapText the best Misc. Utility of 2007. His apps earned 22 nominations from 2003 to 2008.</p>
+        <p>In November 2002 he founded DinarSoft, and with his co-developer, Hosam Aly, built six apps for Pocket PC and Windows Mobile phones, the smartphones of the day. Reviewers called MemMaid “the Swiss Army Knife of PPC utilities”. <cite>Smartphone &amp; Pocket PC</cite> magazine named HandySwitcher the best task manager in 2007 and again in 2008, and TapText the best Misc. Utility of 2007. His apps earned 22 nominations from 2003 to 2008.</p>
         <a class="more" href={`${base}/dinarsoft/`}>Visit DinarSoft</a>
       </div>
-      <div class="ide" data-ide>
-        <Window kind="panel" title="Solution Explorer" active class="ide-sol">
-          <p class="sol-root">Solution ‘DinarSoft’ (6 projects)</p>
-          <div class="sol-list" role="tablist" aria-label="DinarSoft apps" aria-orientation="vertical">
-            {apps.map((a, i) => (
-              <button type="button" role="tab" id={`ds-t-${a.id}`} aria-controls="ds-device" aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-app={i}>
-                <span class="proj" aria-hidden="true"></span>{a.name}
-              </button>
-            ))}
-          </div>
-        </Window>
-        <div class="ide-dev" id="ds-device" role="tabpanel" aria-labelledby="ds-t-memmaid" data-device>
-          {apps.map((a, i) => (
-            <Window kind="device" title={a.name} num="9:41" data-screen={a.id} hidden={i !== 0} class="dev">
-              {a.id === 'memmaid' && (
-                <div class="app mm">
-                  <p class="app-h">Program memory</p>
-                  <div class="mm-bar" data-mm><i></i></div>
-                  <button type="button" class="app-btn" data-mm-go>Reclaim RAM</button>
-                  <p class="app-note" data-mm-note>Tap to free memory that closed programs left behind.</p>
-                </div>
-              )}
-              {a.id === 'handyswitcher' && (
-                <ul class="app hs" data-hs>
-                  {['Calendar', 'Contacts', 'Inbox', 'Internet Explorer', 'Notes'].map(t => <li><span>{t}</span><button type="button" aria-label={`Close ${t}`}>×</button></li>)}
-                </ul>
-              )}
-              {a.id === 'handymenu' && (
-                <ul class="app hm">
-                  {['Power off', 'Soft reset', 'Screen capture', 'Rotate screen'].map(t => <li><button type="button" data-hm={t}>{t}</button></li>)}
-                </ul>
-              )}
-              {a.id === 'handylauncher' && (
-                <ul class="app hl">
-                  {[['Calculator', 'portrait'], ['Notes', 'portrait'], ['Pictures', 'landscape'], ['Tasks', 'portrait']].map(([t, o]) => <li><span class="hl-i" aria-hidden="true"></span>{t}<small>{o}</small></li>)}
-                </ul>
-              )}
-              {a.id === 'taptext' && (
-                <div class="app tt">
-                  <label class="tt-l" for="tt-field">Message</label>
-                  <textarea id="tt-field" rows="3" data-tt></textarea>
-                  <div class="tt-snips">
-                    {['Running late, there in 10.', 'Thank you!', 'Call me back.'].map(t => <button type="button" data-snip={t}>{t}</button>)}
-                    <button type="button" data-snip="@date">Today’s date</button>
-                  </div>
-                </div>
-              )}
-              {a.id === 'hijridate' && (
-                <div class="app hd">
-                  <p class="hd-ar" lang="ar" dir="rtl" data-hijri>{hijriAr}</p>
-                  <p class="hd-en" data-greg>{greg}</p>
-                  <p class="app-note">Calculated for Mecca, as in his app.</p>
-                </div>
-              )}
-              <Fragment slot="status"><span>{a.soft[0]}</span><span>{a.soft[1]}</span></Fragment>
-            </Window>
-          ))}
-        </div>
-        <Window kind="panel" title="Properties" class="ide-props">
-          {apps.map((a, i) => (
-            <dl class="props" data-props={a.id} hidden={i !== 0}>
-              <div><dt>Name</dt><dd>{a.name}</dd></div>
-              <div><dt>Does</dt><dd>{a.what}</dd></div>
-              <div><dt>First</dt><dd>{a.first}</dd></div>
-              <div><dt>Latest</dt><dd>{a.last}</dd></div>
-              {a.awards && <div><dt>Awards</dt><dd>{a.awards}</dd></div>}
-            </dl>
-          ))}
-        </Window>
+      <div class="ds-ide">
+        <Explorer>
+          <MmDevice solo slot="memmaid" />
+          <LiveSwitcher solo slot="handyswitcher" />
+          <HmMenu solo slot="handymenu" />
+          <Build solo slot="handylauncher" />
+          <TapPhone solo id="home-tt" slot="taptext" />
+          <TodayScreen solo id="home-hd" slot="hijridate" />
+        </Explorer>
       </div>
     </div>
   </section>
@@ -235,6 +175,8 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
   .pm { width: min(100%, 560px); }
   .pm-group { font: 700 0.9375rem/1 var(--font-pixel); color: var(--ink-2); margin-bottom: 14px; }
   .pm-icons { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .pm-wrap { position: relative; }
+  .pm-wrap :global(.pm-tip) { top: 92px; left: 4px; }
   .pm-icons button { display: grid; justify-items: center; gap: 8px; min-height: 96px; padding: 10px 4px; background: none; border: 0; cursor: pointer; font: 500 0.9375rem/1.2 var(--font-pixel); color: var(--ink); text-align: center; }
   .pm-icons .ico { width: 40px; height: 40px; }
   .pm-icons button span { padding: 1px 4px; }
@@ -270,46 +212,7 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
   .ds-copy { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 52ch); gap: 0 56px; align-items: end; }
   .ds-copy p { margin-top: 0; }
   .ds-copy .more { grid-column: 2; }
-  .ide { display: grid; grid-template-columns: minmax(200px, 0.8fr) auto minmax(240px, 1fr); gap: 24px; align-items: start; margin-top: clamp(40px, 5vw, 64px); }
-  .sol-root { font-size: 0.9375rem; font-weight: 600; padding: 2px 4px 6px; }
-  .sol-list { display: grid; padding-left: 14px; }
-  .sol-list button { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 8px; font: 400 1rem/1 var(--sans); color: var(--ink); background: none; border: 1px solid transparent; cursor: pointer; text-align: left; }
-  .sol-list button[aria-selected='true'] { background: var(--xp-sel); color: var(--w-white); }
-  .sol-list button:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -3px; }
-  .proj { width: 16px; height: 14px; border: 1px solid #5a7bb8; background: linear-gradient(#fff, #d6e2f6); position: relative; }
-  .proj::after { content: ''; position: absolute; left: 3px; top: 3px; width: 8px; height: 6px; background: #3f7d3f; }
-  .ide-dev { display: grid; justify-items: center; }
-  .dev { width: 300px; }
-  .ide-props .props { display: grid; font-size: 0.9375rem; }
-  .props div { display: grid; grid-template-columns: 6.5em minmax(0, 1fr); border-bottom: 1px solid var(--rule); }
-  .props dt { padding: 6px 8px; background: var(--xp-beige); color: oklch(0.3 0 0); }
-  .props dd { padding: 6px 8px; line-height: 1.45; }
-
-  .app { list-style: none; font: 400 0.9375rem/1.35 var(--sans); }
-  .app-h { font-weight: 700; }
-  .app-note { margin-top: 10px; font-size: 0.8125rem; color: var(--ink-2); }
-  .app-btn { margin-top: 12px; min-height: 44px; padding: 0 14px; border: 1px solid #5a7bb8; border-radius: 3px; background: linear-gradient(#fff, #dde7f6); font: 600 0.9375rem/1 var(--sans); color: var(--w-black); cursor: pointer; }
-  .mm-bar { margin-top: 8px; height: 18px; border: 1px solid #5a7bb8; background: #fff; }
-  .mm-bar i { display: block; height: 100%; width: var(--used, 82%); background: linear-gradient(#7fb0f2, #2c63c8); transition: width 1.4s var(--expo); }
-  .hs li { display: flex; align-items: center; justify-content: space-between; min-height: 44px; border-bottom: 1px solid var(--rule); }
-  .hs li.gone { animation: gone 0.3s var(--quart) forwards; }
-  @keyframes gone { to { opacity: 0; translate: 30px 0; } }
-  .hs button { width: 44px; height: 40px; border: 0; background: none; font: 700 1.25rem/1 var(--sans); color: #b3261e; cursor: pointer; }
-  .hm li + li { border-top: 1px solid var(--rule); }
-  .hm button { width: 100%; min-height: 44px; text-align: left; border: 0; background: none; font: inherit; color: inherit; cursor: pointer; padding: 0 6px; }
-  .hm button.done { background: #c1d2ee; }
-  .rot :global(.win-body) { rotate: 90deg; transition: rotate 0.5s var(--expo); }
-  .hl { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .hl li { display: grid; justify-items: center; gap: 4px; padding: 8px 4px; text-align: center; }
-  .hl small { font-size: 0.75rem; color: var(--ink-2); }
-  .hl-i { width: 32px; height: 32px; border-radius: 6px; background: linear-gradient(135deg, #7fb0f2, #2c63c8); }
-  .tt-l { font-weight: 700; font-size: 0.875rem; }
-  .tt textarea { width: 100%; margin-top: 4px; padding: 6px; font: 400 0.9375rem/1.35 var(--sans); border: 1px solid #7f9db9; resize: none; color: var(--w-black); background: #fff; }
-  .tt-snips { display: grid; gap: 4px; margin-top: 8px; }
-  .tt-snips button { min-height: 44px; text-align: left; padding: 0 8px; border: 1px solid #c5d3ea; background: #f2f6fc; font: 400 0.875rem/1.2 var(--sans); color: var(--w-black); cursor: pointer; }
-  .hd { display: grid; gap: 6px; padding-top: 6px; }
-  .hd-ar { font: 700 1.5rem/1.5 var(--ar); color: oklch(0.35 0.14 258); }
-  .hd-en { font-weight: 600; }
+  .ds-ide { margin-top: clamp(40px, 5vw, 64px); }
 
   /* Closing */
   .fa-in { display: grid; justify-items: center; text-align: center; }
@@ -321,13 +224,6 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
   .family p { margin-top: 18px; max-width: 52ch; color: var(--ink-2); font-size: clamp(1.0625rem, 0.4vw + 1rem, 1.25rem); }
   .fa-acts { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-top: 32px; }
 
-  @media (pointer: coarse) {
-    .sol-list button, .tt-snips button, .hs button { min-height: 44px; }
-  }
-  @media (max-width: 1100px) {
-    .ide { grid-template-columns: minmax(0, 1fr) auto; }
-    .ide-props { grid-column: 1 / -1; }
-  }
   @media (max-width: 900px) {
     .sk-grid, .ka-grid { grid-template-columns: 1fr; }
     .ka-grid .desk { order: 0; }
@@ -340,8 +236,6 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
     .pm-detail { width: auto; margin-top: 0; }
     .pm-icons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .pat-fields { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .ide { grid-template-columns: 1fr; }
-    .dev { width: min(300px, 100%); }
   }
 </style>
 
@@ -370,43 +264,6 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
   const skPanels = [...document.querySelectorAll<HTMLElement>('.sk-desk [data-panel]')];
   tabs(sk, i => skPanels.forEach((p, k) => (p.hidden = k !== i)));
 
-  const sol = document.querySelector<HTMLElement>('.sol-list')!;
-  const screens = [...document.querySelectorAll<HTMLElement>('[data-screen]')];
-  const props = [...document.querySelectorAll<HTMLElement>('[data-props]')];
-  const dev = document.querySelector<HTMLElement>('[data-device]')!;
-  tabs(sol, i => {
-    screens.forEach((s, k) => (s.hidden = k !== i));
-    props.forEach((p, k) => (p.hidden = k !== i));
-    dev.setAttribute('aria-labelledby', sol.querySelectorAll('[role="tab"]')[i].id);
-  });
-
-  // The small apps on the Pocket PC
-  const mm = document.querySelector<HTMLElement>('[data-mm]')!;
-  document.querySelector('[data-mm-go]')!.addEventListener('click', () => {
-    mm.style.setProperty('--used', '38%');
-    document.querySelector('[data-mm-note]')!.textContent = 'Memory reclaimed. The phone has room again.';
-    setTimeout(() => mm.style.setProperty('--used', '82%'), 6000);
-  });
-  document.querySelectorAll<HTMLButtonElement>('[data-hs] button').forEach(b => b.addEventListener('click', () => {
-    const li = b.closest('li')!;
-    li.classList.add('gone');
-    li.addEventListener('animationend', () => li.remove(), { once: true });
-  }));
-  const hmScreen = document.querySelector<HTMLElement>('[data-screen="handymenu"]')!;
-  document.querySelectorAll<HTMLButtonElement>('[data-hm]').forEach(b => b.addEventListener('click', () => {
-    if (b.dataset.hm === 'Rotate screen') hmScreen.classList.toggle('rot');
-    b.classList.add('done');
-    setTimeout(() => b.classList.remove('done'), 600);
-  }));
-  const tt = document.querySelector<HTMLTextAreaElement>('[data-tt]')!;
-  document.querySelectorAll<HTMLButtonElement>('[data-snip]').forEach(b => b.addEventListener('click', () => {
-    const s = b.dataset.snip === '@date' ? new Date().toLocaleDateString('en-US', { dateStyle: 'long' }) : b.dataset.snip!;
-    tt.value = (tt.value ? tt.value + ' ' : '') + s;
-  }));
-  const now = new Date();
-  document.querySelector('[data-hijri]')!.textContent = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }).format(now);
-  document.querySelector('[data-greg]')!.textContent = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(now);
-
   // The patent's key: five numbers in, one 32-bit number out
   const pat = document.querySelector<HTMLElement>('[data-key]')!;
   const F = [['node', 10], ['shelf', 5], ['slot', 5], ['card', 5], ['port', 7]] as const;
@@ -433,7 +290,7 @@ const greg = new Intl.DateTimeFormat('en-US', { weekday: 'long', day: 'numeric',
   new IntersectionObserver(async ([e], io) => {
     if (!e.isIntersecting) return;
     io.disconnect();
-    const bin = await load(`${import.meta.env.BASE_URL}/arabart/fonts.bin`);
+    const bin = await load(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/arabart/fonts.bin`);
     const c = nameBox.querySelector('canvas')!;
     const img = render(bin, fromUnicode('ياسر عوض'), { font: 3, color: 14, mode: '3d', shadow: 4 });
     const d = devicePixelRatio || 1;

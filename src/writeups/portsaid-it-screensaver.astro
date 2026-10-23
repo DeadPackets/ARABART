@@ -13,7 +13,7 @@ import Deep from '../components/explain/Deep.astro';
 import Listing from '../components/explain/Listing.astro';
 import Term from '../components/explain/Term.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <section id="scr-gift">

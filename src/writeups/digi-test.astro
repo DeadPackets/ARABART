@@ -16,7 +16,7 @@ import Listing from '../components/explain/Listing.astro';
 import Deep from '../components/explain/Deep.astro';
 import Term from '../components/explain/Term.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&layer=memory&at=0x${(0x4230 + seg * 16 + off).toString(16)}`;
 ---
 

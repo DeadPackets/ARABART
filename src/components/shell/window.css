@@ -159,29 +159,150 @@
   .wx.win--screen > .win-body { background: var(--surface); }
 }
 
-/* ---------- device: a Pocket PC running Windows Mobile 5, the same in every era ---------- */
+/* ---------- device: a generic silver Pocket PC, the same in every era. The screen is 240 x 320 CSS pixels, one per QVGA pixel ---------- */
+@font-face { font-family: 'WM Tahoma'; src: local('Tahoma'); }
+@font-face { font-family: 'WM Tahoma'; src: local('Tahoma Bold'), local('Tahoma-Bold'); font-weight: 700; }
+/* Where Tahoma is missing, Verdana or DejaVu Sans shrunk to Tahoma's width keeps every label on its line */
+@font-face { font-family: 'WM Sans'; src: local('Verdana'), local('DejaVu Sans'); size-adjust: 88%; }
+@font-face { font-family: 'WM Sans'; src: local('Verdana Bold'), local('Verdana-Bold'), local('DejaVu Sans Bold'); font-weight: 700; size-adjust: 88%; }
+
 .win--device {
   --surface: var(--w-white); --surface-2: oklch(0.95 0.01 250); --ink: var(--w-black); --ink-2: oklch(0.4 0 0); --accent: oklch(0.45 0.16 258);
   --accent-2: oklch(0.5 0.13 150); --rule: oklch(0.85 0.01 250); --focus: oklch(0.45 0.16 258); --btn-bg: oklch(0.93 0.01 250); --btn-ink: var(--w-black);
-  width: min(100%, 320px);
-  padding: 40px 16px 52px;
-  border-radius: 30px;
-  background: linear-gradient(160deg, oklch(0.42 0.012 260), oklch(0.22 0.01 260) 55%, oklch(0.3 0.01 260));
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.25), inset 0 -2px 6px oklch(0 0 0 / 0.5), 0 24px 48px oklch(0 0 0 / 0.35);
+  --wm-font: 'WM Tahoma', Tahoma, 'WM Sans', sans-serif;
+  --wm-flag: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cg stroke='%23fff' stroke-opacity='.55' stroke-width='.6'%3E%3Cpath fill='%23f25022' d='M3.6 2.4c1.9-1 3.8-1 5.6 0l-.8 5.7c-1.8-1-3.7-1-5.6 0z'/%3E%3Cpath fill='%237fba00' d='M10 2.7c1.8 1 3.7 1 5.6 0l-.9 5.7c-1.8 1-3.7 1-5.5 0z'/%3E%3Cpath fill='%2300a4ef' d='M2.6 9.2c1.9-1 3.8-1 5.6 0l-.8 5.7c-1.8-1-3.7-1-5.6 0z'/%3E%3Cpath fill='%23ffb900' d='M9 9.5c1.8 1 3.7 1 5.6 0l-.9 5.7c-1.8 1-3.7 1-5.5 0z'/%3E%3C/g%3E%3C/svg%3E");
+  --wm-conn: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15' width='15' height='15' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' d='M8 0h1v1h-1zM8 1h2v1h-2zM4 2h1v1h-1zM6 2h5v1h-5zM4 3h1v1h-1zM6 3h5v1h-5zM8 4h2v1h-2zM2 5h1v1h-1zM8 5h1v1h-1zM1 6h2v1h-2zM0 7h5v1h-5zM6 7h1v1h-1zM0 8h5v1h-5zM6 8h1v1h-1zM8 8h2v1h-2zM13 8h2v1h-2zM1 9h2v1h-2zM8 9h3v1h-3zM12 9h3v1h-3zM2 10h1v1h-1zM9 10h5v1h-5zM10 11h3v1h-3zM9 12h5v1h-5zM8 13h3v1h-3zM12 13h3v1h-3zM8 14h2v1h-2zM13 14h2v1h-2z'/%3E%3C/svg%3E"); /* 15x15 */
+  --wm-ant: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15' width='15' height='15' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' d='M0 0h10v1h-10zM0 1h10v1h-10zM0 2h3v1h-3zM7 2h3v1h-3zM1 3h3v1h-3zM6 3h3v1h-3zM2 4h6v1h-6zM3 5h4v1h-4zM4 6h2v1h-2zM4 7h2v1h-2zM4 8h2v1h-2zM8 8h2v1h-2zM13 8h2v1h-2zM4 9h2v1h-2zM8 9h3v1h-3zM12 9h3v1h-3zM4 10h2v1h-2zM9 10h5v1h-5zM10 11h3v1h-3zM9 12h5v1h-5zM8 13h3v1h-3zM12 13h3v1h-3zM8 14h2v1h-2zM13 14h2v1h-2z'/%3E%3C/svg%3E"); /* 15x15 */
+  --wm-vol: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 12' width='15' height='12' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' d='M7 0h1v1h-1zM13 0h2v1h-2zM6 1h2v1h-2zM12 1h2v1h-2zM5 2h3v1h-3zM11 2h2v1h-2zM4 3h4v1h-4zM10 3h2v1h-2zM0 4h8v1h-8zM0 5h8v1h-8zM10 5h5v1h-5zM0 6h8v1h-8zM10 6h5v1h-5zM0 7h8v1h-8zM4 8h4v1h-4zM10 8h2v1h-2zM5 9h3v1h-3zM11 9h2v1h-2zM6 10h2v1h-2zM12 10h2v1h-2zM7 11h1v1h-1zM13 11h2v1h-2z'/%3E%3C/svg%3E"); /* 15x12 */
+  --wm-batt: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 11' width='16' height='11' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' d='M2 0h14v1h-14zM2 1h14v1h-14zM2 2h2v1h-2zM0 3h4v1h-4zM5 3h2v1h-2zM8 3h2v1h-2zM11 3h2v1h-2zM14 3h2v1h-2zM0 4h2v1h-2zM5 4h2v1h-2zM8 4h2v1h-2zM11 4h2v1h-2zM14 4h2v1h-2zM0 5h2v1h-2zM5 5h2v1h-2zM8 5h2v1h-2zM11 5h2v1h-2zM14 5h2v1h-2zM0 6h2v1h-2zM5 6h2v1h-2zM8 6h2v1h-2zM11 6h2v1h-2zM14 6h2v1h-2zM0 7h4v1h-4zM5 7h2v1h-2zM8 7h2v1h-2zM11 7h2v1h-2zM14 7h2v1h-2zM2 8h2v1h-2zM2 9h14v1h-14zM2 10h14v1h-14z'/%3E%3C/svg%3E"); /* 16x11 */
+  --wm-sip: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 12' width='16' height='12' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' d='M0 0h16v1h-16zM0 1h16v1h-16zM0 2h2v1h-2zM3 2h1v1h-1zM6 2h1v1h-1zM9 2h1v1h-1zM12 2h1v1h-1zM14 2h2v1h-2zM0 3h2v1h-2zM3 3h1v1h-1zM6 3h1v1h-1zM9 3h1v1h-1zM12 3h1v1h-1zM14 3h2v1h-2zM0 4h16v1h-16zM0 5h2v1h-2zM4 5h1v1h-1zM7 5h1v1h-1zM10 5h1v1h-1zM14 5h2v1h-2zM0 6h2v1h-2zM4 6h1v1h-1zM7 6h1v1h-1zM10 6h1v1h-1zM14 6h2v1h-2zM0 7h16v1h-16zM0 8h2v1h-2zM3 8h1v1h-1zM12 8h1v1h-1zM14 8h2v1h-2zM0 9h2v1h-2zM3 9h1v1h-1zM12 9h1v1h-1zM14 9h2v1h-2zM0 10h16v1h-16zM0 11h16v1h-16z'/%3E%3C/svg%3E"); /* 16x12 */
+  --wm-sip03: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 19 7' width='19' height='7' shape-rendering='crispEdges'%3E%3Cpath fill='%23000' d='M0 0h13v1h-13zM0 1h1v1h-1zM2 1h1v1h-1zM4 1h1v1h-1zM6 1h1v1h-1zM8 1h1v1h-1zM10 1h1v1h-1zM12 1h1v1h-1zM0 2h13v1h-13zM16 2h1v1h-1zM0 3h1v1h-1zM2 3h1v1h-1zM4 3h1v1h-1zM6 3h1v1h-1zM8 3h1v1h-1zM10 3h1v1h-1zM12 3h1v1h-1zM15 3h3v1h-3zM0 4h13v1h-13zM14 4h5v1h-5zM0 5h1v1h-1zM2 5h1v1h-1zM10 5h1v1h-1zM12 5h1v1h-1zM0 6h13v1h-13z'/%3E%3C/svg%3E"); /* 19x7 */
+  position: relative; box-sizing: border-box; width: 300px; max-width: 100%; height: 470px;
+  display: grid; grid-template-columns: minmax(0, 1fr) 240px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto;
+  padding: 46px 0 104px;
+  border-radius: 40px 40px 54px 54px / 34px 34px 62px 62px;
+  background:
+    radial-gradient(circle at 38px 21px, oklch(0.86 0.19 145) 0 1.4px, oklch(0.5 0.13 145) 2.2px, oklch(0.5 0 0 / 0.5) 2.8px, transparent 3.4px),
+    linear-gradient(oklch(1 0 0 / 0.5), transparent 14%, transparent 86%, oklch(0 0 0 / 0.1)),
+    linear-gradient(90deg, #a2a7ad, #e4e6e9 6%, #cdd1d5 24%, #dcdfe2 58%, #c2c6cb 88%, #969ca3);
+  box-shadow: inset 0 1px 1px #fff, inset 0 -3px 4px oklch(0 0 0 / 0.22), inset 2px 0 2px oklch(1 0 0 / 0.5), inset -2px 0 3px oklch(0 0 0 / 0.16),
+    0 0 0 1px #868c93, 0 24px 40px -16px oklch(0 0 0 / 0.55), 0 3px 8px oklch(0 0 0 / 0.18);
+  font-family: var(--wm-font); scrollbar-color: auto;
 }
-.win--device::after { content: ''; position: absolute; left: 50%; bottom: 14px; width: 54px; height: 24px; translate: -50% 0; border-radius: 12px; background: linear-gradient(oklch(0.32 0.01 260), oklch(0.18 0.01 260)); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.18); }
-.win--device > .win-bar {
-  display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px;
-  border-radius: 3px 3px 0 0; color: var(--w-white); font: 600 0.8125rem/1 var(--font-ui, sans-serif);
-  background: linear-gradient(oklch(0.48 0.15 258), oklch(0.32 0.14 262));
+/* The dark face around the glass, and the earpiece slot above it */
+.win--device::before { content: ''; position: absolute; left: calc(50% - 129px); top: 37px; width: 258px; height: 338px; border-radius: 7px; background: linear-gradient(#34383d, #1d2023); box-shadow: 0 0 0 1px #7a8087, inset 0 1px 0 oklch(1 0 0 / 0.12); }
+.win--device::after { content: ''; position: absolute; left: calc(50% - 32px); top: 15px; width: 64px; height: 7px; border-radius: 4px; background: radial-gradient(circle, #222529 1.1px, transparent 1.6px) 1px 0 / 5px 7px repeat-x, linear-gradient(#80868d, #b6bbc0); box-shadow: inset 0 1px 1px oklch(0 0 0 / 0.45), 0 1px 0 oklch(1 0 0 / 0.8); }
+.win--device > :is(.win-bar, .win-body, .win-status) { grid-column: 2; position: relative; z-index: 1; min-width: 0; }
+
+/* Five-way pad and four round program buttons, molded in, not controls */
+.dev-hw { position: absolute; left: 0; right: 0; bottom: 0; height: 96px; display: flex; align-items: center; justify-content: center; gap: 9px; pointer-events: none; }
+.dev-hw i { position: relative; flex: none; width: 31px; height: 31px; border-radius: 50%; background: radial-gradient(circle at 42% 34%, #f6f7f8, #c4c8cd 62%, #9aa0a7); box-shadow: 0 1px 0 #fff, 0 0 0 1px #8e949b, inset 0 -2px 3px oklch(0 0 0 / 0.2); }
+.dev-hw i:first-child, .dev-hw i:last-child { translate: 0 7px; }
+.dev-hw i::before { content: ''; position: absolute; inset: 9px; background: #5c636a; mask: var(--g) center / contain no-repeat; }
+.dev-hw i:nth-child(1) { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%23000' stroke-width='1.4'%3E%3Crect x='1.5' y='2.5' width='11' height='10' rx='1'/%3E%3Cpath d='M1.5 6h11M5.2 6v6.5M8.8 6v6.5M4 1v3M10 1v3'/%3E%3C/svg%3E"); }
+.dev-hw i:nth-child(2) { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Ccircle cx='7' cy='4.6' r='2.8'/%3E%3Cpath d='M1.6 13.4c0-3.3 2.3-5.2 5.4-5.2s5.4 1.9 5.4 5.2z'/%3E%3C/svg%3E"); }
+.dev-hw i:nth-child(4) { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' fill='none' stroke='%23000' stroke-width='1.4'%3E%3Crect x='1.2' y='3' width='11.6' height='8.4' rx='1'/%3E%3Cpath d='M1.4 3.4 7 8l5.6-4.6'/%3E%3C/svg%3E"); }
+.dev-hw i:nth-child(5) { --g: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M7 1.2 13 6.6h-1.8v6.2H8.4V9H5.6v3.8H2.8V6.6H1z'/%3E%3C/svg%3E"); }
+.dev-hw .dev-pad { width: 60px; height: 60px; margin: 0 3px; background: radial-gradient(circle, #eceef0 0 10px, #8f959c 10.6px 11.6px, #d9dcdf 12.4px, #bfc4c9 25px, #8e949b 28px 29px, transparent 29.6px); box-shadow: 0 1px 0 #fff, inset 0 0 0 1px #9da3aa; }
+.dev-hw .dev-pad::before { inset: 4px; background: #6b7279; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Cpath d='M26 3l4 5h-8zM26 49l4-5h-8zM3 26l5-4v8zM49 26l-5-4v8z'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+/* The navigation bar: Start flag, title, tray icons, clock, then the ok or X button's place, kept even when empty */
+.win--device > .win-bar { grid-row: 1; display: flex; align-items: center; height: 26px; padding: 0; color: #fff; font: 700 11px/1 var(--wm-font); background: var(--wm-nav); overflow: hidden; }
+.win--device > .win-bar .win-sys { display: block; flex: none; width: 26px; height: 26px; background: var(--wm-flag) 4px 4px / 18px 18px no-repeat, linear-gradient(var(--wm-sep), var(--wm-sep)) 25px 2px / 1px 22px no-repeat; }
+.win--device > .win-bar .win-title { flex: 1 1 auto; padding-left: 3px; text-overflow: clip; }
+.wm-tray { display: flex; flex: none; align-items: center; gap: 5px; margin-left: 4px; }
+.wm-i { display: block; flex: none; background: no-repeat 0 0 / 100% 100%; image-rendering: pixelated; }
+.wm-conn { width: 15px; height: 15px; margin-top: 4px; background-image: var(--wm-conn); }
+.wm-ant { width: 15px; height: 15px; margin-top: 4px; background-image: var(--wm-ant); }
+.wm-vol { width: 15px; height: 12px; background-image: var(--wm-vol); }
+.wm-batt { width: 16px; height: 11px; background-image: var(--wm-batt); }
+.win--device > .win-bar .win-num { flex: none; margin-left: 6px; font: inherit; font-variant-numeric: tabular-nums; }
+.win--device > .win-bar .win-ctl { display: block; flex: none; position: relative; width: 31px; height: 26px; }
+.win-ctl :is(.wm-ok, .wm-x) { position: absolute; right: 4px; top: 4px; display: grid; place-items: center; width: 18px; height: 16px; font: 700 11px/1 var(--wm-font); color: #fff;
+  border: 1px solid color-mix(in srgb, var(--wm-bar, #1a6fc4) 40%, #000); box-shadow: inset 0 0 0 1px var(--wm-hl); background: linear-gradient(var(--wm-mid, #50a9ed), var(--wm-bar, #1a85dc)); }
+.wm-2003 .win-ctl :is(.wm-ok, .wm-x) { width: 19px; height: 18px; top: 4px; border: 1px solid #fff; border-radius: 50%; box-shadow: none; background: none; }
+.win-ctl [hidden] { display: none !important; }
+.win-ctl .wm-x { width: 17px; height: 17px; top: 4px; border-radius: 50%; }
+.win-ctl .wm-x::before, .win-ctl .wm-x::after { content: ''; position: absolute; width: 9px; height: 2px; background: #fff; rotate: 45deg; }
+.win-ctl .wm-x::after { rotate: -45deg; }
+
+.win--device > .win-body { grid-row: 2; overflow: auto; padding: 10px 12px; background: var(--surface); font-size: 0.9375rem; }
+
+/* WM5 soft-key bar: two keys centered in 88 px each, the input panel button in the 64 px between */
+.win--device > .win-status { grid-row: 3; display: grid; grid-template-columns: 88px 64px 88px; align-items: center; justify-items: center; height: 26px; padding: 0; color: #fff; font: 700 11px/1 var(--wm-font); background: var(--wm-soft); }
+.win--device > .win-status :is(.sk-l, .sk-c, .sk-r, .wm-sip) { grid-row: 1; }
+.win--device > .win-status .sk-l { grid-column: 1; }
+.win--device > .win-status :is(.sk-c, .wm-sip) { grid-column: 2; }
+.win--device > .win-status .sk-r { grid-column: 3; }
+.win--device > .win-status > :nth-child(2):not(.sk-c, .wm-sip) { grid-area: 1 / 3; }
+.wm-sip { display: block; width: 16px; height: 12px; background: var(--wm-sip) no-repeat 0 0 / 100% 100%; }
+
+/* Themes: WM5's default blue is flat; the rest are glossy WM6 themes, as on DinarSoft's screenshots */
+.win--device[data-wmt] { --wm-nav: linear-gradient(var(--wm-hi), var(--wm-mid) 11px, var(--wm-bar) 11px 25px, #2a2c29 25px); --wm-soft: linear-gradient(#2a2c29 0 1px, var(--wm-hi) 1px, var(--wm-mid) 12px, var(--wm-bar) 12px); --wm-sep: oklch(1 0 0 / 0.45); }
+.win--device[data-wmt='blue'] { --wm-head: #1059c0; --wm-tint: #d5e7f8; --wm-hl: #3d95e8; --wm-nav: linear-gradient(#0b1a26 0 1px, #50a9ed 1px 24px, #c3dcf1 24px); --wm-soft: linear-gradient(#c3dcf1 0 2px, #50a9ed 2px 25px, #0b1a26 25px); --wm-sep: #c9e2f7; }
+.win--device[data-wmt='teal'] { --wm-hi: #a9d7de; --wm-mid: #469dab; --wm-bar: #178890; --wm-head: #08747b; --wm-tint: #cee7ef; --wm-hl: #2dc7d5; }
+.win--device[data-wmt='green'] { --wm-hi: #a2e3a2; --wm-mid: #3da043; --wm-bar: #069119; --wm-head: #087a16; --wm-tint: #d3eed3; --wm-hl: #2fc23a; }
+.win--device[data-wmt='red'] { --wm-hi: #dca7a6; --wm-mid: #a93e3c; --wm-bar: #911710; --wm-head: #8e130f; --wm-tint: #f3d9d8; --wm-hl: #d7392f; }
+.win--device[data-wmt='wine'] { --wm-hi: #d5a7a3; --wm-mid: #ae5d5e; --wm-bar: #761111; --wm-head: #761111; --wm-tint: #f0d6d4; --wm-hl: #c83a30; }
+.win--device[data-wmt='navy'] { --wm-hi: #a6c0db; --wm-mid: #4074ac; --wm-bar: #135291; --wm-head: #105594; --wm-tint: #d6e2f0; --wm-hl: #3b7fd0; }
+.win--device[data-wmt='amber'] { --wm-hi: #dbc4a7; --wm-mid: #b88a56; --wm-bar: #8c5610; --wm-head: #7a4a0c; --wm-tint: #f0e4d3; --wm-hl: #d99a3a; }
+
+/* Windows Mobile 2003: a flat navy title bar, and the gray command bar with menus on the left and the input panel at the right */
+.win--device.wm-2003 { --wm-nav: #0228a1; --wm-sep: #fff; --wm-head: #0228a1; --wm-tint: #d6d3ce; --wm-hl: #0a246a; }
+.wm-2003 > .win-bar .win-sys { background-position: 4px 4px, 25px 0; background-size: 18px 18px, 1px 26px; }
+.wm-2003 > .win-status { display: flex; justify-content: flex-start; padding: 0 3px 0 0; color: #000; background: linear-gradient(#000 0 1px, #c6c6d2 1px); }
+.wm-2003 > .win-status .wm-sip { order: 9; width: 19px; height: 7px; margin-left: auto; background-image: var(--wm-sip03); }
+
+/* The Today screen, shared by the remakes: the theme's wallpaper, and rows of a 16 px icon and one line of 8 pt Tahoma */
+.win--device {
+  --ti-owner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23262a33' d='M6 1h4v1h-4zM5 2h1v1h-1zM10 2h1v1h-1zM4 3h1v1h-1zM11 3h1v1h-1zM4 4h1v1h-1zM11 4h1v1h-1zM4 5h1v1h-1zM11 5h1v1h-1zM5 6h1v1h-1zM10 6h1v1h-1zM6 7h1v1h-1zM9 7h1v1h-1zM4 8h2v1h-2zM10 8h2v1h-2zM3 9h1v1h-1zM12 9h1v1h-1zM2 10h1v1h-1zM13 10h1v1h-1zM2 11h1v1h-1zM13 11h1v1h-1zM2 12h1v1h-1zM13 12h1v1h-1zM2 13h1v1h-1zM13 13h1v1h-1zM3 14h10v1h-10z'/%3E%3Cpath fill='%23858a93' d='M6 3h1v1h-1zM10 3h1v1h-1zM6 4h1v1h-1zM10 4h1v1h-1zM5 5h1v1h-1zM10 5h1v1h-1zM6 6h1v1h-1zM9 6h1v1h-1zM7 7h2v1h-2z'/%3E%3Cpath fill='%23b9bdc4' d='M6 2h4v1h-4zM5 3h1v1h-1zM7 3h3v1h-3zM5 4h1v1h-1zM7 4h3v1h-3zM6 5h4v1h-4zM7 6h2v1h-2z'/%3E%3Cpath fill='%23e8641c' d='M6 10h1v1h-1zM9 10h1v1h-1zM4 11h1v1h-1zM11 11h1v1h-1zM4 12h1v1h-1zM11 12h1v1h-1zM3 13h10v1h-10z'/%3E%3Cpath fill='%23f59a4a' d='M6 8h1v1h-1zM9 8h1v1h-1zM4 9h3v1h-3zM9 9h3v1h-3zM3 10h3v1h-3zM7 10h2v1h-2zM10 10h3v1h-3zM3 11h1v1h-1zM5 11h6v1h-6zM12 11h1v1h-1zM3 12h1v1h-1zM5 12h6v1h-6zM12 12h1v1h-1z'/%3E%3Cpath fill='%23fff' d='M7 8h2v1h-2zM7 9h2v1h-2z'/%3E%3C/svg%3E");
+  --ti-mail: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23262a33' d='M5 1h6v1h-6zM4 2h1v1h-1zM11 2h1v1h-1zM3 3h1v1h-1zM12 3h1v1h-1zM2 4h2v1h-2zM12 4h2v1h-2zM1 5h1v1h-1zM3 5h1v1h-1zM12 5h1v1h-1zM14 5h1v1h-1zM1 6h1v1h-1zM4 6h1v1h-1zM11 6h1v1h-1zM14 6h1v1h-1zM1 7h1v1h-1zM5 7h1v1h-1zM10 7h1v1h-1zM14 7h1v1h-1zM1 8h1v1h-1zM6 8h4v1h-4zM14 8h1v1h-1zM1 9h1v1h-1zM14 9h1v1h-1zM1 10h1v1h-1zM14 10h1v1h-1zM1 11h1v1h-1zM14 11h1v1h-1zM1 12h1v1h-1zM14 12h1v1h-1zM1 13h14v1h-14z'/%3E%3Cpath fill='%23f59a4a' d='M5 2h1v1h-1zM10 2h1v1h-1zM4 3h1v1h-1zM11 3h1v1h-1z'/%3E%3Cpath fill='%23fff' d='M6 3h4v1h-4zM5 4h6v1h-6zM4 5h8v1h-8zM5 6h6v1h-6zM6 7h4v1h-4z'/%3E%3Cpath fill='%23a8c8ec' d='M2 5h1v1h-1zM13 5h1v1h-1zM2 6h2v1h-2zM12 6h2v1h-2zM2 7h3v1h-3zM11 7h3v1h-3zM2 8h1v1h-1zM4 8h2v1h-2zM10 8h2v1h-2zM13 8h1v1h-1zM2 9h2v1h-2zM5 9h6v1h-6zM12 9h2v1h-2zM2 10h3v1h-3zM6 10h4v1h-4zM11 10h3v1h-3zM2 11h4v1h-4zM7 11h2v1h-2zM10 11h4v1h-4zM2 12h5v1h-5zM9 12h5v1h-5z'/%3E%3Cpath fill='%23ffd84a' d='M6 2h4v1h-4zM5 3h1v1h-1zM10 3h1v1h-1zM4 4h1v1h-1zM11 4h1v1h-1z'/%3E%3Cpath fill='%237da2e0' d='M3 8h1v1h-1zM12 8h1v1h-1zM4 9h1v1h-1zM11 9h1v1h-1zM5 10h1v1h-1zM10 10h1v1h-1zM6 11h1v1h-1zM9 11h1v1h-1zM7 12h2v1h-2z'/%3E%3C/svg%3E");
+  --ti-task: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23262a33' d='M6 0h4v1h-4zM5 1h1v1h-1zM10 1h1v1h-1zM5 2h6v1h-6z'/%3E%3Cpath fill='%23b9bdc4' d='M6 1h4v1h-4z'/%3E%3Cpath fill='%23e02424' d='M10 5h2v1h-2zM9 6h2v1h-2zM4 7h2v1h-2zM8 7h2v1h-2zM5 8h4v1h-4zM6 9h2v1h-2z'/%3E%3Cpath fill='%23a0601c' d='M2 1h3v1h-3zM11 1h3v1h-3zM2 2h1v1h-1zM13 2h1v1h-1zM2 3h1v1h-1zM13 3h1v1h-1zM2 4h1v1h-1zM13 4h1v1h-1zM2 5h1v1h-1zM13 5h1v1h-1zM2 6h1v1h-1zM13 6h1v1h-1zM2 7h1v1h-1zM13 7h1v1h-1zM2 8h1v1h-1zM13 8h1v1h-1zM2 9h1v1h-1zM13 9h1v1h-1zM2 10h1v1h-1zM13 10h1v1h-1zM2 11h1v1h-1zM13 11h1v1h-1zM2 12h1v1h-1zM13 12h1v1h-1zM2 13h12v1h-12z'/%3E%3Cpath fill='%23d79a45' d='M3 2h2v1h-2zM11 2h2v1h-2zM3 3h1v1h-1zM12 3h1v1h-1zM3 4h1v1h-1zM12 4h1v1h-1zM3 5h1v1h-1zM12 5h1v1h-1zM3 6h1v1h-1zM12 6h1v1h-1zM3 7h1v1h-1zM12 7h1v1h-1zM3 8h1v1h-1zM12 8h1v1h-1zM3 9h1v1h-1zM12 9h1v1h-1zM3 10h1v1h-1zM12 10h1v1h-1zM3 11h1v1h-1zM12 11h1v1h-1zM3 12h10v1h-10z'/%3E%3Cpath fill='%23eef3fb' d='M4 3h8v1h-8zM4 4h8v1h-8zM4 5h6v1h-6zM4 6h5v1h-5zM11 6h1v1h-1zM6 7h2v1h-2zM10 7h2v1h-2zM4 8h1v1h-1zM9 8h3v1h-3zM4 9h2v1h-2zM8 9h4v1h-4zM4 10h8v1h-8zM4 11h8v1h-8z'/%3E%3C/svg%3E");
+  --ti-clock: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23262a33' d='M7 2h1v1h-1zM7 3h1v1h-1zM7 4h1v1h-1zM7 5h1v1h-1zM7 6h1v1h-1zM7 7h5v1h-5z'/%3E%3Cpath fill='%23fff' d='M5 1h6v1h-6zM3 2h4v1h-4zM8 2h5v1h-5zM2 3h5v1h-5zM8 3h6v1h-6zM2 4h5v1h-5zM8 4h6v1h-6zM1 5h1v1h-1zM3 5h4v1h-4zM8 5h5v1h-5zM14 5h1v1h-1zM1 6h6v1h-6zM8 6h7v1h-7zM1 7h6v1h-6zM12 7h3v1h-3zM1 8h14v1h-14zM1 9h14v1h-14zM2 10h12v1h-12zM2 11h6v1h-6zM9 11h5v1h-5zM3 12h10v1h-10zM5 13h6v1h-6z'/%3E%3Cpath fill='%23a8c8ec' d='M14 3h1v1h-1zM14 4h1v1h-1zM15 5h1v1h-1zM15 6h1v1h-1zM15 7h1v1h-1zM15 8h1v1h-1zM15 9h1v1h-1zM14 10h1v1h-1zM14 11h1v1h-1zM3 13h2v1h-2zM11 13h2v1h-2zM5 14h6v1h-6z'/%3E%3Cpath fill='%235d7fc4' d='M5 0h6v1h-6zM3 1h2v1h-2zM11 1h2v1h-2zM2 2h1v1h-1zM13 2h1v1h-1zM1 3h1v1h-1zM1 4h1v1h-1zM0 5h1v1h-1zM0 6h1v1h-1zM0 7h1v1h-1zM0 8h1v1h-1zM0 9h1v1h-1zM1 10h1v1h-1zM1 11h1v1h-1zM2 12h1v1h-1zM13 12h1v1h-1z'/%3E%3Cpath fill='%23e02424' d='M2 5h1v1h-1zM13 5h1v1h-1zM8 11h1v1h-1z'/%3E%3C/svg%3E");
+  --ti-cal: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'%3E%3Cpath fill='%23262a33' d='M1 1h14v1h-14zM1 2h1v1h-1zM14 2h1v1h-1zM1 3h1v1h-1zM14 3h1v1h-1zM1 4h1v1h-1zM14 4h1v1h-1zM1 5h1v1h-1zM14 5h1v1h-1zM1 6h1v1h-1zM14 6h1v1h-1zM1 7h1v1h-1zM14 7h1v1h-1zM1 8h1v1h-1zM14 8h1v1h-1zM1 9h1v1h-1zM14 9h1v1h-1zM1 10h1v1h-1zM12 10h3v1h-3zM1 11h1v1h-1zM12 11h1v1h-1zM14 11h1v1h-1zM1 12h13v1h-13z'/%3E%3Cpath fill='%23b9bdc4' d='M3 4h1v1h-1zM5 4h1v1h-1zM7 4h1v1h-1zM9 4h1v1h-1zM11 4h1v1h-1zM13 4h1v1h-1zM2 5h12v1h-12zM3 6h1v1h-1zM5 6h1v1h-1zM7 6h1v1h-1zM13 6h1v1h-1zM2 7h7v1h-7zM12 7h2v1h-2zM3 8h1v1h-1zM5 8h1v1h-1zM7 8h1v1h-1zM13 8h1v1h-1zM2 9h12v1h-12zM3 10h1v1h-1zM5 10h1v1h-1zM7 10h1v1h-1zM9 10h1v1h-1zM11 10h1v1h-1zM2 11h10v1h-10z'/%3E%3Cpath fill='%23fff' d='M2 4h1v1h-1zM4 4h1v1h-1zM6 4h1v1h-1zM8 4h1v1h-1zM10 4h1v1h-1zM12 4h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM6 6h1v1h-1zM8 6h1v1h-1zM12 6h1v1h-1zM10 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM6 8h1v1h-1zM8 8h1v1h-1zM12 8h1v1h-1zM2 10h1v1h-1zM4 10h1v1h-1zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM13 11h1v1h-1z'/%3E%3Cpath fill='%23e02424' d='M9 6h3v1h-3zM9 7h1v1h-1zM11 7h1v1h-1zM9 8h3v1h-3z'/%3E%3Cpath fill='%232d5fb8' d='M2 2h12v1h-12z'/%3E%3Cpath fill='%237da2e0' d='M2 3h12v1h-12z'/%3E%3C/svg%3E");
 }
-.win--device > .win-bar .win-sys { display: block; width: 14px; height: 14px; flex: none; background: conic-gradient(from 90deg, oklch(0.65 0.2 145) 25%, oklch(0.75 0.17 85) 0 50%, oklch(0.62 0.19 255) 0 75%, oklch(0.62 0.22 28) 0); border-radius: 2px; transform: skewY(-6deg); }
-.win--device > .win-bar .win-title { flex: 1; }
-.win--device > .win-bar .win-num { font-weight: 400; }
-.win--device > .win-body { aspect-ratio: 240 / 268; overflow: auto; padding: 10px 12px; background: var(--surface); font-size: 0.9375rem; }
-.win--device > .win-status {
-  display: flex; justify-content: space-between; align-items: center; height: 28px; padding: 0 12px;
-  border-radius: 0 0 3px 3px; color: var(--w-white); font: 600 0.8125rem/1 var(--font-ui, sans-serif);
-  background: linear-gradient(oklch(0.42 0.14 258), oklch(0.3 0.13 262));
+.wm-today { position: relative; height: 100%; overflow: hidden; color: var(--wm-today-ink, #fff); font: 400 11px/1.25 var(--wm-font); background: var(--wm-wall); }
+.wm-row { display: flex; align-items: center; min-height: 20px; padding: 0 2px; border-bottom: 1px solid var(--wm-rule); white-space: nowrap; overflow: hidden; }
+.wm-row::before { content: ''; flex: none; width: 16px; height: 16px; margin-right: 10px; background: var(--ti) no-repeat 0 0 / 100% 100%; }
+.wm-row--date { font-weight: 700; --ti: var(--ti-clock); }
+.wm-row--owner { --ti: var(--ti-owner); }
+.wm-row--mail { --ti: var(--ti-mail); }
+.wm-row--task { --ti: var(--ti-task); }
+.wm-row--cal { --ti: var(--ti-cal); }
+.win--device[data-wmt='blue'] {
+  --wm-rule: #1276c2;
+  --wm-wall: radial-gradient(150% 24% at 100% 0, #9ad9f0, #5ebde8 45%, transparent 80%),
+    linear-gradient(172deg, transparent 69%, oklch(0.85 0.09 225 / 0.6) 71.5%, transparent 74%),
+    radial-gradient(190% 34% at 0 100%, transparent 62%, oklch(0.8 0.1 230 / 0.55) 66%, transparent 71%),
+    linear-gradient(#3aa6e2, #138fd6 30%, #0058aa 46%, #0049a8 66%, #0b6dc4 86%, #2e92d8);
 }
-.win--device:not(:has(> .win-status)) > .win-body { border-radius: 0 0 3px 3px; }
+.win--device[data-wmt='teal'] {
+  --wm-rule: oklch(0.45 0.07 205);
+  --wm-wall: radial-gradient(150% 26% at 100% 0, #a9dde2, #5fb7c1 45%, transparent 80%), radial-gradient(190% 34% at 0 100%, transparent 62%, oklch(0.85 0.07 200 / 0.5) 66%, transparent 71%),
+    linear-gradient(#3fa6b1, #1d8a95 30%, #0d6e78 50%, #0b5f69 72%, #178890);
+}
+.win--device[data-wmt='wine'] {
+  --wm-rule: oklch(0.45 0.13 25);
+  --wm-wall: radial-gradient(120% 30% at 0 0, #e58a74, transparent 75%), radial-gradient(160% 40% at 100% 100%, transparent 55%, oklch(0.62 0.17 32 / 0.6) 64%, transparent 72%),
+    linear-gradient(#d4593f, #b53a31 25%, #8f2b24 45%, #761111 65%, #8c1715 85%, #ae271d);
+}
+.wm-2003 { --wm-today-ink: #0228a1; --wm-rule: #748fe9; --wm-wall: radial-gradient(90% 60% at 70% 40%, #b9c7fc, transparent 70%), linear-gradient(160deg, #a9b9f9, #9aabf6 60%, #8fa2f2); }
+
+/* Windows Mobile 5 controls for every dialog rebuilt inside a device: thin black boxes, black marks */
+.win--device :is(input[type='checkbox'], input[type='radio']) { appearance: none; flex: none; width: 13px; height: 13px; margin: 0; border: 1px solid #000; border-radius: 0; background: #fff no-repeat center / 100% 100%; cursor: pointer; }
+.win--device input[type='radio'] { border-radius: 50%; }
+.win--device input[type='checkbox']:checked { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 11 11'%3E%3Cpath d='M2 5.4l2.4 2.4L9.2 3' fill='none' stroke='%23000' stroke-width='1.9'/%3E%3C/svg%3E"); }
+.win--device input[type='radio']:checked { background-image: radial-gradient(circle, #000 0 2.6px, transparent 3.2px); }
+.win--device :is(input[type='checkbox'], input[type='radio']):disabled { border-color: #8a8a8a; background-color: #ececec; }
+.win--device :is(input[type='checkbox'], input[type='radio']):focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+.win--device select { appearance: none; border: 1px solid #000; border-radius: 0; padding: 0 14px 0 3px; color: #000; font: 400 11px/1 var(--wm-font); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 4'%3E%3Cpath d='M0 0h7L3.5 4z'/%3E%3C/svg%3E") no-repeat right 4px center / 7px 4px; }
+.win--device select:disabled { color: #8a8a8a; border-color: #8a8a8a; opacity: 1; }
+
+/* Scroll bars the way Windows Mobile 5 drew them: arrow boxes and a tinted thumb, 12 pixels wide */
+.win--device ::-webkit-scrollbar { width: 12px; height: 12px; }
+.win--device ::-webkit-scrollbar-track { background: #fff; border-left: 1px solid #000; }
+.win--device ::-webkit-scrollbar-thumb { background: var(--wm-tint, #d6d3ce) linear-gradient(#000, #000) center / 6px 1px no-repeat; border: 1px solid #000; border-right: 0; }
+.win--device ::-webkit-scrollbar-button:single-button { display: block; height: 12px; background: var(--wm-tint, #d6d3ce) no-repeat center / 7px 4px; border: 1px solid #000; border-right: 0; }
+.win--device ::-webkit-scrollbar-button:single-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 4'%3E%3Cpath d='M0 4h7L3.5 0z'/%3E%3C/svg%3E"); }
+.win--device ::-webkit-scrollbar-button:single-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 7 4'%3E%3Cpath d='M0 0h7L3.5 4z'/%3E%3C/svg%3E"); }
+.win--device ::-webkit-scrollbar-button:horizontal { display: none; }

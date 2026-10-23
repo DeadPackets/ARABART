@@ -64,8 +64,8 @@ const sh = engine.shared as Sh[];
   <p class="hl-say" data-say><b>{sh[first].label}</b>: {sh[first].size} bytes. The same instructions in all three files. Only the addresses move, because each program puts it in a different place.</p>
 
   <div class="hl-eng-dlgs">
-    <figure><div class="ppc hl-eng-dlg" inert set:html={lic} /><figcaption class="hl-cap">His License Key dialog, with the DINAR globe logo of the 2006 builds: the same nine controls in all three apps.</figcaption></figure>
-    <figure><div class="ppc hl-eng-dlg" inert set:html={colors} /><figcaption class="hl-cap">His Custom Colors page: the same eighteen controls, the same five colors.</figcaption></figure>
+    <figure><div class="ppc hl-eng-dlg" inert set:html={lic} /><figcaption class="hl-cap">The License Key dialog, with the DINAR globe logo of the 2006 builds: the same nine controls in all three apps.</figcaption></figure>
+    <figure><div class="ppc hl-eng-dlg" inert set:html={colors} /><figcaption class="hl-cap">The Custom Colors page: the same eighteen controls, the same five colors.</figcaption></figure>
   </div>
 </div>
 
@@ -96,7 +96,10 @@ const sh = engine.shared as Sh[];
   .hl-eng-code li em { grid-column: 2; font-style: normal; color: var(--vs-comment, #008000); }
   .hl-eng-code li.diff code { color: var(--hot); background: color-mix(in oklch, var(--hot) 10%, transparent); }
   .hl-eng-dlgs { display: flex; flex-wrap: wrap; gap: 20px; }
-  .hl-eng-dlgs figure { display: grid; gap: 6px; margin: 0; width: min(100%, 260px); }
+  /* 280 px keeps the dialog text at 12 px or more; Tahoma runs wider than his 8 pt bitmap font, so labels keep one line */
+  .hl-eng-dlgs figure { display: grid; gap: 6px; margin: 0; width: min(100%, 280px); }
+  .hl-eng-dlg .ppc-st { white-space: nowrap; }
+  .hl-eng-dlg .ppc-st:not(.c, .r) { width: max-content; }
   .hl-eng-dlg { border: 1px solid #000; box-shadow: 4px 4px 0 rgb(0 0 0 / 0.2); }
   .hl-eng-dlg .ppc-dlg { pointer-events: none; }
   .hl-eng-dlg .ppc-btn.sw:nth-of-type(1) { --sw: #000; }

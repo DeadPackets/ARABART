@@ -57,7 +57,7 @@ const last = WINDOW.length - 1;
   @keyframes ed-fade { from { opacity: 1; } to { opacity: 0; } }
   .ed-sc-pal { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; margin-top: 10px; }
   .ed-sc-pal span { position: relative; display: grid; place-items: end center; height: 30px; box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.25); }
-  .ed-sc-pal b { font: 600 10px/1 var(--font-code); padding-bottom: 2px; }
+  .ed-sc-pal b { font: 600 12px/1 var(--font-code); font-stretch: 75%; padding-bottom: 2px; }
   .ed-sc-pal span.his { outline: 2px solid var(--vga-14); outline-offset: 1px; z-index: 1; }
   .ed-sc-side { display: grid; gap: 14px; min-width: 0; }
   .ed-sc-opts { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -67,7 +67,7 @@ const last = WINDOW.length - 1;
   .ed-sc-calls li::marker { content: none; }
   .ed-sc-calls button { display: grid; grid-template-columns: 2.5ch minmax(0, 1fr); gap: 1ch; width: 100%; min-height: 32px; padding: 4px 8px; text-align: left; font: 500 12px/1.5 var(--font-code); color: var(--ink); background: none; border: 0; cursor: pointer; }
   .ed-sc-calls button span { color: var(--accent-2); }
-  .ed-sc-calls code { font: inherit; color: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .ed-sc-calls code { font: inherit !important; color: inherit; white-space: pre-wrap; overflow-wrap: anywhere; }
   .ed-sc-calls li:not(.done):not(.now) button { opacity: 0.55; }
   .ed-sc-calls li.now button { background: var(--ink); color: var(--surface); opacity: 1; } /* the page's own text pair: accent-2 under surface text fell to 1.3:1 */
   .ed-sc-calls li.now button :is(span, code) { color: var(--surface); } /* beats .writeup code's accent color */

@@ -62,7 +62,7 @@ const vars = (img: (typeof letters)[0]['img']) => `--adv:${img.advance};--gx:${i
   .dw-l.is-lift { z-index: 3; cursor: grabbing; }
   .dw-g { position: absolute; inset: 0 0 42px 0; pointer-events: none; }
   .dw-g svg { position: absolute; left: calc(var(--gx) * var(--s) * 1px); top: calc(var(--gy) * var(--s) * 1px); width: calc(var(--gw) * var(--s) * 1px); height: auto; }
-  .dw-f { position: absolute; left: 50%; bottom: 0; translate: -50% 0; font: 500 11px/1 var(--font-code); color: var(--vga-11); white-space: nowrap; direction: ltr; opacity: 0.85; pointer-events: none; }
+  .dw-f { position: absolute; left: 50%; bottom: 0; translate: -50% 0; font: 500 12px/1 var(--font-code); font-stretch: 75%; color: var(--vga-11); white-space: nowrap; direction: ltr; opacity: 0.85; pointer-events: none; }
   .dw-l:nth-child(even of .dw-l) .dw-f { bottom: 16px; }
   .dw-l:hover .dw-f, .dw-l:focus-visible .dw-f, .dw-l.is-lift .dw-f { color: var(--vga-14); opacity: 1; }
   .dw-l:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 2px; }
@@ -76,7 +76,6 @@ const vars = (img: (typeof letters)[0]['img']) => `--adv:${img.advance};--gx:${i
   @media (max-width: 1023px) {
     .dw { --s: 3; }
     .dw-bar { grid-template-columns: 1fr; }
-    .dw-f { font-size: 10px; }
     .dw-l:nth-child(n of .dw-l) .dw-f { bottom: 0; }
     .dw-l:nth-child(3n + 2 of .dw-l) .dw-f { bottom: 14px; }
     .dw-l:nth-child(3n of .dw-l) .dw-f { bottom: 28px; }

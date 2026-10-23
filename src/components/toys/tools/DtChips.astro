@@ -36,21 +36,21 @@ const data = JSON.stringify({ chips: C, gat: G4.map(g => ({ name: g.name, bytes:
       ))}
     </div>
     <div class="dtc-chip">
-      <svg class="dtc-svg" viewBox="0 0 352 172" role="img" aria-label="The chip from the top, its pins colored by gate" data-svg>
-        <rect class="dtc-body" x="22" y="34" width="308" height="104" rx="3" />
-        <path class="dtc-notch" d="M22 74a12 12 0 0 1 0 24z" />
+      <svg class="dtc-svg" viewBox="0 0 352 200" role="img" aria-label="The chip from the top, its pins colored by gate" data-svg>
+        <rect class="dtc-body" x="22" y="46" width="308" height="104" rx="3" />
+        <path class="dtc-notch" d="M22 86a12 12 0 0 1 0 24z" />
         {Array.from({ length: 14 }, (_, k) => k + 1).map(p => {
           const [g, t] = first.pins[p - 1];
           return (
             <g class="dtc-pin" data-pin={p} data-g={t === 0x20 || t === 0x40 ? g : ''} data-t={KIND[t] ?? 'nc'}>
-              <rect x={px(p) - 11} y={p <= 7 ? 138 : 12} width="22" height="22" />
-              <text x={px(p)} y={p <= 7 ? 168 : 8} text-anchor="middle" class="dtc-num">{p}</text>
-              <text x={px(p)} y={p <= 7 ? 153 : 27} text-anchor="middle" class="dtc-k">{t === 0x40 ? 'out' : t === 0x02 ? '+5' : t === 0x10 ? '0V' : ''}</text>
+              <rect x={px(p) - 16} y={p <= 7 ? 150 : 22} width="32" height="24" />
+              <text x={px(p)} y={p <= 7 ? 192 : 16} text-anchor="middle" class="dtc-num">{p}</text>
+              <text x={px(p)} y={p <= 7 ? 167 : 39} text-anchor="middle" class="dtc-k">{t === 0x40 ? 'out' : t === 0x02 ? '+5' : t === 0x10 ? '0V' : ''}</text>
             </g>
           );
         })}
-        <text x="176" y="80" text-anchor="middle" class="dtc-part" data-part>{first.part}</text>
-        <text x="176" y="108" text-anchor="middle" class="dtc-type" data-type>{first.type} × {first.gates}</text>
+        <text x="176" y="92" text-anchor="middle" class="dtc-part" data-part>{first.part}</text>
+        <text x="176" y="120" text-anchor="middle" class="dtc-type" data-type>{first.type} × {first.gates}</text>
       </svg>
       <p class="dtc-say" aria-live="polite" data-say>{first.part}: {first.gates} gates of type {first.type}, from {first.file}.</p>
     </div>
@@ -108,7 +108,7 @@ const data = JSON.stringify({ chips: C, gat: G4.map(g => ({ name: g.name, bytes:
   .dtc-lib { --dtc-cols: 150px minmax(0, 1fr) 190px; }
   .dtc-lib > .win-body { display: grid; grid-template-columns: var(--dtc-cols); gap: 18px; align-items: start; }
   .dtc-list { display: grid; gap: 4px; }
-  .dtc-pick { display: grid; grid-template-columns: 4ch 1fr; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; text-align: left; font: inherit; color: var(--ink); background: none; border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; }
+  .dtc-pick { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px; min-height: 44px; padding: 0 10px; text-align: left; font: inherit; color: var(--ink); background: none; border: 0; box-shadow: inset 0 0 0 1px var(--rule); cursor: pointer; }
   .dtc-pick b { font: 700 0.9375rem/1 var(--font-code); }
   .dtc-pick span { font: 500 0.75rem/1.2 var(--font-code); color: var(--ink-2); }
   .dtc-pick[aria-checked='true'] { background: var(--ink); color: var(--surface); box-shadow: none; }
@@ -118,8 +118,9 @@ const data = JSON.stringify({ chips: C, gat: G4.map(g => ({ name: g.name, bytes:
   .dtc-body { fill: #111; }
   .dtc-notch { fill: #444; }
   .dtc-pin rect { fill: #c8c8c8; transition: fill 0.25s; }
-  .dtc-num { font-size: 12px; font-weight: 600; fill: var(--ink-2); }
-  .dtc-k { font-size: 9px; font-weight: 700; fill: #000; }
+  /* The chip draws at about 0.87 scale on a 390 px phone: 14 px keeps the pin labels at 12 px there */
+  .dtc-num { font-size: 14px; font-weight: 600; fill: var(--ink-2); }
+  .dtc-k { font-size: 14px; font-weight: 700; font-stretch: 75%; fill: #000; }
   .dtc-pin[data-g='0'] rect { fill: #ffff55; } .dtc-pin[data-g='1'] rect { fill: #55ffff; } .dtc-pin[data-g='2'] rect { fill: #ff55ff; }
   .dtc-pin[data-g='3'] rect { fill: #55ff55; } .dtc-pin[data-g='4'] rect { fill: #ff9955; } .dtc-pin[data-g='5'] rect { fill: #aaaaff; }
   .dtc-pin[data-t='VCC'] rect { fill: #aa0000; } .dtc-pin[data-t='GND'] rect { fill: #555; }
@@ -160,9 +161,9 @@ const data = JSON.stringify({ chips: C, gat: G4.map(g => ({ name: g.name, bytes:
   .dtc-gbytes .hot { box-shadow: inset 0 0 0 2px var(--accent); }
   .dtc-gbytes code { font: 700 1.125rem/1 var(--font-code) !important; color: var(--ink) !important; }
   .dtc-gbytes .hot code { color: var(--accent) !important; }
-  .dtc-gbytes i { font: 500 11px/1.2 var(--font-code); font-style: normal; color: var(--ink-2); }
+  .dtc-gbytes i { font: 500 12px/1.2 var(--font-code); font-style: normal; color: var(--ink-2); }
   .dtc-tt { grid-area: tt; border-collapse: collapse; font: 600 0.9375rem/1 var(--font-code); }
-  .dtc-tt caption { caption-side: bottom; padding-top: 8px; font: 500 11px/1.3 var(--font-code); color: var(--ink-2); max-width: 12ch; }
+  .dtc-tt caption { caption-side: bottom; padding-top: 8px; font: 500 12px/1.3 var(--font-code); color: var(--ink-2); max-width: 12ch; }
   .dtc-tt th { padding: 6px 12px; color: var(--accent-2); border-bottom: 2px solid var(--accent-2); }
   .dtc-tt td { padding: 7px 12px; text-align: center; color: var(--ink); border-bottom: 1px solid var(--rule); }
   .dtc-tt td:last-child { color: var(--accent); font-weight: 800; }

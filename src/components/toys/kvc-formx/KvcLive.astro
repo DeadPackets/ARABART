@@ -4,7 +4,7 @@
 // its own screen, keys and sound. Event 'kvc:ready' { ci, master } bubbles from the root once the PC runs.
 import Window from '../../shell/Window.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // What the PC shows after the scan, row by row (read from the emulator's text screen), and right after it boots
 const DONE = [
   '              *****    KEMYAM Virus Capture. (Ver 1.05)    *****', '', '', '',

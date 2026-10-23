@@ -348,7 +348,7 @@ function paint2d() {
 /* ---------- start ---------- */
 let trigger: { kill(): void } | null = null;
 async function start() {
-  bin = await load(`${import.meta.env.BASE_URL}/arabart/fonts.bin`);
+  bin = await load(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/arabart/fonts.bin`);
   hero.classList.add('live');
   keysOut.forEach(el => (el.textContent = keys));
   said.textContent = DEFAULT;

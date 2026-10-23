@@ -37,7 +37,7 @@ const big = svgPath([first]);
       <rect width="100%" height="16" fill={`url(#${id}-px)`} />
       <path d={big.d} fill="currentColor" data-path />
     </svg>
-    <figcaption data-cap>{label(first)}: {big.width} × 16 pixels. One of {total} pictures.</figcaption>
+    <figcaption data-cap>{label(first).split(/([\u0600-\u06ff](?:[\u0600-\u06ff\s]*[\u0600-\u06ff])?)/).map((x, i) => (i % 2 ? <span lang="ar" dir="rtl">{x}</span> : x))}: {big.width} × 16 pixels. One of {total} pictures.</figcaption>
   </figure>
 </div>
 
@@ -66,7 +66,7 @@ const big = svgPath([first]);
       root.querySelectorAll('[data-g]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
       big.setAttribute('viewBox', `0 0 ${Math.max(p.width, 3)} 16`); big.setAttribute('aria-label', label(g));
       path.setAttribute('d', p.d);
-      cap.textContent = `${label(g)}: ${p.width} × 16 pixels. One of ${total} pictures.`;
+      cap.innerHTML = `${label(g)}: ${p.width} × 16 pixels. One of ${total} pictures.`.replace(/[\u0600-\u06ff](?:[\u0600-\u06ff\s]*[\u0600-\u06ff])?/g, '<span lang="ar" dir="rtl">$&</span>');
     });
   }
 </script>

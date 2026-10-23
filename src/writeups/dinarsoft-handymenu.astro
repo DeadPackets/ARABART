@@ -23,8 +23,8 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
   <p class="lead">A Pocket PC kept its most useful switches deep inside Settings. HandyMenu put them all in one menu, behind one small icon: restart, power off, turn the screen, take a screenshot, check the network.</p>
   <p>The last version, 3.7 from June 2008, is 81,408 bytes: smaller than a single photo on your phone. Everything below comes from that file, and from version 3.6 where the two differ.</p>
   <HmMenu />
-  <p>Tap the <Term id="hm-tray-icon">tray icon</Term> for the menu. <Term id="hm-tap-and-hold">Hold it</Term>, and HandyMenu runs your Quick Action straight away, without opening anything. On the settings sheet you choose which items show, what the Quick Action is, the colors and the language. Both screens are rebuilt from his own files: the labels from HandyMenu.exe, the 27 icons from HandyMenu.vga, the translations from HandyMenu.bin. The menu itself is <Term id="hm-owner-draw">owner-drawn</Term>: HandyMenu paints every row, icon column and highlight in the five colors you pick.</p>
-  <p>Switch the language on the Display page and the whole program changes, the menu and the settings together. Every label has a number. English lives inside the program. HandyMenu.bin holds German, Dutch, Portuguese, Spanish and Hungarian as plain text, one line per label, like <code>IX3=Ausschalten</code>. His lookup takes the line with that number, and where a language has no line, the English label stays. Apps still translate this way today: a key per string, one file per language, English as the fallback.</p>
+  <p>Tap the <Term id="hm-tray-icon">tray icon</Term> for the menu. <Term id="hm-tap-and-hold">Hold it</Term>, and HandyMenu runs your Quick Action straight away, without opening anything. On the settings sheet you choose which items show, what the Quick Action is, the colors and the language. Both screens are rebuilt from HandyMenu’s own files: the labels from HandyMenu.exe, the 27 icons from HandyMenu.vga, the translations from HandyMenu.bin. The menu itself is <Term id="hm-owner-draw">owner-drawn</Term>: HandyMenu paints every row, icon column and highlight in the five colors you pick.</p>
+  <p>Switch the language on the Display page and the whole program changes, the menu and the settings together. Every label has a number. English lives inside the program. HandyMenu.bin holds German, Dutch, Portuguese, Spanish and Hungarian as plain text, one line per label, like <code>IX3=Ausschalten</code>. Its lookup takes the line with that number, and where a language has no line, the English label stays. Apps still translate this way today: a key per string, one file per language, English as the fallback.</p>
   <Deep title="For engineers: the whole lookup, nine instructions">
     <Listing
       title="HandyMenu.exe 3.7  16E98, a label by number"
@@ -47,9 +47,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <section id="hm-switch" class="hm">
   <h2>One jump for every item</h2>
   <p class="lead">Pick an item and the menu hands back a number from 1 to 27. A simple program would then test that number 27 times. HandyMenu needs one jump.</p>
-  <p>The C compiler turned his <code>switch</code> statement into a <Term id="hm-jump-table">jump table</Term>. It has one two-byte row per item, and each row says how far ahead that item’s code starts. The processor subtracts 1, doubles it, reads the row, and adds the row to where it stands. Four instructions, whichever item you picked. Choose an item in the menu above or in the list here, and step through it.</p>
+  <p>The C compiler turned the app’s <code>switch</code> statement into a <Term id="hm-jump-table">jump table</Term>. It has one two-byte row per item, and each row says how far ahead that item’s code starts. The processor subtracts 1, doubles it, reads the row, and adds the row to where it stands. Four instructions, whichever item you picked. Choose an item in the menu above or in the list here, and step through it.</p>
   <HmSwitch />
-  <p>Look at the first three lines. Before any item runs, HandyMenu reads the key from the registry and checks its license again, on every single tap. If the 15 days are over, the item never runs: his Settings sheet opens instead, with the <b>Register…</b> button on its About page. Turn on “Trial is over” to follow that path.</p>
+  <p>Look at the first three lines. Before any item runs, HandyMenu reads the key from the registry and checks its license again, on every single tap. If the 15 days are over, the item never runs: the Settings sheet opens instead, with the <b>Register…</b> button on its About page. Turn on “Trial is over” to follow that path.</p>
 </section>
 
 <section id="hm-power" class="hm">
@@ -64,9 +64,9 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <section id="hm-capture" class="hm">
   <h2>A screenshot, byte by byte</h2>
   <p class="lead">Pocket PCs had no screenshot button. HandyMenu added one, and wrote the picture file itself, one header at a time.</p>
-  <p>The file is a <Term id="hm-bmp">BMP</Term>: 54 bytes of headers that say how big the picture is, then three bytes for every pixel. Step his code and watch the headers fill in. Then capture the Pocket PC beside it: the button builds a real .bmp the same way, and your computer opens it today.</p>
+  <p>The file is a <Term id="hm-bmp">BMP</Term>: 54 bytes of headers that say how big the picture is, then three bytes for every pixel. Step the code and watch the headers fill in. Then capture the Pocket PC beside it: the button builds a real .bmp the same way, and your computer opens it today.</p>
   <HmCapture />
-  <p>Look at the order. He copies the screen first, and only then opens the Save dialog, so the dialog is never in your picture. The delay setting works the same way from the other side. It gives you time to open the screen you want before the copy is made.</p>
+  <p>Look at the order. HandyMenu copies the screen first, and only then opens the Save dialog, so the dialog is never in your picture. The delay setting works the same way from the other side. It gives you time to open the screen you want before the copy is made.</p>
 </section>
 
 <section id="hm-rotate" class="hm">
@@ -80,7 +80,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <section id="hm-ip" class="hm">
   <h2>The network, in your pocket</h2>
   <p class="lead">IP Helper shows the Pocket PC’s address on the network. It can hand the address back and ask for a fresh one.</p>
-  <p>On Wi-Fi, a device borrows its address from the network’s <Term id="hm-dhcp">DHCP</Term> server, the same way your laptop does today. <b>Release</b> gives the address back. <b>Renew</b> asks again, and four short messages fly back and forth. When a connection got stuck, these two buttons fixed it without a restart. Try them. The dialog is his own, dialog 507 inside HandyMenu.exe; the addresses are made-up private ones.</p>
+  <p>On Wi-Fi, a device borrows its address from the network’s <Term id="hm-dhcp">DHCP</Term> server, the same way your laptop does today. <b>Release</b> gives the address back. <b>Renew</b> asks again, and four short messages fly back and forth. When a connection got stuck, these two buttons fixed it without a restart. Try them. The dialog is HandyMenu’s own, dialog 507 inside HandyMenu.exe; the addresses are made-up private ones.</p>
   <HmIp />
   <Deep title="For engineers: ask for the size, then ask for the data">
     <Listing
@@ -114,14 +114,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 <section id="hm-trial" class="hm">
   <h2>Fifteen days, written in disguise</h2>
   <p class="lead">Like every DinarSoft program, HandyMenu was <Term id="shareware">shareware</Term>: try it free for 15 days, then buy a 16-letter key. Where it kept the install date is a small piece of craft.</p>
-  <p>The date sits in a 14-byte file, <code>\Windows\xintra.dat</code>, with a name that gives nothing away. Inside, the year, the month and the day are each stored twice, and every copy is dressed differently. The month appears as month × 2 + 3, and again as month × 2 + 1. Then every second byte goes up by one, a <Term id="hm-salt">salt</Term>, and a <Term id="checksum">checksum</Term> seals the lot. When HandyMenu reads the file, both copies must agree and the checksum must match. Change one byte and the trial ends. Pick an install date, step his encoder, then tap any byte.</p>
+  <p>The date sits in a 14-byte file, <code>\Windows\xintra.dat</code>, with a name that gives nothing away. Inside, the year, the month and the day are each stored twice, and every copy is dressed differently. The month appears as month × 2 + 3, and again as month × 2 + 1. Then every second byte goes up by one, a <Term id="hm-salt">salt</Term>, and a <Term id="checksum">checksum</Term> seals the lot. When HandyMenu reads the file, both copies must agree and the checksum must match. Change one byte and the trial ends. Pick an install date, step the encoder, then tap any byte.</p>
   <HmTrial />
-  <p>This encoder is the same function, instruction for instruction, inside HandySwitcher 2.7 and HandyLauncher 3.4. It is one of 24 functions, 4,508 bytes of code, that all three 2006 builds share. Among them are the key engine, the date check, the color picker and the settings layout. Yasser wrote them once and built them into every app. Only the file name changes: HandySwitcher hides its date in <code>tonter.bin</code>, HandyLauncher in <code>mcterthr.dat</code>.</p>
+  <p>This encoder is the same function, instruction for instruction, inside HandySwitcher 2.7 and HandyLauncher 3.4. It is one of 24 functions, 4,508 bytes of code, that all three 2006 builds share. Among them are the key engine, the date check, the color picker and the settings layout. DinarSoft wrote them once and built them into every app. Only the file name changes: HandySwitcher hides its date in <code>tonter.bin</code>, HandyLauncher in <code>mcterthr.dat</code>.</p>
 
   <h3>The key, now free</h3>
-  <p>In 2026, Yasser Awad released HandyMenu as freeware. A key was always made from two things: your Pocket PC’s own code, shown in the License Key dialog, and the product’s name. His key function shuffles 120 numbers using the name, then uses the shuffle to turn each character of your code into a letter of the key. The <a href={`${base}/dinarsoft/handyswitcher/`}>HandySwitcher page</a> steps through it. Version 3.7 also accepts keys made from a few codes built into the program in place of the device’s. One is his own name, <code>YASSERMOHAMEDALI</code>. Others are the names of his family, and <code>GIVEAWAYVERSION1</code> served magazine give-aways. The key made from his name opens every copy of HandyMenu 3.7, on any Pocket PC.</p>
+  <p>In 2026, Yasser Awad released HandyMenu as freeware. A key was always made from two things: your Pocket PC’s own code, shown in the License Key dialog, and the product’s name. The key function shuffles 120 numbers using the name, then uses the shuffle to turn each character of your code into a letter of the key. The <a href={`${base}/dinarsoft/handyswitcher/`}>HandySwitcher page</a> steps through it. Version 3.7 also accepts keys made from a few codes built into the program in place of the device’s. One is his own name, <code>YASSERMOHAMEDALI</code>. Others are the names of his family, and <code>GIVEAWAYVERSION1</code> served magazine give-aways. The key made from his name opens every copy of HandyMenu 3.7, on any Pocket PC.</p>
   <HmKey />
-  <p>HandyMenu’s own check routine stands behind this key. Its real ARM code, from the 2008 installer, ran in an emulator with his key, the keys for random devices and a pile of near misses. It opened for his key and every device key, and it stayed shut for every near miss. HandyMenu 3.7 keeps the key in the registry as <code>HMLicKey</code>.</p>
+  <p>HandyMenu’s own check routine stands behind this key. Its real ARM code, from the 2008 installer, ran in an emulator with the freeware key, the keys for random devices and a pile of near misses. It opened for the freeware key and every device key, and it stayed shut for every near miss. HandyMenu 3.7 keeps the key in the registry as <code>HMLicKey</code>.</p>
 </section>
 
 <style>

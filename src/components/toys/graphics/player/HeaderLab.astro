@@ -90,7 +90,8 @@ const data = JSON.stringify({ X0, Y0, CW, CH, line: [...line] });
   .gphl-lines .o { color: var(--accent-2); }
   .gphl-lines .b { color: var(--ink-2); white-space: nowrap; }
   .gphl-lines i { font-style: normal; color: var(--surface); background: var(--accent); padding: 0 2px; }
-  .gphl-lines code { font: inherit; color: var(--accent); white-space: nowrap; }
+  /* .gp beats the writeup's 0.9em code size */
+  .gp .gphl-lines code { font: inherit; color: var(--accent); white-space: nowrap; }
   .gphl-lines .n { color: var(--ink-2); }
   .gphl-lines .flash, .gphl-head .flash { animation: gphl-flash 0.8s var(--quart); }
   @keyframes gphl-flash { from { background: var(--vga-15); color: var(--vga-0); } }

@@ -9,20 +9,52 @@ interface Props {
   num?: string | number;
   as?: 'div' | 'section' | 'article' | 'aside' | 'figure';
   class?: string;
+  /** device only: the Windows Mobile version, its theme, the right-hand button, the tray icons and the input panel button. Slot bar: other apps' icons on the title bar */
+  wm?: '2003' | '5';
+  theme?: 'blue' | 'teal' | 'green' | 'red' | 'wine' | 'navy' | 'amber';
+  ok?: 'ok' | 'x';
+  icons?: ('conn' | 'ant' | 'vol' | 'batt')[];
+  sip?: boolean;
   [attr: string]: unknown;
 }
 
-const { title, kind = 'editor', active = false, num, as: Tag = 'div', class: cls, ...rest } = Astro.props;
+const { title, kind = 'editor', active = false, num, as: Tag = 'div', class: cls, wm = '5', theme, ok, icons, sip = false, ...rest } = Astro.props;
 const status = Astro.slots.has('status');
+const tray = icons ?? (wm === '2003' ? ['vol'] : ['conn', 'vol']);
 ---
 
-<Tag class:list={['win', kind !== 'device' && 'wx', `win--${kind}`, { 'is-active': active }, cls]} data-win={kind} {...rest}>
-  <div class="win-bar">
-    <span class="win-sys" aria-hidden="true"></span>
-    <span class="win-title">{title}</span>
-    {num != null && <span class="win-num" aria-hidden="true">{num}</span>}
-    <span class="win-ctl" aria-hidden="true"><i></i><i></i><i></i></span>
-  </div>
-  <div class="win-body"><slot /></div>
-  {status && <div class="win-status"><slot name="status" /></div>}
-</Tag>
+{kind === 'device' ? (
+  <Tag class:list={['win', 'win--device', `wm-${wm}`, cls]} data-win={kind} data-wmt={theme ?? (wm === '2003' ? 'navy' : 'blue')} {...rest}>
+    <div class="win-bar">
+      <span class="win-sys" aria-hidden="true"></span>
+      <span class="win-title">{title}</span>
+      <slot name="bar" />
+      <span class="wm-tray" aria-hidden="true">{tray.map(i => <i class={`wm-i wm-${i}`}></i>)}</span>
+      {num != null && <span class="win-num" data-wm-clock>{num}</span>}
+      <span class="win-ctl" aria-hidden="true">{ok && <b class={`wm-${ok}`}>{ok === 'ok' ? 'ok' : ''}</b>}</span>
+    </div>
+    <div class="win-body"><slot /></div>
+    {status && <div class="win-status"><slot name="status" />{sip && <i class="wm-sip" aria-hidden="true"></i>}</div>}
+    <span class="dev-hw" aria-hidden="true"><i></i><i></i><i class="dev-pad"></i><i></i><i></i></span>
+  </Tag>
+) : (
+  <Tag class:list={['win', 'wx', `win--${kind}`, { 'is-active': active }, cls]} data-win={kind} {...rest}>
+    <div class="win-bar">
+      <span class="win-sys" aria-hidden="true"></span>
+      <span class="win-title">{title}</span>
+      {num != null && <span class="win-num" aria-hidden="true">{num}</span>}
+      <span class="win-ctl" aria-hidden="true"><i></i><i></i><i></i></span>
+    </div>
+    <div class="win-body"><slot /></div>
+    {status && <div class="win-status"><slot name="status" /></div>}
+  </Tag>
+)}
+
+<script>
+  // A Pocket PC shows the time as h:mm, with no AM or PM, as in DinarSoft's own screenshots
+  const tick = () => {
+    const d = new Date(), t = `${d.getHours() % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')}`;
+    document.querySelectorAll<HTMLElement>('[data-wm-clock]').forEach(c => (c.textContent = t));
+  };
+  if (document.querySelector('[data-wm-clock]')) { tick(); setInterval(tick, 15000); }
+</script>

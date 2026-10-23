@@ -13,7 +13,7 @@ const n = lastF - first + 1;
 const crop = (s: ReturnType<typeof bootScreen>) => s.pixels().slice(0, 640 * 200);
 const still = png(crop(bootScreen(ps, lastF)), 640, 200);
 // Chart: x = draw number across the whole entrance, y = the name's top row
-const W = 600, H = 170, sx = (i: number) => 40 + (i / (n - 1)) * (W - 50), sy = (y: number) => 20 + (y / 130) * (H - 40);
+const W = 400, H = 140, sx = (i: number) => 60 + (i / (n - 1)) * (W - 70), sy = (y: number) => 28 + (y / 123) * (H - 48);
 const ys = ps.frames.slice(first, lastF + 1).map(f => (f.phase === 'curtain' ? 0 : f.y!));
 const pathD = ys.map((y, i) => `${i ? 'L' : 'M'}${sx(i).toFixed(1)} ${sy(y).toFixed(1)}`).join('');
 let k = 80;
@@ -24,7 +24,7 @@ const marks = BOUNCE.map(([y0, y1, steps]) => { const at = k + steps; k += steps
   <Window title="THE BOUNCE   the name's top row" kind="panel" class="ps-bn-chart">
     <svg class="dg" viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="ps-bn-t">
       <title id="ps-bn-t">The Arabic name's top row over its entrance: 80 draws of the curtain at row 0, then a fall to row 123 and bounces up to 110, 117, 119 and 122, settling at 123.</title>
-      <line class="wire" x1="40" x2={W - 10} y1={sy(123)} y2={sy(123)} stroke-dasharray="3 5" />
+      <line class="wire" x1="60" x2={W - 10} y1={sy(123)} y2={sy(123)} stroke-dasharray="3 5" />
       <text class="t-sm" x="2" y={sy(0) + 4}>row 0</text>
       <text class="t-sm" x="2" y={sy(123) + 4}>123</text>
       <text class="t-sm" x={sx(40)} y={sy(0) - 8} text-anchor="middle">curtain</text>
@@ -51,6 +51,8 @@ const marks = BOUNCE.map(([y0, y1, steps]) => { const at = k + steps; k += steps
   .ps-bn-scr > * { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
   .ps-bn-scr > [hidden] { display: none; }
   @media (max-width: 860px) { .ps-bn { grid-template-columns: minmax(0, 1fr); } }
+  /* The chart draws at about 0.77 scale on a 390 px phone */
+  @media (max-width: 640px) { .ps-bn text { font-size: 16px; } }
 </style>
 
 <script>

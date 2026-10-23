@@ -11,7 +11,7 @@ import Ping from '../components/toys/kvc-formx/Ping.astro';
 import Freeze from '../components/toys/kvc-formx/Freeze.astro';
 import FileRebuild from '../components/toys/kvc-formx/FileRebuild.astro';
 
-const PROGS = [['GAME.COM', 330], ['WP.EXE', 430], ['SHEET.EXE', 530]] as const;
+const PROGS = [['GAME.COM', 365], ['WP.EXE', 465], ['SHEET.EXE', 565]] as const;
 ---
 
 <section id="kvc-koko" class="kv">
@@ -21,7 +21,7 @@ const PROGS = [['GAME.COM', 330], ['WP.EXE', 430], ['SHEET.EXE', 530]] as const;
   <Steps
     title="How Koko took over a PC"
     steps={[
-      `A clean PC. Every program asks DOS, the system, for everything through one door: <b><a class="term" href="${import.meta.env.BASE_URL}/glossary/#int-21h" data-term="int-21h">slot 21h</a></b>. Think of one API endpoint that every app on the machine calls.`,
+      `A clean PC. Every program asks DOS, the system, for everything through one door: <b><a class="term" href="${import.meta.env.BASE_URL.replace(/\/$/, '')}/glossary/#int-21h" data-term="int-21h">slot 21h</a></b>. Think of one API endpoint that every app on the machine calls.`,
       'Someone runs a program that carries Koko. <b>Koko moves into memory and stays there</b>, even after that program ends.',
       'Koko writes its own address into slot 21h, so every request reaches Koko first. It keeps the real DOS address for itself, in <b>slot 3</b>, a slot normal programs never use.',
       'Now every program that starts gets a copy of Koko, signed <code>KoKo (1)</code>.',
@@ -45,13 +45,13 @@ const PROGS = [['GAME.COM', 330], ['WP.EXE', 430], ['SHEET.EXE', 530]] as const;
       <rect class="box" x="300" y="30" width="330" height="200" />
       {PROGS.map(([n, x], i) => (
         <g>
-          <rect class="box-bk" x={x - 40} y="52" width="80" height="110" data-s={i === 0 ? '1-5' : '1-5'} />
-          <text x={x} y="182" text-anchor="middle" class="t-sm" data-s="1-5">{n}</text>
+          <rect class="box-bk kv-x" x={x - 40} y="52" width="80" height="110" data-s="1-5" />
+          <text x={x} y="182" text-anchor="middle" class="t-sm kv-x" data-s="1-5">{n}</text>
           <g data-s={i === 0 ? '2-5' : '4-5'} class="kv-x"><rect class="box-hi" x={x - 36} y="118" width="72" height="40" /><text class="t-bk" x={x} y="135" text-anchor="middle">KoKo</text><text class="t-bk" x={x} y="152" text-anchor="middle">(1)</text></g>
         </g>
       ))}
-      <text class="t-sm kv-x kv-pre" x="330" y="215" data-s="2">the infected one</text>
-      <path class="wire-hi arrow" data-s="4" d="M280 160 C300 160 300 140 318 140" />
+      <text class="t-sm kv-x kv-pre" x="325" y="215" data-s="2">the infected one</text>
+      <path class="wire-hi arrow" data-s="4" d="M280 160 C300 160 300 140 321 140" />
       <g data-s="6" class="kv-x"><rect class="box-bk" x="310" y="46" width="310" height="150" /><text class="t-yl t-lg" x="465" y="128" text-anchor="middle">data lost</text></g>
       <g data-s="5"><rect class="box-hi" x="300" y="248" width="150" height="64" /><text class="t-bk t-lg" x="375" y="278" text-anchor="middle">FEB 17</text><text class="t-bk" x="375" y="300" text-anchor="middle">the warning</text></g>
       <g data-s="6"><rect class="box-hi" x="470" y="248" width="160" height="64" /><text class="t-bk t-lg" x="550" y="278" text-anchor="middle">JUL 29</text><text class="t-bk" x="550" y="300" text-anchor="middle">disk wiped</text></g>
@@ -70,8 +70,8 @@ const PROGS = [['GAME.COM', 330], ['WP.EXE', 430], ['SHEET.EXE', 530]] as const;
       <rect class="box" x="6" y="254" width="348" height="96" />
       {PROGS.map(([n], i) => (
         <g>
-          <rect class="box-bk" x={18 + i * 112} y="266" width="100" height="72" data-s="1-5" />
-          <text class="t-sm" x={68 + i * 112} y="286" text-anchor="middle" data-s="1-5">{n}</text>
+          <rect class="box-bk kv-x" x={18 + i * 112} y="266" width="100" height="72" data-s="1-5" />
+          <text class="t-sm kv-x" x={68 + i * 112} y="286" text-anchor="middle" data-s="1-5">{n}</text>
           <g data-s={i === 0 ? '2-5' : '4-5'} class="kv-x"><rect class="box-hi" x={26 + i * 112} y="298" width="84" height="30" /><text class="t-bk" x={68 + i * 112} y="318" text-anchor="middle">KoKo (1)</text></g>
         </g>
       ))}

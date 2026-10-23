@@ -61,7 +61,7 @@ const steps = compareSteps(KEY, dinarKey(UNIVERSAL, 'HandyLauncher3'), UNIVERSAL
   .hl-kv-row { display: flex; align-items: center; gap: 10px; }
   .hl-kv-lab { min-width: 6ch; font: 700 12px/1 var(--font-code); color: var(--ink-2); }
   .hl-kv-cells { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; flex: 1; min-width: 0; }
-  .hl-kv-cells i { display: grid; place-items: center; height: clamp(26px, 6cqw, 36px); font: 700 clamp(11px, 2.6cqw, 16px)/1 var(--font-code); font-style: normal; color: #000; background: #fff; box-shadow: inset 0 0 0 1px var(--xp-line, #7f9db9); }
+  .hl-kv-cells i { display: grid; place-items: center; height: clamp(26px, 6cqw, 36px); font: 700 clamp(12px, 2.6cqw, 16px)/1 var(--font-code); font-style: normal; color: #000; background: #fff; box-shadow: inset 0 0 0 1px var(--xp-line, #7f9db9); }
   .hl-kv-cells i:nth-child(4n):not(:last-child) { margin-right: 4px; }
   .hl-kv-cells i.ok { background: color-mix(in oklch, var(--good) 22%, white); }
   .hl-kv-cells i.bad { color: #fff; background: var(--hot); }
@@ -97,14 +97,14 @@ const steps = compareSteps(KEY, dinarKey(UNIVERSAL, 'HandyLauncher3'), UNIVERSAL
         let from = 16; while (from > 0 && typed[from - 1] === made[from - 1]) from--;
         const bad = s.all ? -1 : from - 1;
         cells(rowT, typed, s.all ? 0 : from - 1, bad, -1); cells(rowM, made, s.all ? 0 : from - 1, bad, -1);
-        if (s.done) out.innerHTML = s.all ? 'All sixteen letters match: <b>registered</b>.' : `Letter ${from} from the left differs, so this name does not open it. He moves on to the next name.`;
+        if (s.done) out.innerHTML = s.all ? 'All sixteen letters match: <b>registered</b>.' : `Letter ${from} from the left differs, so this name does not open it. It moves on to the next name.`;
       }
     });
     const go = () => {
       typed = typedIn.value.replace(/[^A-Z]/gi, '').toUpperCase().slice(0, 16);
       made = dinarKey(nameSel.value, 'HandyLauncher3');
       if (typed.length !== 16) { out.textContent = 'A key has sixteen letters.'; typedIn.focus(); return; }
-      out.textContent = 'Follow his code below.';
+      out.textContent = 'Follow the code below.';
       cs.stepper?.load(compareSteps(typed, made, nameSel.value), 0);
       cs.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
     };

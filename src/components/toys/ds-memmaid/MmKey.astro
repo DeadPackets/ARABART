@@ -10,7 +10,7 @@ const TEXT = 'YASSERMOHAMEDALI', WORD = 'MemMaid2';
 const steps = keyTrace(TEXT, WORD);
 const last = steps[steps.length - 1] as { S: number[]; out: string };
 const PRESETS = [
-  ['YASSERMOHAMEDALI', 'His name'],
+  ['YASSERMOHAMEDALI', 'Yasser’s name'],
   ['GIVEAWAYVERSION1', 'GIVEAWAYVERSION1'],
   [pocketCode('730007B6BFA373D1380000050BFE45CE5'), 'A Pocket PC code'],
 ];
@@ -61,7 +61,7 @@ const WORDS = [['MemMaid2', '2.3'], ['MemMaidI', '1.72 and 1.73, device keys'], 
   .mky-out b { color: var(--accent); }
   .mky-out b:empty { background: none; box-shadow: inset 0 0 0 1px var(--rule); }
   @media (max-width: 1023px) { .mky { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 560px) { .mky-rows span { width: 100%; } .mky-grid { grid-template-columns: repeat(12, minmax(0, 1fr)); } .mky-rows b { width: 1.25em; font-size: 0.8125rem; } .mky-rows b.gap { margin-right: 4px; } }
+  @media (max-width: 560px) { .mky-rows span { width: 100%; } .mky-grid { grid-template-columns: repeat(10, minmax(0, 1fr)); } .mky-grid li { font-size: 12px; font-stretch: 87.5%; } .mky-rows b { width: 1.25em; font-size: 0.8125rem; } .mky-rows b.gap { margin-right: 4px; } }
 </style>
 
 <script>

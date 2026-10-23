@@ -8,9 +8,13 @@ import '../ds-handyswitcher/pocket.css';
 import './hl.css';
 import ui from './ui.json';
 import icon16 from './icon-175-16.png';
+import hmIcon from '../ds-handymenu/icon-101-16.png';
+import hsIcon from '../ds-handyswitcher/icon-101-16.png';
 import { MENU1, MENU2, MENU1_NAME, MENU2_NAME, ORIENT, GLYPH } from './hl.ts';
 import { menuHTML } from './launcher.ts';
 
+interface Props { solo?: boolean }
+const { solo = false } = Astro.props;
 const D = ui['34'].dialogs as unknown as Record<string, Dialog>;
 const rows = (m: typeof MENU1) => m.map(it => ({ text: it.kind === 'sep' ? '----------------' : it.name }));
 const setup = renderDialog(D['502'], {
@@ -39,63 +43,76 @@ const props = renderDialog(D['103'], {
 const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.exe', '\\My Documents\\Letter.psw', '\\My Documents\\My Music\\Song.mp3', '\\My Documents\\Pictures', '\\Windows\\Start Menu\\Programs\\Games', '\\'];
 ---
 
-<div class="hl-build" data-hlbuild data-menus={JSON.stringify([MENU1, MENU2])} data-glyphs={JSON.stringify(GLYPH)}>
+<div class:list={['hl-build', { 'is-solo': solo }]} data-hlbuild data-menus={JSON.stringify([MENU1, MENU2])} data-glyphs={JSON.stringify(GLYPH)}>
   <div class="hl-build-grid">
     <figure class="hl-build-fig">
-      <Window title="Today" kind="device" num="9:41" class="hl-dev" aria-label="A Pocket PC with HandyLauncher in its tray">
-        <div class="hl-scr" data-scr>
-          <ul class="hl-today" aria-hidden="true">
-            <li>Monday, March 20, 2006</li>
-            <li><i></i>Tap here to set owner information</li>
-            <li><i></i>No unread messages</li>
-            <li><i></i>No tasks</li>
-            <li><i></i>No upcoming appointments</li>
-          </ul>
+      <Window title="Start" kind="device" wm="5" theme="blue" num="10:47" class="hl-dev" aria-label="A Pocket PC with HandyLauncher on its Today screen">
+        <div class="hl-scr wm-today" data-scr>
+          <div aria-hidden="true">
+            <p class="wm-row wm-row--date">Monday, March 20, 2006</p>
+            <p class="wm-row wm-row--owner">Tap here to set owner information</p>
+            <p class="wm-row wm-row--mail">No unread messages</p>
+            <p class="wm-row wm-row--task">No tasks</p>
+            <p class="wm-row wm-row--cal">No upcoming appointments</p>
+          </div>
           <ul class="hl-menu" role="menu" aria-label={MENU1_NAME} data-menu set:html={menuHTML(MENU1, MENU1_NAME)} />
           <div class="hl-splash" data-splash hidden><b data-splash-name></b><small data-splash-note></small></div>
-          <div class="hl-bar"><b aria-hidden="true">New</b>
+          <div class="hl-bar"><img src={hmIcon.src} alt="" width="16" height="16" />
             <button type="button" class="hl-ticon" data-ticon aria-label="HandyLauncher: Enter for the first menu, Shift+F10 for the second"><img src={icon16.src} alt="" width="16" height="16" /></button>
           </div>
         </div>
+        <img slot="bar" class="hl-hs" src={hsIcon.src} width="16" height="16" alt="" />
+        <Fragment slot="status"><span class="sk-l">Calendar</span><span class="sk-r">Contacts</span></Fragment>
       </Window>
-      <figcaption class="hl-cap">His icon sits in the tray. Tap it, or tap and hold it.</figcaption>
+      {!solo && <figcaption class="hl-cap">Its icon sits at the bottom of the Today screen. Tap it, or tap and hold it.</figcaption>}
     </figure>
-    <figure class="hl-build-fig">
-      <Window title="HandyLauncher" kind="device" num="9:41" class="hl-dev" aria-label="HandyLauncher settings, rebuilt from his own dialogs">
-        <div class="ppc hl-set" data-set>
-          <div class="hl-set-in">
-            <div class="hl-page" data-page="setup" set:html={setup} />
-            <div class="hl-page" data-page="props" set:html={props} />
+    {!solo && (
+      <figure class="hl-build-fig">
+        <Window title="HandyLauncher" kind="device" wm="5" theme="blue" sip class="hl-dev hl-dev-set" aria-label="HandyLauncher settings, rebuilt from its own dialogs">
+          <div class="ppc hl-set" data-set>
+            <div class="hl-set-in">
+              <div class="hl-page" data-page="setup" set:html={setup} />
+              <div class="hl-page" data-page="props" set:html={props} />
+            </div>
           </div>
-        </div>
-        <p slot="status" class="ds-soft hl-soft"><button type="button" class="hl-ok" data-hl="ok" hidden>ok</button><span>Menu</span></p>
-      </Window>
-      <figcaption class="hl-cap">His Shortcut Setup page. Pick a menu, then tap + to add a shortcut.</figcaption>
-    </figure>
+          <button type="button" class="hl-ok wm-ok" data-hl="ok" hidden>ok</button>
+          <Fragment slot="status"><span class="sk-r">Menu</span></Fragment>
+        </Window>
+        <figcaption class="hl-cap">The Shortcut Setup page. Pick a menu, then tap + to add a shortcut.</figcaption>
+      </figure>
+    )}
   </div>
-  <datalist id="hlb-targets">{SAMPLES.map(s => <option value={s} />)}</datalist>
-  <div class="hl-row hl-build-ctl" hidden data-ctl>
-    <button type="button" class="button" data-act="tap">Tap the icon</button>
-    <button type="button" class="button" data-act="hold">Tap and hold</button>
-  </div>
-  <p class="hl-say" aria-live="polite" data-say>The first menu is open, as his setup program filled it. Tap a shortcut to launch it.</p>
+  {!solo && <datalist id="hlb-targets">{SAMPLES.map(s => <option value={s} />)}</datalist>}
+  {!solo && (
+    <div class="hl-row hl-build-ctl" hidden data-ctl>
+      <button type="button" class="button" data-act="tap">Tap the icon</button>
+      <button type="button" class="button" data-act="hold">Tap and hold</button>
+    </div>
+  )}
+  <p class:list={['hl-say', { 'sr-only': solo }]} aria-live="polite" data-say>The first menu is open, as its setup program filled it. Tap a shortcut to launch it.</p>
 </div>
 
 <style is:global>
   .hl-build { display: grid; gap: 16px; }
-  .hl-build-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 320px)); gap: 24px; justify-content: start; }
+  .hl-build-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 300px)); gap: 24px; justify-content: start; }
   .hl-build-fig { display: grid; gap: 8px; margin: 0; min-width: 0; }
+  .hl-build.is-solo { display: block; }
+  .hl-build.is-solo .hl-build-grid { grid-template-columns: minmax(0, 300px); justify-content: center; }
   .hl-set { height: 100%; overflow: hidden auto; }
   .hl-set .ppc-lv li { cursor: default; }
   .hl-lvb { display: flex; align-items: center; gap: 4px; width: 100%; padding: 1px 2px; font: inherit; color: #000; text-align: left; background: none; border: 0; cursor: pointer; white-space: nowrap; }
-  .hl-lvb[aria-pressed='true'] { color: #fff; background: #316ac5; }
+  .hl-lvb[aria-pressed='true'] { color: #fff; background: var(--wm-head, #316ac5); }
   .hl-lvb svg { width: 12px; height: 12px; flex: none; }
   .hl-lvb:focus-visible { outline: 2px solid #316ac5; outline-offset: -2px; }
   .hl-build:not(.is-live) .hl-page + .hl-page { border-top: 2px solid #808080; }
   .hl-build.is-live .hl-page[hidden] { display: none; }
-  .hl-soft .hl-ok { min-width: 44px; min-height: 28px; padding: 0 6px; font: inherit; color: #fff; background: none; border: 0; cursor: pointer; }
-  .hl-soft .hl-ok:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
-  @media (max-width: 760px) { .hl-build-grid { grid-template-columns: minmax(0, 320px); } }
+  /* HandySwitcher's icon, which sat on DinarSoft's own device too */
+  .hl-hs { position: absolute; left: 64px; top: 5px; image-rendering: pixelated; }
+  .hl-ok { display: none; }
+  .win-ctl .hl-ok { display: grid; padding: 0; cursor: pointer; }
+  .win-ctl .hl-ok::after { content: ''; position: absolute; inset: -5px -4px -6px; }
+  .win-ctl .hl-ok:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+  @media (max-width: 760px) { .hl-build-grid { grid-template-columns: minmax(0, 300px); } }
 </style>
 
 <script>
@@ -113,7 +130,9 @@ const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.
     const pages = [...root.querySelectorAll<HTMLElement>('[data-page]')];
     const f = <T extends HTMLElement>(k: string) => root.querySelector<T>(`[data-hl="${k}"]`)!;
     const list = f('list'), pickMenu = f<HTMLSelectElement>('menu'), ok = f<HTMLButtonElement>('ok');
-    const rev = f<HTMLLabelElement>('rev').querySelector('input')!, first = f<HTMLLabelElement>('first').querySelector('input')!;
+    // Without the settings device (solo), Reverse stays off
+    const rev = f<HTMLLabelElement>('rev')?.querySelector('input') ?? { checked: false }, first = f<HTMLLabelElement>('first')?.querySelector('input');
+    const title = $('.win-title');
     let cur = 0, sel = -1, editing = -1, open = -1;
 
     const page = (p: string) => {
@@ -135,8 +154,8 @@ const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.
     const hold = () => showMenu(rev.checked ? 0 : 1, 'Tap and hold');
     tapOrHold(ticon, { tap, hold });
     menuKeys(menu, () => closeMenu(true));
-    root.querySelector('[data-act="tap"]')!.addEventListener('click', tap);
-    root.querySelector('[data-act="hold"]')!.addEventListener('click', hold);
+    root.querySelector('[data-act="tap"]')?.addEventListener('click', tap);
+    root.querySelector('[data-act="hold"]')?.addEventListener('click', hold);
     scr.addEventListener('pointerdown', e => { if (open >= 0 && !(e.target as Element).closest('[data-menu], [data-ticon]')) closeMenu(); });
 
     menu.addEventListener('click', e => {
@@ -147,11 +166,17 @@ const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.
       $('[data-splash-name]').textContent = it.name;
       $('[data-splash-note]').textContent = (it.orient ? `Screen turned to ${ORIENT[it.orient]} first. ` : '') + (it.kind === 'folder' ? `File Explorer opens ${it.target}` : `Opening ${it.target}`);
       splash.hidden = false;
+      title.textContent = it.name;
       say.innerHTML = `HandyLauncher opens <b>${it.name}</b>${it.orient ? `, after turning the screen to <b>${ORIENT[it.orient]}</b>` : ''}.`;
-      window.setTimeout(() => (splash.hidden = true), 1600);
+      window.setTimeout(() => { splash.hidden = true; title.textContent = 'Start'; }, 1600);
     });
 
-    // His Shortcut Setup page
+    root.classList.add('is-live');
+    if (!list) return;
+    // His Shortcut Setup page; its ok sits at the right of the title bar, where Windows Mobile puts it
+    const ctl = root.querySelector<HTMLElement>('.hl-dev-set .win-ctl')!;
+    ctl.removeAttribute('aria-hidden');
+    ctl.append(ok);
     pickMenu.addEventListener('change', () => { cur = pickMenu.selectedIndex; sel = -1; drawList(); });
     list.addEventListener('click', e => {
       const b = (e.target as Element).closest<HTMLElement>('[data-row]');
@@ -159,9 +184,9 @@ const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.
       sel = +b.dataset.row!; drawList();
       list.querySelector<HTMLElement>(`[data-row="${sel}"]`)?.focus();
     });
-    const sync = () => { first.checked = !rev.checked; };
-    rev.addEventListener('change', () => { sync(); say.innerHTML = rev.checked ? 'Reverse is on: a tap now opens the second menu, a hold the first.' : 'Reverse is off: a tap opens the first menu, a hold the second.'; });
-    first.addEventListener('change', () => { rev.checked = !first.checked; });
+    const sync = () => { first!.checked = !rev.checked; };
+    (rev as HTMLInputElement).addEventListener('change', () => { sync(); say.innerHTML = rev.checked ? 'Reverse is on: a tap now opens the second menu, a hold the first.' : 'Reverse is off: a tap opens the first menu, a hold the second.'; });
+    first!.addEventListener('change', () => { rev.checked = !first!.checked; });
 
     const kindSc = f('kind-sc').querySelector('input')!, kindSep = f('kind-sep').querySelector('input')!;
     const nameEd = f<HTMLInputElement>('name'), targetEd = f<HTMLInputElement>('target'), orient = f<HTMLSelectElement>('orient');
@@ -197,6 +222,5 @@ const SAMPLES = ['\\Windows\\PWord.exe', '\\Windows\\Calc.exe', '\\Windows\\Pxl.
 
     drawList(); page('setup'); sync();
     root.querySelector<HTMLElement>('[data-ctl]')!.hidden = false;
-    root.classList.add('is-live');
   });
 </script>

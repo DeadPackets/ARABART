@@ -7,7 +7,7 @@ import { MEM_RGB, DISK_RGB, MEM_NAME, DISK_NAME, BY_NAME, rgb, deepLink } from '
 
 interface Props { id: string }
 const { id } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const { files, anatomy, memRegions } = loadBytes();
 const n = (v: number) => v.toLocaleString('en-US');
 const pct = (a: number, b: number) => (a / b < 0.001 ? '<0.1%' : `${((a / b) * 100).toFixed(a / b < 0.1 ? 1 : 0)}%`);

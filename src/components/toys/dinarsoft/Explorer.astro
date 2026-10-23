@@ -1,12 +1,14 @@
 ---
 // The six apps as a Visual Studio solution: pick a project in Solution Explorer, see it run on the Pocket PC beside it,
 // read its Properties, then open its page. Without JS every project's links still show, and MemMaid is on the device.
+// A slot named after an app (memmaid, taptext...) puts that app's live remake on the device instead of its screenshots.
 import Window from '../../shell/Window.astro';
+import Balloon from '../../shell/Balloon.astro';
 import Device from './Device.astro';
 import { apps, icon, awards, reviews, downloads, longDate, type AppId } from '../../../data/dinarsoft';
 import './ds.css';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const page = (id: AppId, hash = '') => `${base}/dinarsoft/${id}/${hash}`;
 const years = (id: AppId, lv: string) => awards.filter(a => a.app === id && a.level === lv).map(a => a.year);
 const list = (ys: number[]) => ys.length > 2 && ys.every((y, i) => !i || y === ys[i - 1] + 1) ? `${ys[0]} to ${ys.at(-1)}` : ys.join(', ').replace(/, (\d+)$/, ' and $1');
@@ -18,6 +20,7 @@ const honors = (id: AppId) => {
   }
   return out;
 };
+const live = Object.fromEntries(await Promise.all(apps.map(async a => [a.id, Astro.slots.has(a.id) ? await Astro.slots.render(a.id) : ''])));
 const rows = apps.map(a => {
   const r = a.releases;
   return {
@@ -34,6 +37,8 @@ const rows = apps.map(a => {
 <div class="dse" data-dse>
   <Window kind="panel" title="Solution Explorer" active class="dse-sol">
     <p class="dse-root"><span class="dse-sln" aria-hidden="true"></span>Solution ‘DinarSoft’ (6 projects)</p>
+    <div class="dse-tree-wrap" data-balloon-host>
+    {live.memmaid && <Balloon text="Pick a project to run it on the Pocket PC." class="dse-tip" />}
     <ul class="dse-tree" aria-label="DinarSoft’s six apps">
       {rows.map(({ a, ic, nRev, nDl, honors }, i) => (
         <li class="dse-proj" data-proj={a.id}>
@@ -52,11 +57,12 @@ const rows = apps.map(a => {
         </li>
       ))}
     </ul>
+    </div>
   </Window>
 
   {rows.map(({ a, ic, first, last, honors, nRev }, i) => (
     <div class="dse-pane" id={`dse-p-${a.id}`} role="region" aria-labelledby={`dse-t-${a.id}`} hidden={i !== 0} data-pane={a.id}>
-      <Device app={a} class="dse-dev" />
+      {live[a.id] ? <div class="dse-live" set:html={live[a.id]} /> : <Device app={a} class="dse-dev" />}
       <Window kind="panel" title="Properties" class="dse-props">
         <div class="dse-head">
           <img src={ic.src} width={ic.w} height={ic.h} alt="" loading="lazy" />
@@ -114,6 +120,9 @@ const rows = apps.map(a => {
   .dse-f--cpp::after { background: none; content: '++'; font: 700 7px/6px var(--ds-arial); color: #2b5bb8; inset: 4px 0 auto; text-align: center; }
 
   .dse-dev { width: 300px; }
+  .dse-live { display: grid; justify-items: center; min-width: 0; }
+  .dse-tree-wrap { position: relative; }
+  .dse-tree-wrap :global(.dse-tip) { top: 52px; left: 40px; }
   .dse-head { display: flex; align-items: center; gap: 14px; }
   .dse-head img { width: 72px; height: 72px; flex: none; }
   .dse-word { font-size: clamp(1.75rem, 1.2vw + 1rem, 2.25rem); }

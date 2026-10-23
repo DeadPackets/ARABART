@@ -14,7 +14,7 @@ import Planes from '../components/toys/primer/Planes.astro';
 import ExeLoader from '../components/toys/primer/ExeLoader.astro';
 import Unpack from '../components/toys/primer/Unpack.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const prog = (id: string) => `${base}/program/${id}/`;
 const MAP = [
   { href: '#memory', now: 'new Uint8Array(1048576)', then: 'Memory', act: 'drag' },
@@ -245,7 +245,7 @@ const RUN = [
     .pr-run-rows { grid-template-columns: minmax(0, 1fr); }
   }
   @media (max-width: 480px) {
-    .pr-nc-head, .pr-nc-rows a { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); }
+    .pr-nc-head, .pr-nc-rows a { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); }
     .pr-nc-head span:last-child, .pr-nc-rows span { display: none; }
   }
 </style>

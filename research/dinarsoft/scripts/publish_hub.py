@@ -57,7 +57,8 @@ for n in ('ttmc', 'tto'):
     man['images'][f'screen-{n}'] = {**rec, 'from': f'site/images/{n}.gif'}
 
 # 5. Press captures. Blur: the contact email line in the 2003 to 2005 magazine entries (DinarSoft's free-mail address).
-# Trim: keep the praise and leave out the rest of a paragraph.
+# Trim: keep the praise and leave out the rest of a paragraph, or the empty width of a list row.
+# BLUR: other personal data, boxes in crop pixels. Each review page also gets its first screen (<page>--page), lossy.
 def email_line(im):
     g = im.convert('L'); px = g.load(); w, h = g.size
     rows = [sum(1 for x in range(8, min(470, w)) if px[x, y] < 120) for y in range(h)]
@@ -76,9 +77,18 @@ def blur(im, box):
 meta = {m['file']: m for m in json.load(open(f'{CAP}/manifest.json'))}
 EMAIL = ['tp-2003-ppcmag-nominations--handymenu'] + [f'tp-{y}-ppcmag-nominations--{a}' for y, apps in (('2004', 'memmaid handymenu handyswitcher'), ('2005', 'memmaid handymenu handyswitcher taptext')) for a in apps.split()]
 TRIM = {
-    'tp-2007-08-gadgeteer-taptext--verdict': (0, 0, None, 78),
     'tp-2007-gadgetmix-handymenu--verdict': (0, 0, 308, None),
     'tp-2006-06-treocentral-shootout--dinarsoft': (0, 0, None, 274),
+    'tp-2006-smartphonemag-winners--memmaid': (0, 0, 317, None),
+    'tp-2007-smartphonemag-winners--handyswitcher': (0, 0, 417, None),
+    'tp-2007-smartphonemag-winners--memmaid': (0, 0, 385, None),
+    'tp-2007-smartphonemag-winners--taptext': (0, 0, 377, None),
+}
+PHONE = "the phone number under the owner's name in the review's Today-screen thumbnail"
+BLUR = {
+    'tp-2004-04-pocketpclife-handymenu--headline': [((13, 18, 48, 25), PHONE)],
+    'tp-2004-04-pocketpclife-handymenu--page': [((181, 131, 216, 138), PHONE)],
+    'tp-2004-09-ppcthoughts-handymenu--page': [((4, 445, 80, 521), "the reviewer's forum photo")],
 }
 PRESS = EMAIL + [
     'tp-2005-smartphonemag-winners--memmaid', 'tp-2006-smartphonemag-winners--memmaid',
@@ -103,6 +113,7 @@ PRESS = EMAIL + [
     'tp-2007-08-gadgeteer-taptext--headline', 'tp-2007-08-gadgeteer-taptext--verdict', 'tp-2007-12-etenblog-taptext--headline',
     'tp-chip-2006-06--entry', 'tp-chip-2007-05--entry', 'tp-chip-2008-06--entry', 'tp-chip-2008-09--entry',
 ]
+PRESS += [f'{p}--page' for p in sorted({n.split('--')[0] for n in PRESS if not re.search('nominations|winners', n)})]
 assert len(PRESS) == len(set(PRESS))
 for n in PRESS:
     m = meta[f'{n}.png']
@@ -112,13 +123,28 @@ for n in PRESS:
         y0, y1 = email_line(im)
         blur(im, (0, max(0, y0 - 3), im.width, min(im.height, y1 + 4)))
         done.append(f'contact email line blurred (rows {y0 - 3} to {y1 + 4})')
+    for box, what in BLUR.get(n, []):
+        blur(im, box)
+        done.append(f'{what} blurred (box {box})')
     if n in TRIM:
         x0, y0, x1, y1 = TRIM[n]
         im = im.crop((x0, y0, x1 or im.width, y1 or im.height))
         done.append(f'trimmed to {im.width}x{im.height}')
-    rec = save(im, f'press/{n}.webp')
+    page, q = n.endswith('--page'), 80
+    rec = save(im, f'press/{n}.webp', lossless=not page, q=q)
+    while page and rec['bytes'] > 150_000 and q > 50:  # keep each first screen under about 150 KB
+        q -= 5
+        rec = save(im, f'press/{n}.webp', lossless=False, q=q)
+    if page: done.append(f'lossy WebP, quality {q}')
     man['images'][n] = {**rec, 'from': f'captures/{n}.png', 'owner': m['owner'], 'shows': m['shows'],
                         'wayback': m['wayback_url'], 'timestamp': m['timestamp'], 'edits': done}
+
+# 5b. Print-magazine crops from their lossless PNG sources. magazines.json gives each one's magazine, what it shows
+# and its source page. Paper scans, so lossy WebP.
+mags = json.load(open(f'{R}/magazines/magazines.json'))
+for p in sorted(pathlib.Path(f'{R}/magazines/crops').glob('*.png')):
+    rec = save(Image.open(p).convert('RGB'), f'press/{p.stem}.webp', lossless=False, q=85)
+    man['images'][p.stem] = {**mags[p.stem], **rec, 'from': f'magazines/crops/{p.name}'}
 
 # 6. DinarSoft's home page before and after the November 2006 relaunch, and a home-page banner
 for n in ('ds-2006-05-home-frames', 'ds-2006-home-relaunch'):

@@ -16,9 +16,9 @@ const ZONES: { z: Zone; label: string; icon?: number }[] = [
 const ASM = [
   { off: '11C98', code: 'ldr  r0,=HHTaskBar', note: 'the top bar’s class name' },
   { off: '11C9C', code: 'bl   FindWindowW', note: 'find the system’s top bar' },
-  { off: '11CA4', code: 'ldr  r2,=12628h', note: 'his own function' },
+  { off: '11CA4', code: 'ldr  r2,=12628h', note: 'its own function' },
   { off: '11CAC', code: 'mvn  r1,#3', note: '-4: its message handler' },
-  { off: '11CB0', code: 'bl   SetWindowLongW', note: 'swap his in, get the old one back' },
+  { off: '11CB0', code: 'bl   SetWindowLongW', note: 'swap its own in, get the old one back' },
   { off: '11CB8', code: 'str  r0,[r1]', note: 'keep the old one' },
   { off: '126B4', label: 'proc', code: 'cmp  fp,r3', note: 'a tap? (WM_LBUTTONDOWN)' },
   { off: '12748', code: 'bl   PtInRect', note: 'on the HandySwitcher icon?' },
@@ -27,7 +27,7 @@ const ASM = [
   { off: '12844', code: 'bl   PtInRect', note: 'on the HandyLauncher icon?' },
   { off: '12854', code: 'bl   SHRecognizeGesture', note: 'tap, or tap and hold?' },
   { off: '128A8', code: 'bl   PtInRect', note: 'on the (X) button?' },
-  { off: '1294C', code: 'bl   CallWindowProcW', note: 'not his: pass it on' },
+  { off: '1294C', code: 'bl   CallWindowProcW', note: 'not its own: pass it on' },
 ];
 const C = [
   { code: 'HWND bar = FindWindow(L"HHTaskBar", 0);' },
@@ -64,7 +64,7 @@ const C = [
       </div>
       <ol class="hs-tb-flow" aria-label="Where the tap goes">
         <li data-node="tap">Your tap</li>
-        <li data-node="his" class="on">His function</li>
+        <li data-node="his" class="on">Its function</li>
         <li class="hs-tb-to">
           <span data-node="HandySwitcher" class="on">HandySwitcher</span>
           <span data-node="HandyMenu">HandyMenu</span>

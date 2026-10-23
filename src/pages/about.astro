@@ -3,11 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Window from '../components/shell/Window.astro';
 import Term from '../components/explain/Term.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <BaseLayout
   title="For my father · Yasser Awad"
+  pageType="AboutPage"
   description="A son's tribute to Yasser Awad, how the site keeps his fifteen DOS programs running, and who helped."
 >
   <article class="container about">

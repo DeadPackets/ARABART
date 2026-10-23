@@ -21,4 +21,4 @@ export function blit(canvas: HTMLCanvasElement, data: Uint8Array, w: number, h: 
 let cache: Record<string, Promise<Uint8Array>> = {};
 /** One of his unpacked programs, exactly as it sits in memory (public/bytes/files/<name>.mem), fetched once. */
 export const mem = (name: string) =>
-  (cache[name] ??= fetch(`${import.meta.env.BASE_URL}/bytes/files/${name}.mem`).then(r => r.arrayBuffer()).then(b => new Uint8Array(b)));
+  (cache[name] ??= fetch(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/bytes/files/${name}.mem`).then(r => r.arrayBuffer()).then(b => new Uint8Array(b)));

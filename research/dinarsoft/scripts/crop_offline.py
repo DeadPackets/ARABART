@@ -28,7 +28,8 @@ for c in json.loads(Path(sys.argv[1]).read_text()):
     x1, y1 = max(b["x"] + b["w"] for b in hit) + pad, max(b["y"] + b["h"] for b in hit) + pad
     src = full[f"{c['page']}.png"]
     name = f"{c['page']}--{c['name']}.png"
-    Image.open(CAP / src["file"]).crop((max(0, int(x0)), max(0, int(y0)), int(x1), int(y1))).save(CAP / name)
+    im = Image.open(CAP / src["file"])
+    im.crop((max(0, int(x0)), max(0, int(y0)), min(im.width, int(x1)), min(im.height, int(y1)))).save(CAP / name)
     log = [x for x in log if x["file"] != name]
     log.append(dict(file=name, kind="crop", shows=c["shows"], matched_text=" / ".join(" ".join(b["text"].split())[:120] for b in hit),
                     **{k: src[k] for k in ("source_url", "wayback_url", "timestamp", "owner")}))

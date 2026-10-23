@@ -1,13 +1,12 @@
 ---
 // One program: it runs first, in a DOS screen window; its label sits beside it; then the story and the writeup in a calm
-// reading column; then Norton Commander's panels to move to the next one.
+// reading column; then Norton Commander's key bar to step to the previous or next one.
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Toc from '../../layouts/Toc.astro';
 import DosPlayer from '../../components/DosPlayer.astro';
 import ControlsTable from '../../components/ControlsTable.astro';
 import Writeup from '../../components/explain/Writeup.astro';
 import BytesMap from '../../components/BytesMap.astro';
-import Programs from '../../components/shell/Programs.astro';
 import { programs } from '../../data/programs';
 import { exeSize, bundleSize, bytes } from '../../data/files';
 import { glance, shelf } from '../../layouts/glance';
@@ -16,22 +15,31 @@ import type { GetStaticPaths } from 'astro';
 export const getStaticPaths: GetStaticPaths = () => programs.map(program => ({ params: { id: program.id }, props: { program } }));
 
 const { program } = Astro.props as { program: (typeof programs)[number] };
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const bundleUrl = `${base}/bundles/${program.id}.jsdos?v=${Date.now()}`;
 const title = program.title.replace(' - ', ': ');
 const path = `C:\\${program.folder}\\${program.executable}`;
 // Programs that start at a DOS prompt and want a command typed: one tap types it on a phone
 const LINES: Record<string, string> = { 'kvc-antivirus': 'KVC C:' };
-const next = shelf[(shelf.findIndex(p => p.id === program.id) + 1) % shelf.length];
+const at = shelf.findIndex(p => p.id === program.id);
+const prev = shelf[(at + shelf.length - 1) % shelf.length], next = shelf[(at + 1) % shelf.length];
+const short = (p: (typeof shelf)[number]) => p.title.replace(' - ', ' ');
 // only the program writeups, so a program page does not carry the CSS of the DinarSoft, career and other pages
+const home = new URL(`${base}/`, Astro.site).href;
+const KIND: Record<string, string> = { educational: 'EducationalApplication', tool: 'UtilitiesApplication', utility: 'UtilitiesApplication', library: 'DeveloperApplication', demo: 'MultimediaApplication', splash: 'MultimediaApplication' };
+const sw = { '@type': 'SoftwareApplication', '@id': `${home}program/${program.id}/#app`, name: title, description: glance[program.id] ?? program.description,
+  url: `${home}program/${program.id}/`, operatingSystem: 'MS-DOS', applicationCategory: KIND[program.category], dateCreated: String(program.year),
+  image: new URL(`${base}/images/${program.image}`, Astro.site).href, author: { '@id': `${home}#yasser` }, isAccessibleForFree: true };
 const writeups = import.meta.glob(['../../writeups/*.astro', '!../../writeups/{dinarsoft-*,arabart,career,patents,primer}.astro']);
 ---
 
 <BaseLayout
   title={`${title} (${program.year}) · Yasser Awad`}
   description={glance[program.id] ?? program.description}
-  image={`/ARABART/images/${program.image}`}
+  image={`${base}/images/${program.image}`}
   hasEmulator={true}
+  schema={[sw]}
+  crumbs={[['Programs', '#programs'], [title, `program/${program.id}/`]]}
   keys={[{ k: '►', label: `Next: ${next.title.replace(' - ', ': ')}`, href: `${base}/program/${next.id}/` }]}
 >
   <article class="program">
@@ -85,7 +93,10 @@ const writeups = import.meta.glob(['../../writeups/*.astro', '!../../writeups/{d
       <Toc />
     </div>
 
-    <Programs current={program.id} />
+    <nav class="container nc-keys" aria-label="Previous and next program">
+      <a href={`${base}/program/${prev.id}/`} rel="prev"><b aria-hidden="true">◄</b><span>Previous: {short(prev)}</span></a>
+      <a href={`${base}/program/${next.id}/`} rel="next"><span>Next: {short(next)}</span><b aria-hidden="true">►</b></a>
+    </nav>
   </article>
 </BaseLayout>
 
@@ -130,7 +141,13 @@ const writeups = import.meta.glob(['../../writeups/*.astro', '!../../writeups/{d
   .read > :global(* + *) { margin-top: clamp(72px, 9vw, 120px); }
   .story h2 { font: 800 clamp(2rem, 2.4vw + 1rem, 3.25rem)/1.05 var(--font-display); font-stretch: 80%; }
   .story p { max-width: 68ch; margin-top: 18px; font-size: clamp(1.125rem, 0.3vw + 1.05rem, 1.25rem); line-height: 1.7; }
-  .program :global(.progs) { margin-top: clamp(80px, 10vw, 140px); border-top: 1px solid var(--rule); }
+  /* Norton Commander's bottom line: the key in white on black, its job in black on cyan */
+  .nc-keys { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: clamp(80px, 10vw, 140px); padding-top: 36px; border-top: 1px solid var(--rule); }
+  .nc-keys a { display: flex; min-height: 44px; min-width: 0; font: 400 16px/1 var(--font-dos); text-decoration: none; }
+  .nc-keys b { display: grid; place-items: center; padding: 0 10px; font-weight: 400; color: var(--vga-15); background: var(--vga-0); }
+  .nc-keys span { display: flex; align-items: center; min-width: 0; padding: 0 14px; color: var(--vga-0); background: var(--vga-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .nc-keys a:hover span { background: var(--vga-14); }
+  .nc-keys a:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 3px; }
 
   @media (max-width: 1199px) {
     .body { grid-template-columns: minmax(0, 1fr); }

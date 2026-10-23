@@ -1,84 +1,252 @@
 ---
-// The reviews, each with the reviewer's own page as the Internet Archive kept it. On the hub, filter by app.
+// The reviews in two parts. On top, the loudest praise as pull quotes. Below, every review as mail in an Outlook 2003
+// inbox: folders per app, messages grouped by year, and a reading pane with the quote, the stars, the site's first
+// screen in an Internet Explorer window, and the clippings. On a narrow screen a message opens under its own line.
+// No JS: every message is open in the list, and each pull quote links to its message.
 import Window from '../../shell/Window.astro';
 import Cap from './Cap.astro';
-import { apps, reviews, discs, longDate, type AppId } from '../../../data/dinarsoft';
+import { apps, reviews, discs, icon, longDate, pageShot, type AppId, type Shot } from '../../../data/dinarsoft';
 import './ds.css';
 
 interface Props { only?: AppId }
 const { only } = Astro.props;
-const list = reviews.filter(r => !only || r.app === only).sort((a, b) => a.date.localeCompare(b.date));
-const cds = discs.filter(d => !only || d.app === only);
-const counts = apps.map(a => ({ a, n: reviews.filter(r => r.app === a.id).length })).filter(x => x.n);
 const name = (id: AppId) => apps.find(a => a.id === id)!.name;
+const PICKS = [
+  'focuses on memory management, Registry cleaning, and the ability to “wipe” files', 'an indispensable tool for Pocket PC/Windows Mobile device owners',
+  'Looks great, works great', 'the Swiss Army Knife of PPC utilities', 'MemMaid is a godsend!', 'Definitely deserves a 10/10 rating!',
+  'A steal at $5.99!', 'functional and must have on every Pocket PC', 'TapText is quickly becoming a utility that I can’t live without',
+  'If you have a PDA or smartphone this is a program you must have.', 'MemMaid fills a gap left by Microsoft in the memory management department',
+  'Extremely powerful and comprehensive suite of memory and storage management utilities',
+];
+
+type Msg = { id: string; app: AppId; date: string; from: string; by?: string; where?: string; print?: string; subject: string; quote?: string; stars: number; shots: Shot[]; page?: Shot; url?: string; link: string };
+const page = (s: Shot) => s.key.split('--')[0];
+const original = (wb: string) => wb.split(/\/web\/\d+[a-z_]*\//)[1] ?? wb;
+const all: Msg[] = [
+  ...reviews.map(r => {
+    const p = pageShot(page(r.shots[0]), `${r.outlet}, the page with the review, as it first appeared in a 1280 by 800 window`);
+    return { id: `rv-${page(r.shots[0])}`, app: r.app, date: r.date, from: r.outlet, by: r.by, where: r.where, print: r.print, subject: r.title, quote: r.quote, stars: +(r.rating?.match(/^(\d)/)?.[1] ?? 0), shots: r.shots, page: p, url: original(r.shots[0].link), link: r.shots[0].link };
+  }),
+  ...discs.map(d => {
+    const p = pageShot(page(d.shot), `CHIP's disc page for ${d.title}, as it first appeared`);
+    // the CHIP page is little more than its entry, so the page shot replaces the clipping
+    return { id: `rv-${page(d.shot)}`, app: d.app, date: d.date, from: 'CHIP magazine, Russia', where: 'cover disc', subject: `${d.title}, on the cover disc`, stars: 0, shots: [...(p ? [] : [d.shot]), ...(d.print ?? [])], page: p, url: original(d.shot.link), link: d.shot.link };
+  }),
+].filter(m => !only || m.app === only).sort((a, b) => b.date.localeCompare(a.date));
+const picks = PICKS.map(q => all.find(m => m.quote === q)).filter((m): m is Msg => !!m);
+const years = [...new Set(all.map(m => m.date.slice(0, 4)))];
+const folders = apps.map(a => ({ a, n: all.filter(m => m.app === a.id).length })).filter(f => f.n);
+const short = (d: string) => longDate(d).replace(/^(\w{3})\w*/, '$1');
 ---
 
-<div class="dsr" data-dsr>
-  {!only && (
-    <div class="dsr-filter" role="group" aria-label="Show reviews of" hidden>
-      <button type="button" class="button k-btn" aria-pressed="true" data-f="">All <span>{reviews.length}</span></button>
-      {counts.map(({ a, n }) => <button type="button" class="button k-btn" aria-pressed="false" data-f={a.id}>{a.name} <span>{n}</span></button>)}
-    </div>
+{all.length > 0 && <div class="dsr" data-dsr>
+  {picks.length > 0 && (
+    <ul class="dsr-picks">
+      {picks.map(m => (
+        <li>
+          <p class="dsr-out">{m.from}</p>
+          <blockquote class="dsr-pq"><p>{m.quote}</p></blockquote>
+          {m.stars > 0 && <p class="dsr-st" role="img" aria-label={`${m.stars} of 5 stars`}>{'★'.repeat(m.stars)}<span>{'★'.repeat(5 - m.stars)}</span></p>}
+          <p class="dsr-by"><img src={icon(m.app).src} width="22" height="22" alt="" /><span>{name(m.app)} · {m.by ? `${m.by}, ` : ''}{longDate(m.date)}</span></p>
+          <a class="dsr-see" href={`#${m.id}`} data-open={m.id}>{m.print ? 'See the page' : 'Read the review'}</a>
+        </li>
+      ))}
+    </ul>
   )}
-  <ul class="dsr-wall">
-    {list.map(r => (
-      <li data-app={r.app}>
-        <Window kind="panel" title={r.outlet} class="dsr-card" as="article">
-          <p class="dsr-meta">{longDate(r.date)}{r.by && <> · {r.by}</>}{r.where && <> · {r.where}</>}{!only && <> · <b>{name(r.app)}</b></>}</p>
-          <h3 class="dsr-t">{r.title}</h3>
-          {r.quote && <blockquote class="dsr-q"><p>“{r.quote}”</p></blockquote>}
-          {r.rating && <p class="dsr-rate"><span aria-hidden="true">★</span> {r.rating}</p>}
-          <div class="dsr-caps">{r.shots.map(s => <Cap shot={s} />)}</div>
-        </Window>
-      </li>
-    ))}
-    {cds.map(d => (
-      <li data-app={d.app}>
-        <Window kind="panel" title="CHIP magazine, Russia" class="dsr-card" as="article">
-          <p class="dsr-meta">{longDate(d.date)} · cover disc{!only && <> · <b>{name(d.app)}</b></>}</p>
-          <h3 class="dsr-t">{d.title}, on the cover disc</h3>
-          <div class="dsr-caps"><Cap shot={d.shot} /></div>
-        </Window>
-      </li>
-    ))}
-  </ul>
-</div>
+
+  <Window kind="editor" title={`Inbox (${all.length})  ·  Microsoft Office Outlook 2003`} active class="dsr-ol">
+    <div class:list={['dsr-3', { 'dsr-3--one': only }]}>
+      {!only && (
+        <nav class="dsr-folders" aria-label="Show reviews of">
+          <p class="dsr-fh">Mail Folders</p>
+          <ul>
+            <li><button type="button" aria-pressed="true" data-f=""><span class="dsr-fi" aria-hidden="true"></span>Inbox <b>({all.length})</b></button></li>
+            {folders.map(({ a, n }) => <li><button type="button" aria-pressed="false" data-f={a.id}><img src={icon(a.id).src} width="16" height="16" alt="" />{a.name} <b>({n})</b></button></li>)}
+          </ul>
+        </nav>
+      )}
+      <div class="dsr-listbox">
+        <p class="dsr-arr">Arranged By: <b>Date</b> <span>Newest on top</span></p>
+        <ol class="dsr-list">
+          {years.map(y => (
+            <>
+              <li class="dsr-grp" aria-hidden="true" data-y={y}>{y}</li>
+              {all.filter(m => m.date.startsWith(y)).map(m => (
+                <li class="dsr-m" id={m.id} data-app={m.app} data-y={y}>
+                  <a class="dsr-mh" href={`#${m.id}-body`} aria-controls={`${m.id}-body`}>
+                    <img src={icon(m.app).src} width="20" height="20" alt="" />
+                    <span class="dsr-from">{m.from}</span>
+                    <span class="dsr-date">{short(m.date)}</span>
+                    <span class="dsr-sub">{m.subject}</span>
+                  </a>
+                  <article class="dsr-body" id={`${m.id}-body`} aria-label={m.subject}>
+                    <h3 class="dsr-h">{m.subject}</h3>
+                    <p class="dsr-meta">
+                      <span><b>From:</b> {m.from}{m.by && ` (${m.by})`}</span>
+                      <span><b>Sent:</b> {longDate(m.date)}</span>
+                      <span><b>About:</b> {name(m.app)}</span>
+                      {m.where && <span><b>Where:</b> {m.where}</span>}
+                      {m.print && <span><b>In print:</b> {m.print}</span>}
+                    </p>
+                    {m.quote && <blockquote class="dsr-q"><p>{m.quote}</p></blockquote>}
+                    {m.stars > 0 && <p class="dsr-st" role="img" aria-label={`${m.stars} of 5 stars`}>{'★'.repeat(m.stars)}<span>{'★'.repeat(5 - m.stars)}</span></p>}
+                    {m.page && (
+                      <figure class="dsr-ie">
+                        <div class="dsr-ie-t" aria-hidden="true"><span>{m.from} - Microsoft Internet Explorer</span><i></i><i></i><i></i></div>
+                        <div class="dsr-ie-a"><span aria-hidden="true">Address</span><a href={m.link} rel="noopener">{m.url}</a></div>
+                        <a class="dsr-ie-img" href={m.link} rel="noopener" tabindex="-1"><img src={m.page.src} width={m.page.w} height={m.page.h} alt={m.page.alt} loading="lazy" decoding="async" /></a>
+                        <figcaption class="dsx-credit">{m.page.credit}</figcaption>
+                      </figure>
+                    )}
+                    <div class="dsr-clips">{m.shots.map(s => <Cap shot={s} />)}</div>
+                  </article>
+                </li>
+              ))}
+            </>
+          ))}
+        </ol>
+      </div>
+      <div class="dsr-pane" aria-live="polite"></div>
+    </div>
+  </Window>
+</div>}
 
 <style>
-  .dsr-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
-  .dsr-filter .k-btn { box-shadow: none; font-family: var(--ds-verdana); font-weight: 400; }
-  .dsr-filter .k-btn span { margin-left: 4px; font-size: 0.8125rem; }
-  .dsr-filter .k-btn[aria-pressed='true'] { background: var(--xp-sel); color: #fff; border-color: #003c74; }
-  .dsr-wall { list-style: none; columns: 3 300px; column-gap: 20px; }
-  .dsr-wall > li { break-inside: avoid; margin-bottom: 20px; }
-  .dsr-wall > li.out { display: none; }
-  .dsr-wall > li.in { animation: dsr-in 0.35s var(--expo) both; }
-  @keyframes dsr-in { from { opacity: 0; translate: 0 10px; } }
-  .dsr-meta { font: 400 0.8125rem/1.45 var(--ds-verdana); color: var(--ink-2); }
-  .dsr-meta b { color: var(--ds-rust); font-weight: 700; }
-  .dsr-t { margin-top: 6px; font: 700 1.0625rem/1.3 var(--ds-arial); color: var(--ds-ink); letter-spacing: 0; }
-  .dsr-q { margin-top: 10px; padding-left: 12px; border-left: 3px solid var(--ds-red); }
-  .dsr-q p { font: italic 400 1.0625rem/1.45 Georgia, 'Times New Roman', serif; color: #222; }
-  .dsr-rate { margin-top: 8px; font: 700 0.875rem/1.3 var(--ds-verdana); color: #8a6100; }
-  .dsr-rate span { color: #e0a100; }
-  .dsr-caps { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+  /* The pull quotes */
+  .dsr-picks { list-style: none; columns: 3 290px; column-gap: 40px; margin-bottom: clamp(40px, 5vw, 64px); }
+  .dsr-picks > li { break-inside: avoid; margin-bottom: 40px; padding-top: 14px; border-top: 2px solid var(--ds-ink); }
+  .dsr-out { font: 800 1.0625rem/1.2 var(--font-display); font-stretch: 80%; text-transform: uppercase; letter-spacing: 0.04em; color: #b8262a; }
+  .dsr-pq p { margin-top: 10px; font: 400 clamp(1.375rem, 0.9vw + 1rem, 1.75rem)/1.3 Georgia, 'Times New Roman', serif; color: #1b1b1b; text-wrap: balance; }
+  .dsr-pq p::before, .dsr-q p::before { content: '“'; }
+  .dsr-pq p::after, .dsr-q p::after { content: '”'; }
+  .dsr-st { margin-top: 8px; color: #c98a00; font-size: 1.125rem; letter-spacing: 2px; }
+  .dsr-st span { color: #d9d9d9; }
+  .dsr-by { display: flex; align-items: center; gap: 8px; margin-top: 10px; font: 400 0.875rem/1.4 var(--ds-verdana); color: #4a4a4a; }
+  .dsr-see { display: inline-flex; align-items: center; min-height: 44px; font: 700 0.875rem/1 var(--ds-verdana); color: #1a3f8f; }
+
+  /* Outlook 2003: folders, the list, the reading pane */
+  .dsr-ol :global(.win-body) { padding: 0; }
+  .dsr-3 { display: grid; grid-template-columns: 200px minmax(300px, 0.85fr) minmax(0, 1.4fr); height: min(760px, 86vh); font-family: Tahoma, var(--ds-verdana); }
+  .dsr-3--one { grid-template-columns: minmax(300px, 0.85fr) minmax(0, 1.4fr); }
+  .dsr-folders { padding: 8px 6px; background: linear-gradient(#e3efff, #c4d9f7); border-right: 1px solid #7f9db9; overflow-y: auto; }
+  .dsr-fh { padding: 4px 6px 8px; font: 700 0.875rem/1.2 Tahoma, sans-serif; color: #15428b; }
+  .dsr-folders ul { list-style: none; display: grid; gap: 2px; }
+  .dsr-folders button { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; padding: 0 8px; border: 1px solid transparent; border-radius: 2px; background: none; font: 400 0.875rem/1.2 Tahoma, sans-serif; color: #000; text-align: left; cursor: pointer; }
+  .dsr-folders button b { font-weight: 700; color: #15428b; }
+  .dsr-folders button:hover { border-color: #f2c867; background: #fff4cc; }
+  .dsr-folders button[aria-pressed='true'] { border-color: #e6a23c; background: #ffd27a; }
+  .dsr-folders button:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  .dsr-fi { width: 16px; height: 12px; border: 1px solid #5a7bb8; background: linear-gradient(135deg, #fff 45%, #d6e2f6 46%); }
+
+  .dsr-listbox { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid #7f9db9; background: #fff; }
+  .dsr-arr { padding: 6px 10px; border-bottom: 1px solid #c5d3ea; background: linear-gradient(#fff, #e6eef9); font-size: 0.8125rem; color: #333; }
+  .dsr-arr span { float: right; color: #555; }
+  .dsr-list { list-style: none; flex: 1; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  .dsr-grp { padding: 6px 10px 4px; border-bottom: 1px solid #a5bfe1; font: 700 0.8125rem/1.2 Tahoma, sans-serif; color: #15428b; background: #f0f5fc; }
+  .dsr-mh { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 1px 8px; padding: 7px 10px; border-bottom: 1px solid #e1e7f2; color: #000; text-decoration: none; font-size: 0.875rem; }
+  .dsr-mh img { grid-row: span 2; align-self: center; }
+  .dsr-from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dsr-date { font-size: 0.75rem; color: #555; white-space: nowrap; }
+  .dsr-sub { grid-column: 2 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #333; }
+  .dsr-mh:hover { background: #eef4fd; }
+  .dsr-mh:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }
+  :global(.dsr.is-live) .dsr-m.unread .dsr-from, :global(.dsr.is-live) .dsr-m.unread .dsr-sub { font-weight: 700; color: #000; }
+  .dsr-m.on > .dsr-mh { background: #316ac5; color: #fff; }
+  .dsr-m.on > .dsr-mh :is(.dsr-date, .dsr-sub) { color: #e8efff; }
+  .dsr-m.out, .dsr-grp.out { display: none; }
+
+  /* A message: without JS it sits open under its line; with JS only the chosen one shows, in the pane when there is room */
+  .dsr-body { padding: 16px 18px 22px; background: #fff; }
+  :global(.dsr.is-live) .dsr-body:not(.on) { display: none; }
+  .dsr-pane { min-width: 0; overflow-y: auto; overscroll-behavior: contain; background: #fff; }
+  .dsr-pane .dsr-body { animation: dsr-in 0.3s var(--expo); }
+  @keyframes dsr-in { from { opacity: 0; translate: 0 6px; } }
+  .dsr-h { font: 700 1.25rem/1.3 Tahoma, sans-serif; color: #000; letter-spacing: 0; }
+  .dsr-meta { display: flex; flex-wrap: wrap; gap: 2px 16px; margin-top: 8px; padding-bottom: 10px; border-bottom: 1px solid #c5d3ea; font-size: 0.8125rem; color: #333; }
+  .dsr-meta b { margin-right: 0.3em; }
+  .dsr-q p { margin-top: 16px; font: 400 clamp(1.375rem, 1vw + 1rem, 1.875rem)/1.3 Georgia, 'Times New Roman', serif; color: #1b1b1b; text-wrap: balance; }
+  .dsr-ie { margin: 18px 0 0; border: 1px solid #0a246a; background: #ece9d8; }
+  .dsr-ie-t { display: flex; align-items: center; gap: 3px; padding: 3px 4px 3px 8px; background: linear-gradient(#0a5fe8, #0442b8); color: #fff; font: 700 0.75rem/1.4 Tahoma, sans-serif; }
+  .dsr-ie-t span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dsr-ie-t i { width: 15px; height: 15px; border: 1px solid #fff; border-radius: 3px; background: #3c81f3; }
+  .dsr-ie-t i:last-child { background: #e0552e; }
+  .dsr-ie-a { display: flex; align-items: center; gap: 6px; padding: 3px 6px; font-size: 0.75rem; color: #444; border-bottom: 1px solid #aca899; }
+  .dsr-ie-a a { flex: 1; min-width: 0; padding: 1px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: #fff; border: 1px solid #7f9db9; color: #000; text-decoration: none; }
+  .dsr-ie-img { display: block; line-height: 0; background: #fff; }
+  .dsr-ie-img img { width: 100%; height: auto; }
+  .dsr-ie figcaption { padding: 4px 8px 6px; }
+  .dsr-clips { display: grid; gap: 12px; margin-top: 16px; }
+
+  @media (max-width: 1100px) {
+    .dsr-3 { grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.3fr); }
+    .dsr-folders { grid-column: 1 / -1; border-right: 0; border-bottom: 1px solid #7f9db9; overflow-x: auto; }
+    .dsr-folders ul { display: flex; flex-wrap: wrap; }
+    .dsr-folders button { width: auto; }
+    .dsr-fh { display: none; }
+    .dsr-3:not(.dsr-3--one) { grid-template-rows: auto minmax(0, 1fr); }
+  }
+  @media (max-width: 760px) {
+    .dsr-3, .dsr-3--one { display: block; height: auto; }
+    .dsr-list { max-height: 70vh; }
+    .dsr-pane { display: none; }
+    .dsr-m.on > .dsr-body { border-bottom: 2px solid #316ac5; }
+  }
+  @media (prefers-reduced-motion: reduce) { .dsr-pane .dsr-body { animation: none; } }
 </style>
 
 <script>
   document.querySelectorAll<HTMLElement>('[data-dsr]').forEach(root => {
-    const bar = root.querySelector<HTMLElement>('.dsr-filter');
-    if (!bar) return;
-    bar.hidden = false;
-    const items = [...root.querySelectorAll<HTMLElement>('.dsr-wall > li')];
-    bar.querySelectorAll<HTMLButtonElement>('[data-f]').forEach(b => b.addEventListener('click', () => {
-      bar.querySelectorAll('[data-f]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      const f = b.dataset.f;
-      items.forEach(li => {
-        const on = !f || li.dataset.app === f;
-        li.classList.toggle('out', !on);
-        li.classList.remove('in');
-        if (on) { void li.offsetWidth; li.classList.add('in'); }
-      });
+    const items = [...root.querySelectorAll<HTMLElement>('.dsr-m')];
+    const groups = [...root.querySelectorAll<HTMLElement>('.dsr-grp')];
+    const pane = root.querySelector<HTMLElement>('.dsr-pane')!;
+    const wide = matchMedia('(min-width: 761px)');
+    let cur: HTMLElement | null = null;
+    const place = () => {
+      if (!cur) return;
+      const body = root.querySelector<HTMLElement>(`#${cur.id}-body`)!;
+      if (wide.matches) pane.replaceChildren(body); else cur.append(body);
+    };
+    const open = (li: HTMLElement, focus = false) => {
+      if (cur && cur !== li) {
+        cur.classList.remove('on');
+        const old = root.querySelector<HTMLElement>(`#${cur.id}-body`)!;
+        old.classList.remove('on');
+        cur.append(old);
+      }
+      cur = li;
+      li.classList.add('on');
+      li.classList.remove('unread');
+      root.querySelector<HTMLElement>(`#${li.id}-body`)!.classList.add('on');
+      place();
+      pane.scrollTop = 0;
+      if (focus) li.querySelector<HTMLElement>('.dsr-mh')!.focus({ preventScroll: true });
+    };
+    items.forEach((li, i) => {
+      if (i) li.classList.add('unread');
+      li.querySelector('.dsr-mh')!.addEventListener('click', e => { e.preventDefault(); open(li); });
+    });
+    wide.addEventListener('change', place);
+
+    // A pull quote opens its message and brings the inbox into view
+    root.querySelectorAll<HTMLAnchorElement>('[data-open]').forEach(a => a.addEventListener('click', e => {
+      e.preventDefault();
+      const li = root.querySelector<HTMLElement>(`#${a.dataset.open}`)!;
+      filter('');
+      open(li, true);
+      li.scrollIntoView({ block: 'nearest' });
+      root.querySelector('.dsr-ol')!.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
     }));
+
+    const bar = root.querySelector<HTMLElement>('.dsr-folders');
+    const filter = (f: string) => {
+      bar?.querySelectorAll('[data-f]').forEach(x => x.setAttribute('aria-pressed', String((x as HTMLElement).dataset.f === f)));
+      items.forEach(li => li.classList.toggle('out', !!f && li.dataset.app !== f));
+      groups.forEach(g => g.classList.toggle('out', !items.some(li => li.dataset.y === g.dataset.y && !li.classList.contains('out'))));
+      if (!cur || cur.classList.contains('out')) open(items.find(li => !li.classList.contains('out'))!);
+    };
+    bar?.querySelectorAll<HTMLButtonElement>('[data-f]').forEach(b => b.addEventListener('click', () => filter(b.dataset.f!)));
+
+    root.classList.add('is-live');
+    open(items[0]);
   });
 </script>

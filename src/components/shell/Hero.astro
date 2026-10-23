@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import Window from './Window.astro';
 import { programs } from '../../data/programs';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const dir = join(process.cwd(), 'programs');
 const size = (folder: string, file: string) => statSync(join(dir, folder, file)).size;
 const [nm, ext] = [(f: string) => f.split('.')[0], (f: string) => f.split('.')[1] ?? ''];

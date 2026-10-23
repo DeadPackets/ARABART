@@ -24,7 +24,7 @@ const json = JSON.stringify(steps).replace(/</g, '\\u003c');
   </div>
   <div class="k-cs-panes">
     <Window title={title} kind="editor" num="1" active class="k-cs-pane" id={`${id}-cs-a`} data-pane="a">
-      <div class="k-code-box" tabindex="0"><ol class="k-code k-code--asm">
+      <div class="k-code-box" tabindex="0"><ol class="k-code k-code--asm" style={`--off: ${Math.max(4, ...asm.map(l => l.off?.length ?? 0)) + 0.4}ch`}>
         {asm.map((l, i) => (
           <li data-l={i} class:list={{ exec: s?.a === i }}>
             <span class="off">{l.off}</span><span class="lab">{l.label && `${l.label}:`}</span><code set:html={hl(l.code)} />{l.note && <span class="cm">; {l.note}</span>}
@@ -70,22 +70,23 @@ const json = JSON.stringify(steps).replace(/</g, '\\u003c');
   .k-code-box { position: relative; overflow-x: auto; }
   .k-code { position: relative; list-style: none; margin: 0; padding: 0; font: 500 clamp(12px, 0.25vw + 9.5px, 13.5px)/1.85 var(--font-code); }
   .k-code li { position: relative; z-index: 1; display: grid; column-gap: 1.2ch; padding: 0 8px; white-space: pre; color: var(--ink); transition: color 0.12s; }
-  .k-code--asm li { grid-template-columns: 4.4ch 6.2ch minmax(15ch, auto) 1fr; }
-  .k-code--c li { grid-template-columns: minmax(24ch, auto) 1fr; }
+  /* The comment column may shrink to nothing, so a long line of code pushes its comment to wrap instead of covering it */
+  .k-code--asm li { grid-template-columns: var(--off) 6.2ch minmax(15ch, auto) minmax(0, 1fr); }
+  .k-code--c li { grid-template-columns: minmax(24ch, auto) minmax(0, 1fr); }
   .k-code .off { color: color-mix(in oklch, var(--accent-2) 75%, transparent); }
   :global([data-era='vs2005']) .k-code .off { color: var(--accent-2); } /* on white, the faded green falls under 4.5:1 */
   .k-code .lab { color: var(--accent); }
   .k-code code { font: inherit; color: inherit; }
   .k-code :global(.op) { color: var(--accent); }
   .k-code :global(.num) { color: var(--accent-2); }
-  .k-code .cm { color: var(--ink-2); white-space: pre-wrap; }
+  .k-code .cm { color: var(--ink-2); white-space: pre-wrap; overflow-wrap: anywhere; }
   /* :global() inside :is() is not compiled by Astro and voided the whole rule, so each selector stands alone */
   .k-code li.exec, .k-code li.exec :is(.off, .lab, .cm), .k-code li.exec :global(.op), .k-code li.exec :global(.num) { color: var(--surface); }
   .k-xbar { position: absolute !important; inset: 0 0 auto 0; height: 1.85em; padding: 0 !important; background: var(--accent-2); z-index: 0 !important; opacity: 0; pointer-events: none; }
   .k-cs:not(.is-live) .k-code li.exec { background: var(--accent-2); }
 
   .k-regs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 2px 18px; margin: 0; font: 500 13px/1.5 var(--font-code); }
-  .k-regs :global(div) { display: grid; grid-template-columns: 3ch 1fr; gap: 1.2ch; padding: 3px 4px; }
+  .k-regs :global(div) { display: grid; grid-template-columns: minmax(3ch, max-content) 1fr; gap: 1.2ch; padding: 3px 4px; }
   .k-regs :global(dt) { color: var(--accent-2); font-weight: 700; }
   .k-regs :global(dd) { margin: 0; color: var(--ink-2); }
   .k-regs :global(b) { color: var(--ink); font-weight: 700; margin-right: 0.6ch; padding: 0 2px; }
@@ -102,10 +103,10 @@ const json = JSON.stringify(steps).replace(/</g, '\\u003c');
     .k-cs-under > :global(.k-cs-help) { order: -1; }
   }
   @media (max-width: 640px) {
-    .k-code--asm li { grid-template-columns: 4.4ch 6.2ch 1fr; white-space: pre-wrap; }
-    .k-code--asm .cm { grid-column: 3; font-size: 0.92em; line-height: 1.4; padding-bottom: 3px; }
+    .k-code--asm li { grid-template-columns: var(--off) 6.2ch 1fr; white-space: pre-wrap; }
+    .k-code--asm .cm { grid-column: 3; font-size: max(12px, 0.92em); line-height: 1.4; padding-bottom: 3px; }
     .k-code--c li { grid-template-columns: 1fr; }
-    .k-code--c .cm { font-size: 0.92em; line-height: 1.4; }
+    .k-code--c .cm { font-size: max(12px, 0.92em); line-height: 1.4; }
     /* Not sticky on phones: it would cover the code. It sits right under the code instead */
     .k-cs-ctl { position: static; order: 1; margin-right: 0; padding: 8px; }
     .k-cs-under { order: 2; }

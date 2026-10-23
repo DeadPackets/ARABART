@@ -74,7 +74,7 @@ const inside = (k: number) => k > SEL.k && (hiK === null || k < hiK);
   .f5-sql .op { color: var(--w-navy); font-weight: 700; }
   .f5-sql b { color: #b00000; font-variant-numeric: tabular-nums; }
   .f5-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
-  .f5-rows li { display: grid; grid-template-columns: auto 4.5ch minmax(0, 1fr); align-items: center; gap: 14px; min-height: 44px; padding: 4px 10px; background: oklch(0.96 0 0); color: var(--ink-2); transition: background-color 0.2s, color 0.2s; }
+  .f5-rows li { display: grid; grid-template-columns: auto max-content minmax(0, 1fr); align-items: center; gap: 14px; min-height: 44px; padding: 4px 10px; background: oklch(0.96 0 0); color: var(--ink-2); transition: background-color 0.2s, color 0.2s; }
   .f5-rows li.in { background: var(--w-navy); color: var(--w-white); }
   .f5-hex { display: flex; gap: 2px; }
   .f5-hex i, .f5-legend span { font: 700 1rem/1 var(--font-code); font-style: normal; padding: 5px 6px; color: var(--w-white); }

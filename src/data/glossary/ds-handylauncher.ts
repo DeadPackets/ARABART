@@ -39,12 +39,12 @@ export default {
   },
   'hl-owner-drawn': {
     term: 'Owner-drawn menu',
-    short: 'A menu that the program paints itself, item by item, instead of letting Windows do it. That is how his menus got their icons and his own colors.',
+    short: 'A menu that the program paints itself, item by item, instead of letting Windows do it. That is how HandyLauncher’s menus got their icons and their own colors.',
     now: 'A custom right-click menu built with HTML and CSS instead of the browser’s plain one.',
   },
   'hl-function-table': {
     term: 'Function table (.pdata)',
-    short: 'A list inside every Windows Mobile program file with the start and length of each function. The system reads it to unwind the call stack after an exception, and it also lets anyone count and compare his functions exactly.',
+    short: 'A list inside every Windows Mobile program file with the start and length of each function. The system reads it to unwind the call stack after an exception, and it also lets anyone count and compare its functions exactly.',
     now: 'A table of contents for the compiled code, like the symbol list a bundler prints for a JavaScript build.',
   },
   'hl-key-engine': {

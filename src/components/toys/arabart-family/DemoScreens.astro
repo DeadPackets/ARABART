@@ -9,7 +9,7 @@ import { ssrBin } from '../arabart/ssr.ts';
 
 interface Props { id?: string; tw?: string }
 const { id = 'demoscreens', tw = '' } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const s = screens(ssrBin());
 const TABS = s.map((x, i) => [i + 1, x.title]);
 const n = s[0].calls.length;

@@ -56,26 +56,27 @@ const data = JSON.stringify({ X0, Y0, CW, CH, line: [...line] });
 <style is:global>
   .gpcc-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; align-items: start; }
   .gpcc-sw { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 12px !important; }
-  .gpcc-sw button { width: 100%; min-height: 44px; padding: 0; border: 0; background: var(--c); cursor: pointer; font: 700 11px/1 var(--font-code); color: var(--vga-0); position: relative; }
+  .gpcc-sw button { width: 100%; min-height: 44px; padding: 0; border: 0; background: var(--c); cursor: pointer; font: 700 12px/1 var(--font-code); color: var(--vga-0); position: relative; }
   .gpcc-sw button span { background: oklch(1 0 0 / 0.75); padding: 2px 3px; }
   .gpcc-sw button[aria-pressed='true'] { outline: 3px solid var(--vga-15); outline-offset: -3px; }
   .gpcc-sw button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; z-index: 1; }
   .gpcc-lines { display: grid; gap: 0; font: 500 13px/1.75 var(--font-code); }
-  .gpcc-lines li { display: grid; grid-template-columns: 4.5ch 20ch minmax(0, 1fr); gap: 1.2ch; padding: 0 6px; }
+  .gpcc-lines li { display: grid; grid-template-columns: 4.5ch 21ch minmax(0, 1fr); gap: 1.2ch; padding: 0 6px; }
   .gpcc-lines span { color: var(--accent-2); }
-  .gpcc-lines code { font: inherit; color: var(--ink); white-space: pre; }
+  /* .gp beats the writeup's 0.9em code size */
+  .gp .gpcc-lines code { font: inherit; color: var(--ink); white-space: pre; }
   .gpcc-lines em { font-style: normal; color: var(--ink-2); }
   .gpcc-lines li.hi { background: var(--accent-2); }
   .gpcc-lines li.hi :is(span, code, em) { color: var(--surface); }
   .gpcc .gpcc-byte { margin-top: 14px; font: 500 13px/1.6 var(--font-code); color: var(--ink); }
   .gpcc-byte b { color: var(--accent); }
-  .gpcc-byte code { font: inherit; color: var(--ink-2); }
+  .gp .gpcc-byte code { font: inherit; color: var(--ink-2); }
   .gpcc-ctl { margin-top: 18px; }
   @media (max-width: 1023px) { .gpcc-grid { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 560px) {
     .gpcc-lines li { grid-template-columns: 4.5ch minmax(0, 1fr); }
     .gpcc-lines em { grid-column: 2; font-size: 12px; line-height: 1.3; padding-bottom: 4px; }
-    .gpcc-lines code { white-space: normal; }
+    .gp .gpcc-lines code { white-space: normal; }
   }
 </style>
 

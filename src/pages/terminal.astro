@@ -4,12 +4,12 @@ import DosPlayer from '../components/DosPlayer.astro';
 import Commander from '../components/Commander.astro';
 import { bundleSize } from '../data/files';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const bundleUrl = `${base}/bundles/terminal.jsdos?v=${Date.now()}`;
 ---
 
 <BaseLayout
-  title="DOS shell · Yasser Awad"
+  title="DOS shell: run the archive in your browser · Yasser Awad"
   description="Boot the whole archive as one DOS machine and browse Yasser Awad's programs from a real command line."
   hasEmulator={true}
 >

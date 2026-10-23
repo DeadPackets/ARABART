@@ -22,7 +22,7 @@ const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
     </div>
     <ol class="mtr-bytes" data-bytes aria-label="The 14 bytes MemMaid stores. Tap one to change it.">
       {bytes.map((b, i) => (
-        <li><button type="button" data-b={i} aria-label={`Byte ${i + 1}, ${LAB[i]}: ${hex(b)}. Tap to change it.`}><b>{hex(b)}</b><small>{LAB[i]}</small></button></li>
+        <li><button type="button" data-b={i} aria-label={`${hex(b)} ${LAB[i]}, byte ${i + 1}. Tap to change it.`}><b>{hex(b)}</b><small>{LAB[i]}</small></button></li>
       ))}
     </ol>
     <p class="mtr-read" data-read>Month 6, read twice: (15 − 3) ÷ 2 and (13 − 1) ÷ 2. Year 2008: 2015 − 7 and 2029 − 21. Day 20: (45 − 5) ÷ 2 and (44 − 4) ÷ 2.</p>
@@ -40,7 +40,7 @@ const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
   .mtr-bytes button:hover { box-shadow: inset 0 0 0 2px var(--accent); }
   .mtr-bytes button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
   .mtr-bytes b { font: 700 clamp(0.75rem, 0.6vw + 0.5rem, 1rem)/1 var(--font-code); }
-  .mtr-bytes small { font-size: 0.625rem; color: var(--ink-2); }
+  .mtr-bytes small { font-size: 0.75rem; color: var(--ink-2); }
   .mtr-bytes li:nth-child(-n + 2) button, .mtr-bytes li:nth-child(n + 9):nth-child(-n + 10) button { background: color-mix(in oklch, var(--accent) 16%, var(--surface-2)); }
   .mtr-bytes li:nth-child(n + 3):nth-child(-n + 6) button { background: color-mix(in oklch, var(--accent-2) 18%, var(--surface-2)); }
   .mtr-bytes li:nth-child(n + 13) button { background: color-mix(in oklch, var(--hot) 14%, var(--surface-2)); }
@@ -82,6 +82,7 @@ const hex = (n: number) => n.toString(16).toUpperCase().padStart(2, '0');
     const paint = () => {
       btns.forEach((b, i) => {
         b.querySelector('b')!.textContent = hex(bytes[i]);
+        b.setAttribute('aria-label', `${hex(bytes[i])} ${b.querySelector('small')!.textContent}, byte ${i + 1}. Tap to change it.`);
         b.classList.toggle('is-bad', bytes[i] !== good[i]);
       });
       const r = dec(bytes), t = parse(today.value);

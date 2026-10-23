@@ -1,10 +1,19 @@
 // Performance tier: shaders run only where they will be smooth. Everything else gets the static look.
 export const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** WebGL is worth trying: motion allowed and not a low-memory device. The context itself is the final test. */
+let gpu: boolean | undefined;
+/** WebGL is worth trying: motion allowed, not a low-memory device, and a real GPU. A software renderer (SwiftShader in
+ * headless Chrome and PageSpeed) takes seconds just to set up, so the probe asks the browser to refuse one. */
 export function canGL(): boolean {
   const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-  return !RM && !(mem !== undefined && mem < 4) && !(navigator.hardwareConcurrency <= 2);
+  if (RM || (mem !== undefined && mem < 4) || navigator.hardwareConcurrency <= 2) return false;
+  if (gpu === undefined) {
+    const c = document.createElement('canvas'), o = { failIfMajorPerformanceCaveat: true };
+    const gl = c.getContext('webgl2', o) || c.getContext('webgl', o);
+    gpu = !!gl;
+    gl?.getExtension('WEBGL_lose_context')?.loseContext();
+  }
+  return gpu;
 }
 
 /** Canvas pixels per CSS pixel: the device ratio divided by a whole number, at most 1.5. A pixelated canvas then lands on whole device pixels. */

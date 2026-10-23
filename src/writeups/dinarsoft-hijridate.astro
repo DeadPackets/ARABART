@@ -18,12 +18,12 @@ import Listing from '../components/explain/Listing.astro';
 import Term from '../components/explain/Term.astro';
 import { MECCA, STRIP, INK, KEY, KEY_CODE } from '../components/toys/ds-hijridate/steps.ts';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <section id="hd-home" class="hd">
   <h2>Arabic on the home screen</h2>
-  <p class="lead">In 1991 Yasser’s <a href={`${base}/arabart/`}>ARABART</a> taught a DOS PC to write Arabic. In 2003 he did it again on a phone. HijriDate put today’s Hijri date, in Arabic, on the Pocket PC’s home screen, right under the owner’s name and the unread mail.</p>
+  <p class="lead">In 1991 Yasser’s <a href={`${base}/arabart/`}>ARABART</a> taught a DOS PC to write Arabic. In 2003 he did it again on a phone, with Hosam Aly. HijriDate put today’s Hijri date, in Arabic, on the Pocket PC’s home screen, right under the owner’s name and the unread mail.</p>
   <p>The <Term id="hd-hijri">Hijri calendar</Term> follows the moon, and it sets the dates of Ramadan, the two Eids and the Hajj. A Pocket PC knew only the Gregorian calendar, and an English one had no Arabic font at all. HijriDate brought both. It is a <Term id="hd-today-plugin">Today plug-in</Term>, the 2003 version of a home screen widget, and it cost $2.99.</p>
   <p>This is HijriDate rebuilt from its own file: its word pictures, its four settings pages, its icons and its calendar engine. Tap the clock icon to open the settings. Change the format, move the date a day, switch to English, or try another theme.</p>
   <TodayScreen id="hd-today" />
@@ -32,11 +32,11 @@ const base = import.meta.env.BASE_URL;
 <section id="hd-moon" class="hd">
   <h2>The moon decides</h2>
   <p class="lead">A Hijri month starts when the new crescent is first seen after sunset. HijriDate works that out from the moon itself, for any date, in about a dozen lines of arithmetic.</p>
-  <p>Pick a date. The steps below the answer are his, in his order. Count the days and estimate which new moon came last. Work out the exact moment it was born, and decide when it could first be seen. Then count months from a fixed starting point. Every number is the one his code computes. The engine on this page is a line-for-line copy of his, and it matches his original, running in an ARM emulator, on all 37,700 dates from 1700 to 2300.</p>
+  <p>Pick a date. The steps below the answer are HijriDate’s, in its order. Count the days and estimate which new moon came last. Work out the exact moment it was born, and decide when it could first be seen. Then count months from a fixed starting point. Every number is the one its code computes. The engine on this page is a line-for-line copy of HijriDate’s, and it matches the original, running in an ARM emulator, on all 37,700 dates from 1700 to 2300.</p>
   <HijriLab id="hd-lab" />
   <p>Your browser ships four Islamic calendars, and they do not always agree with each other. One follows Saudi Arabia’s official tables, one estimates from the sky, and two use plain arithmetic. Muslims in different countries can start Ramadan a day apart for the same reason: the crescent is seen in one place before another. That is why HijriDate has an adjustment of up to two days either way. The date on the phone then matches the sighting announced where you live.</p>
-  <Deep title="The new-moon formula, in his order">
-    <p>The moment of a new moon is a steady beat of 29.53 days, plus 13 small corrections for the pull of the sun and the tilt and stretch of the moon’s orbit, minus a few seconds for the Earth’s slowing spin. His code runs them in this order, with these numbers:</p>
+  <Deep title="The new-moon formula, in HijriDate’s order">
+    <p>The moment of a new moon is a steady beat of 29.53 days, plus 13 small corrections for the pull of the sun and the tilt and stretch of the moon’s orbit, minus a few seconds for the Earth’s slowing spin. Its code runs them in this order, with these numbers:</p>
     <Listing title="tmoonphase (0x1020A8), as C" lang="c" lines={[
       { code: 'jd = 2415020.75933 + 29.53058868 * k', note: 'the steady beat' },
       { code: 'sa = 359.2242 + 29.10535608 * k', note: 'where the sun is' },
@@ -53,7 +53,7 @@ const base = import.meta.env.BASE_URL;
 <section id="hd-mecca" class="hd">
   <h2>Six in the morning, Mecca time</h2>
   <p class="lead">One rule turns the moment of the new moon into the first day of the month, and it fits in one short routine.</p>
-  <p>A crescent needs time to grow wide enough to see. A new moon born before 6:00 in the morning in Mecca is old enough to be seen at sunset that same day. The month then starts the next morning. Born any later, it is seen one evening later. Step through his routine with the new moon of September 2006, then drag the birth time yourself.</p>
+  <p>A crescent needs time to grow wide enough to see. A new moon born before 6:00 in the morning in Mecca is old enough to be seen at sunset that same day. The month then starts the next morning. Born any later, it is seen one evening later. Step through its routine with the new moon of September 2006, then drag the birth time yourself.</p>
   <CodeStepper id="hd-mecca-cs" title="HIJRIPLUGIN.DLL  visible()" asm={MECCA.asm} c={MECCA.c} steps={MECCA.steps}>
     <MeccaRule slot="visual" id="hd-mecca-vis" minutes={MECCA.minutes} dates={MECCA.dates} />
   </CodeStepper>
@@ -65,17 +65,17 @@ const base = import.meta.env.BASE_URL;
   <p class="lead">Arabic letters change shape with their neighbors, and in 2003 a Pocket PC could not join them. HijriDate never needs to. It carries every word it will ever show as a picture. There are 7 days, 12 Hijri months, 12 Gregorian months, 10 digits, a comma, a dash and a space.</p>
   <p>Each is 16 pixels tall and one bit a pixel, ink or paper. Tap one to see its pixels.</p>
   <GlyphWall id="hd-glyphs" />
-  <p>To write a date, he lists the words in reading order, then joins their pictures into one strip. Arabic reads right to left, but its numbers read left to right, so the digits of each number go into the list last first. Step through it:</p>
+  <p>To write a date, HijriDate lists the words in reading order, then joins their pictures into one strip. Arabic reads right to left, but its numbers read left to right, so the digits of each number go into the list last first. Step through it:</p>
   <CodeStepper id="hd-strip-cs" title="HIJRIPLUGIN.DLL  building the date" asm={STRIP.asm} c={STRIP.c} steps={STRIP.steps}>
     <WordStrip slot="visual" id="hd-strip-vis" />
   </CodeStepper>
-  <p>Eight formats come out of the same 44 pictures, from الأحد ٢، رمضان ١٤٢٧ to ٠٢-٠٩-٢٧. Today your phone shapes Arabic from a font on the fly. A website that ships its icons as one sprite sheet, or a game that draws its score from digit pictures, is doing what HijriDate did.</p>
+  <p>Eight formats come out of the same 44 pictures, from <span lang="ar" dir="rtl">الأحد ٢، رمضان ١٤٢٧</span> to <span lang="ar" dir="rtl">٠٢-٠٩-٢٧</span>. Today your phone shapes Arabic from a font on the fly. A website that ships its icons as one sprite sheet, or a game that draws its score from digit pictures, is doing what HijriDate did.</p>
 </section>
 
 <section id="hd-ink" class="hd">
   <h2>Any wallpaper, any color</h2>
   <p class="lead">Owners picked their own Today themes: blue waves, photos, black. The word pictures are plain black on white. Yet on the phone they show in the theme’s own text color, with the wallpaper showing through every gap.</p>
-  <p>He does it with <Term id="hd-bitblt">BitBlt</Term>, the Windows call that copies pixels, and three of its <Term id="hd-rop">raster operations</Term>: XOR, AND and OR. Two run once to color a copy of the word. Two run every time it is drawn. Pick a color and a wallpaper, then step through his code.</p>
+  <p>It does it with <Term id="hd-bitblt">BitBlt</Term>, the Windows call that copies pixels, and three of its <Term id="hd-rop">raster operations</Term>: XOR, AND and OR. Two run once to color a copy of the word. Two run every time it is drawn. Pick a color and a wallpaper, then step through the code.</p>
   <CodeStepper id="hd-ink-cs" title="HIJRIPLUGIN.DLL  mask and paint" asm={INK.asm} c={INK.c} steps={INK.steps}>
     <InkLab slot="visual" id="hd-ink-vis" />
   </CodeStepper>
@@ -98,7 +98,7 @@ const base = import.meta.env.BASE_URL;
     { name: 'Icons', bytes: 4728, hue: 60, what: 'The small clock beside the date, and the icons for the settings and the installer.' },
     { name: 'Settings pages', bytes: 3368, hue: 140, what: 'Seven dialog layouts: Main, Hijri, Gregorian, About, License Key and two more. The rebuilt settings above are drawn from these.' },
     { name: 'Version and index', bytes: 4172, hue: 170, what: 'The version block, 1.5, and the index that finds each picture and page by number.' },
-    { name: 'Data', bytes: 5632, hue: 290, what: 'The English month names, his Babylonian month names, the tables of word numbers and month lengths, and the settings in memory.' },
+    { name: 'Data', bytes: 5632, hue: 290, what: 'The English month names, the app’s Babylonian month names, the tables of word numbers and month lengths, and the settings in memory.' },
     { name: 'Tables for Windows', bytes: 3584, hue: 320, what: 'The list of functions it offers: 240 and 241 for the Today screen, Install_Init and Install_Exit for the installer. Then a table that lets Windows walk back through calls, and the fix-ups for loading at any address.' },
   ]} />
   <p>A widget on a phone today asks the system to wake it on a schedule. The Today screen of 2003 asked every plug-in, every two seconds, whether it needed to redraw. HijriDate answers no, again and again, until the day changes. Drag the device clock across midnight:</p>
@@ -110,7 +110,7 @@ const base = import.meta.env.BASE_URL;
     { then: 'One broadcast after install, <code>WM_WININICHANGE</code>', now: 'A widget reload call', why: 'Tell the home screen to look again, no restart.' },
   ]} />
   <p>That last row is a quiet kindness. HijriDate’s installer ends by sending the Today screen one broadcast message, so the date appears at once, with no restart.</p>
-  <Deep title="His redraw check, in ARM">
+  <Deep title="The redraw check, in ARM">
     <Listing title="HIJRIPLUGIN.DLL  0x103EBC" lines={[
       { off: '103ECC', code: 'bl   GetLocalTime', note: 'what day is it now?' },
       { off: '103EE0', code: 'cmp  r2,r3', note: 'the same day as the one drawn?' },

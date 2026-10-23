@@ -88,6 +88,8 @@ const REQ = [
   .kxp-sw[aria-checked='true'] .kxp-sw-box::after { content: ''; width: 10px; height: 10px; background: currentColor; }
   .kxp-narrow { display: none; }
   @media (max-width: 640px) { .kxp-wide { display: none; } .kxp-narrow { display: block; max-width: 420px; margin-inline: auto; } }
+  /* The narrow chart draws at about 0.85 scale on a 390 px phone; these keep its text at 12 px or more */
+  @media (max-width: 640px) { .kxp-narrow text:not(.t-lg) { font-size: 15px; } .kxp-narrow text.t-sm { font-size: 14.5px; } }
   .kxp-svg .kxp-koko, .kxp-svg .kxp-koko-w { transition: opacity 0.3s var(--quart); }
   .kxp-svg .kxp-gone, .kxp-svg .kxp-clean-w { opacity: 0; transition: opacity 0.3s var(--quart); }
   .kxp[data-clean] .kxp-svg :is(.kxp-koko, .kxp-koko-w) { opacity: 0; }

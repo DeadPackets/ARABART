@@ -98,7 +98,7 @@ const DEST = [
       t = TARGETS[i];
       btns.forEach(x => { x.setAttribute('aria-pressed', String(x === b)); x.classList.toggle('button--primary', x === b); });
       root.querySelector('[data-path]')!.textContent = t.path;
-      out.textContent = 'Follow his code below.';
+      out.textContent = 'Follow the code below.';
       cs.stepper?.load(openSteps(t), 0);
       cs.querySelector<HTMLButtonElement>('[data-act="play"]')?.click();
     }));

@@ -67,7 +67,7 @@ export function svgMarkup(img: Bitmap, scale = 2, cls = 'pix') {
 
 let binP: Promise<Bin> | null = null;
 /** His key table, font table and five fonts (public/arabart/fonts.bin), fetched once per page. */
-export const fonts = () => (binP ??= load(`${import.meta.env.BASE_URL}/arabart/fonts.bin`));
+export const fonts = () => (binP ??= load(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/arabart/fonts.bin`));
 
 export type Tok =
   | { t: 'head'; adv: number; d: number; b: number[] }

@@ -29,7 +29,7 @@ const end = MACRO.steps[MACRO.steps.length - 1] as unknown as { out: string };
       {TIME_FORMATS.map((f, i) => <button type="button" role="radio" aria-checked={i === 3 ? 'true' : 'false'} data-tf={f}>{picture(f, SAMPLE)}</button>)}
     </div>
   </fieldset>
-  <label class="ttt-mv-now"><input type="checkbox" data-now /> Use today’s date and time instead of his sample, 16 March 2005 at 3:27:57 PM</label>
+  <label class="ttt-mv-now"><input type="checkbox" data-now /> Use today’s date and time instead of the sample, 16 March 2005 at 3:27:57 PM</label>
 </div>
 
 <style>

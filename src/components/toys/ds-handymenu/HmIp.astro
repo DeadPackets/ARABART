@@ -16,11 +16,11 @@ const html = renderDialog(D, {
 ---
 
 <div class="hm-ip" data-hm-ip>
-  <Window title="IP Helper" kind="device" num="9:41" class="hm-dev2" aria-label="HandyMenu's IP Helper">
+  <Window title="IP Helper" kind="device" wm="2003" num="11:08" ok="ok" sip class="hm-dev2" aria-label="HandyMenu's IP Helper">
     <div class="ppc hm-ip-scr">
       <div class="hm-ip-dlg" set:html={html} />
     </div>
-    <p slot="status" class="hm-soft"><span>ok</span><span></span></p>
+    <Fragment slot="status"></Fragment>
   </Window>
   <div class="hm-ip-net">
     <svg class="hm-ip-svg" viewBox="0 0 320 120" role="img" aria-labelledby="hm-ip-t">
@@ -50,7 +50,6 @@ const html = renderDialog(D, {
   .hm-ip-log { margin: 0 !important; padding-left: 1.4em !important; display: grid; gap: 6px; }
   .hm-ip-log li { font-size: 0.9375rem !important; line-height: 1.45 !important; color: var(--ink) !important; max-width: none !important; }
   .hm-ip-log b { font-family: var(--font-code); color: var(--accent); margin-right: 6px; }
-  .ppc-dlg [data-addr] { font-family: var(--font-code, monospace); }
   @media (max-width: 760px) { .hm-ip { grid-template-columns: minmax(0, 1fr); justify-items: center; } .hm-ip-net { width: 100%; } }
 </style>
 

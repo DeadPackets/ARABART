@@ -122,7 +122,7 @@ const json = (x: unknown) => JSON.stringify(x).replace(/</g, '\\u003c');
   .kxr-seg.body { background: repeating-linear-gradient(-45deg, var(--vga-4) 0 8px, var(--vga-12) 8px 16px); color: var(--vga-15); text-shadow: 0 1px 0 var(--vga-0), 1px 0 0 var(--vga-0); }
   .kxr-scale { position: relative; height: 18px; margin-top: 6px; background: var(--vga-4); }
   .kxr-scale span:first-child { position: absolute; inset: 0 auto 0 0; background: var(--vga-11); }
-  .kxr-scale span:last-child { position: absolute; right: 6px; top: 0; font: 600 11px/18px var(--font-code); color: var(--vga-15); }
+  .kxr-scale span:last-child { position: absolute; right: 6px; top: 0; font: 600 12px/18px var(--font-code); color: var(--vga-15); }
   .kxr-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px 28px; margin-top: 22px; }
   .kxr-h { margin: 0 0 10px; font: 700 0.8125rem/1.4 var(--font-code); color: var(--accent-2); text-align: left; }
   .kxr-grid { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 2px; margin: 0; padding: 0; list-style: none; }
@@ -130,7 +130,7 @@ const json = (x: unknown) => JSON.stringify(x).replace(/</g, '\\u003c');
   .kxr-grid > span.hl { outline: 2px solid var(--accent); outline-offset: -2px; position: relative; z-index: 1; }
   .kxr-grid > span.cut { opacity: 0.12; }
   .kxr-grid > span.ok { background: var(--vga-10); color: var(--vga-0); }
-  .kxr-key { display: flex; gap: 14px; margin-top: 8px; font: 600 11px/1 var(--font-code); }
+  .kxr-key { display: flex; gap: 14px; margin-top: 8px; font: 600 12px/1 var(--font-code); }
   .kxr-key span { padding: 4px 6px; }
   .kxr-body { display: grid; align-content: start; gap: 8px; }
   .kxr-row { display: grid; grid-template-columns: 10ch minmax(0, 1fr); gap: 10px; padding: 8px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow 0.2s; }
@@ -159,7 +159,7 @@ const json = (x: unknown) => JSON.stringify(x).replace(/</g, '\\u003c');
   :global(.kxr-fly) { position: fixed; z-index: 50; display: grid; place-items: center; font: 600 12px/1 var(--font-code); background: var(--vga-11); color: var(--vga-0); pointer-events: none; }
   @media (max-width: 860px) { .kxr-cols { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 520px) {
-    .kxr-seg { font-size: 10px; padding: 0 3px; }
+    .kxr-seg { padding: 0 3px; }
     .kxr-seg.pad i { display: none; }
     .kxr-seg:not(.body) b { display: none; }
     .kxr-grid { grid-template-columns: repeat(8, minmax(0, 1fr)); }

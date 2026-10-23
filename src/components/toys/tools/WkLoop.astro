@@ -90,9 +90,9 @@ const C = [
   .wk-lp-bytes { display: grid; grid-template-columns: 1fr 1fr; font: 600 12px/1.2 var(--font-code); color: var(--vga-11); text-align: center; }
   .wk-lp-bytes span { border-bottom: 2px solid var(--vga-11); padding-bottom: 4px; }
   ol.wk-lp-px { display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 3px; margin: 0 !important; padding: 0 !important; list-style: none !important; }
-  .wk-lp-px li { position: relative; display: grid; place-items: end center; aspect-ratio: 1 / 1.25; background: var(--off); font: 500 10px/1 var(--font-code) !important; color: #000 !important; max-width: none !important; transition: background-color 0.18s; }
+  .wk-lp-px li { position: relative; display: grid; place-items: end center; aspect-ratio: 1 / 1.25; background: var(--off); font: 500 12px/1 var(--font-code) !important; color: #000 !important; max-width: none !important; transition: background-color 0.18s; }
   .wk-lp-px li::marker { content: none; }
-  .wk-lp-px li:nth-child(8) { margin-right: 6px; }
+  .wk-lp-px li:nth-child(8) { margin-right: 6px; aspect-ratio: auto; } /* the byte gap narrows this cell: stretch it to the row instead */
   .wk-lp-px li span { padding-bottom: 3px; }
   .wk-lp-px li.on { background: var(--on); }
   .wk-lp-px li.mask { box-shadow: inset 0 0 0 3px var(--vga-14); }
@@ -104,7 +104,7 @@ const C = [
     .wk-lp-bytes { display: none; }
     ol.wk-lp-px { grid-template-columns: repeat(8, minmax(0, 1fr)); row-gap: 22px; }
     .wk-lp-px li:nth-child(8) { margin-right: 0; }
-    .wk-lp-px li:nth-child(1)::before, .wk-lp-px li:nth-child(9)::before { position: absolute; left: 0; top: -13px; font: 600 10px/1 var(--font-code); color: var(--vga-11); white-space: nowrap; }
+    .wk-lp-px li:nth-child(1)::before, .wk-lp-px li:nth-child(9)::before { position: absolute; left: 0; top: -15px; font: 600 12px/1 var(--font-code); color: var(--vga-11); white-space: nowrap; }
     .wk-lp-px li:nth-child(1)::before { content: 'byte 3,523'; }
     .wk-lp-px li:nth-child(9)::before { content: 'byte 3,524'; }
     ol.wk-lp-px { margin-top: 14px !important; }
