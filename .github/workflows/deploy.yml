@@ -1,8 +1,7 @@
 name: Deploy ARABART to Cloudflare Workers
 
+# Manual only: deploys run with `npx wrangler deploy`. Add `push: branches: [master]` once the secrets exist.
 on:
-  push:
-    branches: [master]
   workflow_dispatch:
 
 permissions:
