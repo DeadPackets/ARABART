@@ -1,0 +1,54 @@
+---
+// A Windows balloon tip ("Click me!") that points at the first of a set of clickable things. Put it inside a positioned
+// element with data-balloon-host; it leaves after the first click, tap or key press there, or on its close box.
+interface Props { text: string; title?: string; class?: string }
+const { text, title = 'Click me!', class: cls } = Astro.props;
+---
+
+<div class:list={['balloon', cls]} role="note" data-balloon>
+  <p class="balloon-t"><i aria-hidden="true">i</i>{title}</p>
+  <p>{text}</p>
+  <button type="button" class="balloon-x" aria-label="Close the tip" data-balloon-x>×</button>
+</div>
+
+<style>
+  .balloon {
+    position: absolute; z-index: var(--z-word); width: min(280px, 86%); padding: 10px 30px 12px 12px;
+    background: #ffffe1; color: #000; border: 1px solid #000; border-radius: 8px; box-shadow: 2px 2px 0 oklch(0 0 0 / 0.35);
+    font: 400 0.9375rem/1.4 Tahoma, Verdana, var(--sans); text-align: left;
+    /* taps go through to whatever it covers; only the close box is its own */
+    pointer-events: none;
+    animation: balloon-in 0.4s var(--expo) 0.6s both, balloon-bob 2.4s ease-in-out 1s infinite;
+  }
+  /* the tail: a black triangle with a cream one inside it, pointing up at the target */
+  .balloon::before, .balloon::after { content: ''; position: absolute; left: 30px; border-style: solid; border-color: transparent; border-left-width: 0; }
+  .balloon::before { top: -17px; border-width: 0 0 16px 16px; border-bottom-color: #000; }
+  .balloon::after { top: -14px; left: 31px; border-width: 0 0 14px 14px; border-bottom-color: #ffffe1; }
+  .balloon-t { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-weight: 700; }
+  .balloon-t i { display: grid; place-items: center; width: 18px; height: 18px; flex: none; border-radius: 50%; background: #0a3fd6; color: #fff; font: italic 700 12px/1 Georgia, serif; }
+  .balloon-x {
+    position: absolute; top: 2px; right: 2px; width: 28px; height: 28px; display: grid; place-items: center; padding: 0;
+    border: 0; background: none; color: #000; font: 700 15px/1 Tahoma, sans-serif; cursor: pointer; pointer-events: auto;
+  }
+  .balloon-x:hover { color: #b3261e; }
+  .balloon-x:focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+  .balloon.gone { animation: balloon-out 0.25s var(--quart) forwards; pointer-events: none; }
+  @keyframes balloon-in { from { opacity: 0; translate: 0 8px; } }
+  @keyframes balloon-bob { 50% { translate: 0 -5px; } }
+  @keyframes balloon-out { to { opacity: 0; translate: 0 -6px; } }
+  @media (prefers-reduced-motion: reduce) { .balloon { animation: none; } .balloon.gone { animation: none; display: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-balloon]').forEach(b => {
+    const host = b.closest<HTMLElement>('[data-balloon-host]') ?? b.parentElement!;
+    const off = new AbortController();
+    const bye = () => {
+      off.abort();
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) { b.hidden = true; return; }
+      b.classList.add('gone');
+      b.addEventListener('animationend', () => (b.hidden = true), { once: true });
+    };
+    for (const t of ['click', 'keydown']) host.addEventListener(t, bye, { signal: off.signal });
+  });
+</script>

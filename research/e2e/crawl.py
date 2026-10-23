@@ -5,7 +5,7 @@
 import json, pathlib, re, urllib.request
 from playwright.sync_api import sync_playwright
 
-SITE = 'http://localhost:4321/ARABART'
+SITE = 'http://localhost:4321'
 OUT = pathlib.Path(__file__).parent / 'out'
 OUT.mkdir(exist_ok=True)
 DIST = pathlib.Path(__file__).resolve().parents[2] / 'dist'
@@ -29,7 +29,7 @@ with sync_playwright() as p:
             info = pg.evaluate("""() => ({
               overflow: document.documentElement.scrollWidth - innerWidth,
               brokenImgs: [...document.images].filter(i => i.complete && !i.naturalWidth && !i.loading?.includes('lazy')).map(i => i.src),
-              links: [...document.querySelectorAll('a[href]')].map(a => new URL(a.getAttribute('href'), location.href).href).filter(h => h.startsWith(location.origin) && h.includes('/ARABART')),
+              links: [...document.querySelectorAll('a[href]')].map(a => new URL(a.getAttribute('href'), location.href).href).filter(h => h.startsWith(location.origin)),
               terms: document.querySelectorAll('.term').length,
               steps: document.querySelectorAll('[data-steps]').length,
             })""")

@@ -21,7 +21,7 @@ import { render, draw, svgRuns, translate, FORMS } from '../components/toys/arab
 import { ssrBin } from '../components/toys/arabart/ssr.ts';
 
 const bin = ssrBin();
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const title = render(bin, '~gtk ~guvfd', { font: 4, mode: '3d', color: 14, shadow: 4 });
 // Small pictures for the diagrams, drawn by his engine
 const art = (keys: string, font: number, color = 14, mode: 'plain' | '3d' = 'plain') => {
@@ -106,55 +106,55 @@ const PROGRAMS = [
         'Any other request, like <code>0Ch</code> for one plain pixel, goes on to the PC’s own video code, as if ARABART were not there. It is middleware that calls <code>next()</code>.',
       ]}
     >
-      <svg class="dg" viewBox="0 0 640 336" role="img" aria-labelledby="ab-svc-t">
+      <svg class="dg" viewBox="0 0 640 366" role="img" aria-labelledby="ab-svc-t">
         <title id="ab-svc-t">Three programs call INT 10h. ARABART sits in front of the video BIOS: it answers function 36h and draws Arabic on the screen, and passes every other call on.</title>
-        <rect class="box" x="10" y="20" width="150" height="44" /><text x="85" y="47" text-anchor="middle">DEMO.EXE</text>
-        <rect class="box" x="10" y="80" width="150" height="44" /><text x="85" y="107" text-anchor="middle">EDITOR.EXE</text>
-        <rect class="box" x="10" y="140" width="150" height="44" /><text x="85" y="167" text-anchor="middle">SUN.EXE</text>
-        <path class="wire" d="M160 42 C190 42 186 96 208 96" />
-        <path class="wire" d="M160 102 H208" />
-        <path class="wire" d="M160 162 C190 162 186 108 208 108" />
-        <rect class="box" x="210" y="80" width="140" height="44" /><text x="280" y="100" text-anchor="middle">INT 10h</text><text class="t-sm" x="280" y="117" text-anchor="middle">the video service</text>
-        <rect class="box" x="210" y="236" width="140" height="50" /><text x="280" y="258" text-anchor="middle">Video BIOS</text><text class="t-sm" x="280" y="276" text-anchor="middle">the PC's own code</text>
-        <path class="wire arrow" data-s="1" d="M280 124 V228" />
+        <rect class="box" x="10" y="50" width="130" height="44" /><text x="75" y="77" text-anchor="middle">DEMO.EXE</text>
+        <rect class="box" x="10" y="110" width="130" height="44" /><text x="75" y="137" text-anchor="middle">EDITOR.EXE</text>
+        <rect class="box" x="10" y="170" width="130" height="44" /><text x="75" y="197" text-anchor="middle">SUN.EXE</text>
+        <path class="wire" d="M140 72 C162 72 158 126 178 126" />
+        <path class="wire" d="M140 132 H178" />
+        <path class="wire" d="M140 192 C162 192 158 138 178 138" />
+        <rect class="box" x="180" y="110" width="164" height="44" /><text x="262" y="130" text-anchor="middle">INT 10h</text><text class="t-sm" x="262" y="147" text-anchor="middle">the video service</text>
+        <rect class="box" x="180" y="266" width="164" height="50" /><text x="262" y="288" text-anchor="middle">Video BIOS</text><text class="t-sm" x="262" y="306" text-anchor="middle">the PC's own code</text>
+        <path class="wire arrow" data-s="1" d="M262 154 V258" />
         <g data-s="1+">
-          <rect class="box-hi" x="410" y="10" width="220" height="104" />
-          <text class="t-bk t-lg" x="520" y="42" text-anchor="middle">ARABART</text>
-          <text class="t-bk" x="520" y="68" text-anchor="middle">30,110 bytes</text>
-          <text class="t-bk" x="520" y="94" text-anchor="middle">AH = 36h? Draw Arabic</text>
+          <rect class="box-hi" x="410" y="40" width="220" height="104" />
+          <text class="t-bk t-lg" x="520" y="72" text-anchor="middle">ARABART</text>
+          <text class="t-bk" x="520" y="98" text-anchor="middle">30,110 bytes</text>
+          <text class="t-bk" x="520" y="124" text-anchor="middle">AH = 36h? Draw Arabic</text>
         </g>
-        <g data-s="2+"><path class="wire-hi arrow" d="M350 96 C376 96 376 62 402 62" /><text class="t-yl" x="356" y="54">hooked</text></g>
-        <g data-s="3"><path class="wire-hi" d="M160 42 C190 42 186 96 208 96" /><text class="t-yl" x="166" y="14">AH = 36h, AL = 07h: draw</text></g>
-        <path class="wire-hi arrow" data-s="3" d="M520 114 V190" />
+        <g data-s="2+"><path class="wire-hi arrow" d="M344 126 C370 126 372 92 402 92" /><text class="t-yl" x="373" y="78" text-anchor="middle">hooked</text></g>
+        <g data-s="3"><path class="wire-hi" d="M140 72 C162 72 158 126 178 126" /><text class="t-yl" x="10" y="34">AH = 36h, AL = 07h: draw</text></g>
+        <path class="wire-hi arrow" data-s="3" d="M520 144 V220" />
         <g data-s="3+">
-          <rect class="box-bk" x="410" y="198" width="220" height="126" />
-          <svg x={520 - screenArt.w} y="228" width={screenArt.w * 2} height={screenArt.h * 2} viewBox={`0 0 ${screenArt.w} ${screenArt.h}`} shape-rendering="crispEdges">{screenArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+          <rect class="box-bk" x="410" y="228" width="220" height="126" />
+          <svg x="420" y={291 - screenArt.h * 100 / screenArt.w} width="200" height={screenArt.h * 200 / screenArt.w} viewBox={`0 0 ${screenArt.w} ${screenArt.h}`} shape-rendering="crispEdges">{screenArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
         </g>
-        <g data-s="4"><path class="wire-hi" d="M160 102 H208" /><text class="t-yl" x="166" y="140">AH = 0Ch: one pixel</text></g>
-        <g data-s="4"><path class="wire arrow dash" d="M410 104 C372 150 372 262 358 262" /><text class="t-cy" x="376" y="176">not 36h:</text><text class="t-cy" x="376" y="194">passed on</text></g>
+        <g data-s="4"><path class="wire-hi" d="M140 192 C162 192 158 138 178 138" /><text class="t-yl" x="10" y="240">AH = 0Ch: one pixel</text></g>
+        <g data-s="4"><path class="wire arrow dash" d="M410 134 C378 160 384 291 352 291" /><text class="t-cy" x="282" y="206">not 36h:</text><text class="t-cy" x="282" y="224">passed on</text></g>
       </svg>
-      <svg slot="narrow" class="dg" viewBox="0 0 360 520" role="img" aria-labelledby="ab-svc-tn">
+      <svg slot="narrow" class="dg" viewBox="0 0 360 458" role="img" aria-labelledby="ab-svc-tn">
         <title id="ab-svc-tn">Programs call INT 10h; ARABART answers function 36h and draws, and passes other calls to the video BIOS.</title>
         <rect class="box" x="6" y="10" width="110" height="40" /><text x="61" y="35" text-anchor="middle">DEMO</text>
         <rect class="box" x="125" y="10" width="110" height="40" /><text x="180" y="35" text-anchor="middle">EDITOR</text>
         <rect class="box" x="244" y="10" width="110" height="40" /><text x="299" y="35" text-anchor="middle">SUN</text>
         <path class="wire" d="M61 50 C61 80 150 70 150 92" /><path class="wire" d="M180 50 V92" /><path class="wire" d="M299 50 C299 80 210 70 210 92" />
-        <rect class="box" x="110" y="94" width="140" height="44" /><text x="180" y="114" text-anchor="middle">INT 10h</text><text class="t-sm" x="180" y="131" text-anchor="middle">the video service</text>
+        <rect class="box" x="90" y="94" width="180" height="50" /><text x="180" y="115" text-anchor="middle">INT 10h</text><text class="t-sm" x="180" y="135" text-anchor="middle">the video service</text>
         <g data-s="1+">
           <rect class="box-hi" x="6" y="200" width="348" height="80" />
           <text class="t-bk t-lg" x="180" y="228" text-anchor="middle">ARABART</text>
-          <text class="t-bk" x="180" y="252" text-anchor="middle">30,110 bytes. AH = 36h? Draw</text>
+          <text class="t-bk" x="180" y="256" text-anchor="middle">30,110 bytes. AH = 36h? Draw</text>
         </g>
-        <path class="wire arrow" data-s="1" d="M250 116 C340 116 340 300 300 336" />
-        <path class="wire-hi arrow" data-s="2+" d="M180 138 V192" /><text class="t-yl" x="190" y="172" data-s="2+">hooked</text>
+        <path class="wire arrow" data-s="1" d="M270 120 C340 120 340 300 300 330" />
+        <path class="wire-hi arrow" data-s="2+" d="M180 144 V192" /><text class="t-yl" x="190" y="174" data-s="2+">hooked</text>
         <g data-s="3"><path class="wire-hi" d="M61 50 C61 80 150 70 150 92" /></g>
-        <path class="wire-hi arrow" data-s="3" d="M90 280 V330" />
+        <path class="wire-hi arrow" data-s="3" d="M88 280 V330" />
         <g data-s="3+">
-          <rect class="box-bk" x="6" y="338" width="176" height="110" />
-          <svg x="14" y="372" width="160" height={screenArt.h * 160 / screenArt.w} viewBox={`0 0 ${screenArt.w} ${screenArt.h}`} shape-rendering="crispEdges">{screenArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
+          <rect class="box-bk" x="6" y="338" width="164" height="110" />
+          <svg x="14" y={393 - screenArt.h * 74 / screenArt.w} width="148" height={screenArt.h * 148 / screenArt.w} viewBox={`0 0 ${screenArt.w} ${screenArt.h}`} shape-rendering="crispEdges">{screenArt.paths.map(p => <path fill={p.fill} d={p.d} />)}</svg>
         </g>
-        <rect class="box" x="200" y="338" width="154" height="50" /><text x="277" y="360" text-anchor="middle">Video BIOS</text><text class="t-sm" x="277" y="378" text-anchor="middle">the PC's own code</text>
-        <g data-s="4"><path class="wire-hi" d="M180 50 V92" /><path class="wire arrow dash" d="M277 280 V330" /><text class="t-cy" x="200" y="420">not 36h: passed on</text></g>
+        <rect class="box" x="182" y="338" width="172" height="50" /><text x="268" y="360" text-anchor="middle">Video BIOS</text><text class="t-sm" x="268" y="379" text-anchor="middle">the PC's own code</text>
+        <g data-s="4"><path class="wire-hi" d="M180 50 V92" /><path class="wire arrow dash" d="M268 280 V330" /><text class="t-cy" x="190" y="414">not 36h:</text><text class="t-cy" x="190" y="434">passed on</text></g>
       </svg>
     </Steps>
     </div>
@@ -296,7 +296,7 @@ const PROGRAMS = [
         <path class="wire-hi arrow" data-s="3" d="M560 140 C600 130 600 90 560 70" />
         <g data-s="4"><text class="t-yl" x="102" y="240">One write: 4 pixels, 4 planes.</text><text class="t-sm" x="102" y="262">The other pixels come back from the latches unchanged.</text></g>
       </svg>
-      <svg slot="narrow" class="dg" viewBox="0 0 360 380" role="img" aria-labelledby="ab-vga-tn">
+      <svg slot="narrow" class="dg" viewBox="0 0 360 322" role="img" aria-labelledby="ab-vga-tn">
         <title id="ab-vga-tn">Set/Reset holds the color, the Bit Mask picks pixels, a read fills the latches, one write paints them.</title>
         <g data-s="1+"><rect class="box-hi" x="6" y="6" width="348" height="44" /><text class="t-bk" x="180" y="34" text-anchor="middle">Set/Reset = 14: the color, once</text></g>
         <g data-s="2+"><rect class="box-hi" x="6" y="58" width="348" height="44" /><text class="t-bk" x="180" y="86" text-anchor="middle">Bit Mask = 3Ch: which pixels</text></g>
@@ -373,7 +373,7 @@ const PROGRAMS = [
         '<b>1993, ARAB-ART 7.15.</b> Made for The Brave Sun: the fonts move out into their own file, <code>ARAB-ART.FNT</code>, 20,264 bytes that begin with his signature, <code>YASSER DOT DESIGN</code>. Like loading a web font file instead of building the font into the page.',
       ]}
     >
-      <svg class="dg" viewBox="0 0 640 330" role="img" aria-labelledby="ab-path-t">
+      <svg class="dg" viewBox="0 -4 640 298" role="img" aria-labelledby="ab-path-t">
         <title id="ab-path-t">1991: PESM carries its own engine. 1993: ARABART 4.15 is one resident engine for DEMO, EDITOR and SUN. 1993: ARAB-ART 7.15 keeps its fonts in ARAB-ART.FNT.</title>
         <path class="wire" d="M40 30 H600" />
         {[[105, '1991'], [320, '1993'], [535, '1993']].map(([x, y]) => <g><circle cx={x} cy="30" r="6" class="box-hi" /><text class="t-lg t-yl" x={x} y="22" text-anchor="middle" dy="-6">{y}</text></g>)}

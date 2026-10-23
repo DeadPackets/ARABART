@@ -10,7 +10,7 @@ import { NAMES } from './vga.ts';
 
 interface Props { id?: string }
 const { id = 'pesmwalk' } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const last = CALLS[15];
 const code = (c: typeof last) => [
   [hex(c.off, 4), `mov  dx,${hex(c.text, 4)}h`, 'the text'],
@@ -60,7 +60,8 @@ const code = (c: typeof last) => [
   .pesmw-code { font: 500 13px/1.9 var(--font-code); }
   .pesmw-code > div { display: grid; grid-template-columns: 4.5ch 13.5ch 1fr; gap: 1ch; padding: 0 6px; white-space: pre; }
   .pesmw-code .o { color: var(--ink-2); }
-  .pesmw-code code { font: inherit; color: var(--accent); }
+  /* .pesmw prefix: the writeup's code rule (0.9em) would otherwise win and shrink it under 12 px */
+  .pesmw .pesmw-code code { font: inherit; color: var(--accent); }
   .pesmw-code .n { color: var(--ink); white-space: normal; }
   .pesmw-code > div:last-child { color: var(--surface); background: var(--accent-2); }
   .pesmw-code > div:last-child :is(.o, code, .n) { color: var(--surface); }
@@ -70,7 +71,8 @@ const code = (c: typeof last) => [
   .pesmw-keys kbd { font-size: 1rem; }
   .pesmw-bits { margin-top: 14px; }
   .pesmw-bits .k-bits { --cell: 66px; }
-  .pesmw-bits .k-bits-lab { white-space: nowrap; font-size: 11px; }
+  /* One bit per switch: each label may be wider than its cell, so the group grows to fit it */
+  .pesmw-bits .k-bits .k-bits-lab { width: auto; min-width: var(--cell); white-space: nowrap; }
   .pesmw-say { margin-top: 14px; min-height: 3.2em; font: 400 1rem/1.55 var(--sans); color: var(--ink); }
   .pesmw-say b { color: var(--accent); }
   .pesmw-ctl { position: sticky; bottom: calc(var(--sl, 0px) + 8px); z-index: 2; padding: 10px; background: var(--surface-2); box-shadow: 0 0 0 1px var(--rule), 8px 8px 0 oklch(0 0 0 / 0.55); margin-right: 14px; }

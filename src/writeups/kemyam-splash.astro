@@ -14,7 +14,7 @@ import Deep from '../components/explain/Deep.astro';
 import Listing from '../components/explain/Listing.astro';
 import ThenNow from '../components/explain/ThenNow.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const bytes = (mem: number) => `${base}/bytes/?f=NAMES_NAMES.COM&layer=memory&at=${(mem - 0x100).toString(16)}`;
 ---
 

@@ -6,7 +6,7 @@ import Window from '../../shell/Window.astro';
 interface Item { file: string; size: string; date: string; title: string; img: string; alt: string; href: string; body: string }
 interface Props { items: Item[]; dir?: string }
 const { items, dir = 'C:\\ARABART' } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <div class="pg" data-programs>
@@ -34,9 +34,11 @@ const base = import.meta.env.BASE_URL;
 </div>
 
 <style is:global>
-  .pg { display: grid; grid-template-columns: minmax(260px, 0.7fr) minmax(0, 1.6fr); gap: 22px 26px; align-items: start; }
-  .pg-cols, .pg-tab { display: grid; grid-template-columns: minmax(0, 1fr) 7ch 9ch; gap: 10px; }
+  .pg { display: grid; grid-template-columns: minmax(330px, 0.7fr) minmax(0, 1.6fr); gap: 22px 26px; align-items: start; }
+  /* rem, not ch: the header and the rows use two font sizes but must share the same columns */
+  .pg-cols, .pg-tab { display: grid; grid-template-columns: minmax(0, 1fr) 4.5rem 4.5rem; gap: 10px; }
   .pg-cols { padding: 0 10px 8px; font: 600 12px/1.4 var(--font-code); color: var(--accent); border-bottom: 1px solid var(--rule); }
+  .pg-cols span + span { text-align: right; }
   .pg-tabs { display: grid; margin-top: 6px; }
   .pg-tab { align-items: center; min-height: 44px; padding: 0 10px; font: 500 0.875rem/1 var(--font-code); color: var(--ink); text-align: left; background: none; border: 0; cursor: pointer; }
   .pg-tab span:not(.pg-name) { color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; }

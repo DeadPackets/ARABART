@@ -11,21 +11,28 @@ import Reviews from '../../components/toys/dinarsoft/Reviews.astro';
 import Downloads from '../../components/toys/dinarsoft/Downloads.astro';
 import Relaunch from '../../components/toys/dinarsoft/Relaunch.astro';
 import Term from '../../components/explain/Term.astro';
-import { apps, icon, img, press, reviews, downloads, totalBytes, awards, company, longDate } from '../../data/dinarsoft';
+import { apps, icon, img, press, reviews, discs, downloads, totalBytes, awards, company, longDate } from '../../data/dinarsoft';
 import '../../components/toys/dinarsoft/ds.css';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const logo = img('logo'), mark = img('mark'), banner = img('banner');
 const his = press.filter(p => p.his).length;
 const releases = apps.reduce((n, a) => n + a.releases.length, 0);
 const mb = (totalBytes / 1e6).toFixed(1);
 const wins = awards.filter(a => a.level === 'Winner').length;
+const printed = reviews.filter(r => r.print);
+const mags = new Set(printed.map(r => r.outlet)).size;
+const home = new URL(`${base}/`, Astro.site).href;
+const org = { '@type': 'Organization', '@id': `${home}dinarsoft/#org`, name: 'DinarSoft Corporation', url: `${home}dinarsoft/`, logo: new URL(logo.src, Astro.site).href,
+  foundingDate: '2002-11', founder: { '@id': `${home}#yasser` }, foundingLocation: { '@type': 'Place', name: 'Kanata, Ontario, Canada' } };
 ---
 
 <BaseLayout
-  title="DinarSoft · Yasser Awad"
-  description="Yasser Awad's own company: six award-winning apps for Pocket PC and Windows Mobile, made in Kanata from 2002 to 2008, and free since 2026. Run them, download them, unlock them."
-  image="/ARABART/dinarsoft/site/ds-2006-home-relaunch.webp"
+  title="DinarSoft: six Pocket PC apps, free since 2026 · Yasser Awad"
+  description="Yasser Awad's company: six award-winning apps for Pocket PC and Windows Mobile, built with Hosam Aly in Kanata from 2002 to 2008, and free since 2026. Run them, download them, unlock them."
+  pageType="CollectionPage"
+  schema={[org]}
+  image={`${base}/dinarsoft/site/ds-2006-home-relaunch.webp`}
   era="vs2005"
   keys={[{ k: 'F5', label: 'Free downloads', href: '#free' }, { k: 'F6', label: 'The six apps', href: '#apps' }]}
 >
@@ -38,9 +45,9 @@ const wins = awards.filter(a => a.level === 'Winner').length;
               <h1 id="dsh-h1" class="dsh-h1"><img src={logo.src} width={logo.w} height={logo.h} alt="DinarSoft" fetchpriority="high" /></h1>
               <p class="dsh-tag">{company.tagline}</p>
               <p class="dsh-big">Six apps for the smartphones before the iPhone. {awards.length} nominations, {wins} magazine wins, and all six free today.</p>
-              <p class="dsh-lead">In November 2002, Yasser Awad founded DinarSoft Corporation in Kanata, Ontario, the tech town its own website called “silicon valley north”. Alongside his work at Alcatel, he wrote all six of its apps for <Term id="pocket-pc">Pocket PC and Windows Mobile</Term>: the phones people carried before the iPhone. Reviewers from New Zealand to Dubai to Spain praised them. In October 2026 he released all six as freeware.</p>
+              <p class="dsh-lead">In November 2002, Yasser Awad founded DinarSoft Corporation in Kanata, Ontario, the tech town its own website called “silicon valley north”. Alongside his work at Alcatel, he ran the company, and with his co-developer, Hosam Aly, he built its six apps for <Term id="pocket-pc">Pocket PC and Windows Mobile</Term>: the phones people carried before the iPhone. Reviewers from New Zealand to Dubai to Spain praised them. In October 2026 he released all six as freeware.</p>
               <div class="dsh-acts">
-                <a class="button button--primary" href="#apps">Open the solution</a>
+                <a class="button button--primary" href="#apps">See the six apps</a>
                 <a class="button" href="#free">Download, free</a>
               </div>
             </div>
@@ -78,8 +85,8 @@ const wins = awards.filter(a => a.level === 'Winner').length;
     <section class="dsh-sec" id="apps" aria-labelledby="apps-h">
       <div class="container">
         <div class="dsh-intro">
-          <h2 id="apps-h" class="dsx-h2">Open the solution.</h2>
-          <p class="dsx-lede">Six projects, one engineer. Pick one in Solution Explorer to see it on a Pocket PC, in its real screens from DinarSoft’s own product pages. Tap the screen to move through them, then open the app for its story, its installers, a free unlock key and a tour of how it works.</p>
+          <h2 id="apps-h" class="dsx-h2">Six apps from Kanata.</h2>
+          <p class="dsx-lede">Pick one in Solution Explorer to see it on a Pocket PC, in its real screens from DinarSoft’s own product pages. Tap the screen to move through them, then open the app for its story, its installers, a free unlock key and a tour of how it works.</p>
         </div>
         <Explorer />
       </div>
@@ -89,7 +96,7 @@ const wins = awards.filter(a => a.level === 'Winner').length;
       <div class="container">
         <div class="dsh-intro">
           <h2 id="years-h" class="dsx-h2">Five apps in one summer.</h2>
-          <p class="dsx-lede">Between June and September 2003 he shipped MemMaid, HijriDate, HandyMenu, HandyLauncher and HandySwitcher. TapText followed in 2005. He kept making them better: {releases} releases in six years, each one in his own revision histories. Press Run to watch DinarSoft grow year by year, or tap any dot to read what that version added.</p>
+          <p class="dsx-lede">Between June and September 2003 DinarSoft shipped MemMaid, HijriDate, HandyMenu, HandyLauncher and HandySwitcher. TapText followed in 2005. Yasser and Hosam kept making them better: {releases} releases in six years, each one in DinarSoft’s own revision histories. Read it like a commit log, one colored line per app. Press Run to watch DinarSoft grow year by year, or open any row for everything that version added.</p>
         </div>
         <Years />
       </div>
@@ -100,7 +107,7 @@ const wins = awards.filter(a => a.level === 'Winner').length;
         <div class="dsh-intro">
           <h2 id="awards-h" class="dsx-h2">{awards.length} nominations. {wins === 3 ? 'Three' : wins} wins.</h2>
           <p class="dsx-lede">For eight years, <cite>Pocket PC Magazine</cite>, later renamed <cite>Smartphone &amp; Pocket PC</cite>, held the Best Software Awards for Windows Mobile. A DinarSoft app was nominated every year from 2003 to 2008. HandySwitcher won Task Managers in 2007 and again in 2008, TapText won Misc. Utilities in 2007, and MemMaid was a finalist four years running.</p>
-          <p class="dsx-lede">Tap a year to open the magazine’s own page, as the Internet Archive kept it. Stores and review sites honored his apps too.</p>
+          <p class="dsx-lede">Tap a year to open the magazine’s own page, as the Internet Archive kept it. Stores and review sites honored DinarSoft’s apps too.</p>
         </div>
         <Awards />
       </div>
@@ -110,7 +117,7 @@ const wins = awards.filter(a => a.level === 'Winner').length;
       <div class="container">
         <div class="dsh-intro">
           <h2 id="reviews-h" class="dsx-h2">What the reviewers said.</h2>
-          <p class="dsx-lede">Reviewers in the US, the UK, New Zealand, the UAE, Germany and Spain wrote about his apps, and Russia’s <cite>CHIP</cite> magazine put them on its cover discs. Here are {reviews.length} reviews, each with the reviewer’s own page as the Internet Archive kept it.</p>
+          <p class="dsx-lede">Reviewers in the US, the UK, New Zealand, the UAE, Germany and Spain wrote about DinarSoft’s apps online. Magazines printed them too, {printed.length} times in {mags} magazines, <cite>PC Magazine</cite> among them, and Russia’s <cite>CHIP</cite> put them on its cover discs. Here are all {reviews.length + discs.length}, as mail in DinarSoft’s inbox, each with the page it appeared on.</p>
         </div>
         <Reviews />
       </div>
@@ -120,7 +127,7 @@ const wins = awards.filter(a => a.level === 'Winner').length;
       <div class="container">
         <div class="dsh-intro">
           <h2 id="look-h" class="dsx-h2">Red, charcoal and Verdana.</h2>
-          <p class="dsx-lede">His first logo was DiNAR in blue, with a little green globe as the dot of the i, and an Arabic twin that spells <span lang="ar" dir="rtl">دينار</span>. It shipped inside his apps, which is where it was found again. On November 1, 2006, DinarSoft got a new logo: two red crescents around a red dot, forming a D, beside a charcoal italic wordmark. Two weeks later a new dinarsoft.com went live with it, and with a store of its own. Drag across the two home pages to see the change.</p>
+          <p class="dsx-lede">DinarSoft’s first logo was DiNAR in blue, with a little green globe as the dot of the i, and an Arabic twin that spells <span lang="ar" dir="rtl">دينار</span>. It shipped inside the apps, which is where it was found again. On November 1, 2006, DinarSoft got a new logo: two red crescents around a red dot, forming a D, beside a charcoal italic wordmark. Two weeks later a new dinarsoft.com went live with it, and with a store of its own. Drag across the two home pages to see the change.</p>
         </div>
         <div class="dsh-brand">
           <Window kind="panel" title="logo.png" class="dsh-logo-win">

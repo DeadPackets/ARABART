@@ -17,7 +17,7 @@ import engine from '../components/toys/ds-handylauncher/engine.json';
 <section id="hl-build" class="hl-w">
   <h2>Build your own launcher</h2>
   <p class="lead">HandyLauncher put your favorite things one tap away. Its icon sat in the <Term id="hl-tray">tray</Term>, in the corner of every Pocket PC screen. Tap it for one menu, tap and hold for a second one.</p>
-  <p>A shortcut could open anything: a program, a document, a folder, a song. Each one could even turn the screen sideways before it opened. Below are his two menus exactly as his installer wrote them, drawn by his own <Term id="hl-owner-drawn">owner-drawn</Term> menu code. Beside them is his own Shortcut Setup page, rebuilt from the <Term id="hl-dialog-template">dialog templates</Term> inside HandyLauncher.exe. Add a shortcut, delete one, swap the menus, then tap the icon.</p>
+  <p>A shortcut could open anything: a program, a document, a folder, a song. Each one could even turn the screen sideways before it opened. Below are its two menus exactly as its installer wrote them, drawn by its own <Term id="hl-owner-drawn">owner-drawn</Term> menu code. Beside them is its own Shortcut Setup page, rebuilt from the <Term id="hl-dialog-template">dialog templates</Term> inside HandyLauncher.exe. Add a shortcut, delete one, swap the menus, then tap the icon.</p>
   <figure class="hl-toy"><Build /></figure>
   <p>The whole program is one file of 83,456 bytes for the <Term id="pocket-pc">Pocket PC</Term>. A small helper runs once at install time and writes the two starting menus into the <Term id="hl-registry">registry</Term>. “HandyLauncher” holds My Documents, Pocket Excel, Pocket Word and five more, and “ExtraLauncher” holds My Device, MS Reader and the Games folder. Since version 2.0, the switch <code>-X</code> opens the menu from the top of the screen instead. Add a number to <code>-X</code> and it sets how far down, so a hardware button can open it too.</p>
   <ThenNow
@@ -36,10 +36,10 @@ import engine from '../components/toys/ds-handylauncher/engine.json';
 <section id="hl-hold" class="hl-w">
   <h2>One icon, two menus</h2>
   <p class="lead">Since version 3.0, a quick tap opens the first menu and a <Term id="hl-tap-and-hold">tap and hold</Term> opens the second. Twice the shortcuts, behind the same little icon.</p>
-  <p>The clever part is how few lines it takes. When the stylus touches his icon, Windows Mobile sends him a message. He works out the corner of the screen from its size, so the same code fits a 240-pixel screen and a 480-pixel one. Then he hands that point to the system’s own gesture watcher. It answers with one number: zero for a tap, anything else for a hold. Press his icon below, quickly or slowly.</p>
+  <p>The clever part is how few lines it takes. When the stylus touches its icon, Windows Mobile sends HandyLauncher a message. It works out the corner of the screen from its size, so the same code fits a 240-pixel screen and a 480-pixel one. Then it hands that point to the system’s own gesture watcher. It answers with one number: zero for a tap, anything else for a hold. Press its icon below, quickly or slowly.</p>
   <figure class="hl-toy"><Hold /></figure>
   <Deep title="For engineers: the gesture form">
-    <p>The form is a <code>SHRGINFO</code>: 20 bytes holding its own size, the window to watch, the point where the stylus came down and a flag. He sets the flag to <code>SHRG_RETURNCMD</code> (1), so Windows Mobile draws its red dots, waits, and returns <code>GN_CONTEXTMENU</code> for a hold instead of sending a message. The tray message number is <code>0BD5h</code> and the icon number <code>5001</code>, both his. The menus live at <code>1D458h</code> (first) and <code>1D238h</code> (second); the Reverse setting at <code>1C2B8h + 218h</code> swaps the two pointers before the menu opens. The scale comes from <code>sub_19078</code>, which reads the screen’s width and height once and answers 2 when either is 480.</p>
+    <p>The form is a <code>SHRGINFO</code>: 20 bytes holding its own size, the window to watch, the point where the stylus came down and a flag. HandyLauncher sets the flag to <code>SHRG_RETURNCMD</code> (1), so Windows Mobile draws its red dots, waits, and returns <code>GN_CONTEXTMENU</code> for a hold instead of sending a message. The tray message number is <code>0BD5h</code> and the icon number <code>5001</code>, both its own. The menus live at <code>1D458h</code> (first) and <code>1D238h</code> (second); the Reverse setting at <code>1C2B8h + 218h</code> swaps the two pointers before the menu opens. The scale comes from <code>sub_19078</code>, which reads the screen’s width and height once and answers 2 when either is 480.</p>
   </Deep>
 </section>
 
@@ -54,7 +54,7 @@ import engine from '../components/toys/ds-handylauncher/engine.json';
 
 <section id="hl-open" class="hl-w">
   <h2>Programs, documents, folders, songs</h2>
-  <p class="lead">A launcher that only launched programs would be half a launcher. His takes anything you can name, and asks a single question first: is this a folder?</p>
+  <p class="lead">A launcher that only launched programs would be half a launcher. HandyLauncher takes anything you can name, and asks a single question first: is this a folder?</p>
   <p>A folder, or the top of the whole device, opens in File Explorer. Everything else goes to <Term id="hl-shellexecute">ShellExecuteEx</Term>, and Windows works out the rest: a program starts, a document opens in Pocket Word, a song in Windows Media Player. In today’s terms the whole function is one line:</p>
   <pre class="hl-js"><code>isFolder(target) ? open('fexplore.exe', target) : open(target);   // the system picks the app</code></pre>
   <figure class="hl-toy"><Open /></figure>
@@ -62,10 +62,10 @@ import engine from '../components/toys/ds-handylauncher/engine.json';
 
 <section id="hl-engine" class="hl-w">
   <h2>One engine, three apps</h2>
-  <p class="lead">HandyLauncher, HandySwitcher and HandyMenu look like three programs. Inside, they share one engine that Yasser wrote once and built into all three.</p>
+  <p class="lead">HandyLauncher, HandySwitcher and HandyMenu look like three programs. Inside, they share one engine that DinarSoft wrote once and built into all three.</p>
   <p>The bytes show it. Every program file lists its functions in a small <Term id="hl-function-table">table</Term>. Line up the 2006 builds of all three apps, set aside the addresses (each program puts things in different places), and whole functions match, instruction for instruction. They cover how a Pocket PC’s code is read and folded, the <Term id="hl-key-engine">key engine</Term> and the disguised install date. They also cover the theme colors, the font that scales with the screen, the icon builder and the color picker. In this map, each block is one of HandyLauncher’s {engine.funcs.length} functions, as wide as its code.</p>
   <figure class="hl-toy"><Engine /></figure>
-  <p>The same goes for the screens around the engine. His License Key dialog and his Custom Colors page carry the same controls and the same words in all three apps. When he made one of them better, all three got better.</p>
+  <p>The same goes for the screens around the engine. The License Key dialog and the Custom Colors page carry the same controls and the same words in all three apps. When DinarSoft made one of them better, all three got better.</p>
   <Deep title="For engineers: how the functions were compared">
     <p>Function bounds come from each file’s <code>.pdata</code> section. Each function is disassembled with Capstone; branch targets inside the function become offsets, calls to other functions become a placeholder, calls to Windows keep their names, and every literal loaded from the code keeps its value unless it points into the program, which becomes a placeholder too. Strings stay as strings. Two functions count as the same when what is left matches exactly. Pairwise, HandySwitcher 2.7 and HandyLauncher 3.4 share {engine.pairs[0][2]} functions ({engine.pairs[0][3].toLocaleString('en-US')} bytes), HandySwitcher and HandyMenu 3.6 share {engine.pairs[1][2]}, and HandyLauncher and HandyMenu {engine.pairs[2][2]}. The script is <code>research/dinarsoft/re/handylauncher/shared.py</code>.</p>
   </Deep>
@@ -73,9 +73,9 @@ import engine from '../components/toys/ds-handylauncher/engine.json';
 
 <section id="hl-key" class="hl-w">
   <h2>The keys that open every copy</h2>
-  <p class="lead">HandyLauncher was <Term id="shareware">shareware</Term>: fifteen days to try it, then a sixteen-letter key. Yasser also built in a handful of keys that open every copy, on every device.</p>
+  <p class="lead">HandyLauncher was <Term id="shareware">shareware</Term>: fifteen days to try it, then a sixteen-letter key. DinarSoft also built in a handful of keys that open every copy, on every device.</p>
   <p>When you install it, the installer leaves the date in a small file, <code>\Windows\mcterthr.dat</code>. It is disguised as fourteen bytes with a checksum, so a curious hand cannot read it and a changed byte is caught. HandyLauncher counts the days from there. A normal key belongs to one device. The app reads the device’s ID and folds it into the sixteen characters shown on its License Key page as “Your Pocket PC Code”. Then it runs them through the key engine with the product name, <code>HandyLauncher3</code>. If your key matches, you are registered.</p>
-  <p>If it does not match, he tries again with five built-in sixteen-letter names instead of the device code. One is his own, <code>YASSERMOHAMEDALI</code>. One is <code>GIVEAWAYVERSION1</code>, a give-away version, as its name says. Three are names from his family. A key made from any of them opens every copy. He even compares those keys with a loop of his own and a little arithmetic, so a cracker waiting on the usual compare call never sees them go by.</p>
+  <p>If it does not match, HandyLauncher tries again with five built-in sixteen-letter names instead of the device code. One is Yasser’s own, <code>YASSERMOHAMEDALI</code>. One is <code>GIVEAWAYVERSION1</code>, a give-away version, as its name says. Three are names from his family. A key made from any of them opens every copy. HandyLauncher even compares those keys with a loop of its own and a little arithmetic, so a cracker waiting on the usual compare call never sees them go by.</p>
   <figure class="hl-toy"><Keys /></figure>
 </section>
 

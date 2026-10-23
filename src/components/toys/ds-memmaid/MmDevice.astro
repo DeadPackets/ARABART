@@ -46,18 +46,21 @@ const STORAGE = [['Windows', '58.86 MB', 1], ['Storage Card', '22.6 MB', 3], ['P
 const STARTUP = [['poutlook.lnk', true, '\\Windows\\poutlook.exe'], ['HandyLauncher.lnk', true, '\\Program Files\\HandyLauncher\\HandyLauncher.exe'], ['HandyMenu.lnk', true, '\\Program Files\\HandyMenu\\HandyMenu.exe'], ['HandySwitcher.lnk', false, '\\Program Files\\HandySwitcher\\HandySwitcher.exe']] as const;
 const TIMED = ['sqmevent.exe', '\\windows\\enrollnot.exe', '\\Windows\\calupd.exe', 'CALNOT.EXE', 'clocknot.exe'];
 const MMKEYS = ['LicKey', 'Language', 'AdvancedMode', 'EnabledItems', 'SecureDelete', 'ShowReport', 'ShowProgress', 'EnableSchedule', 'ScheduleFreq', 'ScheduleTime', 'RRHibernate', 'RRCompact', 'RRCloseAll', 'SilentReclaim', 'SkinColor', 'LastTab', 'Pie3D'];
-const tool = (i: number) => `--x:${-i * 28}px`;
-const file = (i: number) => `--x:${-i * 32}px`;
+// His VGA bitmaps, drawn at half size: one bitmap pixel per device pixel on a 2x screen, as on a VGA Pocket PC
+const tool = (i: number) => `--x:${-i * 11}px`;
+const file = (i: number) => `--x:${-i * 16}px`;
+interface Props { solo?: boolean }
+const { solo = false } = Astro.props;
 const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c');
 ---
 
-<div class="mmd" data-mm-device style={`--tabs:url(${tabsImg.src});--tools:url(${toolsImg.src});--files:url(${filesImg.src});--checks:url(${checksImg.src});--reg:url(${regImg.src})`}>
+<div class:list={['mmd', { 'is-solo': solo }]} data-mm-device style={`--tabs:url(${tabsImg.src});--tools:url(${toolsImg.src});--files:url(${filesImg.src});--checks:url(${checksImg.src});--reg:url(${regImg.src})`}>
   <script type="application/json" data-mmd set:html={json} />
-  <Window title="MemMaid" kind="device" num="12:00" class="mmd-dev" aria-label="MemMaid 2.3 on a Pocket PC. Tap through it.">
+  <Window title="MemMaid" kind="device" wm="5" theme="teal" ok="ok" icons={['conn', 'ant', 'vol']} sip class="mmd-dev" aria-label="MemMaid 2.3 on a Pocket PC. Tap through it.">
     <div class="mmd-scr" data-scr data-tab="cleaner" lang="en">
       <header class="mmd-head">
         <button type="button" class="mmd-view" data-act="views" aria-haspopup="menu" aria-expanded="false"><span data-title data-s="quick">{s('quick')}</span> ▾</button>
-        <span class="mmd-tools" aria-hidden="true"><i style={tool(14)}></i><i style={tool(5)}></i><i style={tool(17)}></i></span>
+        <span class="mmd-tools" aria-hidden="true"><i style={tool(18)}></i><i style={tool(7)}></i><i style={tool(14)}></i></span>
       </header>
       <ul class="mmd-menu mmd-views" data-pop="views" role="menu" hidden>
         {TABS.map(t => t.views.map(v => <li role="none" data-of={t.id}><button type="button" role="menuitem" data-go={v} data-s={v}>{s(v)}</button></li>))}
@@ -146,10 +149,10 @@ const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c'
           </ul>
           <p class="mmd-info" data-stinfo><span data-s="type">{s('type')}</span><span data-s="shortcut">{s('shortcut')}</span><br /><span data-s="target">{s('target')}</span><span data-sttarget>{STARTUP[1][2]}</span></p>
           <div class="mmd-btns mmd-icons">
-            <button type="button" class="mmd-tb" data-act="up" aria-label="Move up"><i style={tool(4)}></i></button>
-            <button type="button" class="mmd-tb" data-act="down" aria-label="Move down"><i style={tool(6)}></i></button>
-            <button type="button" class="mmd-tb" data-act="stop" aria-label="Disable"><i style={tool(21)}></i></button>
-            <button type="button" class="mmd-tb" data-act="play" aria-label="Enable"><i style={tool(20)}></i></button>
+            <button type="button" class="mmd-tb" data-act="up" aria-label="Move up"><i style={tool(5)}></i></button>
+            <button type="button" class="mmd-tb" data-act="down" aria-label="Move down"><i style={tool(8)}></i></button>
+            <button type="button" class="mmd-tb" data-act="stop" aria-label="Disable"><i style={tool(1)}></i></button>
+            <button type="button" class="mmd-tb" data-act="play" aria-label="Enable"><i style={tool(26)}></i></button>
           </div>
         </section>
 
@@ -166,10 +169,10 @@ const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c'
         <section data-view="running" class="mmd-v" hidden>
           <p class="mmd-cols"><span data-s-fmt="programs_n" data-n="6">Programs (6)</span><span data-s="memory">{s('memory')}</span></p>
           <ul class="mmd-list" data-run>
-            {RUNNING.map(([n, kb], i) => <li><button type="button" class:list={['mmd-row', { 'is-sel': i === 0 }]} data-r={i}><span>{n}</span><b>{kb}</b></button></li>)}
+            {RUNNING.map(([n, kb], i) => <li><button type="button" class:list={['mmd-row', { 'is-sel': i === 0 }]} data-r={i}><i class="mmd-ico" style={file(4)} aria-hidden="true"></i><span>{n}</span><b>{kb}</b></button></li>)}
           </ul>
-          <p class="mmd-info"><span data-s="installedby">{s('installedby')}</span>Windows Mobile<br />Target: \Windows\wmplayer.exe<br />Threads: 4</p>
-          <div class="mmd-btns"><button type="button" class="mmd-b" data-act="noop" data-s="activate">{s('activate')}</button><button type="button" class="mmd-b" data-act="noop" data-s="terminate">{s('terminate')}</button></div>
+          <p class="mmd-info"><span data-s="installedby">{s('installedby')}</span> Windows Mobile<br />Target: \Windows\wmplayer.exe<br />Threads: 4</p>
+          <div class="mmd-btns"><button type="button" class="mmd-b" data-act="noop" data-s="activate">{s('activate')}</button><button type="button" class="mmd-b" data-act="noop" data-s="memory">{s('memory')}</button><button type="button" class="mmd-b" data-act="noop" data-s="terminate">{s('terminate')}</button></div>
         </section>
 
         {Object.entries(GENERIC).map(([v, say]) => (
@@ -236,128 +239,131 @@ const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c'
       <section class="mmd-dlg mmd-today" data-dlg="exit" hidden><button type="button" class="mmd-b" data-act="run" data-s="run">{s('run')}</button></section>
       <p class="mmd-toast" data-toast aria-live="polite" hidden></p>
     </div>
-    <div slot="status" class="mmd-keys">
-      <button type="button" data-soft="0" data-s="jump">{s('jump')}</button>
-      <span class="mmd-kbd" aria-hidden="true"></span>
-      <button type="button" data-soft="1" data-s="tools">{s('tools')}</button>
-    </div>
+    <Fragment slot="status">
+      <button type="button" class="sk-l mmd-sk" data-soft="0" data-s="jump">{s('jump')}</button>
+      <button type="button" class="sk-r mmd-sk" data-soft="1" data-s="tools">{s('tools')}</button>
+    </Fragment>
   </Window>
-  <p class="mmd-cap">Rebuilt from MemMaid’s own icons, menus and strings. Lists show what DinarSoft’s own 2007 screenshots show; scan sizes are a sample.</p>
+  {!solo && <p class="mmd-cap">Rebuilt from MemMaid’s own icons, menus and strings. Lists show what DinarSoft’s own 2007 screenshots show; scan sizes are a sample.</p>}
 </div>
 
 <style is:global>
   .mmd { display: grid; justify-items: center; gap: 12px; }
-  .mmd .mmd-dev { width: min(100%, 372px); }
   .mmd .mmd-dev > .win-body { padding: 0; overflow: hidden; }
   .mmd-cap { max-width: 44ch; font-size: 0.875rem !important; line-height: 1.5 !important; color: var(--ink-2) !important; text-align: center; }
 
+  /* MemMaid 2 at QVGA: 8 pt Tahoma, rows of 18 pixels, his Stripes background and Rusty buttons, the theme's color for titles */
   .mmd-scr {
-    --hd: oklch(0.52 0.1 205); --sel: oklch(0.86 0.06 205); --bar: linear-gradient(oklch(0.42 0.02 250), oklch(0.2 0.02 250));
+    --hd: var(--wm-bar); --sel: var(--wm-tint); --hot: var(--wm-hl);
+    --stripes: repeating-linear-gradient(#fff 0 1px, color-mix(in srgb, var(--wm-tint) 30%, #fff) 1px 2px, color-mix(in srgb, var(--wm-tint) 50%, #fff) 2px 3px, color-mix(in srgb, var(--wm-tint) 12%, #fff) 3px 4px);
     position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%;
-    font: 500 13px/1.25 Tahoma, Verdana, var(--font-ui), sans-serif; color: #000;
-    background: repeating-linear-gradient(#fff 0 3px, oklch(0.95 0.015 220) 3px 6px);
+    font: 400 11px/1.2 var(--wm-font); color: #000; background: var(--stripes);
   }
-  .mmd-scr[data-tab='databases'], .mmd-scr[data-tab='storage'] { --hd: oklch(0.5 0.14 145); --sel: oklch(0.88 0.08 145); }
-  .mmd-scr[data-tab='tweaks'], .mmd-scr[data-tab='processes'] { --hd: oklch(0.5 0.17 25); --sel: oklch(0.86 0.07 25); }
-  .mmd-scr[data-tab='startups'] { --hd: oklch(0.48 0.15 255); --sel: oklch(0.86 0.07 255); }
-  .mmd-scr[data-skin='1'] { background: #fff; }
-  .mmd-scr[data-skin='2'] { background: linear-gradient(#fff, oklch(0.9 0.03 220)); }
-  .mmd-scr[data-skin='3'] { background: radial-gradient(circle at 30% 20%, #fff, oklch(0.9 0.03 220)); }
+  .mmd-scr[data-skin='1'] { --stripes: #fff; }
+  .mmd-scr[data-skin='2'] { --stripes: linear-gradient(#fff, color-mix(in srgb, var(--wm-tint) 70%, #fff)); }
+  .mmd-scr[data-skin='3'] { --stripes: radial-gradient(circle at 30% 20%, #fff, var(--wm-tint)); }
   .mmd-scr button { font: inherit; color: inherit; }
-  .mmd-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 4px 6px 2px; }
-  .mmd-view { min-height: 32px; padding: 0 4px; font-weight: 700 !important; font-size: 15px !important; color: var(--hd) !important; background: none; border: 0; cursor: pointer; text-align: left; }
+  .mmd-head { display: flex; align-items: center; justify-content: space-between; gap: 4px; height: 22px; padding: 0 3px 0 2px; border-bottom: 1px solid #000; }
+  .mmd-view { height: 20px; padding: 0 2px; font-weight: 700 !important; font-size: 11px !important; color: var(--hd) !important; background: none; border: 0; cursor: pointer; text-align: left; white-space: nowrap; }
   .mmd-tools { display: flex; gap: 4px; }
-  .mmd-tools i, .mmd-tb i { display: block; width: 28px; height: 22px; background: var(--tools) var(--x) 0 / 616px 22px no-repeat; }
-  .mmd-tools i { width: 30px; border-radius: 3px; background-color: #5f6670; background-position: calc(var(--x) + 1px) 0; box-shadow: inset 0 1px 0 #8b929c, inset 0 -2px 0 #2b3037; opacity: 0.85; }
-  .mmd-body { position: relative; min-height: 0; overflow: hidden; border-top: 1px solid #000; }
+  .mmd-tools i { display: block; width: 20px; height: 14px; border: 1px solid #000; border-radius: 2px; background: var(--tools) calc(var(--x) + 4px) 1px / 308px 11px no-repeat, linear-gradient(#c9cbcd, #8a9096 45%, #5d636a 55%, #7d838a); }
+  .mmd-body { position: relative; min-height: 0; overflow: hidden; }
   .mmd-v { display: grid; grid-template-rows: minmax(0, 1fr) auto auto auto auto; height: 100%; }
   .mmd-v[hidden] { display: none !important; }
-  .mmd-list { margin: 0; padding: 0; list-style: none; overflow: auto; overscroll-behavior: contain; background: #fff; }
-  .mmd-list ul { margin: 0; padding: 0 0 0 16px; list-style: none; }
-  .mmd-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 6px; width: 100%; min-height: 28px; padding: 1px 6px; text-align: left; background: none; border: 0; border-bottom: 1px solid oklch(0.93 0 0); cursor: pointer; }
+  .mmd-v[data-view='running'] { grid-template-rows: auto minmax(0, 1fr) auto auto; }
+  .mmd-list { margin: 0; padding: 0; list-style: none; overflow: hidden scroll; overscroll-behavior: contain; background: #fff; border-bottom: 1px solid #000; }
+  .mmd-list ul { margin: 0; padding: 0 0 0 12px; list-style: none; }
+  .mmd-list > li:nth-child(even) > .mmd-row:not(.is-sel) { background: color-mix(in srgb, var(--wm-tint) 25%, #f4f3f6); }
+  .mmd-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 3px; width: 100%; height: 18px; padding: 0 3px 0 2px; text-align: left; background: none; border: 0; cursor: pointer; }
   span.mmd-row { cursor: default; }
-  .mmd-row > span, .mmd-row { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .mmd-row b { font-weight: 500; }
-  .mmd-row:hover, .mmd-row.is-sel { background: var(--sel); }
-  .mmd-row:focus-visible, .mmd-b:focus-visible, .mmd-tabs button:focus-visible, .mmd-menu button:focus-visible, .mmd-keys button:focus-visible, .mmd-view:focus-visible { outline: 2px solid var(--hd); outline-offset: -2px; }
-  .mmd-ck { width: 18px; height: 18px; background: var(--checks) -18px 0 / 72px 18px; }
-  .mmd-row[aria-checked='true'] .mmd-ck { background-position: -36px 0; }
-  .mmd-ico { width: 20px; height: 20px; background: var(--files) calc(var(--x) * 0.625) 0 / 280px 20px; }
-  .mmd-rt { width: 20px; height: 19px; background: var(--reg) calc(var(--x) * 0.625) 0 / 80px 19px; }
-  .mmd-ball { --x: -224px; }
-  .mmd-row[aria-pressed='false'] .mmd-ball { --x: -192px; }
+  .mmd-row > span, .mmd-row { overflow: hidden; text-overflow: clip; white-space: nowrap; }
+  .mmd-row b { font-weight: 400; padding-right: 2px; }
+  .mmd-row:hover { background: var(--sel); }
+  .mmd-row.is-sel { color: #fff; background: var(--hot); }
+  [data-cats] .mmd-row.is-sel { color: #000; background: var(--sel); }
+  .mmd-row:focus-visible, .mmd-b:focus-visible, .mmd-tb:focus-visible, .mmd-tabs button:focus-visible, .mmd-menu button:focus-visible, .mmd-sk:focus-visible, .mmd-view:focus-visible { outline: 1px dotted currentColor; outline-offset: -2px; }
+  .mmd-ck { width: 16px; height: 16px; background: var(--checks) -16px 0 / 64px 16px; }
+  .mmd-row[aria-checked='true'] .mmd-ck { background-position: -32px 0; }
+  .mmd-all[aria-checked='false'] .mmd-ck { background-position: -48px 0; opacity: 0.6; }
+  .mmd-ico { width: 16px; height: 16px; background: var(--files) calc(var(--x)) 0 / 224px 16px; }
+  .mmd-rt { width: 16px; height: 15px; background: var(--reg) calc(var(--x) * 0.5) 0 / 64px 15px; }
+  .mmd-ball { --x: -112px; }
+  .mmd-row[aria-pressed='false'] .mmd-ball { --x: -96px; }
   .mmd-tree .mmd-row { grid-template-columns: auto minmax(0, 1fr); }
-  .mmd-tree button.mmd-row::before { content: '+'; display: none; }
-  .mmd-total, .mmd-cols { display: flex; justify-content: space-between; margin: 0 !important; padding: 3px 6px; font-size: 12px !important; color: #000 !important; background: oklch(0.93 0.01 220); border-top: 1px solid #000; }
-  .mmd-prog { height: 12px; margin: 0 4px; border: 1px solid oklch(0.45 0.05 220); border-radius: 6px; background: oklch(0.85 0.03 220); overflow: hidden; }
-  .mmd-prog i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(oklch(0.75 0.1 205), oklch(0.5 0.1 210)); }
-  .mmd-cols { border-top: 0; border-bottom: 1px solid #000; font-weight: 700; }
-  .mmd-info { margin: 0 !important; min-height: 4.2em; padding: 4px 6px; font-size: 12px !important; line-height: 1.35 !important; color: #000 !important; background: #fff; border-top: 1px solid #000; overflow-wrap: anywhere; }
-  .mmd-btns { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding: 4px; }
+  .mmd-total b { font-weight: 400; }
+  .mmd-total, .mmd-cols { display: flex; justify-content: space-between; margin: 0 !important; padding: 0 3px; height: 15px; font-size: 11px !important; line-height: 15px !important; color: #000 !important; }
+  .mmd-prog { height: 11px; margin: 1px 1px 3px; border: 1px solid var(--wm-mid); border-radius: 6px; background: linear-gradient(var(--wm-hi), var(--wm-mid)); overflow: hidden; }
+  .mmd-prog i { display: block; height: 100%; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(#fff8, #fff0 50%, #0002); }
+  .mmd-cols { height: 20px; line-height: 20px !important; padding: 0; border-bottom: 1px solid #000; background: color-mix(in srgb, var(--wm-tint) 80%, #fff); }
+  .mmd-cols span { padding: 0 4px; }
+  .mmd-cols span:first-child { flex: 1; border-right: 1px solid #000; }
+  .mmd-cols span:last-child { width: 64px; text-align: center; border-right: 1px solid #000; margin-right: 12px; }
+  .mmd-info { margin: 0 !important; height: 48px; padding: 1px 2px; font-size: 11px !important; line-height: 1.2 !important; color: #000 !important; background: #fff; border-bottom: 1px solid #000; overflow: hidden auto; overflow-wrap: anywhere; }
+  .mmd-btns { display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding: 4px 2px 5px; }
   .mmd-btns .mmd-all { width: auto; margin-right: auto; border: 0; background: none; }
-  .mmd-b { min-width: 72px; min-height: 30px; padding: 0 10px; font-weight: 700 !important; color: #fff !important; border: 1px solid #000; border-radius: 3px; background: var(--bar); box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.35); cursor: pointer; }
-  .mmd-b:active { background: oklch(0.25 0.02 250); }
-  .mmd-tb { display: grid; place-items: center; width: 40px; height: 30px; border: 1px solid #000; border-radius: 3px; background: var(--bar); cursor: pointer; }
-  .mmd-plain .mmd-row { border: 0; background: none; }
-  .mmd-plain { background: none; padding: 4px 0; }
-  .mmd-stats { display: grid; gap: 4px; margin: 0; padding: 6px; }
+  /* His Rusty buttons: a dark glass bar with a light top */
+  .mmd-b { flex: 1 1 0; max-width: 76px; height: 21px; padding: 0 4px; font-weight: 700 !important; font-size: 12px !important; color: #fff !important; text-shadow: 0 1px 0 #000; border: 1px solid #000; border-radius: 2px; background: linear-gradient(#dddfdc 1px, #c8c6ca 4px, #80868a 8px, #424547 10px, #2a3440 15px, #585960 18px, #1a1d22); cursor: pointer; white-space: nowrap; }
+  .mmd-b:active { background: linear-gradient(#2a3440, #424547); }
+  .mmd-tb { display: grid; place-items: center; width: 34px; height: 20px; padding: 0; border: 1px solid #000; border-radius: 2px; background: linear-gradient(#dddfdc 1px, #c8c6ca 4px, #80868a 8px, #424547 10px, #2a3440 15px, #1a1d22); cursor: pointer; }
+  .mmd-tb i { display: block; width: 11px; height: 11px; background: var(--tools) var(--x) 0 / 308px 11px no-repeat; }
+  .mmd-btns.mmd-icons { justify-content: flex-start; gap: 2px; }
+  .mmd-plain .mmd-row { border: 0; background: none !important; }
+  .mmd-plain { background: none; padding: 4px 0; border: 0; }
+  .mmd-stats { display: grid; gap: 3px; margin: 0; padding: 4px; }
   .mmd-stats div { display: flex; justify-content: space-between; }
   .mmd-stats dd { margin: 0; }
-  .mmd-form { display: grid; align-content: start; gap: 4px; padding: 6px; overflow: auto; }
-  .mmd-form label { display: grid; grid-template-columns: minmax(0, 1fr) 80px 18px; align-items: center; gap: 6px; }
-  .mmd-form input { width: 100%; min-height: 26px; padding: 0 4px; font: inherit; border: 1px solid #000; background: #fff; }
+  .mmd-form { display: grid; align-content: start; gap: 4px; padding: 4px; overflow: auto; border-bottom: 1px solid #000; }
+  .mmd-form label { display: grid; grid-template-columns: minmax(0, 1fr) 72px 16px; align-items: center; gap: 4px; }
+  .mmd-form input { width: 100%; height: 18px; padding: 0 2px; font: inherit; border: 1px solid #000; border-radius: 0; background: #fff; }
   .mmd-grp { font-weight: 700; }
-  .mmd-gen { place-items: center; align-content: center; gap: 8px; padding: 16px; text-align: center; grid-template-rows: none; }
-  .mmd-gen p { max-width: 26ch; font-size: 13px; color: #000; }
-  .mmd-gen-t { font-weight: 700; color: var(--hd) !important; font-size: 15px !important; }
-  .mmd-big { width: 64px; height: 50px; background: var(--tabs) calc(var(--i) * -64px) 0 / 384px 50px; }
+  .mmd-gen { place-items: center; align-content: center; gap: 6px; padding: 10px; text-align: center; grid-template-rows: none; }
+  .mmd-gen p { max-width: 28ch; font-size: 11px; color: #000; }
+  .mmd-gen-t { font-weight: 700; color: var(--hd) !important; font-size: 12px !important; }
+  .mmd-big { width: 32px; height: 25px; background: var(--tabs) calc(var(--i) * -32px) 0 / 192px 25px; }
 
-  .mmd-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid #000; background: oklch(0.88 0 0); }
-  .mmd-tabs button { display: grid; place-items: center; min-height: 48px; padding: 0; background: oklch(0.88 0 0); border: 0; border-left: 1px solid #000; cursor: pointer; }
+  /* The six tabs, his icons from MemMaidVGARes.dll; the open one sits on the page's own background */
+  .mmd-tabs { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); height: 33px; border-top: 1px solid #2a2c29; }
+  .mmd-tabs button { display: grid; place-items: center; height: 32px; padding: 0; background: #dddfdc; border: 0; border-left: 1px solid #2a2c29; cursor: pointer; }
   .mmd-tabs button:first-child { border-left: 0; }
-  .mmd-tabs i { width: 46px; height: 36px; background: var(--tabs) calc(var(--i) * -46px) 0 / 276px 36px; filter: grayscale(1) contrast(0.9); opacity: 0.85; transition: filter 0.2s, transform 0.2s; }
-  .mmd-tabs button[aria-pressed='true'] { background: #fff; }
-  .mmd-tabs button[aria-pressed='true'] i { filter: none; opacity: 1; transform: translateY(-2px) scale(1.08); }
+  .mmd-tabs i { width: 32px; height: 25px; background: var(--tabs) calc(var(--i) * -32px) 0 / 192px 25px; filter: saturate(0.25) brightness(0.95); }
+  .mmd-tabs button[aria-pressed='true'] { margin-top: -1px; height: 33px; background: var(--stripes); }
+  .mmd-tabs button[aria-pressed='true'] i { filter: none; }
 
-  .mmd-menu { position: absolute; z-index: 5; margin: 0; padding: 2px; list-style: none; background: #fff; border: 1px solid #000; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.35); }
-  .mmd-menu button { display: block; width: 100%; min-height: 30px; padding: 0 10px; text-align: left; background: none; border: 0; cursor: pointer; white-space: nowrap; }
-  .mmd-menu button:hover { color: #fff; background: var(--hd); }
-  .mmd-views { left: 6px; top: 36px; min-width: 60%; }
-  .mmd-jump { left: 4px; bottom: 4px; max-height: calc(100% - 8px); overflow: auto; width: 62%; }
-  .mmd-jump .mmd-mh { display: block; padding: 4px 6px 0; font-size: 11px; font-weight: 700; color: var(--hd); }
+  .mmd-menu { position: absolute; z-index: 5; margin: 0; padding: 1px; list-style: none; background: #fff; border: 1px solid #000; }
+  .mmd-menu button { display: block; width: 100%; height: 18px; padding: 0 8px; text-align: left; background: none; border: 0; cursor: pointer; white-space: nowrap; }
+  .mmd-menu button:hover, .mmd-menu button:focus-visible { color: #fff; background: var(--wm-bar); outline: 0; }
+  .mmd-views { left: 2px; top: 21px; min-width: 60%; }
+  .mmd-jump { left: 0; bottom: 0; max-height: 100%; overflow: auto; width: 62%; scrollbar-width: none; }
+  .mmd-jump .mmd-mh { display: block; padding: 2px 4px 0; font-size: 11px; font-weight: 700; color: var(--hd); }
   .mmd-jump ul { margin: 0; padding: 0; list-style: none; }
-  .mmd-toolsmenu { right: 4px; bottom: 4px; width: 52%; }
-  .mmd-toolsmenu li[role='separator'] { height: 1px; margin: 2px 4px; background: #000; }
+  .mmd-toolsmenu { right: 0; bottom: 0; width: 52%; }
+  .mmd-toolsmenu li[role='separator'] { height: 1px; margin: 2px 3px; background: #000; }
 
-  .mmd-dlg { position: absolute; inset: 0; z-index: 4; display: grid; align-content: start; justify-items: center; gap: 8px; padding: 0 10px 10px; text-align: center; background: #fff; overflow: auto; }
+  .mmd-dlg { position: absolute; inset: 0; z-index: 4; display: grid; align-content: start; justify-items: center; gap: 6px; padding: 0 6px 8px; text-align: center; background: var(--stripes); overflow: auto; }
   .mmd-dlg[hidden] { display: none !important; }
-  .mmd-dt { justify-self: stretch; margin: 0 -10px 6px !important; padding: 6px 10px; font-weight: 700; font-size: 15px !important; text-align: left; color: var(--hd) !important; border-bottom: 1px solid #000; }
-  .mmd-dlg p { font-size: 13px; color: #000; }
-  .mmd-ver { font-weight: 700; font-size: 15px !important; }
+  .mmd-dt { justify-self: stretch; margin: 0 -6px 4px !important; padding: 0 3px; height: 22px; line-height: 22px !important; font-weight: 700; font-size: 12px !important; text-align: left; color: var(--hd) !important; border-bottom: 1px solid #000; }
+  .mmd-dlg p { font-size: 11px; color: #000; }
+  .mmd-ver { font-weight: 700; font-size: 12px !important; }
   .mmd-lic { color: var(--hd) !important; font-weight: 700; }
-  .mmd-dlg fieldset { display: grid; justify-items: center; gap: 4px; width: 100%; margin: 4px 0 0; padding: 8px; border: 1px solid #000; }
-  .mmd-code { font: 700 14px/1 var(--font-code) !important; letter-spacing: 0.04em; }
+  .mmd-dlg fieldset { display: grid; justify-items: center; gap: 3px; width: 100%; margin: 2px 0 0; padding: 4px; border: 1px solid #000; }
+  .mmd-code { font: 700 11px/1 var(--wm-font) !important; letter-spacing: 0.04em; }
   .mmd-small { font-size: 11px !important; color: #333 !important; }
   .mmd-key { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; width: 100%; }
-  .mmd-key input { min-width: 0; min-height: 32px; padding: 0; font: 700 14px/1 var(--font-code); text-align: center; text-transform: uppercase; border: 1px solid #000; background: #fff; }
-  .mmd-key input:focus-visible, .mmd-lang select:focus-visible { outline: 2px solid var(--hd); outline-offset: 1px; }
-  .mmd-lang { display: grid; gap: 6px; justify-items: start; width: 100%; text-align: left; }
-  .mmd-lang select { width: 100%; min-height: 34px; font: inherit; border: 1px solid #000; background: #fff; }
+  .mmd-key input { min-width: 0; height: 20px; padding: 0; font: 700 11px/1 var(--wm-font); text-align: center; text-transform: uppercase; border: 1px solid #000; border-radius: 0; background: #fff; }
+  .mmd-key input:focus-visible, .mmd-lang select:focus-visible { outline: 1px dotted #000; outline-offset: 1px; }
+  .mmd-lang { display: grid; gap: 4px; justify-items: start; width: 100%; text-align: left; }
+  .mmd-lang select { width: 100%; height: 20px; }
   .mmd-skins { display: grid; width: 100%; }
   .mmd-skins .mmd-row { grid-template-columns: auto 1fr; }
-  .mmd-skins .mmd-row[aria-checked='true'] .mmd-ck { background-position: -36px 0; }
+  .mmd-skins .mmd-row[aria-checked='true'] .mmd-ck { background-position: -32px 0; }
   .mmd-ask { align-content: center; }
   .mmd-black { place-content: center; background: #000; cursor: pointer; }
   .mmd-black p { color: #777 !important; }
-  .mmd-today { place-content: center; background: linear-gradient(oklch(0.55 0.1 220), oklch(0.35 0.08 230)); }
-  .mmd-toast { position: absolute; left: 8px; right: 8px; bottom: 56px; z-index: 6; margin: 0 !important; padding: 8px 10px; font-size: 12px !important; line-height: 1.35 !important; color: #000 !important; background: oklch(0.97 0.05 95); border: 1px solid #000; box-shadow: 3px 3px 0 oklch(0 0 0 / 0.3); }
+  .mmd-today { place-content: center; background: var(--wm-wall, #3a7bc8); }
+  .mmd-toast { position: absolute; left: 4px; right: 4px; bottom: 40px; z-index: 6; margin: 0 !important; padding: 4px 6px; font-size: 11px !important; line-height: 1.25 !important; color: #000 !important; background: #ffffe1; border: 1px solid #000; }
 
-  .mmd-keys { display: grid !important; grid-template-columns: 1fr auto 1fr; align-items: center; height: 100%; padding: 0 !important; }
-  .mmd-keys button { min-height: 32px; font: 700 13px/1 var(--font-ui, sans-serif); color: #fff; background: none; border: 0; cursor: pointer; }
-  .mmd-keys button:active { background: oklch(1 0 0 / 0.15); }
-  .mmd-kbd { width: 22px; height: 12px; border: 2px solid #fff; border-radius: 2px; opacity: 0.85; }
-  .mmd .mmd-dev > .win-status { height: 34px; padding: 0 4px; }
-  .mmd-keys { flex: 1; }
+  .mmd-sk { height: 26px; padding: 0 6px; font: inherit; color: #fff; background: none; border: 0; cursor: pointer; white-space: nowrap; }
+  .mmd-sk:active { background: oklch(1 0 0 / 0.2); }
   @media (prefers-reduced-motion: reduce) { .mmd-tabs i { transition: none; } }
 </style>
 
@@ -375,6 +381,9 @@ const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c'
     const $ = (q: string) => scr.querySelector<HTMLElement>(q)!;
     const $$ = (q: string) => [...scr.querySelectorAll<HTMLElement>(q)];
     const soft = [...root.querySelectorAll<HTMLButtonElement>('[data-soft]')];
+    const win = root.querySelector<HTMLElement>('.win--device')!;
+    // Each tab in the theme DinarSoft shot it in (mm2-1 to mm2-6)
+    const THEME: Record<string, string> = { cleaner: 'teal', databases: 'green', tweaks: 'red', startups: 'teal', storage: 'green', processes: 'red' };
     let lang = 0, view = 'quick', dlg = '', registered = false;
     const last: Record<string, string> = {};
     const t = (k: string) => {
@@ -388,7 +397,7 @@ const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c'
       $$('[data-s]').forEach(el => (el.textContent = t(el.dataset.s!)));
       $$('[data-s-label]').forEach(el => el.setAttribute('aria-label', t(el.dataset.sLabel!)));
       $$('[data-s-fmt]').forEach(el => (el.textContent = t(el.dataset.sFmt!).replace('%d', el.dataset.n!)));
-      root.querySelectorAll<HTMLElement>('.mmd-keys [data-s]').forEach(el => (el.textContent = t(el.dataset.s!)));
+      root.querySelectorAll<HTMLElement>('[data-soft]').forEach(el => (el.textContent = t(el.dataset.s!)));
       scr.lang = ['en', 'de', 'fr', 'it', 'cs', 'sk', 'ru', 'zh-Hans'][lang];
       paintLic();
       $('[data-title]').textContent = t(view);
@@ -405,6 +414,7 @@ const json = JSON.stringify({ STR, SAMPLE, TABS, code }).replace(/</g, '\\u003c'
       view = v; last[tab.id] = v;
       closePops();
       scr.dataset.tab = tab.id;
+      win.dataset.wmt = THEME[tab.id];
       $$('[data-view]').forEach(s => (s.hidden = s.dataset.view !== v));
       $$('[data-tab-btn]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tabBtn === tab.id)));
       $$('.mmd-views [data-of]').forEach(li => (li.hidden = li.dataset.of !== tab.id));

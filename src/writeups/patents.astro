@@ -14,8 +14,12 @@ import KeyZoom from '../components/toys/story/KeyZoom.astro';
 import SameQuestion from '../components/toys/story/SameQuestion.astro';
 import Fig5 from '../components/toys/story/Fig5.astro';
 import TemplateBridge from '../components/toys/story/TemplateBridge.astro';
+import CitedBy from '../components/toys/story/CitedBy.astro';
+import cites from '../../research/patents/citations.json';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const outside = cites.filter(r => r.assignee !== 'Alcatel');
+const nCo = new Set(outside.map(r => r.assignee)).size;
 const CLAIMS = [
   ['Every part gets one number, and no two records in the whole database share it.', 'the abstract'],
   ['The number is cut into groups of bits, one group for each level: node, shelf, card and port. Each group names the part above at that level.', 'point 1'],
@@ -53,6 +57,7 @@ const FILINGS = [
       <h1 id="pt-h1">One number for every port</h1>
       <p class="pt-lead">A phone company’s network is millions of parts, nested inside each other. In 2005 Yasser Awad gave every part one number that says exactly where it sits. With it, the software that runs the network finds everything inside any part in a single read.</p>
       <p class="pt-meta">US patent <b>7,603,377</b>, granted 13 October 2009. <b>Yasser Awad</b>, first-named inventor, with Ahmed Moustafa and Mohamad Hassoun, at Alcatel in Kanata.</p>
+      <p class="pt-meta"><a href="#cited">Cited by {outside.length} later patent filings</a>, from Cisco, IBM, Oracle, Huawei and {nCo - 4} more companies.</p>
     </div>
     <AddressFilm />
   </section>
@@ -169,6 +174,19 @@ const FILINGS = [
         <li>The router templates in the diagram above are examples written in that format.</li>
       </ul>
     </Deep>
+  </section>
+
+  <section class="pt-sec" id="cited" aria-labelledby="h-cited">
+    <div class="pt-text">
+      <h2 id="h-cited">Cited by Cisco, IBM, Oracle and Huawei</h2>
+      <p class="pt-big">Every patent lists the earlier inventions closest to it, its prior art, and the patent examiner adds more. <b>{outside.length}</b> later patent filings, from <b>{nCo}</b> companies, list Yasser’s two inventions.</p>
+    </div>
+    <div class="pt-cols">
+      <p>His database key is cited in storage and database patents: IBM’s index for huge storage clusters, Oracle’s in-memory database, Brocade’s switch configuration, Teradata and Citrix on nested data. His script templates are cited across network automation: Cisco, Huawei, Juniper, Arista, AT&amp;T, Hewlett Packard Enterprise, Level 3, and Ericsson’s CENX.</p>
+      <p>The citations keep coming. They started in 2007 and reached their highest point in 2023, more than fifteen years after he filed. Pick a company to light up its dots, pick any dot or row to read what that invention does, and sort the list by any column.</p>
+    </div>
+    <CitedBy />
+    <p class="pt-after">From Google Patents, checked against the US patent office’s own full-text search in October 2026. Cisco and Oracle cite him through the Chinese filings of their inventions. Alcatel’s own filings that cite him are not counted.</p>
   </section>
 
   <section class="pt-sec" id="filings" aria-labelledby="h-filings">

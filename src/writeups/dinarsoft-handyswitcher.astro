@@ -21,7 +21,7 @@ const KEY = groups(unlock.generate({}));
 <section id="hs-x" class="hs">
   <h2>The X that really closes</h2>
   <p class="lead">On a 2003 Pocket PC, the X in the corner did not close anything. It only hid the program, which kept running and kept eating memory. Yasser’s HandySwitcher put a small icon in the top bar, and one tap showed every running program, each with an X that really closed it.</p>
-  <p>Try it. This is the menu as he drew it, with his own action icons and his five menu colors. Tap a name to switch to that program. Tap its X to close it. One of these programs has stopped responding, so watch what HandySwitcher does with it.</p>
+  <p>Try it. This is the menu as HandySwitcher drew it, with its own action icons and its five menu colors. Tap a name to switch to that program. Tap its X to close it. One of these programs has stopped responding, so watch what HandySwitcher does with it.</p>
   <LiveSwitcher />
   <p>This is the menu that won Task Managers at <cite>Smartphone &amp; Pocket PC</cite> magazine two years in a row. The rest of this page opens it up, from the files in its installer down to single ARM instructions. All of it is read back from the copies DinarSoft published for <Term id="hs-windows-mobile">Windows Mobile</Term>.</p>
 </section>
@@ -46,8 +46,8 @@ const KEY = groups(unlock.generate({}));
 <section id="hs-topbar" class="hs">
   <h2>A seat on the system’s top bar</h2>
   <p class="lead">The top bar belonged to Windows Mobile. No program was supposed to put buttons in it. HandySwitcher, HandyMenu and HandyLauncher all have icons there anyway, and the trick behind it takes three calls.</p>
-  <p>Every window on Windows has one <Term id="hs-window-proc">window procedure</Term>, a function that receives every tap and key press meant for it. A tiny helper, HHTask.exe, finds the top bar by its class name and swaps in its own function. It keeps the old one. Taps on his icons, and on the (X), go to his apps as a <Term id="hs-post-message">posted message</Term>. On the HandyMenu, HandyLauncher and (X) buttons it also checks for <Term id="hs-tap-and-hold">tap and hold</Term>, so a long press can do a second job. Every other tap goes, untouched, to the old function. This is <Term id="hs-subclassing">subclassing</Term>, the same idea as wrapping a function in JavaScript and calling the original for everything you do not handle.</p>
-  <p>Tap a part of the bar, then step his code and watch where the tap goes.</p>
+  <p>Every window on Windows has one <Term id="hs-window-proc">window procedure</Term>, a function that receives every tap and key press meant for it. A tiny helper, HHTask.exe, finds the top bar by its class name and swaps in its own function. It keeps the old one. Taps on its icons, and on the (X), go to DinarSoft’s apps as a <Term id="hs-post-message">posted message</Term>. On the HandyMenu, HandyLauncher and (X) buttons it also checks for <Term id="hs-tap-and-hold">tap and hold</Term>, so a long press can do a second job. Every other tap goes, untouched, to the old function. This is <Term id="hs-subclassing">subclassing</Term>, the same idea as wrapping a function in JavaScript and calling the original for everything you do not handle.</p>
+  <p>Tap a part of the bar, then step the code and watch where the tap goes.</p>
   <TopBar />
   <p>One helper serves all three apps. It reads the HandyMenu and HandyLauncher settings too, draws their icons, and if HandyMenu is not running yet, it starts it from the folder its installer recorded.</p>
 </section>
@@ -55,7 +55,7 @@ const KEY = groups(unlock.generate({}));
 <section id="hs-close" class="hs">
   <h2>Polite, patient, then firm</h2>
   <p class="lead">Closing a program sounds simple. Yasser’s close routine treats every program the way a good host treats a guest: ask nicely, give it time, and only then insist.</p>
-  <p>It sends <Term id="hs-wm-close">WM_CLOSE</Term>, the same polite request a desktop window gets when you click its X, so the program can save your work. Windows Media Player keeps playing music when asked, so for that one he presses its own Quit keys, Ctrl+Q, on your behalf. A busy program gets up to six seconds while the wait cursor spins. A program that never answers gets one question to you in plain words, and then <Term id="hs-terminate">TerminateProcess</Term> ends it. Pick a program and step through his code.</p>
+  <p>It sends <Term id="hs-wm-close">WM_CLOSE</Term>, the same polite request a desktop window gets when you click its X, so the program can save your work. Windows Media Player keeps playing music when asked, so for that one HandySwitcher presses its own Quit keys, Ctrl+Q, on your behalf. A busy program gets up to six seconds while the wait cursor spins. A program that never answers gets one question to you in plain words, and then <Term id="hs-terminate">TerminateProcess</Term> ends it. Pick a program and step through the code.</p>
   <Closer />
   <Deep title="For engineers: which windows count as programs">
     <p>HandySwitcher walks the windows with <code>EnumWindows</code> and keeps only real, visible, top-level programs. Version 3.1 carries its own list of system window classes to skip, among them <code>desktopexplorerwindow</code> (the Today screen), <code>hhtaskbar</code>, <code>ms_sipbutton</code> (the keyboard button), <code>menu_worker</code>, <code>cursorwindow</code> and <code>tooltips_class32</code>. It also knows that a window whose process is <code>device.exe</code> or <code>rnaapp.exe</code> belongs to the system. Your own ignore list sits on top of that.</p>
@@ -63,7 +63,7 @@ const KEY = groups(unlock.generate({}));
 </section>
 
 <section id="hs-settings" class="hs">
-  <h2>His settings, rebuilt from his own dialogs</h2>
+  <h2>Its settings, rebuilt from its own dialogs</h2>
   <p class="lead">A Windows program keeps the layout of each screen as data inside itself: every label, box and button with its exact place. These are HandySwitcher 3.1’s own <Term id="hs-dialog-template">dialog templates</Term>, read out of HandySwitcher.dll and drawn again here, unit for unit.</p>
   <p>The Colors page is live. Pick Theme Colors and the menu takes the colors of the phone’s theme, read from the <Term id="hs-registry">registry</Term>, the way an app follows dark mode today. Pick your own five colors and both menus on this page follow.</p>
   <Settings />
@@ -74,7 +74,7 @@ const KEY = groups(unlock.generate({}));
   <p class="lead">HandySwitcher was <Term id="shareware">shareware</Term>: 15 days to try it, then a 16-letter key. In 2026, Yasser Awad released it as freeware, and the key that opens every copy of version 3.1 is made from his own name.</p>
   <p>Here is how a key was born. Each Pocket PC has a <Term id="hs-device-id">device ID</Term>. HandySwitcher turns it into a 16-letter <b>Pocket PC Code</b> and shows it on the License Key screen. The buyer sent that code to DinarSoft, and DinarSoft sent back the key. The key engine is Yasser’s own take on <Term id="hs-rc4">RC4</Term>, a classic cipher. A deck of 120 numbers is shuffled with the product name, then dealt, card by card, over the letters of the code. Each product name gives a different shuffle, so a HandyMenu key never opens HandySwitcher. The letter O never appears, so nobody reads it as a zero.</p>
   <p>Version 3.1 also accepts a few built-in codes, so one key fits every device. The first of them is YASSERMOHAMEDALI: his name. Step the engine on it below and you get the freeware key. Or type any Pocket PC code.</p>
-  <p>The engine is one of 24 functions, 4,508 bytes of machine code, shared instruction for instruction by HandySwitcher 2.7, HandyMenu 3.6 and HandyLauncher 3.4. The Pocket PC Code, the key engine and the trial record are among them: Yasser wrote them once and built all three apps on them.</p>
+  <p>The engine is one of 24 functions, 4,508 bytes of machine code, shared instruction for instruction by HandySwitcher 2.7, HandyMenu 3.6 and HandyLauncher 3.4. The Pocket PC Code, the key engine and the trial record are among them: DinarSoft wrote them once and built all three apps on them.</p>
   <KeyEngine />
   <div class="hs-free" role="note">
     <p><b>The freeware key for HandySwitcher 3.1:</b> <code>{KEY}</code></p>

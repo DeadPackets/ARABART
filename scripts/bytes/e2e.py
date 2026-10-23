@@ -8,7 +8,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import avscan  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-SITE = os.environ.get('EB_SITE', 'http://localhost:4322/ARABART')
+SITE = os.environ.get('EB_SITE', 'http://localhost:4322')
 OUT = pathlib.Path(os.environ.get('EB_OUT', tempfile.mkdtemp(prefix='eb-e2e-')))
 OUT.mkdir(parents=True, exist_ok=True)
 CH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -132,7 +132,7 @@ async def main():
             b = await ev("document.querySelector('.bx-p-byte').innerText")
             check('byte inspector shows that byte', 'BAh' in b and '01B70' in b, b.replace('\n', ' '))
             lk = await ev("document.querySelector('.bx-p-head .bx-go')?.getAttribute('href')")
-            check('region links to its writeup section', bool(re.fullmatch(r'/ARABART/program/brave-sun/#[\w-]+', lk or '')), lk)
+            check('region links to its writeup section', bool(re.fullmatch(r'/program/brave-sun/#[\w-]+', lk or '')), lk)
 
             # 5. ladder to Code: an instruction is under the camera
             await ev("document.querySelector('.bx-ladder [data-go=code]').click()"); await asyncio.sleep(2.6)
@@ -199,12 +199,12 @@ async def main():
             maps = await ev("document.querySelectorAll('#bytes .bm-win').length")
             check('brave-sun shows SUN.EXE and ARAB-ART.EXE', maps == 2, maps)
             hrefs = await ev("[...document.querySelectorAll('#bytes .bm-top a')].map(a=>a.getAttribute('href'))")
-            bad = [u for u in hrefs if not re.fullmatch(r'/ARABART/bytes/\?f=[A-Z_\-.]+&layer=(memory|disk)&at=[0-9a-f]+', u)]
+            bad = [u for u in hrefs if not re.fullmatch(r'/bytes/\?f=[A-Z_\-.]+&layer=(memory|disk)&at=[0-9a-f]+', u)]
             check('BytesMap links match the deep-link format', hrefs and not bad, bad or len(hrefs))
             label = await ev("document.querySelector('#bytes .bm-top .t').textContent")
             await ev("document.getElementById('bytes').scrollIntoView()"); await asyncio.sleep(0.4)
             await shot('6-program-bytesmap')
-            await go(SITE.split('/ARABART')[0] + hrefs[0])
+            await go(SITE + hrefs[0])
             h = await head(); check('BytesMap link opens the same region in /bytes/', h == label, f'{label!r} vs {h!r}')
 
         await block(bytesmap)

@@ -60,17 +60,17 @@ const PRESETS: [string, string][] = [['~gtk', 'الفن'], ['dhsv', 'ياسر'],
   .sl-t { display: grid; justify-items: center; gap: 4px; min-width: 76px; padding: 8px 6px 6px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow 0.2s var(--quart); }
   .sl-t.is-di { box-shadow: inset 0 0 0 2px var(--accent); }
   .sl-t.is-si { box-shadow: inset 0 0 0 2px var(--accent-2); }
-  .sl-i { font: 500 10px/1 var(--font-code); color: var(--ink-2); }
+  .sl-i { font: 500 12px/1 var(--font-code); color: var(--ink-2); }
   .sl-g { display: grid; place-items: end center; height: 54px; }
   .sl-g svg { width: auto; height: 51px; }
   .sl-hex { font: 700 15px/1 var(--font-code); color: var(--accent); }
-  .sl-bits { display: flex; gap: 1px; font: 600 11px/1 var(--font-code); }
-  .sl-bits i { font-style: normal; width: 8px; text-align: center; color: var(--ink-2); }
+  .sl-bits { display: flex; gap: 1px; font: 600 12px/1 var(--font-code); font-stretch: 75%; }
+  .sl-bits i { font-style: normal; width: 1ch; text-align: center; color: var(--ink-2); }
   .sl-bits i.h { color: var(--surface); background: var(--accent-2); }
   .sl-bits i.h.z { color: var(--accent-2); background: none; box-shadow: inset 0 0 0 1px var(--accent-2); }
-  .sl-f { font: 600 11px/1 var(--font-code); color: var(--ink); }
+  .sl-f { font: 600 12px/1 var(--font-code); color: var(--ink); }
   .sl-ptrs { position: relative; height: 26px; margin-top: 6px; }
-  .sl-p { position: absolute; left: 0; top: 0; padding: 3px 6px; font: 700 11px/1.2 var(--font-code); color: var(--surface); background: var(--accent); white-space: nowrap; opacity: 0; }
+  .sl-p { position: absolute; left: 0; top: 0; padding: 3px 6px; font: 700 12px/1.2 var(--font-code); color: var(--surface); background: var(--accent); white-space: nowrap; opacity: 0; }
   .sl-p[data-p='si'] { background: var(--accent-2); top: 0; }
   .sl-p::before { content: '▲ '; }
   .sl-vga { display: grid; place-items: center; min-height: 200px; height: 100%; padding: 16px; background: var(--vga-0); }

@@ -14,7 +14,7 @@ import WkIcons from '../components/toys/tools/WkIcons.astro';
 import WkMod8 from '../components/toys/tools/WkMod8.astro';
 import '../components/toys/tools/tools.css';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <section id="wk-button" class="wk-sec">

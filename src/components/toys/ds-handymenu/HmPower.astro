@@ -10,7 +10,7 @@ const steps = powerSteps('soft');
 const ASM = [
   { off: '152B4', label: 'soft', code: 'ldr  r0,=0101003Ch', note: 'IOCTL_HAL_REBOOT' },
   { off: '152CC', code: 'bl   KernelIoControl', note: 'ask the hardware to restart' },
-  { off: '152D8', label: 'hard', code: 'mov  r1,#2', note: 'title: his string 2' },
+  { off: '152D8', label: 'hard', code: 'mov  r1,#2', note: 'title: string 2' },
   { off: '152EC', code: 'mov  r1,#45', note: 'the warning: string 45' },
   { off: '15304', code: 'bl   MessageBoxW', note: 'Yes or No' },
   { off: '15308', code: 'cmp  r0,#6', note: '6 = Yes' },
@@ -48,13 +48,14 @@ const C = [
   </div>
   <CodeStepper id="hm-power-code" title="HandyMenu.exe  three cases" asm={ASM} c={C} steps={steps} speed={0.9}>
     <div slot="visual" class="hm-pw-vis">
-      <Window title="Start" kind="device" num="9:41" class="hm-dev2" aria-label="The Pocket PC the code is running on">
-        <div class="ppc hm-scr" data-screen="today" data-scr>
-          <div class="hm-s hm-s-today">
-            <p class="hm-t-date">Thursday, October 22, 2026</p>
-            <p class="hm-t-row"><b>No upcoming appointments</b></p>
-            <p class="hm-t-row">0 unread messages</p>
-            <div class="hm-tray"><span></span><img src={tray.src} alt="" width="16" height="16" /></div>
+      <Window title="Start" kind="device" wm="2003" num="11:08" class="hm-dev2" aria-label="The Pocket PC the code is running on">
+        <div class="hm-scr" data-screen="today" data-scr>
+          <div class="hm-s hm-s-today wm-today">
+            <p class="wm-row wm-row--date">Thursday, May 05, 2005</p>
+            <p class="wm-row wm-row--owner">Tap here to set owner information</p>
+            <p class="wm-row wm-row--cal">No upcoming appointments</p>
+            <p class="wm-row wm-row--mail">No unread messages</p>
+            <p class="wm-row wm-row--task">No tasks</p>
           </div>
           <div class="hm-s hm-s-ask" role="alertdialog" aria-label="Hard Reset">
             <div class="hm-mb">
@@ -67,7 +68,7 @@ const C = [
           <div class="hm-s hm-s-fresh"><p>Welcome</p><small>A brand-new start: no programs, no settings, no data.</small></div>
           <div class="hm-s hm-s-off"><button type="button" data-wake>Screen off. Tap to wake.</button></div>
         </div>
-        <p slot="status" class="hm-soft"><span>Calendar</span><span>Contacts</span></p>
+        <Fragment slot="status"><span class="hm-pw-new">New</span><img class="hm-pw-tray" src={tray.src} alt="" width="16" height="16" /></Fragment>
       </Window>
     </div>
   </CodeStepper>
@@ -78,22 +79,21 @@ const C = [
   .hm-pw-ctl { display: flex; flex-wrap: wrap; gap: 10px; }
   .hm-dev2 > .win-body { padding: 0 !important; overflow: hidden !important; }
   .hm-pw-vis { display: grid; justify-items: center; padding: 12px 0; }
-  .hm-scr { --p: calc(100cqw / 240); position: relative; height: 100%; overflow: hidden; background: #000; }
-  .hm-s { position: absolute; inset: 0; display: none; font-size: calc(var(--p) * 11); }
+  .hm-scr { --p: 1px; position: relative; height: 100%; overflow: hidden; background: #000; }
+  .hm-s { position: absolute; inset: 0; display: none; font-size: 11px; }
+  .hm-pw-new { padding: 0 4px; font-weight: 700; }
+  .hm-pw-tray { margin: 0 3px 0 auto; image-rendering: pixelated; }
   .hm-scr[data-screen='today'] .hm-s-today, .hm-scr[data-screen='ask'] :is(.hm-s-today, .hm-s-ask), .hm-scr[data-screen='boot'] .hm-s-boot,
   .hm-scr[data-screen='fresh'] .hm-s-fresh, .hm-scr[data-screen='off'] .hm-s-off { display: block; }
-  .hm-s-today { padding: calc(var(--p) * 8); background: linear-gradient(#fff, #e9f0fb); }
-  .hm-s-today p { margin: 0 0 calc(var(--p) * 9) !important; font-size: inherit !important; line-height: 1.25 !important; color: #000 !important; max-width: none !important; }
-  .hm-s-today .hm-tray { position: absolute; left: 0; right: 0; bottom: 0; display: flex; justify-content: flex-end; align-items: center; height: calc(var(--p) * 22); padding: 0 calc(var(--p) * 6); background: linear-gradient(#f4f6fb, #d8dfee); border-top: 1px solid #9aa9c8; }
-  .hm-s-today .hm-tray img { width: calc(var(--p) * 16); height: calc(var(--p) * 16); image-rendering: pixelated; }
+  .hm-s-today p { margin: 0 !important; font-size: 11px !important; line-height: 1.25 !important; color: inherit !important; max-width: none !important; }
   .hm-s-ask { background: rgb(0 0 0 / 0.25); }
   .hm-mb { position: absolute; left: calc(var(--p) * 10); right: calc(var(--p) * 10); top: calc(var(--p) * 50); background: #fff; border: 1px solid #000; box-shadow: 3px 3px 0 rgb(0 0 0 / 0.4); }
   .hm-mb p { margin: 0 !important; max-width: none !important; font-size: calc(var(--p) * 11) !important; line-height: 1.3 !important; color: #000 !important; }
-  .hm-mb-t { padding: calc(var(--p) * 4) calc(var(--p) * 6); color: #fff !important; font-weight: 700; background: linear-gradient(#3d6fd1, #1f4ba8); }
+  .hm-mb-t { padding: calc(var(--p) * 4) calc(var(--p) * 6); color: #fff !important; font-weight: 700; background: #0228a1; }
   .hm-mb-q { display: flex; gap: calc(var(--p) * 6); padding: calc(var(--p) * 8); }
-  .hm-mb-i { flex: none; display: grid; place-items: center; width: calc(var(--p) * 20); height: calc(var(--p) * 20); border-radius: 50%; color: #fff; font-weight: 700; background: #1f4ba8; }
+  .hm-mb-i { flex: none; display: grid; place-items: center; width: calc(var(--p) * 20); height: calc(var(--p) * 20); border-radius: 50%; color: #fff; font-weight: 700; background: #0228a1; }
   .hm-mb-b { display: flex; justify-content: center; gap: calc(var(--p) * 10); padding: 0 calc(var(--p) * 8) calc(var(--p) * 8); }
-  .hm-mb-b button { min-width: calc(var(--p) * 56); min-height: calc(var(--p) * 22); font: inherit; font-size: calc(var(--p) * 11); background: linear-gradient(#fff, #e3e3e3); border: 1px solid #555; cursor: pointer; }
+  .hm-mb-b button { min-width: calc(var(--p) * 56); min-height: calc(var(--p) * 22); font: inherit; font-size: 11px; color: #000; background: #fff; border: 1px solid #000; cursor: pointer; }
   .hm-mb-b button:focus-visible, .hm-s-off button:focus-visible { outline: 2px solid #316ac5; outline-offset: 2px; }
   .hm-s-boot { display: none; background: #000; color: #fff; text-align: center; }
   .hm-scr[data-screen='boot'] .hm-s-boot { display: grid; place-content: center; gap: calc(var(--p) * 12); }

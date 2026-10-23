@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/wrangler@4/config-schema.json",
+  "name": "arabart",
+  "compatibility_date": "2026-09-01",
+  // The site is static: every request is a free asset request. The script only answers the old addresses.
+  "main": "worker/redirect.js",
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": ["/ARABART*", "/DOSArchive*"]
+  },
+  "routes": [
+    { "pattern": "arabart.deadpackets.pw", "custom_domain": true },
+    { "pattern": "projects.deadpackets.pw/ARABART*", "zone_name": "deadpackets.pw" },
+    { "pattern": "projects.deadpackets.pw/DOSArchive*", "zone_name": "deadpackets.pw" }
+  ],
+  // one public address: no workers.dev or preview copies for search engines to find
+  "workers_dev": false,
+  "preview_urls": false
+}

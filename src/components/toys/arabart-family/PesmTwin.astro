@@ -9,7 +9,7 @@ import { hex } from '../arabart/core.ts';
 
 interface Props { id?: string }
 const { id = 'pesmtwin' } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const read = (f: string) => new Uint8Array(readFileSync(join(process.cwd(), 'public/bytes/files', f)));
 const P = read('PESM_PESM.EXE.mem'), A = read('ARABART_ARABART.EXE.mem');
 const H = 0x30; // both unpacked files carry a 30h-byte header before the image

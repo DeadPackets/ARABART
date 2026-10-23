@@ -7,25 +7,24 @@ import pen from './tt-icon-101-32.png';
 import strip from './icons.png';
 import shot from './ttm.png';
 
-interface Props { id: string }
-const { id } = Astro.props;
+interface Props { id: string; solo?: boolean }
+const { id, solo = false } = Astro.props;
 ---
 
-<div class="ttt-phone" id={id} data-ttt-phone data-pen={pen.src} data-strip={strip.src}>
+<div class:list={['ttt-phone', { 'is-solo': solo }]} id={id} data-ttt-phone data-pen={pen.src} data-strip={strip.src}>
   <figure class="ttt-dev">
-    <Window title="Pocket Word" kind="device" num="8:03" class="ttt-win">
-      <div class="ttt-fit" data-fit>
-        <div class="ttt-q" data-q>
-          <div class="ttt-doc" data-doc role="textbox" aria-readonly="true" aria-multiline="true" aria-label="The document" tabindex="0"><span data-text></span><i class="ttt-caret" aria-hidden="true"></i></div>
-          <noscript><img class="ttt-shot" src={shot.src} width="274" height="169" alt="TapText’s menu in 2005: Signatures, Email templates, Reports, Meeting Notes, Quotes, Finding Help and Financial, each with its icon, over a bar that reads TapText and Opt." /></noscript>
-          <div class="ttt-menus" data-menus></div>
-        </div>
+    <Window title="Pocket Word" kind="device" wm="2003" num="8:03" ok="ok" sip class="ttt-win">
+      <div class="ttt-q" data-q>
+        <div class="ttt-doc" data-doc role="textbox" aria-readonly="true" aria-multiline="true" aria-label="The document" tabindex="0"><span data-text></span><i class="ttt-caret" aria-hidden="true"></i></div>
+        <noscript><img class="ttt-shot" src={shot.src} width="274" height="169" alt="TapText’s menu in 2005: Signatures, Email templates, Reports, Meeting Notes, Quotes, Finding Help and Financial, each with its icon, over a bar that reads TapText and Opt." /></noscript>
+        <div class="ttt-menus" data-menus></div>
       </div>
-      <Fragment slot="status"><span>Edit</span><span>Menu</span></Fragment>
+      <Fragment slot="status"><span class="ttt-cmd" data-cmd>New</span><span class="ttt-cmd">Edit</span><span class="ttt-cmd" data-word>View</span><span class="ttt-cmd">Tools</span></Fragment>
     </Window>
-    <figcaption>TapText rebuilt from its own files. Tap the pen on the top bar, then pick any saved text.</figcaption>
+    {!solo && <figcaption>TapText rebuilt from its own files. Tap the pen on the top bar, then pick any saved text.</figcaption>}
   </figure>
 
+  {!solo && (
   <div class="ttt-side">
     <button type="button" class="button button--primary ttt-open" data-open aria-haspopup="menu" aria-expanded="false">Tap TapText’s pen</button>
     <fieldset class="ttt-set">
@@ -39,33 +38,40 @@ const { id } = Astro.props;
     <button type="button" class="button k-btn" data-clear>Clear the page</button>
     <p class="ttt-read" aria-live="polite" data-read>Pick a saved text from TapText’s menu.</p>
   </div>
+  )}
 </div>
 
 <style>
   .ttt-phone { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: clamp(24px, 4vw, 56px); align-items: start; }
   .ttt-dev { margin: 0; min-width: 0; }
   .ttt-dev > figcaption { margin-top: 12px; font-size: 0.875rem; line-height: 1.5; color: var(--ink-2); }
+  .ttt-phone.is-solo { display: block; }
+  .ttt-phone.is-solo .ttt-dev { display: grid; justify-items: center; }
   .ttt-dev :global(.ttt-win > .win-body) { padding: 0; overflow: hidden; }
-  .ttt-fit { width: 100%; height: 100%; overflow: hidden; }
-  .ttt-q { --k: 1.2; position: relative; width: 240px; height: 268px; transform: scale(var(--k)); transform-origin: 0 0; background: #fff; color: #000; font: 11px/1.3 Tahoma, Verdana, 'DejaVu Sans', sans-serif; }
-  .ttt-doc { position: absolute; inset: 0; padding: 6px 8px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; outline: none; }
-  .ttt-doc:focus-visible { box-shadow: inset 0 0 0 2px var(--focus); }
+  .ttt-q { position: relative; height: 100%; background: #fff; color: #000; font: 11px/1.3 var(--wm-font); }
+  .ttt-doc { position: absolute; inset: 0; padding: 4px 4px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; outline: none; }
+  .ttt-doc:focus-visible { box-shadow: inset 0 0 0 1px #000; }
   .ttt-caret { display: inline-block; width: 1px; height: 12px; margin-left: 1px; vertical-align: -2px; background: #000; animation: ttt-blink 1s steps(1) infinite; }
   @keyframes ttt-blink { 50% { opacity: 0; } }
-  .ttt-shot { position: absolute; left: 0; top: 0; width: 240px; height: auto; }
+  .ttt-shot { position: absolute; left: 0; top: 0; width: 135px; height: auto; }
+  .ttt-cmd { padding: 0 4px; font-weight: 400; }
+  .ttt-cmd[data-cmd] { padding-right: 6px; font-weight: 700; border-right: 1px solid #000; }
+  /* His menus: owner-drawn, an icon column in gray, bold 8 pt labels, his name and Opt at the foot of the first one */
   .ttt-menus { position: absolute; inset: 0; pointer-events: none; }
-  .ttt-menus :global(.ttt-m) { position: absolute; width: 128px; margin: 0; padding: 0; list-style: none; background: #fff; border: 1px solid #000; box-shadow: 2px 2px 0 #0005; pointer-events: auto; }
-  .ttt-menus :global(.ttt-m button) { display: flex; align-items: center; gap: 4px; width: 100%; height: 19px; padding: 0 4px 0 2px; border: 0; background: none; color: #000; font: 700 11px Tahoma, sans-serif; text-align: left; white-space: nowrap; cursor: pointer; }
+  .ttt-menus :global(.ttt-m) { position: absolute; width: 135px; margin: 0; padding: 0; list-style: none; background: linear-gradient(90deg, #c3c3c3 20px, #fefdfe 20px); border: 1px solid #000; pointer-events: auto; }
+  .ttt-menus :global(.ttt-m button) { display: flex; align-items: center; gap: 4px; width: 100%; height: 20px; padding: 0 3px 0 2px; border: 0; background: none; color: #000; font: 700 11px var(--wm-font); text-align: left; white-space: nowrap; cursor: pointer; }
   .ttt-menus :global(.ttt-m button:hover), .ttt-menus :global(.ttt-m button:focus-visible), .ttt-menus :global(.ttt-m button[aria-expanded='true']) { background: #0a246a; color: #fff; outline: none; }
-  .ttt-menus :global(.ttt-m button span) { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-  .ttt-menus :global(.ttt-m button b) { font-weight: 400; font-size: 8px; }
+  .ttt-menus :global(.ttt-m button span) { flex: 1; overflow: hidden; text-overflow: clip; }
+  .ttt-menus :global(.ttt-m button b) { font-weight: 400; font-size: 7px; }
   .ttt-menus :global(.ttt-ico) { width: 16px; height: 16px; flex: none; background-repeat: no-repeat; image-rendering: pixelated; }
-  .ttt-menus :global(.ttt-sep) { height: 1px; margin: 3px 6px 3px 22px; background: #000; }
-  .ttt-menus :global(.ttt-foot) { display: flex; justify-content: space-between; align-items: center; height: 16px; padding: 0 3px; border-top: 1px solid #000; font: 700 10px Tahoma, sans-serif; }
-  .ttt-menus :global(.ttt-foot i) { font-style: normal; padding: 0 3px; border: 1px solid #000; border-radius: 6px; font-size: 9px; }
-  :global(.ttt-pen) { display: grid; place-items: center; width: 22px; height: 22px; margin: -4px 4px -4px 0; padding: 0; border: 0; border-radius: 3px; background: none; cursor: pointer; }
-  :global(.ttt-pen img) { width: 18px; height: 18px; }
-  :global(.ttt-pen[aria-expanded='true']) { background: oklch(1 0 0 / 0.35); }
+  .ttt-menus :global(.ttt-sep) { height: 10px; margin: 0 8px 0 24px; background: linear-gradient(#000, #000) 0 50% / 100% 1px no-repeat; }
+  .ttt-menus :global(.ttt-foot) { display: flex; justify-content: space-between; align-items: center; height: 17px; padding: 0 2px 0 3px; border-top: 1px solid #000; font: 700 10px var(--wm-font); background: linear-gradient(#fefdfe 30%, #dbdbe6 70%, #8f8b8f); }
+  .ttt-menus :global(.ttt-foot i) { font-style: normal; padding: 0 2px; line-height: 11px; border: 1px solid #000; border-radius: 4px; font-size: 10px; background: #fefdfe; }
+  :global(.ttt-pen) { position: absolute; left: 106px; top: 5px; width: 16px; height: 16px; padding: 0; border: 0; background: none; cursor: pointer; }
+  :global(.ttt-pen::after) { content: ''; position: absolute; inset: -5px -6px; }
+  :global(.ttt-pen img) { display: block; width: 16px; height: 16px; }
+  :global(.ttt-pen[aria-expanded='true']) { outline: 1px solid #fff; }
+  :global(.ttt-pen:focus-visible) { outline: 2px solid #fff; }
 
   .ttt-side { display: grid; gap: 16px; align-content: start; min-width: 0; }
   .ttt-open { justify-self: start; min-height: 44px; }
@@ -88,19 +94,19 @@ const { id } = Astro.props;
   const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
   for (const root of document.querySelectorAll<HTMLElement>('[data-ttt-phone]')) {
-    const q = root.querySelector<HTMLElement>('[data-q]')!, fit = root.querySelector<HTMLElement>('[data-fit]')!;
+    const q = root.querySelector<HTMLElement>('[data-q]')!;
     const menus = root.querySelector<HTMLElement>('[data-menus]')!, text = root.querySelector<HTMLElement>('[data-text]')!;
-    const doc = root.querySelector<HTMLElement>('[data-doc]')!, read = root.querySelector<HTMLElement>('[data-read]')!;
-    const open = root.querySelector<HTMLButtonElement>('[data-open]')!, cascade = root.querySelector<HTMLInputElement>('[data-cascade]')!;
+    // The side controls are left out in solo: the pen alone opens the menus, and they cascade
+    const doc = root.querySelector<HTMLElement>('[data-doc]')!, readEl = root.querySelector<HTMLElement>('[data-read]');
+    const open = root.querySelector<HTMLButtonElement>('[data-open]'), cascade = root.querySelector<HTMLInputElement>('[data-cascade]') ?? { checked: true };
+    const read = { set textContent(t: string) { if (readEl) readEl.textContent = t; } };
     const win = root.querySelector<HTMLElement>('.win')!, title = win.querySelector<HTMLElement>('.win-title')!;
     let app: 'word' | 'notes' = 'word', timer = 0, stack: Group[] = [];
-
-    new ResizeObserver(() => q.style.setProperty('--k', String(fit.clientWidth / 240))).observe(fit);
 
     // His pen icon, on the system's top bar beside the clock
     const pen = document.createElement('button');
     pen.type = 'button'; pen.className = 'ttt-pen'; pen.setAttribute('aria-label', 'TapText'); pen.setAttribute('aria-haspopup', 'menu'); pen.setAttribute('aria-expanded', 'false');
-    pen.innerHTML = `<img src="${root.dataset.pen}" width="18" height="18" alt="">`;
+    pen.innerHTML = `<img src="${root.dataset.pen}" width="16" height="16" alt="">`;
     win.querySelector('.win-bar')!.insertBefore(pen, win.querySelector('.win-num'));
 
     const icon = (i: number) => `<i class="ttt-ico" style="background-image:url(${root.dataset.strip});background-position:${-16 * i}px 0" aria-hidden="true"></i>`;
@@ -127,16 +133,16 @@ const { id } = Astro.props;
 
     const show = (g: Group, back: boolean) => {
       menus.innerHTML = '';
-      list(g, 0, 2, 2, back).querySelector<HTMLElement>('button')?.focus();
+      list(g, 0, 0, 0, back).querySelector<HTMLElement>('button')?.focus();
       setOpen(true);
     };
     const setOpen = (on: boolean) => {
       if (!on) { menus.innerHTML = ''; stack = []; }
-      pen.setAttribute('aria-expanded', String(on)); open.setAttribute('aria-expanded', String(on));
+      pen.setAttribute('aria-expanded', String(on)); open?.setAttribute('aria-expanded', String(on));
     };
     const toggle = () => (menus.innerHTML ? setOpen(false) : show(MENU, false));
     pen.addEventListener('click', toggle);
-    open.addEventListener('click', toggle);
+    open?.addEventListener('click', toggle);
 
     const type = (s: string, name: string) => {
       clearInterval(timer);
@@ -173,8 +179,8 @@ const { id } = Astro.props;
       menus.querySelectorAll<HTMLElement>('ul').forEach(m => { if (+m.dataset.depth! > depth) m.remove(); });
       ul.querySelectorAll('[aria-expanded="true"]').forEach(x => x.setAttribute('aria-expanded', 'false'));
       b.setAttribute('aria-expanded', 'true');
-      const x = Math.min((ul as HTMLElement).offsetLeft + 100, 240 - 130);
-      const y = Math.max(2, Math.min((ul as HTMLElement).offsetTop + b.offsetTop, 268 - n.children.length * 19 - 6));
+      const x = Math.min((ul as HTMLElement).offsetLeft + 100, 240 - 137);
+      const y = Math.max(0, Math.min((ul as HTMLElement).offsetTop + b.offsetTop, 268 - n.children.length * 20 - 2));
       list(n, depth + 1, x, y, false).querySelector<HTMLElement>('button')?.focus();
     });
     menus.addEventListener('keydown', e => {
@@ -193,8 +199,9 @@ const { id } = Astro.props;
       root.querySelectorAll('[data-app]').forEach(x => x.setAttribute('aria-checked', String(x === b)));
       title.textContent = app === 'word' ? 'Pocket Word' : 'Notes';
       q.classList.toggle('is-notes', app === 'notes');
+      root.querySelector<HTMLElement>('[data-word]')!.hidden = app === 'notes';
     }));
-    cascade.addEventListener('change', () => { if (menus.innerHTML) { stack = []; show(MENU, false); } });
-    root.querySelector('[data-clear]')!.addEventListener('click', () => { clearInterval(timer); text.textContent = ''; read.textContent = 'The page is empty again.'; });
+    (cascade as HTMLInputElement).addEventListener?.('change', () => { if (menus.innerHTML) { stack = []; show(MENU, false); } });
+    root.querySelector('[data-clear]')?.addEventListener('click', () => { clearInterval(timer); text.textContent = ''; read.textContent = 'The page is empty again.'; });
   }
 </script>

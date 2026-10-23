@@ -14,11 +14,10 @@
 .dsx-word b { font-weight: 700; }
 .dsx-slogan { font: 400 0.8125rem/1.3 var(--ds-verdana); color: var(--ds-rust); }
 
-/* A capture from the Internet Archive: real pixels, never scaled down; wide ones scroll sideways inside their frame */
+/* A capture from the Internet Archive: real pixels, scaled down only when its card is narrower than the capture */
 .dsx-cap { margin: 0; min-width: 0; max-width: 100%; }
-.dsx-cap-img { max-width: 100%; overflow-x: auto; background: #fff; border: 1px solid var(--xp-line); scrollbar-width: thin; }
-.dsx-cap-img img { max-width: none; height: auto; }
-.dsx-cap-img:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.dsx-cap-img { max-width: 100%; background: #fff; border: 1px solid var(--xp-line); }
+.dsx-cap-img img { display: block; max-width: 100%; height: auto; }
 .dsx-credit { margin-top: 6px; font: 400 0.8125rem/1.45 var(--ds-verdana); color: var(--ink-2); }
 .dsx-credit a { color: var(--accent); }
 

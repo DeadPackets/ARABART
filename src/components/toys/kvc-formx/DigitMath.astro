@@ -76,8 +76,9 @@ const sym = (o: string) => (o === '*' ? '×' : o === '-' ? '−' : '+');
     .kxd-row, .kxd-head { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 1px; }
     .kxd-head .kxd-lab { display: none; }
     .kxd-row .kxd-lab { grid-column: 1 / -1; padding: 6px 0 0; }
-    .kxd-c { height: 26px; font-size: clamp(9px, 2.9vw, 13px); }
-    .kxd-c.big { font-size: clamp(8px, 2.5vw, 11px); }
+    /* Up to 27 columns on a phone: narrow digits keep 12 px, and a two-digit value stacks when its cell is too thin */
+    .kxd-c { height: 26px; font-size: clamp(12px, 2.9vw, 13px); font-stretch: 75%; }
+    .kxd-c.big { font-size: 12px; line-height: 1; overflow-wrap: anywhere; text-align: center; }
     .kxd-in input { width: 11ch; }
   }
 </style>

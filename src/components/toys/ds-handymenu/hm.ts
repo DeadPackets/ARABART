@@ -32,14 +32,14 @@ export const DOES: Record<number, string> = {
   16: 'opens the Today settings',
   17: 'opens Connections: cplmain.cpl,19',
   18: 'opens Phone settings: cplmain.cpl,20',
-  19: 'starts MemMaid, his memory cleaner',
+  19: 'starts MemMaid, DinarSoft’s memory cleaner',
   20: 'starts MemMaid with -Q: a quick clean',
   21: 'turns the screen to 270 degrees, or back',
   22: 'turns the screen to 90 degrees, or back',
   23: 'turns the screen upside down, or back',
   24: 'switches the display off with ExtEscape(SETPOWERMANAGEMENT)',
   25: 'tells every program the settings changed, so the Today screen redraws',
-  26: 'opens his IP Helper',
+  26: 'opens its IP Helper',
   27: 'saves the screen as a .bmp file',
 };
 
@@ -128,12 +128,12 @@ export function switchSteps(n: number, expired: boolean): SwStep[] {
     { a: 3, c: 2, row: -1, jump: false, say: expired ? 'The state is <b>7</b>: the 15 days are over.' : 'The state is <b>13</b>: registered. (0 would mean the trial is still running.)', regs: R(String(n), [{ name: 'r0', value: expired ? '7' : '13', means: expired ? 'trial over' : 'registered', changed: true }]) },
   ];
   if (expired) {
-    s.push({ a: 7, c: 3, row: -1, jump: false, say: 'So instead of acting, it opens his Settings sheet, dialog <b>500</b>, where the <b>Register…</b> button waits. The item never runs.', regs: R(String(n), [{ name: 'r1', value: '500', means: 'the dialog to show', changed: true }]) });
+    s.push({ a: 7, c: 3, row: -1, jump: false, say: 'So instead of acting, it opens its Settings sheet, dialog <b>500</b>, where the <b>Register…</b> button waits. The item never runs.', regs: R(String(n), [{ name: 'r1', value: '500', means: 'the dialog to show', changed: true }]) });
     return s;
   }
   s.push(
     { a: 4, c: 2, row: -1, jump: false, say: 'Not 7, so it carries on to the item.', regs: R(String(n), [{ name: 'r0', value: '13', means: 'registered' }]) },
-    { a: 8, c: 5, row: -1, jump: false, say: 'Numbers from 1001 up are his own extra commands. This one is smaller.', regs: R(String(n), [{ name: 'r8', value: '1001', means: 'first extra command' }]) },
+    { a: 8, c: 5, row: -1, jump: false, say: 'Numbers from 1001 up are its own extra commands. This one is smaller.', regs: R(String(n), [{ name: 'r8', value: '1001', means: 'first extra command' }]) },
     { a: 9, c: 6, row: -1, jump: false, say: `Count from zero: <b>${n} − 1 = ${r2}</b>.`, regs: R(String(n), [{ name: 'r2', value: String(r2), means: 'row number', changed: true }]) },
     { a: 11, c: 6, row: -1, jump: false, say: 'One compare guards the table: anything above 26 is ignored.', regs: R(String(n), [{ name: 'r2', value: String(r2), means: 'row number, 0 to 26' }]) },
     { a: 12, c: 6, row: r2, jump: false, say: `Each row is two bytes, so the row starts <b>${r3a}</b> bytes in.`, regs: R(String(n), [{ name: 'r2', value: String(r2), means: 'row number' }, { name: 'r3', value: String(r3a), means: 'bytes into the table', changed: true }]) },
@@ -163,8 +163,8 @@ export function powerSteps(c: PowerCase, answer?: 'yes' | 'no'): PwStep[] {
     { a: 13, c: 12, dev: 'off', say: 'The system sees a whole press of the power button and goes to sleep, exactly as if you pressed it. Tap the screen to wake it.', regs: [{ name: 'r0', value: '223', means: 'VK_OFF' }, { name: 'r2', value: '2', means: 'key up' }] },
   ];
   const s: PwStep[] = [
-    { a: 2, c: 3, dev: 'today', say: 'Hard Reset erases everything, so it asks first. The title is his string <b>2</b>, “Hard Reset”, in your language.', regs: [{ name: 'r1', value: '2', means: 'string 2: the title', changed: true }] },
-    { a: 3, c: 4, dev: 'today', say: 'The warning is his string <b>45</b>. HandyMenu.bin carries it in five more languages.', regs: [{ name: 'r1', value: '45', means: 'string 45: the warning', changed: true }] },
+    { a: 2, c: 3, dev: 'today', say: 'Hard Reset erases everything, so it asks first. The title is string <b>2</b>, “Hard Reset”, in your language.', regs: [{ name: 'r1', value: '2', means: 'string 2: the title', changed: true }] },
+    { a: 3, c: 4, dev: 'today', say: 'The warning is string <b>45</b>. HandyMenu.bin carries it in five more languages.', regs: [{ name: 'r1', value: '45', means: 'string 45: the warning', changed: true }] },
     { a: 4, c: 5, dev: 'ask', say: answer ? 'MessageBox shows the question and waits.' : 'MessageBox shows the question and waits. <b>Answer it on the screen.</b>', regs: [{ name: 'r3', value: '36', means: 'MB_YESNO | MB_ICONQUESTION' }] },
   ];
   if (answer === 'no') s.push(
@@ -193,10 +193,10 @@ export function captureSteps(w = 240, h = 320): CapStep[] {
     { a: 5, c: 5, kfrom: 54, written: 0, shot: 'taken', say: 'Then it asks the screen to repaint itself.', regs: [] },
     { a: 6, c: 6, kfrom: 54, written: 0, shot: 'save', say: 'Only now does it ask where to save. The Save dialog covers the screen, and it is not in your picture: the shot was already taken.', regs: [] },
     { a: 7, c: 7, kfrom: 54, written: 0, shot: 'save', say: `How many bytes of pixels? Width times height: <b>${n(w * h)}</b>.`, regs: [{ name: 'r3', value: n(w * h), means: 'pixels', changed: true }] },
-    { a: 8, c: 8, kfrom: 54, written: 0, shot: 'save', say: `Times 3, one byte each for blue, green and red: <b>${n(px)}</b>. He writes x × 3 as x + x × 2, one instruction.`, regs: [{ name: 'r3', value: n(px), means: 'bytes of pixels', changed: true }] },
+    { a: 8, c: 8, kfrom: 54, written: 0, shot: 'save', say: `Times 3, one byte each for blue, green and red: <b>${n(px)}</b>. It writes x × 3 as x + x × 2, one instruction.`, regs: [{ name: 'r3', value: n(px), means: 'bytes of pixels', changed: true }] },
     { a: 9, c: 7, kfrom: 14, written: 0, shot: 'save', say: 'The picture header starts with its own size: <b>40</b> bytes.', regs: [{ name: 'r2', value: '40', means: 'biSize', changed: true }] },
     { a: 10, c: 7, kfrom: 14, written: 0, shot: 'save', say: '<b>24</b> bits a pixel: true color, no palette.', regs: [{ name: 'lr', value: '24', means: 'biBitCount', changed: true }] },
-    { a: 11, c: 9, kfrom: 14, written: 0, shot: 'save', say: '<b>CreateDIBSection</b> gives him the pixels as a plain array he can write straight to a file.', regs: [] },
+    { a: 11, c: 9, kfrom: 14, written: 0, shot: 'save', say: '<b>CreateDIBSection</b> gives it the pixels as a plain array it can write straight to a file.', regs: [] },
     { a: 12, c: 10, kfrom: 14, written: 0, shot: 'save', say: 'Copy the picture into that array.', regs: [] },
     { a: 13, c: 11, kfrom: 0, written: 0, shot: 'save', say: `The file header: total size = pixels + 54 = <b>${n(px + 54)}</b>.`, regs: [{ name: 'r5', value: n(px + 54), means: 'bfSize', changed: true }] },
     { a: 14, c: 11, kfrom: 0, written: 0, shot: 'save', say: 'Where the pixels start: byte <b>54</b> (36h), right after the two headers.', regs: [{ name: 'sb', value: '54', means: 'bfOffBits', changed: true }] },
@@ -226,11 +226,11 @@ export function rotateSteps(want: number, now: number, first: boolean): RotStep[
   if (first) s.push(
     { a: 3, c: 2, angle: now, say: '<b>LoadLibrary</b> opens coredll.dll, the system’s main library, while the program runs.', regs: [{ name: 'r0', value: 'coredll', means: 'library handle', changed: true }] },
     { a: 4, c: 3, angle: now, say: '<b>GetProcAddress</b> looks the function up by name. Older Pocket PCs do not have it, and that is fine: HandyMenu still starts on them, because nothing links to the name ahead of time.', regs: [{ name: 'r0', value: 'ChangeDisplay…', means: 'function address', changed: true }] },
-    { a: 5, c: 3, angle: now, say: 'He keeps the address in a global, so every later tap skips the lookup.', regs: [{ name: 'r5', value: '1CDD8', means: 'where it is kept' }] },
+    { a: 5, c: 3, angle: now, say: 'It keeps the address in a global, so every later tap skips the lookup.', regs: [{ name: 'r5', value: '1CDD8', means: 'where it is kept' }] },
   );
   else s.push({ a: 2, c: 1, angle: now, say: 'Straight to the saved address.', regs: [{ name: 'r5', value: '1CDD8', means: 'where it is kept' }] });
   s.push(
-    { a: 6, c: 6, angle: now, say: 'Found. (If it were missing, his string 66 would say the device does not support rotation, in your language.)', regs: [{ name: 'r0', value: 'address', means: 'not 0: found' }] },
+    { a: 6, c: 6, angle: now, say: 'Found. (If it were missing, string 66 would say the device does not support rotation, in your language.)', regs: [{ name: 'r0', value: 'address', means: 'not 0: found' }] },
     { a: 8, c: 7, angle: now, say: 'A DEVMODE, the settings form for the display: its size, <b>192</b> bytes…', regs: [{ name: 'r7', value: '192', means: 'dmSize', changed: true }] },
     { a: 9, c: 8, angle: now, say: '…and one field marked as in use: the orientation.', regs: [{ name: 'r8', value: '800000', means: 'DM_DISPLAYORIENTATION', changed: true }] },
     { a: 10, c: 9, angle: now, say: '<b>CDS_TEST</b> means: change nothing, just fill in the form.', regs: [{ name: 'r3', value: '2', means: 'CDS_TEST', changed: true }] },

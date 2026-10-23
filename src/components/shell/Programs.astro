@@ -1,15 +1,12 @@
 ---
 // The fifteen programs as Norton Commander's two panels: the file list on the left, the info panel on the right.
 // Point at a file (or arrow through the list) to see it; select it to run it. Without JS every row is a plain link.
-// On a program page (current = its id) that program is the highlighted file, with Previous and Next under the panels.
 import Window from './Window.astro';
 import { programs } from '../../data/programs';
 import { exeSize, bytes } from '../../data/files';
 import { glance, shelf } from '../../layouts/glance';
 
-interface Props { current?: string }
-const { current } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const rows = shelf
   .map(p => ({ ...p, size: exeSize(p) }))
   .map(p => ({
@@ -24,20 +21,14 @@ const rows = shelf
     href: `${base}/program/${p.id}/`,
   }));
 const total = bytes(programs.reduce((s, p) => s + exeSize(p), 0));
-const at = Math.max(0, rows.findIndex(r => r.id === current));
-const prev = rows[(at + rows.length - 1) % rows.length], next = rows[(at + 1) % rows.length];
-// On a program page the cursor waits on the next program, the way NC's cursor moves on after you leave a file
-const sel = current ? (at + 1) % rows.length : 0;
-const first = rows[sel];
+const first = rows[0];
 ---
 
 <section class="progs era-sec" data-era="dos" id="programs" aria-labelledby="pg-h">
   <div class="container">
     <div class="pg-head">
       <h2 id="pg-h">Fifteen programs from Port Said</h2>
-      {current
-        ? <p>The arrow marks this page. The bar waits on the next program. Point at any file to see it.</p>
-        : <p>1991 to 1993: {total} bytes of his code in all. Pick one and press Run.</p>}
+      <p>1991 to 1993: {total} bytes of his code in all. Pick one and press Run.</p>
     </div>
 
     <div class="nc" id="collection" data-nc>
@@ -46,8 +37,8 @@ const first = rows[sel];
         <ol class="nc-rows">
           {rows.map((r, i) => (
             <li>
-              <a href={r.href} data-row={i} aria-current={i === sel ? 'true' : undefined} data-here={r.id === current ? '' : undefined}>
-                <span class="nc-n">{r.name}{r.id === current && <span class="sr-only"> (this page)</span>}</span><span class="nc-y">{r.year}</span><span class="nc-s">{r.size}</span>
+              <a href={r.href} data-row={i} aria-current={i === 0 ? 'true' : undefined}>
+                <span class="nc-n">{r.name}</span><span class="nc-y">{r.year}</span><span class="nc-s">{r.size}</span>
               </a>
             </li>
           ))}
@@ -67,12 +58,6 @@ const first = rows[sel];
         </div>
       </Window>
     </div>
-    {current && (
-      <nav class="nc-keys" aria-label="Previous and next program">
-        <a href={prev.href} rel="prev"><b aria-hidden="true">◄</b><span>Previous: {prev.name}</span></a>
-        <a href={next.href} rel="next"><span>Next: {next.name}</span><b aria-hidden="true">►</b></a>
-      </nav>
-    )}
     <script type="application/json" data-nc-rows set:html={JSON.stringify(rows)} />
   </div>
 </section>
@@ -96,16 +81,6 @@ const first = rows[sel];
   .nc-rows a:focus-visible { outline: 2px solid var(--vga-14); outline-offset: -2px; }
   @media (pointer: coarse) { .nc-rows a { min-height: 44px; } }
   .nc-n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .nc-rows a[data-here] .nc-n::after { content: ' \25C4'; color: var(--vga-14); }
-  .nc-rows a[data-here][aria-current='true'] .nc-n::after { color: var(--vga-0); }
-
-  /* Norton Commander's bottom line: the key in white on black, its job in black on cyan */
-  .nc-keys { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px; margin-top: 36px; }
-  .nc-keys a { display: flex; min-height: 44px; min-width: 0; font: 400 16px/1 var(--font-dos); text-decoration: none; }
-  .nc-keys b { display: grid; place-items: center; padding: 0 10px; font-weight: 400; color: var(--vga-15); background: var(--vga-0); }
-  .nc-keys span { display: flex; align-items: center; min-width: 0; padding: 0 14px; color: var(--vga-0); background: var(--vga-3); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-  .nc-keys a:hover span { background: var(--vga-14); }
-  .nc-keys a:focus-visible { outline: 2px solid var(--vga-14); outline-offset: 3px; }
   .nc-path { font: 400 16px/1.3 var(--font-dos); color: var(--vga-15); overflow-wrap: anywhere; }
 
   .nc-shot { position: relative; aspect-ratio: 16 / 10; background: var(--vga-0); overflow: hidden; }

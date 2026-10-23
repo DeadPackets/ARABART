@@ -112,7 +112,7 @@ const JS = [
   .pri-hl li.on { background: var(--vga-14); }
   .pri-hl li.on :is(b, span) { color: var(--vga-0); }
   .pri-out { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin: 16px 0 0; }
-  .pri-out dt { font: 500 0.6875rem/1.3 var(--font-code); color: var(--accent-2); }
+  .pri-out dt { font: 500 0.75rem/1.3 var(--font-code); color: var(--accent-2); }
   .pri-out dd { margin: 2px 0 0; min-height: 1.5em; font: 700 0.9375rem/1.4 var(--font-code); color: var(--accent); overflow-wrap: anywhere; }
   .pri-under { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 26px; align-items: stretch; }
   .pri-steps { margin: 0; padding-left: 1.4em; display: grid; gap: 6px; font: 500 0.9375rem/1.5 var(--sans); color: var(--ink); }
@@ -120,7 +120,8 @@ const JS = [
   .pri-steps li.now { font-weight: 700; }
   .pri-steps li.next { opacity: 0.35; }
   .pri-code { margin: 0; padding: 0; list-style: none; font: 500 clamp(11.5px, 0.25vw + 9.5px, 13px)/1.8 var(--font-code); }
-  .pri-code li { padding: 0 8px; white-space: pre; color: var(--ink); transition: background-color 0.15s, color 0.15s; }
+  .pri-code code { font-size: max(12px, 0.875em); }
+  .pri-code li { padding: 0 8px 0 calc(8px + 2ch); text-indent: -2ch; white-space: pre-wrap; color: var(--ink); transition: background-color 0.15s, color 0.15s; }
   .pri-code li.on { background: var(--accent-2); color: var(--surface); }
   .pri-chip { position: absolute; left: 0; top: 0; z-index: 4; display: none; min-width: 28px; height: 28px; padding: 0 8px; place-items: center; font: 700 0.8125rem/1 var(--font-code); color: var(--vga-0); background: var(--vga-14); box-shadow: 0 0 0 2px var(--vga-0), 0 0 18px var(--vga-14); pointer-events: none; }
   @media (max-width: 1100px) { .pri-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .pri-ev { grid-column: 1 / -1; } .pri-btns { flex-flow: row wrap; } }
@@ -128,7 +129,6 @@ const JS = [
   @media (max-width: 760px) {
     .pri-grid { grid-template-columns: minmax(0, 1fr); }
     .pri-btns .k-btn { flex: 1 1 100%; }
-    .pri-code li { white-space: pre-wrap; padding-left: 2ch; text-indent: -2ch; }
   }
   @media (prefers-reduced-motion: reduce) { .pri-rows td, .pri-hl li, .pri-code li { transition: none; } }
 </style>

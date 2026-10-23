@@ -19,7 +19,7 @@ import type { GetStaticPaths } from 'astro';
 export const getStaticPaths: GetStaticPaths = () => apps.map(app => ({ params: { app: app.id }, props: { app } }));
 
 const { app } = Astro.props as { app: App };
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const ic = icon(app.id);
 
 // The unlock module of this app, if its builder has written it
@@ -40,12 +40,22 @@ const r0 = app.releases[0], rN = app.releases.at(-1)!;
 const press = awards.some(a => a.app === app.id) || reviews.some(r => r.app === app.id) || honors.some(h => h.app === app.id) || discs.some(d => d.app === app.id);
 const i = apps.findIndex(a => a.id === app.id);
 const next = apps[(i + 1) % apps.length];
+const home = new URL(`${base}/`, Astro.site).href;
+const shotURL = new URL(`${base}/dinarsoft/screens/${app.screens[0].key}.webp`, Astro.site).href;
+const sw = { '@type': 'SoftwareApplication', '@id': `${home}dinarsoft/${app.id}/#app`, name: app.name, description: app.one, url: `${home}dinarsoft/${app.id}/`,
+  operatingSystem: 'Windows Mobile (Pocket PC)', applicationCategory: 'UtilitiesApplication', image: shotURL, screenshot: shotURL,
+  author: [{ '@id': `${home}#yasser` }, { '@type': 'Person', name: 'Hosam Aly' }],
+  publisher: { '@type': 'Organization', '@id': `${home}dinarsoft/#org`, name: 'DinarSoft Corporation' },
+  datePublished: r0.date, softwareVersion: rN.v, isAccessibleForFree: true, offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD' },
+  award: awards.filter(a => a.app === app.id && a.level !== 'Nominee').map(a => `${a.level}, ${a.category ?? 'Best Software Awards'}, Smartphone & Pocket PC Best Software Awards ${a.year}`) };
 ---
 
 <BaseLayout
-  title={`${app.name} · DinarSoft · Yasser Awad`}
+  title={`${app.name} for Pocket PC and Windows Mobile · DinarSoft`}
   description={app.one}
-  image={`/ARABART/dinarsoft/screens/${app.screens[0].key}.webp`}
+  schema={[sw]}
+  crumbs={[['DinarSoft', 'dinarsoft/'], [app.name, `dinarsoft/${app.id}/`]]}
+  image={`${base}/dinarsoft/screens/${app.screens[0].key}.webp`}
   era="vs2005"
   keys={[{ k: 'F5', label: 'Download', href: '#download' }, { k: 'F6', label: 'Unlock key', href: '#unlock' }, { k: '►', label: `Next: ${next.name}`, href: `${base}/dinarsoft/${next.id}/` }]}
 >
@@ -86,7 +96,7 @@ const next = apps[(i + 1) % apps.length];
           <h2 id="story-h" class="dsx-h2" data-toc>The story</h2>
           {app.story.map(p => <p class="dsp-p">{p}</p>)}
           <h3 class="dsp-h3">Every version</h3>
-          <p class="dsp-p dsp-p--s">From his revision history and his installers. Press Run to play through them, or step one at a time.</p>
+          <p class="dsp-p dsp-p--s">From DinarSoft’s revision history and installers. Press Run to play through them, or step one at a time.</p>
           <Versions app={app} />
         </section>
 

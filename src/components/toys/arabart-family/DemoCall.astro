@@ -206,7 +206,7 @@ const asm = ASM.map(({ k, ...l }) => l), c = C.map(({ k, ...l }) => l);
       imgs.slice(0, Math.min(n, 12)).forEach((img, i) => stamp(f, img, 630, 18 * (i + 1)));
       for (let y = 0; y < 240; y++) view.data.set(f.data.subarray(y * 640 + 400, y * 640 + 640), y * 240);
       show(canvas, view);
-      mark.innerHTML = n >= 13 ? `<path d="M466 222 V232 H630 V222"/><text x="548" y="226" text-anchor="middle">164 px</text><text x="470" y="200">x = 466: next column</text>` : '';
+      mark.innerHTML = n >= 13 ? `<path d="M466 222 V232 H630 V222"/><text x="548" y="226" text-anchor="middle">164 px</text><text x="461" y="231" text-anchor="end">x=466</text>` : '';
     };
     root.addEventListener('stepper', e => {
       const { step, how } = (e as CustomEvent).detail;

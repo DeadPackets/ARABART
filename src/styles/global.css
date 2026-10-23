@@ -5,13 +5,13 @@
 /* IBM VGA font from The Ultimate Oldschool PC Font Pack by VileR (int10h.org), CC BY-SA 4.0. Bitmap-exact at 16, 32 and 48 px only */
 @font-face {
   font-family: 'Web437 IBM VGA 9x16';
-  src: url('/ARABART/fonts/oldschool/Web437_IBM_VGA_9x16.woff') format('woff');
+  src: url('/fonts/oldschool/Web437_IBM_VGA_9x16.woff') format('woff');
   font-display: swap;
 }
 /* Pixelify's 2 and 5 read as 8 and S at UI sizes, so the Windows-era pixel face takes its digits from the VGA font */
 @font-face {
   font-family: 'Pixel Digits';
-  src: url('/ARABART/fonts/oldschool/Web437_IBM_VGA_9x16.woff') format('woff');
+  src: url('/fonts/oldschool/Web437_IBM_VGA_9x16.woff') format('woff');
   unicode-range: U+0030-0039;
   size-adjust: 102.4%;
   font-display: swap;

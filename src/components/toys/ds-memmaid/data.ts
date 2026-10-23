@@ -68,7 +68,7 @@ export const CLEANERS: { where: string[]; reg?: string; how: string; area: 'file
   { area: 'files', where: ['\\Windows\\Log'], reg: 'HKLM\\SOFTWARE\\AirPrime\\SS_Log', how: 'The phone’s call and radio logs, on Phone Edition devices.' },
   { area: 'files', where: ['a folder you choose'], how: 'Everything in a folder of your own, for any app’s cache.' },
   { area: 'files', where: ['a second folder you choose'], how: 'A second folder of your own.' },
-  { area: 'files', where: ['*.tmp  *.log  *.bak  *.?'], how: 'Files by extension: three he picked, and one of yours.' },
+  { area: 'files', where: ['*.tmp  *.log  *.bak  *.?'], how: 'Files by extension: three built in, and one of yours.' },
   { area: 'files', where: ['any folder'], how: 'Empty files, zero bytes long.' },
   { area: 'files', where: ['\\Application Data\\GoogleMaps\\cache-GLM.dat'], how: 'Google Maps for Mobile’s map cache.' },
   { area: 'files', where: ['\\~Recycled'], how: 'The recycle bin that file managers keep.' },

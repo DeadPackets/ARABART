@@ -4,7 +4,7 @@ import Window from '../components/shell/Window.astro';
 import { glossary } from '../data/glossary';
 import { programs } from '../data/programs';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // Topics, in reading order. A term not listed here lands in "More words", so new terms always show.
 const TOPICS: [string, string, string][] = [
   ['memory', 'Memory and addresses', 'byte kilobyte hex paragraph segment real-mode protected-mode a20-line conventional-memory upper-memory rom cpu-register stack heap memory-model far-pointer memmove mmio io-port bit-field'],
@@ -48,7 +48,7 @@ const total = Object.keys(glossary).length;
 ---
 
 <BaseLayout
-  title="Glossary · Yasser Awad"
+  title="Glossary: DOS and Pocket PC in plain English · Yasser Awad"
   description={`${total} words from Yasser Awad's archive in plain English, each with the 2026 idea that does the same job.`}
   era="dos"
   keys={[{ k: '/', label: 'Search' }, { k: 'Esc', label: 'Clear' }]}
@@ -89,7 +89,7 @@ const total = Object.keys(glossary).length;
               {g.terms.map(([id, t]) => (
                 <div class="gl-term" id={id} data-text={`${t.term} ${id} ${t.short} ${t.now ?? ''}`.toLowerCase()}>
                   <dt><a href={`#${id}`} class="gl-name">{t.term}</a></dt>
-                  <dd class="gl-def" data-hl>{t.short}</dd>
+                  <dd class="gl-def" data-hl>{t.short.split(/([\u0600-\u06ff](?:[\u0600-\u06ff\s]*[\u0600-\u06ff])?)/).map((x, i) => (i % 2 ? <span lang="ar" dir="rtl">{x}</span> : x))}</dd>
                   {t.now && <dd class="gl-now"><b>In 2026</b> <span data-hl>{t.now}</span></dd>}
                   {seen.get(id) && <dd class="gl-seen"><span>Seen on</span> {seen.get(id)!.map(([u, n]) => <a href={`${base}${u}`}>{n}</a>)}</dd>}
                 </div>
@@ -160,7 +160,7 @@ const total = Object.keys(glossary).length;
   const topics = [...document.querySelectorAll<HTMLAnchorElement>('[data-topic]')];
   const none = document.querySelector<HTMLElement>('[data-none]')!;
   const total = terms.length;
-  const orig = new Map(terms.map(t => [t, [...t.querySelectorAll<HTMLElement>('[data-hl]')].map(e => e.textContent!)]));
+  const orig = new Map(terms.map(t => [t, [...t.querySelectorAll<HTMLElement>('[data-hl]')].map(e => [e.textContent!, e.innerHTML])]));
   const esc = (s: string) => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
   box.hidden = false;
 
@@ -172,8 +172,8 @@ const total = Object.keys(glossary).length;
       t.hidden = !hit; if (hit) n++;
       const re = words.length ? new RegExp(`(${words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi') : null;
       t.querySelectorAll<HTMLElement>('[data-hl]').forEach((e, i) => {
-        const txt = orig.get(t)![i];
-        e.innerHTML = re && hit ? esc(txt).replace(re, '<mark>$1</mark>') : esc(txt);
+        const [txt, html] = orig.get(t)![i];
+        e.innerHTML = re && hit ? esc(txt).replace(re, '<mark>$1</mark>') : html;
       });
       const name = t.querySelector('.gl-name')!;
       name.innerHTML = re && hit ? esc(name.textContent!).replace(re, '<mark>$1</mark>') : esc(name.textContent!);

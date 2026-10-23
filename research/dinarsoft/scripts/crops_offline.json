@@ -16,9 +16,15 @@
  {
   "page": "tp-2004-09-emobie-memmaid",
   "name": "verdict",
-  "rx": "^(Rating:|MemMaid is the Swiss Army)",
-  "union": true,
-  "shows": "Star rating and verdict: \"MemMaid is the Swiss Army Knife of PPC utilities\""
+  "shows": "Reviewer, star rating and verdict: \"MemMaid is the Swiss Army Knife of PPC utilities\"",
+  "clip": [
+   162,
+   384,
+   953,
+   107
+  ],
+  "text": "Reviewed By: Russ Terrell / Rating / Overview",
+  "pad": 0
  },
  {
   "page": "tp-2004-11-pocketpcreviews-memmaid",
@@ -33,9 +39,15 @@
  {
   "page": "tp-2004-11-pocketpcreviews-memmaid",
   "name": "verdict",
-  "rx": "^(Conclusion|For a reviewer a must)",
-  "union": true,
-  "shows": "Conclusion: \"MemMaid is a godsend!\""
+  "shows": "Conclusion: \"MemMaid is a godsend!\"",
+  "clip": [
+   0,
+   2632,
+   847,
+   58
+  ],
+  "text": "Conclusion / For a reviewer a must ... MemMaid is a godsend!",
+  "pad": 0
  },
  {
   "page": "tp-2005-01-pocketnow-memmaid",
@@ -46,27 +58,34 @@
  {
   "page": "tp-2005-03-aximsite-taptext",
   "name": "headline",
-  "rx": "^(Knowledge Base|Developer/Vendor)",
-  "union": true,
   "replaces": [
    "tp-2005-03-aximsite-taptext--headline.png"
   ],
-  "shows": "Headline, reviewer, developer DinarSoft and star rating (4 of 5)"
+  "shows": "Headline, reviewer, developer DinarSoft and star rating (4 of 5)",
+  "clip": [
+   210,
+   185,
+   402,
+   180
+  ],
+  "text": "Tap Text / By Jim McGowan / Developer/Vendor: DinarSoft / Rating",
+  "pad": 0
  },
  {
   "page": "tp-2006-03-pdablast-handyswitcher",
   "name": "headline",
   "clip": [
-   181,
+   177,
    195,
-   916,
-   90
+   480,
+   87
   ],
   "text": "HandySwitcher Task Management for Your Pocket PC / By: pdaBlast! Staff / March 27, 2006",
   "replaces": [
    "tp-2006-03-pdablast-handyswitcher--headline.png"
   ],
-  "shows": "Headline: HandySwitcher Task Management for Your Pocket PC (pdaBlast! Staff, 2006-03-27)"
+  "shows": "Headline: HandySwitcher Task Management for Your Pocket PC (pdaBlast! Staff, 2006-03-27)",
+  "pad": 0
  },
  {
   "page": "tp-2006-06-treocentral-shootout",
@@ -98,8 +117,15 @@
  {
   "page": "tp-2006-09-tucows-memmaid",
   "name": "verdict",
-  "rx": "^MemMaid is simply packed",
-  "shows": "Verdict paragraph"
+  "shows": "Verdict paragraph",
+  "clip": [
+   338,
+   885,
+   456,
+   100
+  ],
+  "text": "MemMaid is simply packed with neat tools ... I recommend it highly.",
+  "pad": 0
  },
  {
   "page": "tp-2006-10-tucows-favorite",
@@ -114,17 +140,31 @@
  {
   "page": "tp-2007-05-clintonfitch-memmaid",
   "name": "headline",
-  "rx": "^DinarSoft MemMaid 1\\.73",
-  "shows": "Headline: DinarSoft MemMaid 1.73 (review by Judie Hughes)"
+  "shows": "Headline: DinarSoft MemMaid 1.73 (review by Judie Hughes)",
+  "clip": [
+   189,
+   342,
+   184,
+   34
+  ],
+  "text": "DinarSoft MemMaid 1.73",
+  "pad": 0
  },
  {
   "page": "tp-2007-06-gadgetmix-handyswitcher3",
   "name": "verdict",
-  "rx": "do I recommend it",
   "replaces": [
    "tp-2007-06-gadgetmix-handyswitcher3--headline.png"
   ],
-  "shows": "Verdict: \"So, in the end, do I recommend it? YES, go get it!\""
+  "shows": "Verdict: \"So, in the end, do I recommend it? YES, go get it!\"",
+  "clip": [
+   143,
+   10102,
+   334,
+   37
+  ],
+  "text": "So, in the end, do I recommend it? YES, go get it!",
+  "pad": 0
  },
  {
   "page": "tp-2007-07-mobileview-memmaid",
@@ -132,35 +172,44 @@
   "replaces": [
    "tp-2007-07-mobileview-memmaid--headline.png"
   ],
-  "shows": "Headline: DinarSoft's MemMaid 2.0 Reviewed!",
+  "shows": "Headline and byline: DinarSoft's MemMaid 2.0 Reviewed!, written by Allistair Lee, 11 July 2007",
   "clip": [
-   10,
-   2563,
-   1260,
-   54
+   0,
+   2572,
+   263,
+   103
   ],
-  "text": "DinarSoft's MemMaid 2.0 Reviewed!"
+  "text": "DinarSoft's MemMaid 2.0 Reviewed! / Written by Allistair Lee / Wednesday, 11 July 2007",
+  "pad": 0
  },
  {
   "page": "tp-2007-08-gadgeteer-taptext",
   "name": "headline",
-  "rx": "^DinarSoft TapText - Windows Mobile Utility",
   "replaces": [
    "tp-2007-08-gadgeteer-taptext--headline.png"
   ],
-  "shows": "Headline: DinarSoft TapText - Windows Mobile Utility"
+  "shows": "Headline and byline: DinarSoft TapText - Windows Mobile Utility, by Kent Lanum, August 23, 2007",
+  "clip": [
+   54,
+   124,
+   474,
+   84
+  ],
+  "text": "DinarSoft TapText - Windows Mobile Utility / Gadgeteer Hands On Review by Kent Lanum / August 23, 2007",
+  "pad": 0
  },
  {
   "page": "tp-2007-08-gadgeteer-taptext",
   "name": "verdict",
   "clip": [
-   66,
-   8948,
-   857,
-   235
+   56,
+   8949,
+   469,
+   68
   ],
-  "text": "Conclusion and Thoughts",
-  "shows": "Conclusion: \"I really cannot see any problems with DinarSoft's TapText\""
+  "text": "Conclusion and Thoughts / I really cannot see any problems with DinarSoft's TapText input software.",
+  "shows": "Conclusion: \"I really cannot see any problems with DinarSoft's TapText input software.\"",
+  "pad": 0
  },
  {
   "page": "tp-2007-09-etenblog-memmaid",
@@ -171,8 +220,15 @@
  {
   "page": "tp-2007-10-aximsite-memmaid2",
   "name": "rating",
-  "rx": "^Rating: 5 out of 5",
-  "shows": "Rating: 5 out of 5"
+  "shows": "Rating: 5 out of 5",
+  "clip": [
+   181,
+   403,
+   136,
+   30
+  ],
+  "text": "Rating: 5 out of 5",
+  "pad": 0
  },
  {
   "page": "tp-2007-gadgetmix-handymenu",
@@ -189,13 +245,735 @@
  {
   "page": "tp-2007-gadgetmix-handyswitcher",
   "name": "verdict",
-  "rx": "must have on every Pocket PC",
-  "shows": "Verdict: \"functional and must have on every Pocket PC\""
+  "shows": "Final thoughts: \"functional and must have on every Pocket PC\"",
+  "clip": [
+   366,
+   3180,
+   547,
+   66
+  ],
+  "text": "Final Thoughts.. / A small light-weight application, but, functional and must have on every Pocket PC",
+  "pad": 0
  },
  {
   "page": "tp-2009-01-windowscentral-memmaid",
   "name": "rating",
   "rx": "^Ratings \\(5 out of 5\\)",
   "shows": "Ratings (5 out of 5) with pros and cons"
+ },
+ {
+  "page": "tp-2004-04-pocketpclife-handymenu",
+  "name": "headline",
+  "clip": [
+   168,
+   113,
+   278,
+   118
+  ],
+  "text": "HandyMenu V.2.0 Reviewed / Posted: Friday, April 16, 2004",
+  "shows": "Headline with the review thumbnail: HandyMenu V.2.0 Reviewed, posted Friday, April 16, 2004 (Tim Hillebrand, 5 of 5 stars)",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-04-pocketpclife-handyswitcher",
+  "name": "headline",
+  "clip": [
+   183,
+   222,
+   354,
+   50
+  ],
+  "text": "Handy Switcher V 2.0 Reviewed / Posted: Saturday, April 17, 2004",
+  "shows": "Headline: Handy Switcher V 2.0 Reviewed, posted Saturday, April 17, 2004 (Tim Hillebrand, 4 of 5 stars)",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-07-geekzone-memmaid",
+  "name": "headline",
+  "clip": [
+   0,
+   215,
+   471,
+   72
+  ],
+  "text": "MemMaid for Pocket PC review / posted 01/07/2004 21:10:36 NZ / by M Freitas",
+  "shows": "Headline, section path, date and byline: MemMaid for Pocket PC review, posted 01/07/2004, by M Freitas",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-07-geekzone-handymenu",
+  "name": "headline",
+  "clip": [
+   0,
+   215,
+   471,
+   72
+  ],
+  "text": "HandyMenu review / posted 17/07/2004 11:45:36 NZ / by M Freitas",
+  "shows": "Headline, section path, date and byline: HandyMenu review, posted 17/07/2004, by M Freitas",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-07-pocketpcdubai-memmaid",
+  "name": "headline",
+  "clip": [
+   498,
+   143,
+   284,
+   122
+  ],
+  "text": "MemMaid Review / By: Mabini / Date: July 23, 2004",
+  "shows": "Headline, byline and date: MemMaid Review, by Mabini, July 23, 2004",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-09-emobie-memmaid",
+  "name": "headline",
+  "clip": [
+   173,
+   177,
+   330,
+   111
+  ],
+  "text": "Dinar Soft's MemMaid Reviewed / Posted: 09 September 2004",
+  "shows": "Headline with the review thumbnail: Dinar Soft's MemMaid Reviewed, posted 09 September 2004 (Russ Terrell, 5 of 5 stars)",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-09-ppcthoughts-handymenu",
+  "name": "headline",
+  "clip": [
+   0,
+   265,
+   573,
+   54
+  ],
+  "text": "All Tapped Out? DinarSoft's HandyMenu v2.5 Reviewed",
+  "shows": "Headline only. Page: All Tapped Out? DinarSoft's HandyMenu v2.5 Reviewed, by Doug Raeburn",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-01-pocketnow-memmaid",
+  "name": "headline",
+  "clip": [
+   124,
+   95,
+   392,
+   80
+  ],
+  "text": "Dinarsoft's MemMaid v1.4 / January 7, 2005 / Review by: Tim Adams, Contributing Editor",
+  "shows": "Headline, date and byline: Dinarsoft's MemMaid v1.4, January 7, 2005, review by Tim Adams",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-04-ppcthoughts-taptext",
+  "name": "headline",
+  "clip": [
+   0,
+   267,
+   647,
+   42
+  ],
+  "text": "DinarSoft TapText 1.0: Repetitive Text Entry is Less Repetitive",
+  "shows": "Headline only. Page: DinarSoft TapText 1.0: Repetitive Text Entry is Less Repetitive, by John Walkosak",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-06-pda247-memmaid",
+  "name": "headline",
+  "clip": [
+   197,
+   110,
+   329,
+   76
+  ],
+  "text": "Topic: MemMaid by Neil Brown / MemMaid",
+  "shows": "Topic bar and title: MemMaid by Neil Brown (review date 15/06/2005)",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-07-jamm-memmaid",
+  "name": "headline",
+  "clip": [
+   0,
+   239,
+   555,
+   95
+  ],
+  "text": "Review - Short Take on MemMaid 1.72 / by PatrickJ, published on July 30th, 2006",
+  "shows": "Headline and byline: Review - Short Take on MemMaid 1.72, by PatrickJ, July 30th, 2006",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-08-ppcthoughts-taptext",
+  "name": "headline",
+  "clip": [
+   125,
+   265,
+   371,
+   54
+  ],
+  "text": "Speed Up Text Entry With TapText",
+  "shows": "Headline only. Page: Speed Up Text Entry With TapText, by Brad Adrian",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-01-technologyatplay-memmaid",
+  "name": "headline",
+  "clip": [
+   665,
+   224,
+   164,
+   24
+  ],
+  "text": "MemMaid by Dinarsoft",
+  "shows": "Headline only. Page: MemMaid by Dinarsoft review",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-09-etenblog-memmaid",
+  "name": "headline",
+  "clip": [
+   208,
+   325,
+   381,
+   61
+  ],
+  "text": "Spring Cleaning With DinarSoft's MemMaid / Sep 12th, 2007 by Tariq Bamadhaj",
+  "shows": "Headline and byline: Spring Cleaning With DinarSoft's MemMaid, Sep 12th, 2007, by Tariq Bamadhaj",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-12-etenblog-taptext",
+  "name": "headline",
+  "clip": [
+   208,
+   325,
+   220,
+   61
+  ],
+  "text": "TapText Data With Ease / Dec 12th, 2007 by Tariq Bamadhaj",
+  "shows": "Headline and byline: TapText Data With Ease, Dec 12th, 2007, by Tariq Bamadhaj",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-mypdacafe-memmaid",
+  "name": "headline",
+  "clip": [
+   5,
+   183,
+   324,
+   59
+  ],
+  "text": "MemMaid by DinarSoft",
+  "shows": "Headline only. Page: MyPDACafe article on MemMaid",
+  "pad": 0
+ },
+ {
+  "page": "tp-2009-01-windowscentral-memmaid",
+  "name": "headline",
+  "clip": [
+   171,
+   473,
+   555,
+   110
+  ],
+  "text": "Review: MemMaid Memory Management Utility / By WinC Staff last updated 3 November 2012",
+  "shows": "Headline and byline: Review: MemMaid Memory Management Utility, by WinC Staff (2009-01-03, last updated 3 November 2012), Wayback copy from 2024",
+  "pad": 0
+ },
+ {
+  "page": "tp-2008-smartphonemag-winners-p2",
+  "name": "memmaid",
+  "clip": [
+   325,
+   7842,
+   374,
+   40
+  ],
+  "text": "MemMaid (DinarSoft, www.dinarsoft.com) Product Info... FINALIST",
+  "shows": "MemMaid only. Page: Best Software Awards 2008: HandySwitcher winner; MemMaid, TapText, HandyMenu finalists; HandyLauncher nominee",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-04-pocketpclife-handymenu",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-04-pocketpclife-handyswitcher",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-07-geekzone-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-07-geekzone-handymenu",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-07-pocketpcdubai-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-09-ppcthoughts-handymenu",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-09-emobie-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2004-11-pocketpcreviews-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-01-pocketnow-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-03-aximsite-taptext",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-04-ppcthoughts-taptext",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2005-06-pda247-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-03-pdablast-handyswitcher",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-06-treocentral-shootout",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-07-jamm-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-08-ppcthoughts-taptext",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-09-tucows-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2006-10-tucows-favorite",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-01-pocketland-net-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-01-technologyatplay-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-gadgetmix-handyswitcher",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-gadgetmix-handymenu",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-gadgetmix-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-05-clintonfitch-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-06-gadgetmix-handyswitcher3",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-07-mobileview-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   2008,
+   1280,
+   780
+  ],
+  "text": "first screen",
+  "shows": "A 1280 x 780 window from 2008 px down (the archived page lost its style sheet): the poll naming Mobile View, the headline and byline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-08-gadgeteer-taptext",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-09-jamm-memmaid2-vs-sktools",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-09-etenblog-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-10-aximsite-memmaid2",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-mypdacafe-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2007-12-etenblog-taptext",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-2009-01-windowscentral-memmaid",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   800
+  ],
+  "text": "first screen",
+  "shows": "First screen in a 1280 x 800 window: the site masthead and navigation, and the review headline",
+  "pad": 0
+ },
+ {
+  "page": "tp-chip-2006-06",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   299
+  ],
+  "text": "CHIP disc page",
+  "shows": "The whole disc page, 299 px tall: the DinarSoft entry (the disc file has no masthead)",
+  "pad": 0
+ },
+ {
+  "page": "tp-chip-2007-05",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   308
+  ],
+  "text": "CHIP disc page",
+  "shows": "The whole disc page, 308 px tall: the DinarSoft entry (the disc file has no masthead)",
+  "pad": 0
+ },
+ {
+  "page": "tp-chip-2008-06",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   299
+  ],
+  "text": "CHIP disc page",
+  "shows": "The whole disc page, 299 px tall: the DinarSoft entry (the disc file has no masthead)",
+  "pad": 0
+ },
+ {
+  "page": "tp-chip-2008-09",
+  "name": "page",
+  "clip": [
+   0,
+   0,
+   1280,
+   349
+  ],
+  "text": "CHIP disc page",
+  "shows": "The whole disc page, 349 px tall: the DinarSoft entry (the disc file has no masthead)",
+  "pad": 0
  }
 ]

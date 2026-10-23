@@ -1,43 +1,43 @@
 /* Windows Mobile 5 controls, drawn the way his dialogs looked on a 240 x 320 Pocket PC. Positions come in dialog units. */
-.ppc { --u: calc(100cqw / 164); --uy: calc(var(--u) * 1.09); --tx: calc(var(--u) * 7.4); container-type: inline-size; color: #000; background: #fff; font-family: Tahoma, Verdana, 'Segoe UI', sans-serif; }
+.ppc { --u: calc(100cqw / 164); --uy: calc(var(--u) * 1.09); --tx: calc(var(--u) * 7.4); container-type: inline-size; color: #000; background: linear-gradient(#fff 30%, color-mix(in srgb, var(--wm-tint, #fff) 45%, #fff)); font-family: var(--wm-font, Tahoma, Verdana, sans-serif); }
 /* Sizes resolve against the .ppc container, so they live on its children */
 .ppc > * { font-size: var(--tx); line-height: 1.2; }
 .ppc-dlg { position: relative; width: 100%; height: calc(var(--dh) * var(--uy)); }
 .ppc-dlg > * { position: absolute; left: calc(var(--x) * var(--u)); top: calc(var(--y) * var(--uy)); width: calc(var(--w) * var(--u)); height: calc(var(--h) * var(--uy)); margin: 0; font: inherit; box-sizing: border-box; }
-.ppc-head { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(17 * var(--uy)) !important; padding: calc(var(--u) * 2.4) calc(var(--u) * 4) 0; font-weight: 700; color: #00309c; border-bottom: 1px solid #a9a9a9; white-space: nowrap; }
+.ppc-head { top: 0 !important; left: 0 !important; width: 100% !important; height: calc(17 * var(--uy)) !important; padding: calc(var(--u) * 2.4) calc(var(--u) * 3) 0; font-weight: 700; color: var(--wm-head, #00309c); border-bottom: 1px solid var(--wm-head, #a9a9a9); white-space: nowrap; }
 .ppc-st, .ppc-head, .ppc-img { pointer-events: none; }
 .ppc-st { white-space: pre-wrap; overflow: hidden; line-height: 1.15; }
 .ppc-st.c { text-align: center; }
 .ppc-st.r { text-align: right; }
+.ppc-st.one { white-space: nowrap; overflow: visible; }
 .ppc-img { object-fit: contain; image-rendering: auto; }
 .ppc-grp { border: 1px solid #a9a9a9; border-radius: 2px; pointer-events: none; }
 .ppc-chk { display: flex; align-items: center; gap: calc(var(--u) * 2); cursor: pointer; white-space: nowrap; }
 .ppc-chk input { flex: none; width: calc(var(--u) * 7.5); height: calc(var(--u) * 7.5); margin: 0; accent-color: #00309c; cursor: pointer; }
 .ppc-chk span { overflow: hidden; text-overflow: ellipsis; }
-.ppc-btn { display: grid; place-items: center; padding: 0; color: #000; background: linear-gradient(#fff, #e3e3e3); border: 1px solid #555; border-radius: 0; cursor: pointer; white-space: nowrap; }
-.ppc-btn:active { background: #00309c; color: #fff; }
+.ppc-btn { display: grid; place-items: center; padding: 0; color: #000; background: #fff; border: 1px solid #000; border-radius: 0; cursor: pointer; white-space: nowrap; }
+.ppc-btn:active { background: #000; color: #fff; }
+.ppc-btn:disabled { color: #a0a0a0; border-color: #a0a0a0; cursor: default; }
 .ppc-btn.sw { background: var(--sw, #fff); border: 1px solid #000; box-shadow: 2px 2px 0 #808080; }
-.ppc-ed, .ppc-cb { padding: 0 calc(var(--u) * 1.5); color: #000; background: #fff; border: 1px solid #7f7f7f; border-radius: 0; }
+.ppc-ed, .ppc-cb { padding: 0 calc(var(--u) * 1.5); color: #000; background-color: #fff; border: 1px solid #000; border-radius: 0; }
 .ppc-ed { text-transform: none; letter-spacing: 0.04em; }
 .ppc-ed[autocapitalize='characters'] { text-transform: uppercase; text-align: center; }
-.ppc-cb { height: calc(13 * var(--uy)) !important; appearance: auto; }
-.ppc-ud { display: flex; border: 1px solid #7f7f7f; }
-.ppc-ud i { flex: 1; display: grid; place-items: center; font-style: normal; font-size: 0.8em; background: linear-gradient(#fff, #ddd); }
-.ppc-ud i + i { border-left: 1px solid #7f7f7f; }
-.ppc-lv { list-style: none; padding: 1px; overflow: auto; border: 1px solid #7f7f7f; background: #fff; }
+.ppc-cb { height: calc(13 * var(--uy)) !important; padding-right: 14px; }
+.ppc-ud { display: flex; border: 1px solid #000; }
+.ppc-ud i { flex: 1; display: grid; place-items: center; font-style: normal; font-size: 0.8em; background: #fff; }
+.ppc-ud i + i { border-left: 1px solid #000; }
+.ppc-lv { list-style: none; padding: 1px; overflow: auto; border: 1px solid #000; background: #fff; scrollbar-width: thin; }
 .ppc-lv li { display: flex; align-items: center; gap: calc(var(--u) * 2); padding: calc(var(--u) * 0.6) calc(var(--u) * 1.5); white-space: nowrap; }
 .ppc-lv li img { width: calc(var(--u) * 10); height: calc(var(--u) * 10); }
 .ppc-lv li input { width: calc(var(--u) * 7); height: calc(var(--u) * 7); margin: 0; accent-color: #00309c; }
 .ppc :is(input, select, button, label):focus-visible { outline: 2px solid #316ac5; outline-offset: 1px; }
 
-/* The property sheet: pages on top, the tab strip at the bottom, as Pocket PC drew it */
+/* The property sheet: pages on top, the tab strip at the bottom, as Pocket PC drew it: tinted tabs, the open one white and joined to its page */
 .ppc-sheet { display: flex; flex-direction: column; height: 100%; }
-.ppc-pages { position: relative; flex: 1; overflow: hidden auto; }
-.ppc-tabs { display: flex; flex: none; gap: 0; padding: 0 calc(var(--u) * 2); background: #fff; border-top: 1px solid #808080; }
-.ppc-tabs button { flex: none; min-width: 0; padding: calc(var(--u) * 1.5) calc(var(--u) * 3.2); font: inherit; color: #000; background: #d6d3ce; border: 1px solid #808080; border-top: 0; margin-right: -1px; cursor: pointer; }
-.ppc-tabs button[aria-selected='true'] { position: relative; background: #fff; font-weight: 700; margin-top: -1px; z-index: 1; }
-.ppc-tabs button { min-height: 24px; }
-@media (pointer: coarse) { .ppc-tabs button { min-height: 44px; } }
+.ppc-pages { position: relative; flex: 1; overflow: hidden auto; scrollbar-width: thin; }
+.ppc-tabs { position: relative; display: flex; flex: none; height: 22px; padding: 0; overflow: auto hidden; scrollbar-width: none; background: var(--wm-tint, #d6d3ce); border-top: 1px solid #000; }
+.ppc-tabs button { flex: none; min-width: 0; height: 21px; margin-top: -1px; padding: 0 5px; font: 400 11px/1 var(--wm-font, Tahoma, sans-serif); color: #000; background: var(--wm-tint, #d6d3ce); border: 1px solid #000; border-left: 0; cursor: pointer; white-space: nowrap; }
+.ppc-tabs button[aria-selected='true'] { position: relative; background: #fff; border-top-color: #fff; z-index: 1; }
 .ppc-tabs button:focus-visible { outline: 2px solid #316ac5; outline-offset: -3px; }
 .ppc-sheet.is-live .ppc-page[hidden] { display: none; }
 .ppc-sheet:not(.is-live) .ppc-page + .ppc-page { border-top: 2px solid #808080; }

@@ -14,7 +14,7 @@ const ASM = [
   { off: '1297C', code: 'bl   GetProcAddressW', note: '"ChangeDisplaySettingsEx"' },
   { off: '12980', code: 'str  r0,[r5]', note: 'keep it for next time' },
   { off: '1298C', code: 'cmp  r0,#0', note: 'found?' },
-  { off: '129C4', code: 'bl   MessageBoxW', note: 'not found: his string 66' },
+  { off: '129C4', code: 'bl   MessageBoxW', note: 'not found: string 66' },
   { off: '12A0C', code: 'strh r7,[sp,#72]', note: 'dmSize = 192' },
   { off: '12A10', code: 'str  r8,[sp,#76]', note: 'dmFields = orientation' },
   { off: '12A18', code: 'mov  r3,#2', note: 'CDS_TEST: only ask' },

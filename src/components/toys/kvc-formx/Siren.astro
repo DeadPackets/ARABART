@@ -30,15 +30,13 @@ const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
   </div>
 
   <Window title="PC SPEAKER  10 ms of the wave KVC sends" kind="screen" active class="kxs-scope">
-    <svg class="kxs-svg" viewBox={`0 0 ${W} ${H + 26}`} role="img" aria-labelledby="kxs-wt">
+    <svg class="kxs-svg" viewBox={`0 10 ${W} ${H - 20}`} role="img" aria-labelledby="kxs-wt">
       <title id="kxs-wt">The PC speaker's square wave: the speaker cone is pushed out, then pulled in, 1,193 times a second for the high tone and 746 times for the low one.</title>
       <defs><clipPath id="kxs-clip"><rect width={W} height={H} /></clipPath></defs>
       <line class="kxs-axis" x1="0" x2={W} y1={H / 2} y2={H / 2} />
       <g clip-path="url(#kxs-clip)"><path class="kxs-wave" d={wave(PIT_HZ / DIVISORS[0])} data-wave /></g>
-      <text class="kxs-lab" x="0" y={H + 20}>0 ms</text>
-      <text class="kxs-lab" x={W} y={H + 20} text-anchor="end">10 ms</text>
-      <text class="kxs-hz" x={W / 2} y={H + 20} text-anchor="middle" data-hz>{fmt(PIT_HZ / DIVISORS[0])} Hz</text>
     </svg>
+    <p class="kxs-axl" aria-hidden="true"><span>0 ms</span><span class="kxs-hz" data-hz>{fmt(PIT_HZ / DIVISORS[0])} Hz</span><span>10 ms</span></p>
     <div class="kxs-tones" role="list" aria-label="The 20 tones, high and low in turn">
       {Array.from({ length: TONES }, (_, i) => <div role="listitem" class:list={['kxs-t', i % 2 ? 'lo' : 'hi']} data-i={i}><span class="kxs-bar"></span><span class="kxs-n">{i + 1}</span></div>)}
     </div>
@@ -65,15 +63,16 @@ const fmt = (n: number) => Math.round(n).toLocaleString('en-US');
   .kxs-axis { stroke: var(--vga-8); stroke-dasharray: 3 5; }
   .kxs-wave { fill: none; stroke: var(--vga-10); stroke-width: 3; }
   .kxs.is-playing .kxs-wave { filter: drop-shadow(0 0 6px color-mix(in oklch, var(--vga-10) 70%, transparent)); }
-  .kxs-lab { font: 400 16px var(--font-dos); fill: var(--vga-7); }
-  .kxs-hz { font: 400 16px var(--font-dos); fill: var(--vga-14); }
+  /* The axis labels sit under the wave in HTML, so the VGA font stays at its 16 px at any width */
+  .kxs-axl { display: flex; justify-content: space-between; gap: 12px; margin: 4px 0 0; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); }
+  .kxs-hz { color: var(--vga-14); }
   .kxs-tones { display: grid; grid-template-columns: repeat(20, minmax(0, 1fr)); gap: 3px; margin: 18px 0 0; padding: 0; list-style: none; }
   .kxs-t { display: grid; gap: 4px; justify-items: center; }
   .kxs-bar { width: 100%; height: 34px; background: var(--vga-8); transform-origin: bottom; }
   .kxs-t.lo .kxs-bar { height: 21px; margin-top: 13px; }
   .kxs-t.on .kxs-bar { background: var(--vga-10); }
   .kxs-t.done .kxs-bar { background: var(--vga-2); }
-  .kxs-n { font: 400 11px/1 var(--font-code); color: var(--vga-7); }
+  .kxs-n { font: 400 12px/1 var(--font-code); color: var(--vga-7); }
   .kxs-read { margin-top: 14px; min-height: 3em; font: 400 16px/1.4 var(--font-dos); color: var(--vga-7); }
   .kxs-pit :global(.win-body) { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 28px; align-items: center; }
   .kxs-his { grid-column: 1 / -1; }

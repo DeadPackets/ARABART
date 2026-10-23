@@ -48,8 +48,9 @@
 #gpop :focus-visible { outline-color: var(--black); }
 
 .dg-defs { position: absolute; overflow: hidden; }
-.d-arrow { fill: var(--accent-2); }
-.d-arrow-hi { fill: var(--accent); }
+/* A marker resolves var() where it is defined, so the head takes its wire's color with context-stroke where supported */
+.d-arrow { fill: var(--accent-2); fill: context-stroke; }
+.d-arrow-hi { fill: var(--accent); fill: context-stroke; }
 
 /* Figure, Steps and Listing are Shell windows; the caption sits under the window, like a museum label */
 .k-fig { margin: 40px 0 36px; min-width: 0; }
@@ -60,6 +61,9 @@
   .fig-body.has-narrow .fig-wide { display: none; }
   .fig-body.has-narrow .fig-narrow { display: block; }
 }
+/* A narrow diagram (viewBox 360 wide) draws at about 0.85 scale on a 390 px phone; these keep its text at 12 px or more */
+.fig-narrow .dg text:not(.t-lg) { font-size: 15px; }
+.fig-narrow .dg text.t-sm { font-size: 14.5px; }
 
 /* The older window markup (.win with a .win-t title) that pages outside the kit still use */
 .win:not([data-win]) {
@@ -77,7 +81,7 @@
 
 /* Diagram vocabulary for inline SVG: add class="dg" to the <svg> */
 .dg { display: block; width: 100%; height: auto; overflow: visible; }
-.dg text { fill: var(--ink); font: 500 14px var(--font-code); }
+.dg text { fill: var(--ink); font: 500 14px var(--font-code); font-stretch: 87.5%; }
 .dg .t-sm { font-size: 12px; fill: var(--ink-2); }
 .dg .t-lg { font: 800 20px var(--font-display); font-stretch: 85%; }
 .dg .t-ar { font-family: var(--font-ar); font-weight: 700; }
@@ -197,7 +201,7 @@
 .writeup .tldr { list-style: none; padding: 0; gap: 10px; }
 .writeup .tldr li { position: relative; padding-left: 26px; font-size: 1.125rem; }
 .writeup .tldr li::before { content: ''; position: absolute; left: 0; top: 0.7em; width: 12px; height: 3px; background: var(--accent); }
-.writeup :not(pre) > code { font: 500 0.9em var(--font-code); color: var(--accent); }
+.writeup :not(pre) > code { font: 500 max(12px, 0.9em) var(--font-code); color: var(--accent); }
 .writeup strong { font-weight: 700; color: var(--accent); }
 .writeup .k-fig, .writeup .tn { max-width: 100%; }
 .writeup a:not(.term):not([class*='btn']):not(.button) { color: var(--accent-2); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }

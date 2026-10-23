@@ -27,7 +27,7 @@ MENU.children.forEach((c, i) => walk(c, String(i), 0));
 <div class="ttt-mf" id={id} data-mf data-at={AT}>
   <figure class="ttt-mf-tree">
     <figcaption>Menu Items</figcaption>
-    <ul data-tree set:html={rows.join('')} />
+    <ul data-tree tabindex="0" aria-label="Menu Items" set:html={rows.join('')} />
   </figure>
   <figure class="ttt-mf-file">
     <figcaption>TapText.dmd <span data-size>{dmdParts().reduce((n, p) => n + p.s.length, 0) * 2} bytes</span></figcaption>

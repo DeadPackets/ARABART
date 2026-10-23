@@ -10,7 +10,7 @@ interface Props {
   when?: [string, string];
 }
 const { era, keys = [], when } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const here = Astro.url.pathname.replace(/\/$/, '');
 
 const items = [
@@ -49,7 +49,7 @@ const [place, year] = when ?? ERAS[era].when;
 
   <div class="sh-low">
     <button class="sh-menu" type="button" popovertarget="sh-nav" aria-label="Menu"><span class="sh-flag" aria-hidden="true"></span><span class="sh-menu-l">Menu</span></button>
-    <a class="sh-start" href={`${base}/`} aria-label="Start, home"><span class="sh-flag" aria-hidden="true"></span>Start</a>
+    <a class="sh-start" href={`${base}/`}><span class="sh-flag" aria-hidden="true"></span>Start<span class="sr-only"> page: ARABART home</span></a>
     <ul class="sh-keys" aria-label="Keys">
       {all.map(it => (
         <li>
@@ -221,7 +221,7 @@ const [place, year] = when ?? ERAS[era].when;
   addEventListener('keydown', e => {
     if (e.key !== 'F1') return;
     e.preventDefault();
-    if (!location.pathname.endsWith('/glossary/')) location.href = `${import.meta.env.BASE_URL}/glossary/`;
+    if (!location.pathname.endsWith('/glossary/')) location.href = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/glossary/`;
   });
   // A link inside the phone menu closes it, so a same-page anchor does not leave the menu open
   const nav = document.getElementById('sh-nav');

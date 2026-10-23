@@ -2,14 +2,14 @@
 
 A museum of my father Yasser Awad's software, named after ARABART, the Arabic graphics library he wrote in Port Said in 1991. His 15 DOS programs run in your browser, his Arabic engine is ported line by line to JavaScript, and his DinarSoft Pocket PC apps are archived with free unlock keys.
 
-**[Visit ARABART](https://projects.deadpackets.pw/ARABART/)**
+**[Visit ARABART](https://arabart.deadpackets.pw/)**
 
 ## Stack
 
 - **[Astro](https://astro.build/)**: static site generator
 - **[js-dos v8](https://js-dos.com/)**: DOSBox compiled to WebAssembly, runs his programs
 - **[GSAP](https://gsap.com/)**, **[Lenis](https://lenis.darkroom.engineering/)** and **[OGL](https://github.com/oframe/ogl)**: animation, smooth scroll and the WebGL hero
-- **GitHub Actions**: builds and deploys to GitHub Pages on every push to `master`
+- **GitHub Actions**: builds and deploys to Cloudflare Workers (`wrangler.jsonc`) on every push to `master`
 
 ## Layout
 

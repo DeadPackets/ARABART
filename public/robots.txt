@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://arabart.deadpackets.pw/sitemap.xml

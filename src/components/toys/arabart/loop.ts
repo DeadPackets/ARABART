@@ -145,6 +145,6 @@ export function trace(codes: number[], letters: string[]): Step[] {
     di++; push(31, `Move one letter on. ${name(di - 1)} is done: ${form(mem[di - 1])}.`);
     push(32, 'Back to the top of the loop.');
   }
-  push(33, `Done. Every letter has its shape: ${codes.map((c, i) => (isStyle(c) || c === 3 ? '' : `${letters[i]} ${form(mem[i])}`)).filter(Boolean).join(', ')}.`);
+  push(33, `Done. Every letter has its shape: ${codes.map((c, i) => (isStyle(c) || c === 3 ? '' : `<span lang="ar">${letters[i]}</span> ${form(mem[i])}`)).filter(Boolean).join(', ')}.`);
   return steps;
 }

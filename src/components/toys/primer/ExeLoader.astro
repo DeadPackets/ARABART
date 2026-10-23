@@ -70,6 +70,7 @@ new URL('./data.json', import.meta.url);</code></pre>
   .prx { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; align-items: start; }
   .prx-ctl { grid-column: 1 / -1; }
   .prx-json { margin: 0; white-space: pre; overflow-x: auto; font: 500 clamp(11.5px, 0.3vw + 9px, 13.5px)/1.75 var(--font-code); color: var(--ink); }
+  .prx-json code, .prx-code code { font-size: max(12px, 0.875em); }
   .prx-json b { color: var(--accent); font-weight: 600; }
   .prx-json i { color: var(--ink-2); font-style: normal; }
   .prx-img { display: grid; gap: 6px; margin-top: 18px; }
@@ -81,10 +82,10 @@ new URL('./data.json', import.meta.url);</code></pre>
   .prx-sl small { font: 500 0.75rem var(--font-code); color: var(--ink-2); }
   .prx-sl input { width: 100%; min-height: 44px; margin: 0; accent-color: var(--vga-14); }
   .prx-bar { position: relative; height: 30px; margin: 4px 0 20px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--rule); }
-  .prx-bar > span { position: absolute; top: 100%; font: 500 10px/1.6 var(--font-code); color: var(--ink-2); }
+  .prx-bar > span { position: absolute; top: 100%; font: 500 12px/1.6 var(--font-code); color: var(--ink-2); }
   .prx-bar > span:last-child { right: 0; }
   .prx-blk { position: absolute; top: 0; bottom: 0; width: 3.3%; min-width: 6px; background: var(--vga-14); }
-  .prx-blk span { position: absolute; bottom: 100%; left: 0; font: 700 10px/1.6 var(--font-code); color: var(--accent); white-space: nowrap; }
+  .prx-blk span { position: absolute; bottom: 100%; left: 0; font: 700 12px/1.6 var(--font-code); color: var(--accent); white-space: nowrap; }
   .prx-fix { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; font: 500 clamp(12px, 0.25vw + 10px, 13.5px)/1.75 var(--font-code); }
   .prx-fix li { display: grid; grid-template-columns: 5ch 1fr; gap: 1ch; padding: 0 8px; color: var(--ink); }
   .prx-fix .o { color: var(--ink-2); }
@@ -102,7 +103,8 @@ new URL('./data.json', import.meta.url);</code></pre>
   .prx.is-live [data-part] { transition: opacity 0.3s; }
   .prx.is-live [data-part].dim { opacity: 0.25; }
   .prx.is-live [data-part].lit { outline: 2px solid var(--vga-14); outline-offset: 4px; }
-  @media (max-width: 1023px) { .prx { grid-template-columns: minmax(0, 1fr); } }
+  /* Two columns only where the manifest's longest line fits beside the memory bar */
+  @media (max-width: 1100px) { .prx { grid-template-columns: minmax(0, 1fr); } }
   @media (max-width: 560px) { .prx-json i { display: none; } }
   @media (prefers-reduced-motion: reduce) { .prx.is-live [data-part] { transition: none; } }
 </style>

@@ -110,6 +110,8 @@ const last = STEPS[STEPS.length - 1];
 <style is:global>
   .kxz-narrow { display: none; }
   @media (max-width: 640px) { .kxz-wide { display: none; } .kxz-narrow { display: block; } }
+  /* The narrow chart draws at about 0.85 scale on a 390 px phone; these keep its text at 12 px or more */
+  @media (max-width: 640px) { .kxz-narrow text:not(.t-lg) { font-size: 15px; } .kxz-narrow text.t-sm { font-size: 14.5px; } }
   .kxz { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
   .kxz-svg .kxz-slot rect { transition: stroke 0.2s, stroke-width 0.2s; }
   .kxz-svg .kxz-slot.on rect { stroke: var(--accent); stroke-width: 3; }

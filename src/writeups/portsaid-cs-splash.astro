@@ -12,7 +12,7 @@ import Term from '../components/explain/Term.astro';
 import Deep from '../components/explain/Deep.astro';
 import ThenNow from '../components/explain/ThenNow.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const kemyam = `${base}/program/kemyam-splash/`;
 ---
 

@@ -144,13 +144,15 @@ const editor = trace(true), plain = trace(false);
 
       <g data-s="5+">
         <text x="610" y="24" class="t-cy">Line table, 2,000 bytes</text>
-        {['[0]', '[1]', '[2]', '…', '[499]'].map((t, i) => <><rect class="box" x="610" y={36 + i * 24} width="270" height="24" /><text x="620" y={53 + i * 24}>{t}</text></>)}
+        {[0, 1, 2, 3, 4].map(i => <rect class="box" x="610" y={36 + i * 24} width="270" height="24" />)}
         <path class="wire-hi arrow" d="M292 84 H318 V9 H590 V48 H604" />
       </g>
-      <g data-s="6+">{[1, 2, 4].map(i => <text x="690" y={53 + i * 24}>0000:0000</text>)}</g>
       <text x="690" y="53" data-s="6">0000:0000</text>
+      <rect class="box-hi" x="610" y="36" width="270" height="24" data-s="7" />
+      <g data-s="5+">{['[0]', '[1]', '[2]', '…', '[499]'].map((t, i) => <text class:list={{ 'eg-r0': !i }} x="620" y={53 + i * 24}>{t}</text>)}</g>
+      <g data-s="6+">{[1, 2, 4].map(i => <text x="690" y={53 + i * 24}>0000:0000</text>)}</g>
       <g data-s="7">
-        <rect class="box-hi" x="610" y="36" width="270" height="24" /><text class="t-bk" x="620" y="53">[0]</text><text class="t-bk" x="786" y="53">line 0 ↓</text>
+        <text class="t-bk" x="786" y="53">line 0 ↓</text>
         <text x="610" y="204" class="t-cy">Line 0, 255 bytes</text>
         <rect class="box-ink" x="610" y="216" width="270" height="28" /><text class="t-bk" x="620" y="235">00 00 00 … 00</text>
         <path class="wire-hi arrow" d="M826 60 V210" />
@@ -179,12 +181,14 @@ const editor = trace(true), plain = trace(false);
       </g>
       <g data-s="5+">
         <text x="6" y="500" class="t-cy">Line table, 2,000 bytes</text>
-        {['[0]', '[1]', '…', '[499]'].map((t, i) => <><rect class="box" x="6" y={510 + i * 24} width="348" height="24" /><text x="16" y={527 + i * 24}>{t}</text></>)}
+        {[0, 1, 2, 3].map(i => <rect class="box" x="6" y={510 + i * 24} width="348" height="24" />)}
       </g>
-      <g data-s="6+">{[1, 3].map(i => <text x="90" y={527 + i * 24}>0000:0000</text>)}</g>
       <text x="90" y="527" data-s="6">0000:0000</text>
+      <rect class="box-hi" x="6" y="510" width="348" height="24" data-s="7" />
+      <g data-s="5+">{['[0]', '[1]', '…', '[499]'].map((t, i) => <text class:list={{ 'eg-r0': !i }} x="16" y={527 + i * 24}>{t}</text>)}</g>
+      <g data-s="6+">{[1, 3].map(i => <text x="90" y={527 + i * 24}>0000:0000</text>)}</g>
       <g data-s="7">
-        <rect class="box-hi" x="6" y="510" width="348" height="24" /><text class="t-bk" x="16" y="527">[0]</text><text class="t-bk" x="210" y="527">line 0 ↓</text>
+        <text class="t-bk" x="210" y="527">line 0 ↓</text>
         <text x="6" y="652" class="t-cy">Line 0, 255 bytes</text>
         <rect class="box-ink" x="6" y="662" width="348" height="30" /><text class="t-bk" x="16" y="682">00 00 00 … 00</text>
       </g>
@@ -254,6 +258,8 @@ const editor = trace(true), plain = trace(false);
 </section>
 
 <style>
+  /* Slot 0 turns black on its own highlight in step 7, instead of a second label ghosting over it in the other steps */
+  :global(.steps:not(.is-live), [data-at='7']) .eg-r0 { fill: var(--black); }
   .eg-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px clamp(24px, 4vw, 48px); margin-top: 28px; }
   .eg-cols p { margin: 0 !important; }
   @media (max-width: 760px) { .eg-cols { grid-template-columns: minmax(0, 1fr); } }

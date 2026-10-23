@@ -1,8 +1,8 @@
 # kvc-live end-to-end report
 
-**Result: PASS** (safety 3/3, emulator 10/10, js-dos 8/8, siren 3/3)
+**Result: PASS** (safety 3/3, emulator 10/10, js-dos not run, siren 3/3)
 
-Generated 2026-10-23 06:07 by `research/artifacts/koko/e2e.py`.
+Generated 2026-10-23 20:06 by `research/artifacts/koko/e2e.py`.
 
 Rerun:
 
@@ -94,41 +94,9 @@ File is infected by  KoKo (1) virus   ********** >  Virus removed  < **********
                  YASSER MOHAMED ALI.   -----   EBRAHIM EL-ETR
 ```
 
-## Part 2: js-dos 8.5.3 in headless Chrome (what a visitor gets)
+## Part 2: js-dos
 
-Page http://localhost:4322/ARABART/program/kvc-antivirus/: the demo PC in the writeup, booted by a click on its Start button, its bundle request answered by `public/bundles/kvc-live.jsdos`. SCAN typed by a click on the page's own Type SCAN key.
-
-| Check | Result |
-|---|---|
-| bundle holds exactly the files of programs/KVC_LIVE | PASS |
-| KVC found Koko in memory | PASS |
-| Koko frozen | PASS |
-| 4 files scanned, 2 found, 2 removed | PASS |
-| HELLO.COM equals the clean original byte for byte | PASS |
-| GREET.EXE equals the clean original byte for byte | PASS |
-| PC speaker alarm heard in the page audio, about 1.3 s | PASS |
-| two alternating pitches, high/low = 1.6 like divisors 1600/1000 | PASS |
-
-Sound (analyser on the demo's sound output, 2048-sample windows every 20 ms): tone present for 1.48 s, median pitch 1068 Hz and 668 Hz (KVC asks for 1193 Hz and 746 Hz: js-dos plays both 10% low). The sound starts from the click on Start, as it does for a visitor.
-
-Screens: `jsdos-1-ready.png` (boot scene), `jsdos-2-alarm.png` (1 s after SCAN), `jsdos-3-done.png` (finished).
-
-### Text screen after the run (read from video memory)
-
-```
-                   Found  --KoKo (1) virus--  active in  RAM
-                           ##### Virus Freezed #####
-Scanning >>  C:\GREET.EXE
-File is infected by  KoKo (1) virus   ********** >  Virus removed  < **********
-Scanning >>  C:\HELLO.COM
-File is infected by  KoKo (1) virus   ********** >  Virus removed  < **********
- Total file(s) scanned  >>     4   File (s)
- Total virus(s) found   >>     2   Virus(s)
- Total virus(s) removed >>     2   virus(s)
-                        <c>1993 KEMYAM Computer Group.
-                 YASSER MOHAMED ALI.   -----   EBRAHIM EL-ETR
-C:\>scrdump
-```
+Skipped: http://localhost:4322/ARABART/program/kvc-antivirus/ did not answer (HTTP Error 404: Not Found).
 
 ## Part 3: `src/lib/kvc/siren.ts` in Chrome, started by a real click
 

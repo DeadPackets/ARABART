@@ -9,7 +9,7 @@ import { START } from './editor.ts';
 
 interface Props { id?: string }
 const { id = 'editorsim' } = Astro.props;
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const CMDS = [['Q', 'Font 1'], ['W', 'Font 2'], ['E', 'Font 3'], ['R', 'Font 4'], ['C', 'Text color'], ['V', 'Shadow color']];
 const STYLES = [['!', 'Italic'], ['@', 'Bold'], ['#', 'Underline'], ['$', 'Double'], ['*', 'All off']];
 const LETTERS = [...'ابتثجحخدذرزسشصضطظعغفقكلمنهوي', 'ة', 'ى', 'ء', 'أ', 'آ', 'ؤ', 'ئ', 'لا', 'ـ'].map(ar => ({ ar, k: fromUnicode(ar) }));

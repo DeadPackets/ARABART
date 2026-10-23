@@ -1,15 +1,17 @@
 ---
 // A Pocket PC with one of his settings sheets on it: every page is rebuilt from his own dialog templates (pocket.ts).
-// Tabs sit at the bottom, as Windows Mobile drew them. Without JS the pages stack and all show.
+// Tabs sit at the bottom, as Windows Mobile drew them; ok sits on the title bar. Without JS the pages stack and all show.
 import Window from '../../shell/Window.astro';
 import './pocket.css';
 
 interface Page { tab: string; html: string }
-interface Props { id: string; title: string; clock?: string; pages: Page[]; soft?: [string, string]; at?: number; label: string }
-const { id, title, clock = '9:41', pages, soft = ['ok', ''], at = 0, label } = Astro.props;
+interface Props { id: string; title: string; clock?: string; pages: Page[]; soft?: [string, string]; at?: number; label: string; wm?: '2003' | '5'; theme?: 'teal' | 'blue' }
+const { id, title, clock, pages, soft = ['ok', ''], at = 0, label, wm = '5', theme = wm === '5' ? 'teal' : undefined } = Astro.props;
+// ok is on the title bar in Windows Mobile, so a soft key named ok is left blank; Settings.astro still writes into the first .ds-soft span, the hidden one
+const keys = soft.map(k => (k === 'ok' ? '' : k));
 ---
 
-<Window title={title} kind="device" num={clock} class="ds-dev" id={id} aria-label={label}>
+<Window title={title} kind="device" wm={wm} theme={theme} ok="ok" sip num={clock} class="ds-dev" id={id} aria-label={label}>
   <div class="ppc ppc-sheet" data-sheet>
     <div class="ppc-pages">
       {pages.map((p, i) => <div class="ppc-page" id={`${id}-p${i}`} role="tabpanel" aria-label={p.tab} data-i={i} set:html={p.html} />)}
@@ -18,13 +20,12 @@ const { id, title, clock = '9:41', pages, soft = ['ok', ''], at = 0, label } = A
       {pages.map((p, i) => <button type="button" role="tab" aria-controls={`${id}-p${i}`} aria-selected={String(i === at)} tabindex={i === at ? 0 : -1}>{p.tab}</button>)}
     </div>
   </div>
-  <p slot="status" class="ds-soft"><span>{soft[0]}</span><span>{soft[1]}</span></p>
+  <p slot="status" class="ds-soft"><span hidden></span><span class="sk-l">{keys[0]}</span><span class="sk-r">{keys[1]}</span></p>
 </Window>
 
 <style is:global>
   .ds-dev > .win-body { padding: 0 !important; overflow: hidden !important; }
   .ds-dev .ds-soft { display: contents; }
-  .ds-dev .ds-soft span { min-width: 3ch; }
 </style>
 
 <script>
@@ -35,6 +36,9 @@ const { id, title, clock = '9:41', pages, soft = ['ok', ''], at = 0, label } = A
       tabs.forEach((t, i) => { t.setAttribute('aria-selected', String(i === k)); t.tabIndex = i === k ? 0 : -1; });
       pages.forEach((p, i) => (p.hidden = i !== k));
       if (focus) tabs[k].focus();
+      // Tabs that do not fit scroll sideways, as on the device; keep the open one in view
+      const t = tabs[k], over = t.offsetLeft + t.offsetWidth - strip.clientWidth;
+      strip.scrollLeft = Math.max(0, Math.min(t.offsetLeft, Math.max(strip.scrollLeft, over)));
       sheet.dispatchEvent(new CustomEvent('sheet', { bubbles: true, detail: k }));
     };
     tabs.forEach((t, i) => t.addEventListener('click', () => pick(i)));
@@ -45,7 +49,8 @@ const { id, title, clock = '9:41', pages, soft = ['ok', ''], at = 0, label } = A
       e.preventDefault();
       pick((k + d + tabs.length) % tabs.length, true);
     });
-    sheet.querySelector<HTMLElement>('[role=tablist]')!.hidden = false;
+    const strip = sheet.querySelector<HTMLElement>('[role=tablist]')!;
+    strip.hidden = false;
     sheet.classList.add('is-live');
     pick(Math.max(0, tabs.findIndex(t => t.getAttribute('aria-selected') === 'true')));
   });

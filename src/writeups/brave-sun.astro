@@ -15,7 +15,7 @@ import Term from '../components/explain/Term.astro';
 import { render, svgRuns } from '../components/toys/arabart/core.ts';
 import { ssrBin } from '../components/toys/arabart/ssr.ts';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 // The last line of his poem to the sun, as his opening screen draws it: font 2, color 4, on his card's blue-gray
 const poem = render(ssrBin(), 'ty]h javrdk alsh K ,y]h javrdk t;vm K ,y]h javrdk pdhm', { font: 2, color: 4 });
 const poemRuns = svgRuns(poem);

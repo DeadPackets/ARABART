@@ -39,7 +39,7 @@ const img = draw(bin, [c0], { font: 3, color: 14 });
       <BitField label="The letter's byte" value={c0} groups={[{ bits: 2, label: 'join bits', tone: 'a' }, { bits: 6, label: 'which letter' }]} />
       <div class="lb-out">
         <div class="lb-glyph" data-glyph><Pix img={img} scale={4} /></div>
-        <p class="lb-form" aria-live="polite" data-form><b>{FORMS[c0 >> 6]}</b> {toUnicode(start)}, the shape used in the middle of a word</p>
+        <p class="lb-form" aria-live="polite" data-form><b>{FORMS[c0 >> 6]}</b> <span lang="ar">{toUnicode(start)}</span>, the shape used in the middle of a word</p>
       </div>
     </div>
   </Window>
@@ -72,10 +72,10 @@ const img = draw(bin, [c0], { font: 3, color: 14 });
   .lb-key[aria-pressed='true'] { background: var(--accent); color: var(--surface); box-shadow: none; }
   .lb-key:active { translate: 0 2px; }
   .lb-key:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-  .lb-us { font: 600 11px/1 var(--font-code); color: var(--accent-2); }
+  .lb-us { font: 600 12px/1 var(--font-code); color: var(--accent-2); }
   .lb-key[aria-pressed='true'] .lb-us, .lb-key[aria-pressed='true'] .lb-hex { color: var(--surface); }
   .lb-ar { font: 700 1.375rem/1.3 var(--font-ar); }
-  .lb-hex { font: 500 10px/1 var(--font-code); color: var(--ink); }
+  .lb-hex { font: 500 12px/1 var(--font-code); color: var(--ink); }
   .lb-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-top: 12px; font: 500 12px/1.4 var(--font-code); color: var(--ink-2); }
   .lb-legend span::before { content: ''; display: inline-block; width: 14px; height: 14px; margin-right: 6px; vertical-align: -2px; background: var(--surface-2); box-shadow: inset 0 0 0 1px var(--accent-2); }
   .lb-legend [data-hands='right']::before { background: color-mix(in oklch, var(--ink) 18%, var(--surface-2)); }
@@ -130,7 +130,7 @@ const img = draw(bin, [c0], { font: 3, color: 14 });
       }
       form.innerHTML = isStyle(c) ? `<b>a style key</b> ${hex(c)}h is not a letter: it switches bold, italic, underline or size. His joining loop steps over it.`
         : !img.width ? `<b>no glyph</b> ${hex(c)}h draws nothing in this font.`
-        : `<b>${FORMS[c >> 6]}</b>${letter ? `<span lang="ar">${letter}</span>, ` : ''}the shape used ${WHERE[c >> 6]}.`;
+        : `<b>${FORMS[c >> 6]}</b> ${letter ? `<span lang="ar">${letter}</span>, ` : ''}the shape used ${WHERE[c >> 6]}.`;
     }
 
     bf.addEventListener('bitfield', e => show((e as CustomEvent).detail.value));

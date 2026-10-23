@@ -9,7 +9,7 @@ export default {
   },
   'hs-arm': {
     term: 'ARM processor',
-    short: 'The low-power chip family inside Pocket PCs (StrongARM and XScale). His programs are ARM machine code: 4-byte instructions that work on 16 small slots inside the chip, named r0 to r15.',
+    short: 'The low-power chip family inside Pocket PCs (StrongARM and XScale). DinarSoft’s programs are ARM machine code: 4-byte instructions that work on 16 small slots inside the chip, named r0 to r15.',
     now: 'The same family runs every phone today, and Apple’s M-series Macs.',
   },
   'hs-window-proc': {
@@ -54,7 +54,7 @@ export default {
   },
   'hs-rc4': {
     term: 'RC4',
-    short: 'A famous cipher from 1987: shuffle a deck of 256 numbers with a password, then keep swapping cards and dealing one out for each byte. His key engine uses the same deal-and-swap idea with a deck of 120.',
+    short: 'A famous cipher from 1987: shuffle a deck of 256 numbers with a password, then keep swapping cards and dealing one out for each byte. DinarSoft’s key engine uses the same deal-and-swap idea with a deck of 120.',
     now: 'RC4 once protected Wi-Fi (WEP) and HTTPS. Today ChaCha20 does that job.',
   },
   'hs-tap-and-hold': {

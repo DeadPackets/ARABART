@@ -49,7 +49,7 @@ const on = (b: number) => Math.floor(value / 2 ** b) % 2 === 1;
     display: grid;
     place-items: center;
     padding: 0;
-    font: 700 calc(var(--cell) * 0.42)/1 var(--font-code);
+    font: 700 max(12px, calc(var(--cell) * 0.42))/1 var(--font-code);
     color: var(--ink-2);
     background: var(--surface-2);
     border: 0;
@@ -57,7 +57,7 @@ const on = (b: number) => Math.floor(value / 2 ** b) % 2 === 1;
     transform-style: preserve-3d;
   }
   button.k-bit { cursor: pointer; }
-  .k-bit-i { position: absolute; bottom: 2px; right: 4px; font: 500 9px/1 var(--font-code); color: color-mix(in oklch, currentColor 70%, transparent); }
+  .k-bit-i { position: absolute; bottom: 2px; right: 3px; font: 500 12px/1 var(--font-code); font-stretch: 75%; color: color-mix(in oklch, currentColor 70%, transparent); }
   .k-bit[aria-pressed='true'], .k-bit[data-on='true'] { color: var(--surface); background: var(--accent-2); box-shadow: none; }
   [data-tone='a'] .k-bit:is([aria-pressed='true'], [data-on='true']) { background: var(--ink); }
   [data-tone='c'] .k-bit:is([aria-pressed='true'], [data-on='true']) { background: var(--accent); }
@@ -68,7 +68,7 @@ const on = (b: number) => Math.floor(value / 2 ** b) % 2 === 1;
   [data-tone='a'] .k-bits-lab { color: var(--ink); }
   [data-tone='c'] .k-bits-lab { color: var(--accent); }
   .k-bits--sm .k-bit { height: calc(var(--cell) * 1.4); }
-  .k-bits--sm .k-bits-lab { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .k-bits--sm .k-bits-lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .k-bits-out { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 12px; font: 500 0.8125rem/1.4 var(--font-code); color: var(--ink-2); }
   .k-bits-out b { color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
   /* A container query styles the container's children, never the container itself */

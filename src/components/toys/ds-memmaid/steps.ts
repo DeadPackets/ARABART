@@ -80,7 +80,7 @@ export const INJECT_ASM: Line[] = [
   { off: '3680', code: 'ldr   r1, ="PerformCallBack4"' },
   { off: '3690', code: 'bl    GetProcAddressW', note: 'found by name' },
   { off: '36DC', code: 'ldr   r0, ="MemMaidSetup.dll"' },
-  { off: '36E0', code: 'bl    LoadLibraryW', note: 'his own helper' },
+  { off: '36E0', code: 'bl    LoadLibraryW', note: 'its own helper' },
   { off: '36EC', code: 'ldr   r1, ="PerformInst"' },
   { off: '36F4', code: 'bl    GetProcAddressW' },
   { off: '374C', code: 'mov   r0, #1' },
@@ -128,7 +128,7 @@ export const INJECT_C: Line[] = [
 ];
 export const INJECT_STEPS: Step[] = [
   { a: 3, c: 1, ph: 0, say: 'Windows Mobile has a function Microsoft never documented for apps: <b>PerformCallBack4</b>. It runs a function <b>inside another process</b>. MemMaid looks it up in coredll.dll by its name.', regs: [r('r0', 'coredll', 'the core system library'), r('r1', '"Perform…"', 'the name to look up')] },
-  { a: 5, c: 2, ph: 1, say: 'Next, his own helper library, <b>MemMaidSetup.dll</b>. The same file the installer runs, with one more job inside.', regs: [r('r0', 'hModule', 'MemMaidSetup.dll, in MemMaid', true)] },
+  { a: 5, c: 2, ph: 1, say: 'Next, its own helper library, <b>MemMaidSetup.dll</b>. The same file the installer runs, with one more job inside.', regs: [r('r0', 'hModule', 'MemMaidSetup.dll, in MemMaid', true)] },
   { a: 7, c: 3, ph: 1, say: 'The job is a function named <b>PerformInst</b>. An install step, by its name. It is the part that will run inside the other app.', regs: [r('r5', 'PerformInst', 'its address in MemMaid', true)] },
   { a: 11, c: 5, ph: 2, say: 'For a moment MemMaid steps up to system rights: <b>SetKMode</b>, then <b>SetProcPermissions</b> with every bit set, so it may reach any process.', regs: [r('r0', '0xFFFFFFFF', 'all 32 processes', true)] },
   { a: 12, c: 6, ph: 3, say: 'It opens the app to tidy, here Pocket Internet Explorer.', regs: [r('sb', 'hProcess', 'iexplore.exe', true)] },

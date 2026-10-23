@@ -2,10 +2,10 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Window from '../components/shell/Window.astro';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
-<BaseLayout title="Not found · Yasser Awad" description="This page does not exist in the archive.">
+<BaseLayout title="Not found · Yasser Awad" description="This page does not exist in the archive." noindex>
   <section class="container missing" aria-labelledby="nf-h">
     <p class="cmd" aria-hidden="true">C:\&gt;<span data-missing>PAGE</span><br />Bad command or file name<br /><br />C:\&gt;<span class="cur">_</span></p>
     <Window kind="dialog" title="Error" active class="box">

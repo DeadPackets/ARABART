@@ -1,0 +1,176 @@
+---
+// Who cites his two filings: every later patent publication that lists one of them as prior art (Google Patents,
+// checked against the USPTO's own search; research/patents/). Top: one dot per publication by year, his database
+// patent above the line and his OSS templates filing below. Below: a Windows 95 Find window with every one, sortable.
+// Pick a dot or a row to see it; pick a company to light up its dots. Alcatel citing itself is left out.
+import Window from '../../shell/Window.astro';
+import all from '../../../../research/patents/citations.json';
+
+type C = (typeof all)[number];
+const TOP = ['Cisco', 'IBM', 'Oracle', 'Huawei', 'Ericsson', 'Juniper', 'AT&T', 'HPE'];
+const COL = ['#000080', '#008080', '#800000', '#b8860b', '#800080', '#008000', '#0000ff', '#c00000'];
+const company = (r: C) => r.assignee.replace('HP / HPE', 'HPE').replace('CENX (now Ericsson)', 'Ericsson').replace('Apstra (Juniper)', 'Juniper').replace('Juniper Networks', 'Juniper');
+const shown = (r: C) => r.assignee.replace('HP / HPE', 'HPE').replace('CENX (now Ericsson)', 'CENX, now Ericsson').replace('Apstra (Juniper)', 'Apstra, now Juniper');
+const how = (r: C) => r.link === 'family' ? 'through its Chinese filing' : r.cited_by === 'examiner' ? 'added by the patent examiner' : 'listed by its inventors';
+const rows = all.filter(r => r.assignee !== 'Alcatel').map((r, i) => ({
+  i, co: company(r), name: shown(r), no: r.number, title: r.title, year: +r.publication_date.slice(0, 4),
+  his: r.his_patent.startsWith('US 7,603,377') ? 'key' : 'oss', how: how(r), url: r.url, rank: r.notable ? r.rank : 99,
+}));
+const companies = new Set(all.filter(r => r.assignee !== 'Alcatel').map(r => r.assignee)).size;
+const color = (co: string) => (TOP.includes(co) ? COL[TOP.indexOf(co)] : '#9a9a9a');
+
+// The chart: years across, dots stacked away from the middle line. A wide layout, and a narrow one for phones.
+const Y0 = 2007, Y1 = 2025, L = 6, R = 6;
+const layout = (W: number, D: number, G: number, every: number, small: boolean) => {
+  const cx = (y: number) => L + ((y - Y0 + 0.5) / (Y1 - Y0 + 1)) * (W - L - R);
+  const at = (his: string, y: number) => rows.filter(r => r.his === his && Math.max(r.year, Y0) === y).sort((a, b) => a.rank - b.rank);
+  const years = Array.from({ length: Y1 - Y0 + 1 }, (_, k) => Y0 + k);
+  const MID = 40 + 16 + Math.max(...years.map(y => at('key', y).length)) * (D + G);
+  const dots = (['key', 'oss'] as const).flatMap(his => years.flatMap(y => at(his, y).map((r, k) => {
+    const off = 16 + k * (D + G) + D / 2;
+    return { r, x: cx(y), y: his === 'key' ? MID - off : MID + off };
+  })));
+  return { W, D, H: Math.max(...dots.map(d => d.y)) + 30, MID, dots, small, labels: years.filter(y => (y - Y0) % every === 0).map(y => ({ y, x: cx(y) })) };
+};
+const LAYOUTS = [layout(960, 12, 3, 2, false), layout(300, 10, 2, 4, true)];
+const sorted = [...rows].sort((a, b) => a.rank - b.rank || a.year - b.year);
+const first = Math.min(...rows.map(r => r.year)), last = Math.max(...rows.map(r => r.year));
+---
+
+<div class="cb" data-cb>
+  <Window kind="dialog" title="Find: Patents citing Yasser Awad" active class="cb-win">
+    <div class="cb-chips" role="group" aria-label="Light up one company">
+      {TOP.map((co, k) => <button type="button" class="cb-chip" aria-pressed="false" data-co={co} style={`--c:${COL[k]}`}><i></i>{co}</button>)}
+    </div>
+    <div class="cb-chart">
+      {LAYOUTS.map(({ W, D, H, MID, dots, small, labels }) => (
+        <svg class:list={['cb-svg', small ? 'cb-narrow' : 'cb-wide']} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${rows.length} later patent publications cite his two filings, from ${first} to ${last}. His database patent is cited above the line, his OSS templates filing below it.`}>
+          <text class="cb-band" x={L} y="18">{small ? 'Cite his database key' : 'Cite his database key, US 7,603,377'}</text>
+          <text class="cb-band" x={L} y={H - 8}>{small ? 'Cite his OSS templates' : 'Cite his OSS templates, US 2007/0130192'}</text>
+          <line class="cb-axis" x1={L} x2={W - R} y1={MID} y2={MID} />
+          {labels.map(({ y, x }) => <text class="cb-yr" x={x} y={MID + 5} text-anchor="middle">{y}</text>)}
+          {dots.map(({ r, x, y }) => (
+            <circle class="cb-dot" cx={x} cy={y} r={D / 2} fill={color(r.co)} data-i={r.i} data-co={r.co} style={`--d:${(r.year - Y0) * 60}ms`}>
+              <title>{r.name}, {r.year}: {r.title}</title>
+            </circle>
+          ))}
+        </svg>
+      ))}
+    </div>
+    <p class="cb-pick" aria-live="polite" data-pick>Pick a dot or a row.</p>
+    <div class="cb-res" tabindex="0" role="region" aria-label="Every citing publication">
+      <table class="cb-t">
+        <thead><tr>
+          <th scope="col"><button type="button" data-sort="name">Company</button></th>
+          <th scope="col"><button type="button" data-sort="title">Their invention</button></th>
+          <th scope="col"><button type="button" data-sort="year">Year</button></th>
+          <th scope="col"><button type="button" data-sort="his">Cites his</button></th>
+        </tr></thead>
+        <tbody>
+          {sorted.map(r => (
+            <tr data-i={r.i} data-name={r.name} data-title={r.title} data-year={r.year} data-his={r.his} data-rank={r.rank} class:list={[{ top: r.rank < 99 }]}>
+              <td><i style={`background:${color(r.co)}`}></i>{r.name}</td>
+              <td><a href={r.url} rel="noopener">{r.title}</a> <small>{r.no}</small></td>
+              <td>{r.year}</td>
+              <td>{r.his === 'key' ? 'Database key' : 'OSS templates'}<small>{r.how}</small></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p slot="status">{rows.length} publications found · {new Set(all.filter(r => r.assignee !== 'Alcatel').map(r => r.invention_group)).size} inventions · {companies} companies</p>
+  </Window>
+</div>
+
+<style>
+  .cb-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .cb-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 0; background: var(--w-silver); color: var(--w-black); font: 400 0.9375rem/1 var(--font-ui); cursor: pointer; box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray); }
+  .cb-chip i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); }
+  .cb-chip[aria-pressed='true'] { box-shadow: inset 1px 1px var(--w-black), inset -1px -1px var(--w-white), inset 2px 2px var(--w-gray); background: #d4d0c8; }
+  .cb-chip:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -4px; }
+  .cb-chart { padding: 8px; background: var(--w-white); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-black); }
+  .cb-svg { display: block; width: 100%; height: auto; font-family: var(--sans); }
+  .cb-narrow { display: none; }
+  .cb-narrow .cb-band { font-size: 12px; }
+  .cb-narrow .cb-yr { font-size: 12px; }
+  .cb-band { font-size: 14px; font-weight: 600; fill: #333; }
+  .cb-axis { stroke: var(--w-black); stroke-width: 1.5; }
+  .cb-yr { font: 600 12px var(--sans); fill: #000; paint-order: stroke; stroke: #fff; stroke-width: 4px; }
+  .cb-dot { cursor: pointer; stroke: #fff; stroke-width: 1.5; transition: opacity 0.25s var(--quart), r 0.2s var(--quart); }
+  .cb-chart.go .cb-dot { animation: cb-in 0.45s var(--expo) both; animation-delay: var(--d); }
+  @keyframes cb-in { from { opacity: 0; translate: 0 -14px; } }
+  .cb.dim .cb-dot:not(.lit) { opacity: 0.15; }
+  .cb-dot.on { stroke: var(--w-black); stroke-width: 3; }
+  .cb-pick { min-height: 3.2em; margin: 10px 0; font-size: 0.9375rem !important; line-height: 1.55 !important; }
+  .cb-res { position: relative; max-height: 340px; overflow: auto; background: var(--w-white); box-shadow: inset 1px 1px var(--w-gray), inset -1px -1px var(--w-white), inset 2px 2px var(--w-black); }
+  .cb-res:focus-visible { outline: 1px dotted var(--w-black); outline-offset: 2px; }
+  .cb-t { width: 100%; border-collapse: collapse; font-size: 0.875rem; color: var(--w-black); }
+  .cb-t th { position: sticky; top: 0; z-index: 1; padding: 0; background: var(--w-silver); text-align: left; }
+  .cb-t th button { width: 100%; min-height: 32px; padding: 0 8px; border: 0; background: none; font: 400 0.875rem/1 var(--font-ui); color: var(--w-black); text-align: left; cursor: pointer; box-shadow: inset -1px -1px var(--w-black), inset 1px 1px var(--w-white), inset -2px -2px var(--w-gray); }
+  .cb-t th button[data-dir]::after { content: ' ▲'; font-size: 0.7em; }
+  .cb-t th button[data-dir='desc']::after { content: ' ▼'; }
+  .cb-t td { padding: 6px 8px; vertical-align: top; border-bottom: 1px solid #e4e4e4; line-height: 1.4; }
+  .cb-t td:first-child { white-space: nowrap; }
+  .cb-t td i { display: inline-block; width: 10px; height: 10px; margin-right: 6px; border-radius: 50%; }
+  .cb-t td small { display: block; color: #555; font-size: 0.75rem; }
+  .cb-t td a { color: #000080; }
+  .cb-t tr.top td:first-child { font-weight: 700; }
+  .cb-t tr { cursor: pointer; }
+  .cb-t tr.on td { background: #000080; color: #fff; }
+  .cb-t tr.on td :is(a, small) { color: #fff; }
+  @media (max-width: 640px) {
+    .cb-wide { display: none; }
+    .cb-narrow { display: block; }
+    .cb-chart { padding: 4px; }
+    .cb-t thead { display: none; }
+    .cb-t tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; border-bottom: 1px solid #e4e4e4; }
+    .cb-t td { border: 0; }
+    .cb-t td:nth-child(2) { grid-column: 1 / -1; grid-row: 2; padding-top: 0; }
+    .cb-t td:nth-child(4) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cb-chart.go .cb-dot { animation: none; } }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-cb]').forEach(root => {
+    const chart = root.querySelector<HTMLElement>('.cb-chart')!;
+    const dots = [...root.querySelectorAll<SVGCircleElement>('.cb-dot')];
+    const tbody = root.querySelector('tbody')!;
+    const rows = () => [...tbody.querySelectorAll<HTMLTableRowElement>('tr')];
+    const pick = root.querySelector<HTMLElement>('[data-pick]')!;
+    const res = root.querySelector<HTMLElement>('.cb-res')!;
+    new IntersectionObserver(([e], o) => { if (e.isIntersecting) { chart.classList.add('go'); o.disconnect(); } }, { threshold: 0.3 }).observe(chart);
+
+    const select = (i: string, from: 'dot' | 'row') => {
+      dots.forEach(d => d.classList.toggle('on', d.dataset.i === i));
+      const tr = rows().find(r => r.dataset.i === i)!;
+      rows().forEach(r => r.classList.toggle('on', r === tr));
+      const his = tr.dataset.his === 'key' ? 'database key patent' : 'OSS templates filing';
+      pick.replaceChildren(Object.assign(document.createElement('b'), { textContent: tr.dataset.name }), `, ${tr.dataset.year}: ${tr.dataset.title}. It cites his ${his}, ${tr.cells[3].querySelector('small')!.textContent}.`);
+      if (from === 'dot') res.scrollTo({ top: tr.offsetTop - 40, behavior: 'smooth' });
+    };
+    dots.forEach(d => d.addEventListener('click', () => select(d.dataset.i!, 'dot')));
+    tbody.addEventListener('click', e => {
+      if ((e.target as Element).closest('a')) return;
+      const tr = (e.target as Element).closest('tr');
+      if (tr) select(tr.dataset.i!, 'row');
+    });
+
+    // A company lights up its dots
+    root.querySelectorAll<HTMLButtonElement>('.cb-chip').forEach(b => b.addEventListener('click', () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      root.querySelectorAll('.cb-chip').forEach(x => x.setAttribute('aria-pressed', String(on && x === b)));
+      root.classList.toggle('dim', on);
+      dots.forEach(d => d.classList.toggle('lit', on && d.dataset.co === b.dataset.co));
+    }));
+
+    // Sort by a column, the way Explorer does: click again to turn it around
+    root.querySelectorAll<HTMLButtonElement>('[data-sort]').forEach(b => b.addEventListener('click', () => {
+      const k = b.dataset.sort!, dir = b.dataset.dir === 'asc' ? 'desc' : 'asc';
+      root.querySelectorAll('[data-sort]').forEach(x => x.removeAttribute('data-dir'));
+      b.dataset.dir = dir;
+      const val = (r: HTMLTableRowElement) => (k === 'year' ? +r.dataset.year! : r.dataset[k]!.toLowerCase());
+      tbody.append(...rows().sort((p, q) => (val(p) > val(q) ? 1 : val(p) < val(q) ? -1 : +p.dataset.rank! - +q.dataset.rank!) * (dir === 'asc' ? 1 : -1)));
+    }));
+  });
+</script>

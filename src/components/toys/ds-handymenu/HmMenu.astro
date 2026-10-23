@@ -37,20 +37,24 @@ const pages = [
   { tab: 'About', html: renderDialog(D['504'], { 1047: { img: logo.src }, 1025: { value: 'This version of HandyMenu is Registered', attrs: ix(44) } }, 'hm4') },
 ];
 const TABIX = [53, 54, 56, 55];
+interface Props { solo?: boolean }
+const { solo = false } = Astro.props;
 ---
 
-<div class="hm-m" data-hm-menu style={`--sprite:url(${items32.src})`}>
+<div class:list={['hm-m', { 'is-solo': solo }]} data-hm-menu style={`--sprite:url(${items32.src})`}>
   <div class="hm-m-devs">
     <div class="hm-m-col">
-      <Window title="Start" kind="device" num="9:41" class="hm-dev" aria-label="A Pocket PC Today screen with HandyMenu in the tray">
-        <div class="ppc hm-today" data-today>
-          <div class="hm-today-in" aria-hidden="true">
-            <p class="hm-t-date">Thursday, October 22, 2026</p>
-            <p class="hm-t-row"><b>No upcoming appointments</b></p>
-            <p class="hm-t-row">0 unread messages</p>
-            <p class="hm-t-row">No active tasks</p>
+      <Window title="Start" kind="device" wm="2003" num="11:08" class="hm-dev" aria-label="A Pocket PC Today screen with HandyMenu in the tray">
+        <div class="hm-today wm-today" data-today>
+          <div aria-hidden="true">
+            <p class="wm-row wm-row--date">Thursday, May 05, 2005</p>
+            <p class="wm-row wm-row--owner">Tap here to set owner information</p>
+            <p class="wm-row wm-row--cal">No upcoming appointments</p>
+            <p class="wm-row wm-row--mail">No unread messages</p>
+            <p class="wm-row wm-row--task">No tasks</p>
           </div>
           <div class="hm-pop is-open" role="menu" aria-label="HandyMenu" data-pop>
+            <p class="hm-pop-cap" aria-hidden="true"><b>HandyMenu</b><span>Opt</span></p>
             {ITEMS.map(([id, t]) => (
               <button type="button" role="menuitem" class="hm-it" data-item={id} title={DOES[id]}>
                 <i class="hm-ico" style={`--i:${id - 1}`} aria-hidden="true"></i><span data-ix={id}>{t}</span>
@@ -58,24 +62,27 @@ const TABIX = [53, 54, 56, 55];
             ))}
           </div>
           <p class="hm-toast" aria-live="polite" data-toast></p>
-          <div class="hm-tray">
-            <span class="hm-tray-sp" aria-hidden="true"></span>
-            <button type="button" class="hm-trayicon" aria-label="HandyMenu icon" aria-haspopup="menu" aria-expanded="true" data-icon>
-              <img src={tray.src} alt="" width="16" height="16" /><span class="hm-ring" aria-hidden="true"></span>
-            </button>
-          </div>
         </div>
-        <p slot="status" class="hm-soft"><span>Calendar</span><span>Contacts</span></p>
+        <Fragment slot="status">
+          <span class="hm-new">New</span>
+          <button type="button" class="hm-trayicon" aria-label="HandyMenu icon" aria-haspopup="menu" aria-expanded="true" data-icon>
+            <img src={tray.src} alt="" width="16" height="16" /><span class="hm-ring" aria-hidden="true"></span>
+          </button>
+        </Fragment>
       </Window>
-      <div class="hm-m-keys" hidden data-keys>
-        <button type="button" class="button k-btn" data-act="tap">Tap the icon</button>
-        <button type="button" class="button k-btn" data-act="hold">Tap and hold</button>
+      {!solo && (
+        <div class="hm-m-keys" hidden data-keys>
+          <button type="button" class="button k-btn" data-act="tap">Tap the icon</button>
+          <button type="button" class="button k-btn" data-act="hold">Tap and hold</button>
+        </div>
+      )}
+    </div>
+    {!solo && (
+      <div class="hm-m-col">
+        <Sheet id="hm-set" title="Settings" pages={pages} label="HandyMenu settings" soft={['ok', '']} wm="2003" clock="11:08" />
+        <p class="hm-m-note">Its settings sheet, rebuilt from dialogs 502 to 505 inside HandyMenu.exe. Change anything and the menu beside it follows.</p>
       </div>
-    </div>
-    <div class="hm-m-col">
-      <Sheet id="hm-set" title="Settings" pages={pages} label="HandyMenu settings" soft={['ok', '']} />
-      <p class="hm-m-note">His settings sheet, rebuilt from dialogs 502 to 505 inside HandyMenu.exe. Change anything and the menu beside it follows.</p>
-    </div>
+    )}
   </div>
   <div hidden data-tabix={JSON.stringify(TABIX)}></div>
 </div>
@@ -86,36 +93,38 @@ const TABIX = [53, 54, 56, 55];
   .hm-m-col { display: grid; gap: 14px; justify-items: center; width: 100%; }
   .hm-m-note { max-width: 36ch; font-size: 0.9375rem !important; line-height: 1.5 !important; color: var(--ink-2) !important; text-align: center; }
   .hm-m-keys { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .hm-m.is-solo { margin: 0; }
+  .hm-m.is-solo .hm-m-devs { display: grid; grid-template-columns: minmax(0, 300px); justify-content: center; }
   .hm-dev > .win-body, .hm-dev2 > .win-body { padding: 0 !important; overflow: hidden !important; }
   .hm-soft { display: contents; }
 
-  /* The Today screen, in 240-pixel units */
-  .hm-today { --p: calc(100cqw / 240); position: relative; height: 100%; overflow: hidden; background: linear-gradient(#fff, #e9f0fb); }
-  .hm-today-in { padding: calc(var(--p) * 8) calc(var(--p) * 8) 0; font-size: calc(var(--p) * 11); }
-  .hm-today-in p { margin: 0 0 calc(var(--p) * 9) !important; font-size: inherit !important; line-height: 1.25 !important; color: #000 !important; max-width: none !important; }
-  .hm-t-date { font-weight: 700; color: #00309c !important; border-bottom: 1px solid #a9b8d8; padding-bottom: calc(var(--p) * 4); }
-  .hm-tray { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: flex-end; height: calc(var(--p) * 22); padding: 0 calc(var(--p) * 4); background: linear-gradient(#f4f6fb, #d8dfee); border-top: 1px solid #9aa9c8; }
-  .hm-trayicon { position: relative; display: grid; place-items: center; width: calc(var(--p) * 22); height: calc(var(--p) * 22); padding: 0; background: none; border: 0; cursor: pointer; touch-action: none; -webkit-touch-callout: none; user-select: none; }
-  .hm-trayicon img { width: calc(var(--p) * 16); height: calc(var(--p) * 16); image-rendering: pixelated; pointer-events: none; }
-  .hm-trayicon:focus-visible { outline: 2px solid #316ac5; outline-offset: 1px; }
+  /* The Windows Mobile 2003 Today screen, with his icon in the command bar's tray */
+  .hm-today { position: relative; height: 100%; }
+  .hm-new { padding: 0 4px; font-weight: 700; }
+  .hm-trayicon { position: relative; display: grid; place-items: center; width: 22px; height: 22px; margin-left: auto; padding: 0; background: none; border: 0; cursor: pointer; touch-action: none; -webkit-touch-callout: none; user-select: none; }
+  .hm-trayicon::after { content: ''; position: absolute; inset: -2px -3px -2px -8px; }
+  .hm-trayicon img { width: 16px; height: 16px; image-rendering: pixelated; pointer-events: none; }
+  .hm-trayicon:focus-visible { outline: 1px dotted #000; outline-offset: 0; }
   /* Windows Mobile's tap-and-hold ring: red dots that fill in a circle */
-  .hm-ring { position: absolute; inset: calc(var(--p) * -9); border-radius: 50%; background: repeating-conic-gradient(#d00 0 6deg, transparent 6deg 30deg); -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 74% 100%, transparent 101%); mask: radial-gradient(closest-side, transparent 72%, #000 74% 100%, transparent 101%); opacity: 0; pointer-events: none; }
+  .hm-ring { position: absolute; inset: -9px; border-radius: 50%; background: repeating-conic-gradient(#d00 0 6deg, transparent 6deg 30deg); -webkit-mask: radial-gradient(closest-side, transparent 72%, #000 74% 100%, transparent 101%); mask: radial-gradient(closest-side, transparent 72%, #000 74% 100%, transparent 101%); opacity: 0; pointer-events: none; }
   .hm-trayicon.is-holding .hm-ring { animation: hm-ring 0.6s linear forwards; }
   @keyframes hm-ring { from { opacity: 1; clip-path: polygon(50% 50%, 50% 0, 50% 0); } 25% { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%); } 50% { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 50% 100%); } 75% { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 50%); } to { opacity: 1; clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0); } }
 
-  /* His owner-drawn menu: an icon column, then the label; colors come from the Colors page */
-  .hm-pop { --tc: #000; --bk: #fff; --ibk: #dbe5f5; --stc: #fff; --sbk: #316ac5;
-    position: absolute; right: calc(var(--p) * 2); bottom: calc(var(--p) * 23); z-index: 2; display: none; flex-direction: column; width: calc(var(--p) * 150);
-    max-height: calc(100% - var(--p) * 30); overflow: auto; overscroll-behavior: contain; background: var(--bk); border: 1px solid #000; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.45); }
+  /* His owner-drawn menu: a caption with his name and Opt, an icon column, bold labels; colors come from the Colors page */
+  .hm-pop { --tc: #000; --bk: #fefef6; --ibk: #cac6cf; --stc: #fff; --sbk: #0228a1;
+    position: absolute; right: 0; bottom: 0; z-index: 2; display: none; flex-direction: column; width: 138px;
+    max-height: 100%; overflow: hidden auto; overscroll-behavior: contain; font: 700 11px/1 var(--wm-font); background: var(--bk); border: 1px solid #000; border-bottom: 0; scrollbar-width: none; }
   .hm-pop.is-open { display: flex; }
-  .hm-it { display: flex; align-items: center; gap: calc(var(--p) * 5); min-height: calc(var(--p) * 20); padding: 0 calc(var(--p) * 6) 0 0; font: inherit; font-size: calc(var(--p) * 10.5); text-align: left; color: var(--tc); background: linear-gradient(90deg, var(--ibk) calc(var(--p) * 22), var(--bk) 0); border: 0; cursor: pointer; }
+  .hm-pop-cap { position: sticky; top: 0; z-index: 1; display: flex; flex: none; justify-content: space-between; align-items: center; height: 11px; margin: 0 !important; padding: 0 1px 0 3px; font: 700 9px/1 var(--wm-font) !important; color: #000 !important; background: #fefef6; border-bottom: 1px solid #000; max-width: none !important; }
+  .hm-pop-cap span { padding: 0 1px; line-height: 8px; border: 1px solid #000; border-radius: 3px; }
+  .hm-it { display: flex; flex: none; align-items: center; gap: 7px; height: 20px; padding: 0 6px 0 0; font: inherit; text-align: left; color: var(--tc); background: linear-gradient(90deg, var(--ibk) 20px, var(--bk) 0); border: 0; cursor: pointer; white-space: nowrap; }
   .hm-it[hidden] { display: none; }
   .hm-it:is(:hover, :focus-visible) { color: var(--stc); background: var(--sbk); outline: 0; }
-  .hm-ico { flex: none; width: calc(var(--p) * 16); height: calc(var(--p) * 16); margin-left: calc(var(--p) * 3); background: var(--sprite) calc(var(--i) * var(--p) * -16) 0 / calc(var(--p) * 432) 100% no-repeat; }
+  .hm-ico { flex: none; width: 16px; height: 16px; margin-left: 2px; background: var(--sprite) calc(var(--i) * -16px) 0 / 432px 16px no-repeat; }
   .hm-pop.no-icons .hm-ico { visibility: hidden; }
-  .hm-toast { position: absolute; left: calc(var(--p) * 8); right: calc(var(--p) * 8); top: 42%; z-index: 3; margin: 0 !important; padding: calc(var(--p) * 6) calc(var(--p) * 8); font-size: calc(var(--p) * 10.5) !important; line-height: 1.3 !important; color: #000 !important; background: #ffffe1; border: 1px solid #000; box-shadow: 2px 2px 0 rgb(0 0 0 / 0.4); max-width: none !important; }
+  .hm-toast { position: absolute; left: 6px; right: 6px; top: 40%; z-index: 3; margin: 0 !important; padding: 4px 6px; font-size: 11px !important; line-height: 1.3 !important; color: #000 !important; background: #ffffe1; border: 1px solid #000; max-width: none !important; }
   .hm-toast:empty { display: none; }
-  .hm-toast b { color: #00309c; }
+  .hm-toast b { color: #0228a1; }
   .ppc-lv li.is-sel { background: #316ac5; color: #fff; }
   .ppc-lv li span { cursor: pointer; }
 </style>
@@ -126,8 +135,8 @@ const TABIX = [53, 54, 56, 55];
   const PALETTE = ['#000000', '#ffffff', '#dbe5f5', '#316ac5', '#ffffff', '#003399', '#ffd200', '#cf2f2f', '#2e7d32', '#ece9d8'];
   const SCHEMES: Record<string, Record<string, string>> = {
     'No Colors': { tc: '#000000', bk: '#ffffff', ibk: '#ffffff', stc: '#ffffff', sbk: '#000000' },
-    'Theme Colors': { tc: '#000000', bk: '#ffffff', ibk: '#dbe5f5', stc: '#ffffff', sbk: '#316ac5' },
-    'Reverse Theme Colors': { tc: '#ffffff', bk: '#316ac5', ibk: '#0a3d91', stc: '#000000', sbk: '#dbe5f5' },
+    'Theme Colors': { tc: '#000000', bk: '#fefef6', ibk: '#cac6cf', stc: '#ffffff', sbk: '#0228a1' },
+    'Reverse Theme Colors': { tc: '#ffffff', bk: '#0228a1', ibk: '#011a6b', stc: '#000000', sbk: '#cac6cf' },
   };
 
   document.querySelectorAll<HTMLElement & { hm?: boolean }>('[data-hm-menu]').forEach(root => {
@@ -136,7 +145,8 @@ const TABIX = [53, 54, 56, 55];
     const pop = root.querySelector<HTMLElement>('[data-pop]')!, toast = root.querySelector<HTMLElement>('[data-toast]')!;
     const icon = root.querySelector<HTMLButtonElement>('[data-icon]')!;
     const items = [...pop.querySelectorAll<HTMLButtonElement>('[data-item]')];
-    const qa = root.querySelector<HTMLSelectElement>('[data-qa]')!, langSel = root.querySelector<HTMLSelectElement>('[data-lang]')!;
+    // Without the settings sheet (solo) the Quick Action stays his default, Soft Reset
+    const qa = root.querySelector<HTMLSelectElement>('[data-qa]'), langSel = root.querySelector<HTMLSelectElement>('[data-lang]');
     const tabIx: number[] = JSON.parse(root.querySelector<HTMLElement>('[data-tabix]')!.dataset.tabix!);
     let lang: Lang = 'English', holdMode = 0, timer = 0, held = false;
     const name = (id: number) => label(id, lang);
@@ -149,7 +159,7 @@ const TABIX = [53, 54, 56, 55];
       document.dispatchEvent(new CustomEvent('hm-pick', { detail: { id } }));
     };
     // Tap opens the menu and hold runs the Quick Action; his second radio button swaps the two
-    const act = (hold: boolean) => (hold !== (holdMode === 1) ? run(qa.selectedIndex + 1, true) : open(!pop.classList.contains('is-open')));
+    const act = (hold: boolean) => (hold !== (holdMode === 1) ? run((qa?.selectedIndex ?? 0) + 1, true) : open(!pop.classList.contains('is-open')));
 
     items.forEach(b => b.addEventListener('click', () => run(+b.dataset.item!)));
     pop.addEventListener('keydown', e => {
@@ -185,9 +195,10 @@ const TABIX = [53, 54, 56, 55];
     // Colors: his four schemes, and the five swatches step through a palette
     const setVar = (k: string, v: string) => { pop.style.setProperty(`--${k}`, v); const sw = root.querySelector<HTMLElement>(`[data-sw="${k}"]`); sw?.style.setProperty('--sw', v); };
     const scheme = (n: string) => { const s = SCHEMES[n]; if (s) for (const [k, v] of Object.entries(s)) setVar(k, v); };
-    const schemeSel = root.querySelector<HTMLSelectElement>('[data-scheme]')!;
-    schemeSel.selectedIndex = 2;
     scheme('Theme Colors');
+    const schemeSel = root.querySelector<HTMLSelectElement>('[data-scheme]');
+    if (!langSel || !qa || !schemeSel) return;
+    schemeSel.selectedIndex = 2;
     schemeSel.addEventListener('change', () => scheme(schemeSel.value));
     root.querySelectorAll<HTMLButtonElement>('[data-sw]').forEach(b => b.addEventListener('click', () => {
       const k = b.dataset.sw!, cur = getComputedStyle(pop).getPropertyValue(`--${k}`).trim().toLowerCase();

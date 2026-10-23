@@ -15,7 +15,7 @@ const ASM = [
   { off: '15218', label: 'over', code: 'ldr  r0,[r5,#4]', note: 'this program' },
   { off: '15220', code: 'mov  r1,#500', note: 'dialog 500: Settings' },
   { off: '15248', code: 'bl   DialogBoxIndirectParamW', note: 'show it, and stop' },
-  { off: '15254', code: 'cmp  r6,r8', note: 'r8 = 1001, his extra commands' },
+  { off: '15254', code: 'cmp  r6,r8', note: 'r8 = 1001, the extra commands' },
   { off: '15260', code: 'sub  r2,r6,#1', note: 'item number, counted from 0' },
   { off: '15264', code: 'cmp  r2,#26', note: '27 rows: 0 to 26' },
   { off: '15268', code: 'bhi  1579C', note: 'anything else: ignore' },
@@ -23,7 +23,7 @@ const ASM = [
   { off: '15270', code: 'add  r3,r3,pc', note: 'pc reads as 15278' },
   { off: '15274', code: 'ldrh r3,[r3,#4]', note: 'read the row' },
   { off: '15278', code: 'add  pc,pc,r3', note: 'jump: 15280 + row' },
-  { off: '1527C', code: 'dcw  0034,0058,00CC,...', note: 'his table, 27 rows' },
+  { off: '1527C', code: 'dcw  0034,0058,00CC,...', note: 'the table, 27 rows' },
   { off: hex(target(N0)), label: 'case', code: CASE[N0][0], note: CASE[N0][1] },
 ];
 const C = [
@@ -32,7 +32,7 @@ const C = [
   { code: 'if (license_state() == 7) {', note: 'trial over' },
   { code: '  DialogBox(500); return;', note: 'Settings, with Register…' },
   { code: '}' },
-  { code: 'if (cmd >= 1001) { /* his extras */ }' },
+  { code: 'if (cmd >= 1001) { /* the extras */ }' },
   { code: 'switch (cmd) {', note: 'built as a jump table' },
   { code: `  case ${N0}: /* ${ITEMS[N0 - 1][1]} */ break;` },
   { code: '  /* 26 more cases, one per item */' },
@@ -51,7 +51,7 @@ const C = [
   </div>
   <CodeStepper id="hm-switch-code" title="HandyMenu.exe  the switch" asm={ASM} c={C} steps={steps} speed={0.7} cTitle="The same in C">
     <div slot="visual" class="hm-sw-vis">
-      <p class="hm-sw-cap">His table at <b>1527C</b>: one two-byte row per item. Each row says how far past <b>15280</b> that item’s code starts.</p>
+      <p class="hm-sw-cap">The table at <b>1527C</b>: one two-byte row per item. Each row says how far past <b>15280</b> that item’s code starts.</p>
       <ol class="hm-sw-tab" aria-label="The jump table">
         {TABLE.map((v, i) => (
           <li><button type="button" class:list={['hm-sw-row', { on: i === N0 - 1 }]} data-row={i} aria-label={`Row ${i}: ${ITEMS[i][1]}, ${hex(v, 4)}`}>

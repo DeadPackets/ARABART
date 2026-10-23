@@ -44,10 +44,10 @@ export const MECCA = {
   ] as Line[],
   steps: [
     { a: 0, c: 1, show: 0, say: `Ask for new moon 1320. The answer is Julian day ${nm.jd.toFixed(3)}: 22 September 2006 at 11:43, London time.`, regs: [{ name: 'jd', value: nm.jd.toFixed(3), means: 'new moon 1320, in days' }] },
-    { a: 1, c: 2, show: 0, say: 'He keeps the exact moment too. The settings pages use it.' },
+    { a: 1, c: 2, show: 0, say: 'It keeps the exact moment too. The settings pages use it.' },
     { a: 2, c: 3, show: 1, say: `Drop the whole days. ${f3(frac)} of a day is left. Julian days start at noon, so that is ${(frac * 24).toFixed(1)} hours after noon.`, regs: [{ name: 'frac', value: f3(frac), means: 'part of the day' }] },
     { a: 3, c: 4, show: 1, say: 'Is it 0.5 or less, between noon and midnight in London? No.' },
-    { a: 4, c: 6, show: 2, say: 'So he turns it into a clock time. Mecca is 3 hours ahead of London.' },
+    { a: 4, c: 6, show: 2, say: 'So it turns it into a clock time. Mecca is 3 hours ahead of London.' },
     { a: 8, c: 6, show: 2, say: `(${f3(frac)} − 0.5) × 24 + 3 = ${mecca.toFixed(2)}: born at 14:43 in Mecca.`, regs: [{ name: 'hour', value: mecca.toFixed(2), means: '14:43 in Mecca' }] },
     { a: 9, c: 7, show: 3, say: 'Is that after 6 in the morning? Yes. A moon born that late is too thin to see at sunset the same day.' },
     { a: 10, c: 8, show: 4, say: 'So the month counts from one day later. The crescent shows on the evening of 23 September.' },
@@ -107,7 +107,7 @@ export const STRIP = {
   steps: [
     { a: 0, c: 1, phase: 'list', k: N, say: `The list for الأحد ٢، رمضان ١٤٢٧ has ${N} words in reading order: Sunday, a space, 2, a comma, a space, Ramadan, a space, then 1427 with its digits last first, 7 2 4 1. A zero ends it.` },
     { a: 1, c: 2, phase: 'list', k: N, say: `Room for ${N} pictures.` },
-    { a: 3, c: 4, phase: 'load', k: 1, say: `He reads the list from its end. The last entry is the digit 1, so the first picture loaded is the 1 of 1427.` },
+    { a: 3, c: 4, phase: 'load', k: 1, say: `It reads the list from its end. The last entry is the digit 1, so the first picture loaded is the 1 of 1427.` },
     { a: 3, c: 4, phase: 'load', k: 2, say: 'Then the 4. Each picture comes out of the DLL’s own resources.' },
     { a: 3, c: 4, phase: 'load', k: N, say: `…and last of all ${name(LIST[0])}, Sunday, the first word an Arabic reader sees.` },
     { a: 6, c: 14, phase: 'measure', k: N, say: 'Paste measures every picture.' },
@@ -162,16 +162,16 @@ export const INK = {
     { code: '}' },
   ] as Line[],
   steps: [
-    { a: 8, c: 17, phase: 0, say: 'The Today screen hands him its text color: white on the blue theme, black on a light one.' },
+    { a: 8, c: 17, phase: 0, say: 'The Today screen hands HijriDate its text color: white on the blue theme, black on a light one.' },
     { a: 0, c: 1, phase: 0, say: 'Is there a copy of the word in that color already? Not the first time.' },
-    { a: 2, c: 3, phase: 0, say: 'So he makes a full-color picture the size of the word…' },
+    { a: 2, c: 3, phase: 0, say: 'So it makes a full-color picture the size of the word…' },
     { a: 4, c: 6, phase: 0, say: '…and fills it with the ink color.' },
     { a: 5, c: 8, phase: 0, say: 'A second picture, all white.' },
     { a: 6, c: 9, phase: 0, say: 'White XOR the word. Black ink XOR white is white; white paper XOR white is black. Ink and paper swap.' },
     { a: 7, c: 11, phase: 1, say: 'The color AND that. On the white ink the color comes through; on the black paper nothing does. Picture 2: colored ink on black.' },
     { a: 10, c: 18, phase: 2, say: 'Now the screen itself. Screen AND word: white paper leaves the wallpaper as it was, black ink punches a black hole.' },
     { a: 11, c: 20, phase: 3, say: 'Screen OR the colored copy. Black adds nothing, so only the holes fill, with color. The word sits on the wallpaper in the theme’s own color.' },
-    { a: 1, c: 2, phase: 3, say: 'The next time, with the same color, he skips straight to the two screen steps.' },
+    { a: 1, c: 2, phase: 3, say: 'The next time, with the same color, it skips straight to the two screen steps.' },
   ] as Step[],
 };
 

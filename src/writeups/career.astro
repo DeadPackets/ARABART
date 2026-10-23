@@ -5,6 +5,7 @@
 import Window from '../components/shell/Window.astro';
 import ThenNow from '../components/explain/ThenNow.astro';
 import Deep from '../components/explain/Deep.astro';
+import Steps from '../components/explain/Steps.astro';
 import Term from '../components/explain/Term.astro';
 import Timeline from '../components/toys/story/Timeline.astro';
 import NameFonts from '../components/toys/story/NameFonts.astro';
@@ -14,7 +15,7 @@ import CallNetwork from '../components/toys/story/CallNetwork.astro';
 import DinarApps from '../components/toys/story/DinarApps.astro';
 import logo from '../assets/dinarsoft/press/logo_name_50.png';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const SAKHR = [
   ['Arabic APIs', 'One set of Arabic functions that any program could call, on Arabic Windows and on English Windows alike. Like a shared package every app imports, so no team writes Arabic support twice.'],
   ['A bilingual text displayer', 'Object-oriented, and used in the Al-Ustaz word processor. It put Arabic and English on one line, each in its own direction. Your browser does this for you today; in 1993 someone had to write it.'],
@@ -87,10 +88,64 @@ const SAKHR = [
           <p>Today you would call it <b>the network’s public API</b>.</p>
         </Window>
       </div>
+      <h3 class="cr-h3 cr-h3--gap">What his interface did, in plain words</h3>
       <div class="cr-cols">
-        <p>A phone company runs on its own back-office software, its <Term id="oss">OSS</Term>: orders, billing, trouble tickets. Those systems need the network’s data, and they need to change the network. His interface let them call the 5620 directly, with no person in between. When a customer ordered a line, the order system could set up the connection by itself.</p>
-        <p>It was built on <Term id="corba" />, the 1990s way to call code on another machine, much like gRPC today. One interface file describes every call, and each side gets code generated from it. Alarms flowed the other way through an <Term id="event-channel">event channel</Term>, like a Kafka topic: one alarm in, a copy to every system that listens. He built his own event channel, twice as fast as the standard one, and a test tool for the interface, jidmTester.</p>
+        <p><b>The network.</b> A phone company’s network is thousands of machines in buildings across a country: the switches and routers that carry every call and every byte. The 5620 was the one program that watched and controlled all of them. Think of the AWS console, for a phone company’s own hardware.</p>
+        <p><b>The problem.</b> The phone company also ran its own business software, its <Term id="oss">OSS</Term>: customer orders, billing, repair tickets. These programs came from many vendors, in many languages, on many kinds of computers. Each one needed the 5620: to read its alarms, to list its equipment, and to set up a new line when a customer ordered one. REST and JSON did not exist yet.</p>
+        <p><b>The tool of the day.</b> <Term id="corba" /> was the standard way for a program on one computer to call a function in a program on another. You write the calls down once, in an <Term id="idl">interface file</Term>. A compiler turns that file into code for both sides, each in its own language. After that, a call to the 5620 looks like a normal function call. It is the idea behind gRPC and its <code>.proto</code> files, twenty years earlier.</p>
+        <p><b>His part.</b> Yasser designed that door into the 5620: what outside systems could see, which calls they could make, and how each call reached the network. When a customer ordered a line, the order system could now set up the connection by itself, with no engineer in between. He also built the alarm feed, an <Term id="event-channel">event channel</Term> twice as fast as the standard one, and jidmTester, a tool that tested the whole interface.</p>
       </div>
+      <Steps
+        title="One call, from the billing system to the 5620"
+        steps={[
+          'One contract for both sides. The interface file, <code>Alarms.idl</code>, lists every call. A compiler turns it into code for the billing system and for the 5620. Today: a <code>.proto</code> file and <code>protoc</code>.',
+          'The billing app calls <code>alarms-&gt;getActiveAlarms()</code>, like any function in its own code. What it calls is a stub: generated code that only looks like the real thing.',
+          'The stub packs the call into bytes, and the ORB, a library on each side, sends them across the network. Every CORBA message starts with the four letters <code>GIOP</code>.',
+          'On the 5620, the other ORB receives the bytes. The skeleton, also generated, unpacks them and calls his code, which reads the alarms from the network.',
+          'The answer goes back the same way. The billing app gets its list of alarms as if the function had run on its own computer. Nobody typed a command.',
+        ]}
+      >
+        <svg class="dg cr-call" viewBox="0 0 760 340" role="img" aria-labelledby="cr-call-t">
+          <title id="cr-call-t">A billing app calls the 5620 through CORBA. Its stub and ORB send the call across the network; the 5620's ORB and skeleton hand it to his code; the answer comes back the same way.</title>
+          <rect class="box-dash" x="8" y="8" width="300" height="324" /><text class="t-sm" x="22" y="30">Phone company: billing</text>
+          <rect class="box-dash" x="452" y="8" width="300" height="324" /><text class="t-sm" x="466" y="30">Alcatel 5620 server</text>
+          <path class="wire" d="M158 108 V136 M158 200 V228 M602 228 V200 M602 136 V108 M292 260 H468" />
+          <text class="t-sm" x="380" y="246" text-anchor="middle">the network</text><text class="t-sm" x="380" y="292" text-anchor="middle">IIOP on TCP</text>
+          <rect class="box" x="24" y="44" width="268" height="64" /><text x="158" y="81" text-anchor="middle">Billing app</text>
+          <rect class="box" x="24" y="136" width="268" height="64" /><text x="158" y="162" text-anchor="middle">Stub</text><text class="t-sm" x="158" y="184" text-anchor="middle">generated from the contract</text>
+          <rect class="box" x="24" y="228" width="268" height="64" /><text x="158" y="254" text-anchor="middle">ORB</text><text class="t-sm" x="158" y="276" text-anchor="middle">packs and sends the call</text>
+          <rect class="box" x="468" y="44" width="268" height="64" /><text x="602" y="70" text-anchor="middle">His code</text><text class="t-sm" x="602" y="92" text-anchor="middle">reads the network’s alarms</text>
+          <rect class="box" x="468" y="136" width="268" height="64" /><text x="602" y="162" text-anchor="middle">Skeleton</text><text class="t-sm" x="602" y="184" text-anchor="middle">generated from the contract</text>
+          <rect class="box" x="468" y="228" width="268" height="64" /><text x="602" y="254" text-anchor="middle">ORB</text><text class="t-sm" x="602" y="276" text-anchor="middle">receives and unpacks</text>
+          <rect class="box" x="318" y="120" width="124" height="72" /><text x="380" y="152" text-anchor="middle">Alarms.idl</text><text class="t-sm" x="380" y="174" text-anchor="middle">the contract</text>
+          <g data-s="1"><rect class="box-hi" x="318" y="120" width="124" height="72" /><text class="t-bk" x="380" y="152" text-anchor="middle">Alarms.idl</text><text class="t-bk t-sm" x="380" y="174" text-anchor="middle">the contract</text><path class="wire-hi arrow" d="M318 168 H300" /><path class="wire-hi arrow" d="M442 168 H460" /></g>
+          <g data-s="2"><rect class="box-hi" x="24" y="44" width="268" height="64" /><text class="t-bk" x="158" y="81" text-anchor="middle">Billing app</text><path class="wire-hi arrow" d="M158 108 V128" /></g>
+          <g data-s="3"><rect class="box-hi" x="24" y="228" width="268" height="64" /><text class="t-bk" x="158" y="254" text-anchor="middle">ORB</text><text class="t-bk t-sm" x="158" y="276" text-anchor="middle">packs and sends the call</text><path class="wire-hi arrow" d="M158 200 V220" /><path class="wire-hi arrow" d="M292 260 H460" /></g>
+          <g data-s="4"><rect class="box-hi" x="468" y="44" width="268" height="64" /><text class="t-bk" x="602" y="70" text-anchor="middle">His code</text><text class="t-bk t-sm" x="602" y="92" text-anchor="middle">reads the network’s alarms</text><path class="wire-hi arrow" d="M602 228 V208" /><path class="wire-hi arrow" d="M602 136 V116" /></g>
+          <g data-s="5"><rect class="box-hi" x="24" y="44" width="268" height="64" /><text class="t-bk" x="158" y="81" text-anchor="middle">Billing app</text><path class="wire-hi arrow" d="M468 272 H300" /></g>
+        </svg>
+        <svg slot="narrow" class="dg cr-call" viewBox="0 0 360 400" role="img" aria-labelledby="cr-call-tn">
+          <title id="cr-call-tn">A billing app calls the 5620 through CORBA; the answer comes back the same way.</title>
+          <rect class="box-dash" x="4" y="72" width="168" height="290" /><text class="t-sm" x="14" y="92">Billing</text>
+          <rect class="box-dash" x="188" y="72" width="168" height="290" /><text class="t-sm" x="198" y="92">Alcatel 5620</text>
+          <path class="wire" d="M88 164 V196 M88 256 V288 M272 288 V256 M272 196 V164 M162 312 H198" />
+          <text class="t-sm" x="180" y="388" text-anchor="middle">the network: IIOP on TCP</text>
+          <rect class="box" x="110" y="8" width="140" height="50" /><text x="180" y="31" text-anchor="middle">Alarms.idl</text><text class="t-sm" x="180" y="49" text-anchor="middle">the contract</text>
+          <rect class="box" x="14" y="104" width="148" height="60" /><text x="88" y="139" text-anchor="middle">Billing app</text>
+          <rect class="box" x="14" y="196" width="148" height="60" /><text x="88" y="222" text-anchor="middle">Stub</text><text class="t-sm" x="88" y="242" text-anchor="middle">generated</text>
+          <rect class="box" x="14" y="288" width="148" height="60" /><text x="88" y="314" text-anchor="middle">ORB</text><text class="t-sm" x="88" y="334" text-anchor="middle">sends</text>
+          <rect class="box" x="198" y="104" width="148" height="60" /><text x="272" y="139" text-anchor="middle">His code</text>
+          <rect class="box" x="198" y="196" width="148" height="60" /><text x="272" y="222" text-anchor="middle">Skeleton</text><text class="t-sm" x="272" y="242" text-anchor="middle">generated</text>
+          <rect class="box" x="198" y="288" width="148" height="60" /><text x="272" y="314" text-anchor="middle">ORB</text><text class="t-sm" x="272" y="334" text-anchor="middle">receives</text>
+          <g data-s="1"><rect class="box-hi" x="110" y="8" width="140" height="50" /><text class="t-bk" x="180" y="31" text-anchor="middle">Alarms.idl</text><text class="t-bk t-sm" x="180" y="49" text-anchor="middle">the contract</text><path class="wire-hi arrow" d="M180 58 V226 H168" /><path class="wire-hi arrow" d="M180 226 H192" /></g>
+          <g data-s="2"><rect class="box-hi" x="14" y="104" width="148" height="60" /><text class="t-bk" x="88" y="139" text-anchor="middle">Billing app</text><path class="wire-hi arrow" d="M88 164 V188" /></g>
+          <g data-s="3"><rect class="box-hi" x="14" y="288" width="148" height="60" /><text class="t-bk" x="88" y="314" text-anchor="middle">ORB</text><text class="t-bk t-sm" x="88" y="334" text-anchor="middle">sends</text><path class="wire-hi arrow" d="M88 256 V280" /><path class="wire-hi arrow" d="M162 312 H192" /></g>
+          <g data-s="4"><rect class="box-hi" x="198" y="104" width="148" height="60" /><text class="t-bk" x="272" y="139" text-anchor="middle">His code</text><path class="wire-hi arrow" d="M272 288 V264" /><path class="wire-hi arrow" d="M272 196 V172" /></g>
+          <g data-s="5"><rect class="box-hi" x="14" y="104" width="148" height="60" /><text class="t-bk" x="88" y="139" text-anchor="middle">Billing app</text><path class="wire-hi arrow" d="M198 330 H168" /></g>
+        </svg>
+      </Steps>
+      <h3 class="cr-h3 cr-h3--gap">Now call the network yourself</h3>
+      <p class="cr-p">Press a button: the call goes through his interface to the 5620 and back. Take a node down, and its alarm goes out through his event channel to every app that listens.</p>
       <CallNetwork />
       <ThenNow
         title="Then and now"
@@ -129,7 +184,7 @@ const SAKHR = [
         <div class="cr-text">
           <img class="cr-logo" src={logo.src} width="220" height="50" alt="DinarSoft" />
           <h2 id="h-ds">Kanata, 2002: his own company</h2>
-          <p class="cr-big">In November 2002 he founded DinarSoft and wrote six apps for Pocket PC and Windows Mobile, the smartphones of their day.</p>
+          <p class="cr-big">In November 2002 he founded DinarSoft, and with his co-developer, Hosam Aly, built six apps for Pocket PC and Windows Mobile, the smartphones of their day.</p>
           <p>Each one fixed something people met every day on their phones: memory that ran out, programs that never really closed, settings buried deep in menus. Reviewers from the US, the UK, New Zealand and the UAE wrote about them, on about 20 sites in all. Russia’s CHIP magazine put MemMaid and HandySwitcher on its cover discs.</p>
         </div>
         <Window title="Awards" kind="help" active class="cr-aw">
@@ -173,6 +228,11 @@ const SAKHR = [
   .cr-cols p { max-width: 62ch; }
   .cr-end { margin: 36px 0 0; }
   .cr-h3 { margin-bottom: 10px; }
+  .cr-h3--gap { margin: clamp(40px, 5vw, 64px) 0 16px; }
+  .cr-cols b { color: var(--accent); }
+  .cr-call .t-bk { fill: var(--w-white); }
+  /* only the current step's highlight shows; the plain boxes underneath carry the picture */
+  :global(.steps.is-live) .cr-call [data-s]:not(.on) { opacity: 0; }
   .cr-p { margin-bottom: 18px; max-width: 60ch; }
 
   .cr-built { list-style: none; margin: 0 0 clamp(48px, 6vw, 80px); padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 14px; }

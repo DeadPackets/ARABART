@@ -9,7 +9,7 @@ type Step = { a: number; c: number; say: string; [k: string]: unknown };
 // ---------- Borrowing the focus: 0x1E250, with its helper 0x1E204 ----------
 export const BORROW = {
   asm: [
-    { off: '1E1EC', code: 'bl   RegisterWindowMessageW', note: 'his own message' },
+    { off: '1E1EC', code: 'bl   RegisterWindowMessageW', note: 'its own message' },
     { off: '1E214', code: 'cmp  r1,lr', note: 'helper: my message?' },
     { off: '1E21C', code: 'bl   GetFocus', note: 'yes: ask from inside' },
     { off: '1E240', code: 'bl   CallWindowProcW', note: 'no: pass it on' },
@@ -18,7 +18,7 @@ export const BORROW = {
     { off: '1E274', code: 'bl   GetWindowLongW', note: 'its window procedure' },
     { off: '1E284', code: 'str  r0,[r5]', note: 'keep the old one' },
     { off: '1E28C', code: 'bl   SetWindowLongW', note: 'swap in the helper' },
-    { off: '1E2A8', code: 'bl   SendMessageW', note: 'send his message' },
+    { off: '1E2A8', code: 'bl   SendMessageW', note: 'send its message' },
     { off: '1E2BC', code: 'bl   SetWindowLongW', note: 'swap the old one back' },
     { off: '1E2CC', code: 'pop  {r4,r5,r6,pc}', note: 'return the focus' },
   ] as Line[],
@@ -46,8 +46,8 @@ export const BORROW = {
     { a: 4, c: 9, phase: 1, say: 'You picked a saved text. Which program is in front? Pocket Word. But which box inside it has the cursor? Windows answers that only for the program that asks, and TapText is not Pocket Word.' },
     { a: 5, c: 10, phase: 1, say: 'The window is still there.' },
     { a: 6, c: 11, phase: 2, say: 'Every window has a window procedure: the one function that receives all its messages. Read Pocket Word’s, and keep it.' },
-    { a: 8, c: 12, phase: 3, say: 'Put his own tiny helper in its place.' },
-    { a: 9, c: 13, phase: 4, say: 'Send Pocket Word his message. Pocket Word’s own thread delivers it, straight to the helper.' },
+    { a: 8, c: 12, phase: 3, say: 'Put TapText’s own tiny helper in its place.' },
+    { a: 9, c: 13, phase: 4, say: 'Send Pocket Word TapText’s message. Pocket Word’s own thread delivers it, straight to the helper.' },
     { a: 1, c: 4, phase: 4, say: 'The helper checks: is this my message? Yes.' },
     { a: 2, c: 5, phase: 5, say: 'So it calls GetFocus, from inside Pocket Word, and gets the answer only Pocket Word could get: the page you are typing on.' },
     { a: 10, c: 14, phase: 6, say: 'Put Pocket Word’s own procedure back. The swap lasted one message.' },
@@ -56,7 +56,7 @@ export const BORROW = {
 };
 
 // ---------- Typing: 0x137F4 ----------
-export const TYPE_TEXT = 'Hi,\r\n...\r\nBest Regards\r\n'; // his "General" email template
+export const TYPE_TEXT = 'Hi,\r\n...\r\nBest Regards\r\n'; // TapText's sample "General" email template
 
 export const TYPE = (() => {
   const asm: Line[] = [
@@ -113,7 +113,7 @@ export const TYPE = (() => {
   const snap = (s: Step): Step => ({ ...s, doc, q: q.slice(-6), n: q.length });
   const steps: Step[] = [];
   const chars = [...TYPE_TEXT];
-  steps.push(snap({ a: 0, c: 1, say: `His General email reply: “Hi,”, a new line, three dots, a new line, “Best Regards”. ${chars.length} characters.` }));
+  steps.push(snap({ a: 0, c: 1, say: `The sample General email reply: “Hi,”, a new line, three dots, a new line, “Best Regards”. ${chars.length} characters.` }));
   steps.push(snap({ a: 1, c: 2, say: 'What kind of box is in front? GetClassName asks Windows for its class name.' }));
   steps.push(snap({ a: 2, c: 3, say: 'Notes’ editor is called noteeditclass. Notes gets the whole text through the clipboard and its own Paste command. This is Pocket Word, so TapText types.' }));
   post('WM_CHAR', ' ');
@@ -140,7 +140,7 @@ export const TYPE = (() => {
 })();
 
 // ---------- Macros: the driver 0x1E2EC and the scanner 0x139F4 ----------
-export const MACRO_TEXT = 'Ottawa in {{DATE:MMMM d, yyyy}}\r\nThe time is now {{TIME:h:mm tt}}\r\n'; // his "Date and time" item
+export const MACRO_TEXT = 'Ottawa in {{DATE:MMMM d, yyyy}}\r\nThe time is now {{TIME:h:mm tt}}\r\n'; // TapText's sample "Date and time" item
 
 export const MACRO_ASM: Line[] = [
   { off: '13A10', code: 'bl   wcsstr', note: '"{{DATE:"?' },
@@ -198,7 +198,7 @@ export function macroSteps(dateFmt = 'MMMM d, yyyy', timeFmt = 'h:mm tt', now: D
     s(8, 7, [d0, d1], out1, `Read the format up to the closing braces: ${dateFmt}.`),
     s(9, 8, [d0, d1], out2, `Run it. Windows’ own GetDateFormat writes “${date}” in the language of the phone, and it is typed.`),
     s(10, 9, null, out2, 'Borrow the focus again. After a {{TAB}}, it would be the next box of a form, so the next text lands in the next box.'),
-    s(2, 16, [t0, t1], out2, 'Next pass. No {{DATE: is left, so he tries {{TIME: and finds it.'),
+    s(2, 16, [t0, t1], out2, 'Next pass. No {{DATE: is left, so it tries {{TIME: and finds it.'),
     s(7, 6, [d1, t0], out3, 'Type the new line and “The time is now ”.'),
     s(9, 8, [t0, t1], out4, `Run the Time macro: “${time}”.`),
     s(11, 5, [t1, text.length], out5, 'Nothing left to find. Type the last new line, and the item is done.'),

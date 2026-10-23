@@ -36,7 +36,7 @@ const o = OBJ[0];
       <ol class="dtv-asm">{ASM.map((l, i) => <li data-l={i} class="on"><span class="off">{l.off}</span><code set:html={hl(l.code)} /><span class="cm">; {l.note}</span></li>)}</ol>
       <p class="dtv-cpp"><span>In C++</span><code>obj-&gt;evaluate();</code><span>In JavaScript</span><code>obj.evaluate();</code></p>
     </Window>
-    <svg class="dg dtv-svg" viewBox="0 0 480 268" role="img" aria-labelledby={`${id}-t`} data-svg>
+    <svg class="dg dtv-svg dtv-svg--w" viewBox="0 0 480 268" role="img" aria-labelledby={`${id}-t`} data-svg>
       <title id={`${id}-t`}>A pointer leads to an object; the object's first 2 bytes lead to its class's table; slot 34h of the table leads to the method that runs.</title>
       <g data-s="0"><rect class="box" x="2" y="24" width="84" height="44" /><text x="44" y="42" text-anchor="middle" class="t-sm">pointer</text><text x="44" y="60" text-anchor="middle">this</text></g>
       <path class="wire-hi arrow" d="M86 46H112" data-s="1" />
@@ -56,6 +56,26 @@ const o = OBJ[0];
       <path class="wire-hi arrow" d="M383 222V238" data-s="3" />
       <g data-s="3"><rect class="box-ink" x="114" y="240" width="364" height="26" /><text x="296" y="258" text-anchor="middle" class="t-bk" data-fsay>runs {o.fn}</text></g>
     </svg>
+    <svg class="dg dtv-svg dtv-svg--n" viewBox="0 0 360 268" role="img" aria-labelledby={`${id}-tn`}>
+      <title id={`${id}-tn`}>A pointer leads to an object; the object's first 2 bytes lead to its class's table; slot 34h of the table leads to the method that runs.</title>
+      <g data-s="0"><rect class="box" x="2" y="2" width="146" height="44" /><text x="75" y="20" text-anchor="middle" class="t-sm">pointer</text><text x="75" y="38" text-anchor="middle">this</text></g>
+      <path class="wire-hi arrow" d="M75 46V66" data-s="1" />
+      <g data-s="1">
+        <rect class="box" x="2" y="70" width="146" height="140" />
+        <text x="75" y="92" text-anchor="middle" class="t-cy" data-oname>{o.cls}</text>
+        <text x="75" y="168" text-anchor="middle" class="t-sm">its data</text>
+        <text x="75" y="190" text-anchor="middle" class="t-sm" data-osize>{o.size} bytes in all</text>
+      </g>
+      <g data-s="2"><rect class="box-hi" x="12" y="104" width="126" height="28" /><text x="75" y="123" text-anchor="middle" class="t-bk" data-vt>{o.vt}h</text></g>
+      <path class="wire-hi arrow" d="M138 118C156 118 154 142 172 142" data-s="2" />
+      <g data-s="2">
+        <rect class="box" x="166" y="2" width="192" height="208" />
+        <text x="262" y="24" text-anchor="middle" class="t-cy">the class’s table</text>
+        {['00h', '04h', '…', '30h', '34h', '38h', '…'].map((s, k) => <g data-s={s === '34h' ? '3' : undefined}><rect class={s === '34h' ? 'box-hi' : 'box'} x="176" y={36 + k * 24} width="172" height="20" /><text x="186" y={51 + k * 24} class={s === '34h' ? 't-bk' : 't-sm'}>{s}</text>{s === '34h' && <text x="340" y={51 + k * 24} text-anchor="end" class="t-bk" data-fn>{o.fn}</text>}</g>)}
+      </g>
+      <path class="wire-hi arrow" d="M262 210V230" data-s="3" />
+      <g data-s="3"><rect class="box-ink" x="2" y="238" width="356" height="28" /><text x="180" y="257" text-anchor="middle" class="t-bk" data-fsay>runs {o.fn}</text></g>
+    </svg>
   </div>
   <p class="dtv-say" aria-live="polite" data-step-say>{SAY[3]} For {o.name}, that is {o.says}</p>
   <Scrubber n={4} at={3} label="Step through the call" />
@@ -72,7 +92,7 @@ const o = OBJ[0];
   .dtv-asm li { display: grid; grid-template-columns: 4.4ch 1fr; gap: 0 1.2ch; padding: 0 8px; max-width: none !important; font: inherit !important; color: var(--ink) !important; white-space: pre-wrap; transition: background-color 0.2s; }
   .dtv-asm li::marker { content: none; }
   .dtv-asm .off { color: color-mix(in oklch, var(--accent-2) 75%, transparent); }
-  .dtv-asm code { font: inherit; color: inherit; }
+  .dtv-asm code { font: inherit !important; color: inherit; }
   .dtv-asm :is(.op) { color: var(--accent); } .dtv-asm .num { color: var(--accent-2); }
   .dtv-asm .cm { grid-column: 2; color: var(--ink-2); }
   .dtv-asm li.now { background: var(--accent-2); }
@@ -81,10 +101,14 @@ const o = OBJ[0];
   .dtv-cpp span { color: var(--ink-2); }
   .dtv-cpp code { color: var(--accent) !important; }
   .dtv-svg { width: 100%; max-width: 520px; justify-self: center; height: auto; overflow: visible; }
+  /* On phones the wide drawing would shrink its labels under 12 px: a stacked one takes its place */
+  .dtv-svg.dtv-svg--n { display: none; max-width: 420px; }
+  .dtv-svg--n text.t-sm { font-size: 12.5px; }
   .dtv-svg [data-s] { transition: opacity 0.3s; }
   .dtv.is-live .dtv-svg [data-s]:not(.on) { opacity: 0.12; }
   .dtv-say { margin: 0 !important; min-height: 3.4em; }
   @media (max-width: 860px) { .dtv-grid { grid-template-columns: minmax(0, 1fr); } }
+  @media (max-width: 560px) { .dtv-svg.dtv-svg--w { display: none; } .dtv-svg.dtv-svg--n { display: block; } }
   @media (prefers-reduced-motion: reduce) { .dtv-svg [data-s], .dtv-asm li { transition: none; } }
 </style>
 
@@ -118,11 +142,12 @@ const o = OBJ[0];
     const pick = (b: HTMLButtonElement) => {
       bs.forEach(x => { const on = x === b; x.setAttribute('aria-checked', String(on)); x.tabIndex = on ? 0 : -1; });
       o = OBJ[+b.dataset.i!];
-      root.querySelector('[data-oname]')!.textContent = o.cls;
-      root.querySelector('[data-vt]')!.textContent = `${o.vt}h`;
-      root.querySelector('[data-osize]')!.textContent = `${o.size} bytes in all`;
-      root.querySelector('[data-fn]')!.textContent = o.fn;
-      root.querySelector('[data-fsay]')!.textContent = `runs ${o.fn}`;
+      const set = (sel: string, v: string) => root.querySelectorAll(sel).forEach(e => (e.textContent = v));
+      set('[data-oname]', o.cls);
+      set('[data-vt]', `${o.vt}h`);
+      set('[data-osize]', `${o.size} bytes in all`);
+      set('[data-fn]', o.fn);
+      set('[data-fsay]', `runs ${o.fn}`);
       s.go(0, 'jump');
       if (!reduce()) s.play(); else s.go(3, 'step');
     };

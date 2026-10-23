@@ -1,0 +1,39 @@
+# Cloudflare Workers static assets. HTML keeps the default (revalidate every visit) so a deploy shows at once.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000
+
+# Hashed by the build: a new file gets a new name
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fixed files without a hash in the name: a week, refreshed in the background after that
+/fonts/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/images/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/bundles/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+# /bytes/ itself is a page, so only its data: rebuilt with the site, so a day
+/bytes/code/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+/bytes/files/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+/bytes/files.json
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+/bytes/disk-classes.bin
+  Cache-Control: public, max-age=86400, stale-while-revalidate=86400
+/arabart/fonts.bin
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/dinarsoft/press/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/dinarsoft/screens/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/dinarsoft/icons/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/dinarsoft/site/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+/dinarsoft/downloads/*
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400

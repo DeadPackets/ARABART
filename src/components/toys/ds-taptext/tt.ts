@@ -28,7 +28,7 @@ export const toDmd = (root: Group = MENU) => dmdParts(root).map(p => p.s).join('
 // ---------- Date and time pictures, as Windows GetDateFormat / GetTimeFormat read them (English) ----------
 export const DATE_FORMATS = ['dddd, MMMM d, yyyy', 'MMMM d, yyyy', 'ddd, MMM d, yyyy', 'MMMM', 'dddd', 'MMMM d', 'dd/MM/yy', 'MM/dd/yy', 'dd/MM/yyyy', 'MM/dd/yyyy'];
 export const TIME_FORMATS = ['HH:mm', 'h:mm', 'h:mmt', 'h:mm tt', 'h:mm:ss tt'];
-export const SAMPLE = new Date(2005, 2, 16, 15, 27, 57); // the date his format pickers preview with
+export const SAMPLE = new Date(2005, 2, 16, 15, 27, 57); // the date TapText's format pickers preview with
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const p2 = (n: number) => String(n).padStart(2, '0');

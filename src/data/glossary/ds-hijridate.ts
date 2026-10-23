@@ -59,7 +59,7 @@ export default {
   },
   'hd-rc4': {
     term: 'RC4',
-    short: 'A simple, famous cipher from 1987: shuffle a table of numbers with a key, then walk the table to make a stream of numbers to mix into the text. Yasser’s key function is built the same way, with 120 numbers.',
+    short: 'A simple, famous cipher from 1987: shuffle a table of numbers with a key, then walk the table to make a stream of numbers to mix into the text. DinarSoft’s key function is built the same way, with 120 numbers.',
     now: 'Retired from Wi-Fi and HTTPS. The idea of a keyed shuffle lives on in every stream cipher.',
   },
 } satisfies Record<string, Term>;

@@ -2,7 +2,7 @@
 import { glossary } from '../../data/glossary';
 import '../../styles/explain.css';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const data = JSON.stringify(glossary).replace(/</g, '\\u003c');
 ---
 

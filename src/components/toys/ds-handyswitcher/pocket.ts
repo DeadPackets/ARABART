@@ -42,7 +42,8 @@ export function renderDialog(d: Dialog, fill: Record<number, Fill> = {}, idp = '
         } else if (it.id === 9) {
           out.push(`<p class="ppc-head" ${pos} ${data}>${esc(f.value ?? text)}</p>`);
         } else {
-          const al = kind === 1 ? ' c' : kind === 2 ? ' r' : '';
+          // a one-line label keeps to one line: our Tahoma runs wider than the device's, and wrapping hid its end
+          const al = kind === 1 ? ' c' : kind === 2 ? ' r' : h <= 10 && !(f.value ?? text).includes('\n') ? ' one' : '';
           out.push(`<p class="ppc-st${al}" ${pos} ${data}>${esc(f.value ?? text).replace(/\n/g, '<br>')}</p>`);
         }
         break;

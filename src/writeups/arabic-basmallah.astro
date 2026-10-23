@@ -11,7 +11,7 @@ import Deep from '../components/explain/Deep.astro';
 import Term from '../components/explain/Term.astro';
 import '../components/toys/arabart-family/writeup.css';
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <section id="walk">
@@ -73,7 +73,7 @@ const base = import.meta.env.BASE_URL;
       scale={3}
       title="PESM.EXE  its strings, one key per byte"
       lines={[
-        { label: 'The Basmala', keys: BASMALA, note: 'بسم الله الرحمن الرحيم, “In the name of God, the Most Gracious, the Most Merciful”.' },
+        { label: 'The Basmala', keys: BASMALA, note: '<span lang="ar" dir="rtl">بسم الله الرحمن الرحيم</span>, “In the name of God, the Most Gracious, the Most Merciful”.' },
         { label: 'His name', keys: 'dh#s#v @lpl]@ ugd>', note: 'His name, ياسر محمد علي. A <code>#</code> pair underlines the س of Yasser, and an <code>@</code> pair makes محمد bold.' },
         { label: 'Al-Nour Computer Center', keys: 'lv;. #$hgk,v$#  gg;,lfd,jv @!#', note: 'مركز النور للكومبيوتر, Al-Nour Computer Center. <code>#$</code> makes النور, Al-Nour, underlined and twice as tall.' },
       ]}

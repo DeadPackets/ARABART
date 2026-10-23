@@ -84,7 +84,8 @@ const basics = [
   .cmds button:disabled { opacity: 0.55; cursor: wait; }
   .cmds button:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
 
-  @media (max-width: 1000px) { .cmds { position: static; } }
+  /* Relative, not static: the window's title bar is positioned against it */
+  @media (max-width: 1000px) { .cmds { position: relative; top: 0; } }
 </style>
 
 <script>
