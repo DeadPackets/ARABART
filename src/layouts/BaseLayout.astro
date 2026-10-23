@@ -1,4 +1,6 @@
 ---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Explain from '../components/explain/Explain.astro';
@@ -38,6 +40,9 @@ const {
 
 const canonicalURL = new URL(Astro.url.pathname.replace(/\/?$/, '/'), Astro.site);
 const imageURL = new URL(image, Astro.site);
+// The 1200 x 630 share card from scripts/og/cards.py; a page without one yet shares the home card
+const slug = Astro.url.pathname.replace(/^\/|\/$/g, '').replace(/\//g, '-') || 'home';
+const cardURL = new URL(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/og/${existsSync(join(process.cwd(), 'public/og', `${slug}.png`)) ? slug : 'home'}.png`, Astro.site);
 const home = new URL(`${import.meta.env.BASE_URL.replace(/\/$/, '')}/`, Astro.site).href;
 const isHome = canonicalURL.href === home;
 const ld = {
@@ -72,13 +77,18 @@ const JSDOS = 'https://cdn.jsdelivr.net/npm/js-dos@8.5.3/dist';
   <meta property="og:locale" content="en_US" />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
-  <meta property="og:image" content={imageURL} />
+  <meta property="og:image" content={cardURL} />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={title} />
   <meta property="og:url" content={canonicalURL} />
   <meta property="og:site_name" content="ARABART" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={imageURL} />
+  <meta name="twitter:image" content={cardURL} />
+  <meta name="twitter:image:alt" content={title} />
 
   <link rel="canonical" href={canonicalURL} />
   <link rel="icon" type="image/x-icon" href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/favicon.ico`} />

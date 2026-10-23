@@ -1,0 +1,96 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Share card</title>
+<style>
+  @font-face { font-family: Archivo; src: url('../../src/assets/fonts/archivo-latin.woff2'); font-weight: 100 900; font-stretch: 72% 100%; }
+  @font-face { font-family: VGA; src: url('../../public/fonts/oldschool/Web437_IBM_VGA_9x16.woff'); }
+  :root {
+    --blue: oklch(0.334 0.231 264.1); --blue-deep: oklch(0.271 0.188 264.1); --yellow: oklch(0.971 0.183 109.4);
+    --cyan: oklch(0.915 0.136 195); --ink: oklch(0.97 0.015 264); --ink-2: oklch(0.89 0.04 264);
+    --xp-bg: oklch(0.86 0.045 250); --xp-line: #7f9db9; --ds-ink: #3c3c3c; --ds-red: #c8102e; --ds-slogan: #c33a00;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #000; }
+  #card { position: relative; width: 1200px; height: 630px; overflow: hidden; }
+  .home, .sec, .dos { font-family: Archivo, sans-serif; color: var(--ink); }
+  .px { display: block; image-rendering: pixelated; }
+  .vga { font: 32px/1 VGA, monospace; }
+  .clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+
+  /* A: the home hero, distilled (home and section pages) */
+  .home, .sec { display: flex; flex-direction: column; align-items: center; padding-top: 56px; text-align: center;
+    background: radial-gradient(ellipse 70% 80% at 50% 38%, var(--blue) 0%, var(--blue-deep) 70%, oklch(0.18 0.12 264) 100%); }
+  :is(.home, .sec)::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, oklch(0.5 0.25 264 / 0.55) 1.6px, transparent 2px) 0 0 / 9px 9px;
+    mask: radial-gradient(ellipse 60% 70% at 50% 40%, #000 30%, transparent 85%); }
+  :is(.home, .sec) .px { position: relative; width: 936px; filter: drop-shadow(0 0 18px oklch(0.97 0.18 109 / 0.45)); }
+  .sec .px { width: 702px; }
+  :is(.home, .sec) h1 { position: relative; margin-top: 30px; padding: 0 110px; font: 800 70px/1.02 Archivo; font-stretch: 80%; letter-spacing: -0.015em; text-wrap: balance; }
+  .sec h1 { margin-top: 34px; font-size: 76px; }
+  :is(.home, .sec) p { position: relative; margin-top: 22px; padding: 0 120px; font: 500 29px/1.3 Archivo; color: var(--ink-2); text-wrap: balance; }
+  .bar { position: absolute; left: 0; right: 0; bottom: 0; height: 64px; display: flex; align-items: center; background: #000; }
+  .bar b { padding: 0 18px; color: #fff; font-weight: 400; }
+  .bar span { height: 100%; display: flex; align-items: center; padding: 0 22px; background: #00aaaa; color: #000; }
+  .bar .url { margin-left: auto; background: none; color: var(--cyan); }
+
+  /* B: the program window beside the title (program pages) */
+  .dos { display: grid; grid-template-columns: 670px 1fr; align-items: center; gap: 46px; padding: 0 56px 64px; background: var(--blue); }
+  .dos .win { position: relative; aspect-ratio: 962 / 600; background: #000; border: 3px double #aaa; outline: 8px solid #000;
+    box-shadow: 18px 18px 0 oklch(0.2 0.14 264); }
+  .dos .win em { position: absolute; z-index: 1; top: -18px; left: 50%; translate: -50% 0; max-width: 92%; overflow: hidden; white-space: nowrap; background: #000; color: #ccc; font-style: normal; padding: 0 10px; }
+  .dos .win img { width: 100%; height: 100%; image-rendering: pixelated; }
+  .dos .side { display: flex; flex-direction: column; gap: 20px; }
+  .dos .side .px { width: 100%; filter: drop-shadow(0 0 12px oklch(0.97 0.18 109 / 0.4)); }
+  .dos h1 { margin-top: 6px; font: 800 60px/1.02 Archivo; font-stretch: 80%; letter-spacing: -0.01em; text-wrap: balance; }
+  .dos .when { color: var(--cyan); }
+  .dos .by { font: 500 28px/1.2 Archivo; color: var(--ink-2); }
+  .dos .foot { position: absolute; left: 56px; right: 56px; bottom: 28px; display: flex; justify-content: space-between; color: var(--yellow); }
+
+  /* DinarSoft: Visual Studio 2005's Start Page, as the hub draws it (hub and app pages) */
+  .hub, .app { background: var(--xp-bg); color: var(--ds-ink); font-family: Verdana, Tahoma, sans-serif; }
+  .panel { position: absolute; inset: 40px 40px 76px; background: #fff; border: 1px solid var(--xp-line); }
+  .panel > i { position: absolute; top: -31px; left: 10px; height: 31px; padding: 6px 16px 0; background: #fff; border: 1px solid var(--xp-line); border-bottom: 0; font: 700 17px Tahoma, sans-serif; font-style: normal; color: #000; }
+  .status { position: absolute; left: 0; right: 0; bottom: 0; height: 52px; display: flex; align-items: center; gap: 34px; padding: 0 40px; background: #ece9d8; border-top: 1px solid #aca899; font: 20px Tahoma, sans-serif; color: #000; }
+  .status .url { margin-left: auto; font-weight: 700; }
+  .hub .logo { position: absolute; left: 56px; top: 54px; width: 560px; }
+  .hub h1 { position: absolute; left: 56px; top: 210px; width: 600px; font: 800 58px/1.04 Archivo; font-stretch: 80%; color: var(--ds-ink); text-wrap: balance; }
+  .hub ul { position: absolute; right: 50px; top: 50px; width: 400px; display: grid; gap: 14px; padding: 0; list-style: none; }
+  .hub li { display: flex; align-items: center; gap: 16px; font-size: 27px; }
+  .hub li img { width: 52px; height: 52px; }
+  .hub li b { font-weight: 700; }
+  .app .dev { position: absolute; left: 70px; top: 18px; width: 300px; padding: 34px 18px 58px; border-radius: 26px; background: linear-gradient(160deg, #e9ecef, #aeb4bb 55%, #8d939a);
+    box-shadow: inset 0 0 0 2px #6d737a, 0 10px 20px oklch(0.3 0.03 250 / 0.35); }
+  .app .dev::before { content: ''; position: absolute; top: 15px; left: 50%; width: 64px; height: 6px; translate: -50% 0; border-radius: 3px; background: #6d737a; }
+  .app .dev::after { content: ''; position: absolute; bottom: 16px; left: 50%; width: 30px; height: 30px; translate: -50% 0; border-radius: 50%; background: radial-gradient(circle at 40% 35%, #d5d9de, #868c93); box-shadow: inset 0 0 0 2px #6d737a; }
+  .app .dev img { display: block; width: 264px; height: 352px; border: 3px solid #2b2f33; }
+  .app .side { position: absolute; left: 440px; right: 56px; top: 64px; display: flex; flex-direction: column; gap: 18px; }
+  .app .side img { width: 88px; height: 88px; }
+  .app h1 { font: 400 76px/1 Verdana, sans-serif; letter-spacing: -0.03em; color: var(--ds-ink); }
+  .app h1 b { font-weight: 700; }
+  .app .slogan { font: italic 400 32px/1.2 Verdana, sans-serif; color: var(--ds-slogan); }
+  .app .by { margin-top: 18px; font: 26px/1.4 Verdana, sans-serif; color: var(--ds-ink); }
+</style>
+<div id="card"></div>
+<script>
+  const card = document.getElementById('card');
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => `&#${c.charCodeAt(0)};`);
+  const T = {
+    home: d => `<img class="px" src="${d.arabic}" alt=""><h1>${esc(d.h1)}</h1><p>Port Said, 1991. His engine and 15 DOS programs, live in your browser.</p>${bar()}`,
+    sec: d => `<img class="px" src="${d.arabic}" alt=""><h1>${esc(d.h1)}</h1><p class="clamp2">${esc(d.lede)}</p>${bar()}`,
+    dos: d => `<div class="win vga"><em>${esc(d.path)}</em><img src="${d.screen}" alt=""></div>
+      <div class="side"><img class="px" src="${d.arabic}" alt=""><h1>${esc(d.h1)}</h1><p class="by">Yasser Awad, <span class="vga when">${esc(d.year)}</span></p></div>
+      <div class="foot vga"><span>ARABART</span><span>arabart.deadpackets.pw</span></div>`,
+    hub: d => `<div class="panel"><i>Start Page</i><img class="logo" src="${d.logo}" alt=""><h1>${esc(d.big)}</h1>
+      <ul>${d.apps.map(a => `<li><img src="${a.icon}" alt=""><span>${esc(a.pre)}<b>${esc(a.post)}</b></span></li>`).join('')}</ul></div>${status()}`,
+    app: d => `<div class="panel"><i>${esc(d.name)}</i><div class="dev"><img src="${d.screen}" alt=""></div>
+      <div class="side"><img src="${d.icon}" alt=""><h1>${esc(d.pre)}<b>${esc(d.post)}</b></h1><p class="slogan">${esc(d.slogan)}</p>
+      <p class="by">DinarSoft, Kanata<br>Yasser Awad and Hosam Aly</p></div></div>${status()}`,
+  };
+  const bar = () => `<div class="bar vga"><b>F2</b><span>ARABART</span><b>F9</b><span>Yasser Awad</span><span class="url">arabart.deadpackets.pw</span></div>`;
+  const status = () => `<div class="status"><span>Ready</span><span>DinarSoft</span><span class="url">arabart.deadpackets.pw/dinarsoft</span></div>`;
+  window.fill = async d => {
+    card.className = d.kind;
+    card.innerHTML = T[d.kind](d);
+    await document.fonts.ready;
+    await Promise.all([...card.querySelectorAll('img')].map(i => i.decode()));
+  };
+</script>
