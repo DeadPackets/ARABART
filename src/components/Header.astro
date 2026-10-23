@@ -25,11 +25,29 @@ const items = [
 ];
 const all = [...keys, { k: 'F1', label: 'Glossary', href: `${base}/glossary/` }];
 const [place, year] = when ?? ERAS[era].when;
+// Visual Studio 2005's Standard toolbar, 16 x 16 each: New Project, Open, Save, Save All | Cut, Copy, Paste | Undo, Redo
+const TOOLS = [
+  { cls: '', icons: [
+    '<path d="M3 1.5h6.5l3 3v10H3z" fill="#fff" stroke="#4a6fa5"/><path d="M9.5 1.5v3h3" fill="#dfe8f6" stroke="#4a6fa5"/><path d="M5.5 7.5l1 2 2.2.7-2.2.8-1 2-1-2-2.2-.8 2.2-.7z" fill="#f4c20d" stroke="#a0740b" stroke-width=".6"/>',
+    '<path d="M1.5 3.5h4.5l1.2 1.5h5.3v8h-11z" fill="#e3b341" stroke="#9a6d10"/><path d="M3.5 7.5h11.5l-2 5.5h-11.5z" fill="#ffd96a" stroke="#9a6d10"/>',
+    '<path d="M1.5 1.5h11l2 2v11h-13z" fill="#3d6cc0" stroke="#1f3f7a"/><path d="M4 2h7v5h-7z" fill="#fff"/><path d="M8.5 2.8h1.5V6h-1.5z" fill="#3d6cc0"/><path d="M3.5 9.5h9v5h-9z" fill="#dbe4f3"/>',
+    '<path d="M4.5.5h9l2 2v9h-11z" fill="#6d93d6" stroke="#1f3f7a"/><path d="M.5 4.5h9l2 2v9h-11z" fill="#3d6cc0" stroke="#1f3f7a"/><path d="M2.5 5h5.5v4h-5.5z" fill="#fff"/><path d="M2 11h7v4h-7z" fill="#dbe4f3"/>',
+  ] },
+  { cls: 'sh-t-edit', icons: [
+    '<circle cx="4.5" cy="12" r="2.3" fill="none" stroke="#333" stroke-width="1.3"/><circle cx="11.5" cy="12" r="2.3" fill="none" stroke="#333" stroke-width="1.3"/><path d="M6 10.5L11 1.5M10 10.5L5 1.5" stroke="#6b7a8c" stroke-width="1.4"/>',
+    '<path d="M1.5 1.5h7v9h-7z" fill="#fff" stroke="#4a6fa5"/><path d="M6.5 5.5h8v10h-8z" fill="#fff" stroke="#4a6fa5"/><path d="M8.5 8h4M8.5 10h4M8.5 12h3" stroke="#9db3d6"/>',
+    '<path d="M2.5 2.5h9v12h-9z" fill="#c8964b" stroke="#7a5420"/><rect x="5" y="1" width="4" height="3" rx="1" fill="#bbb" stroke="#555"/><path d="M7.5 6.5h7v9h-7z" fill="#fff" stroke="#4a6fa5"/>',
+  ] },
+  { cls: '', icons: [
+    '<path d="M5 5h5a4 4 0 0 1 0 8H7" fill="none" stroke="#2457b5" stroke-width="2"/><path d="M1 5l5-4v8z" fill="#2457b5"/>',
+    '<path d="M11 5H6a4 4 0 0 0 0 8h3" fill="none" stroke="#2457b5" stroke-width="2"/><path d="M15 5l-5-4v8z" fill="#2457b5"/>',
+  ] },
+];
 ---
 
 <header class="sh" data-sh>
   <div class="sh-top">
-    <span class="sh-logo" aria-hidden="true"><i></i></span>
+    <span class="sh-logo" aria-hidden="true"><i></i><svg class="sh-vs" viewBox="0 0 24 16" width="24" height="16"><defs><linearGradient id="sh-vsg" x1="0" x2="1"><stop offset="0" stop-color="#f08a24" /><stop offset=".5" stop-color="#b5479e" /><stop offset="1" stop-color="#5b3cc4" /></linearGradient></defs><path d="M6 3C3 3 1.5 5.4 1.5 8S3 13 6 13c2.6 0 4.2-2.5 6-5s3.4-5 6-5c3 0 4.5 2.4 4.5 5S21 13 18 13c-2.6 0-4.2-2.5-6-5S8.6 3 6 3z" fill="none" stroke="url(#sh-vsg)" stroke-width="3" /></svg></span>
     <nav class="sh-nav" id="sh-nav" aria-label="Main" popover>
       <p class="sh-banner" aria-hidden="true"><b>ARABART</b> Yasser Awad</p>
       <ul>
@@ -43,13 +61,17 @@ const [place, year] = when ?? ERAS[era].when;
         ))}
       </ul>
     </nav>
-    <span class="sh-tools" aria-hidden="true"><i></i><i></i><i></i><i class="go"></i></span>
+    <span class="sh-tools" aria-hidden="true">
+      {TOOLS.map(g => <span class:list={['sh-tg', g.cls]}>{g.icons.map(svg => <svg viewBox="0 0 16 16" width="16" height="16" set:html={svg} />)}</span>)}
+      <span class="sh-tg"><i class="go"></i><span class="sh-cb">Debug</span><span class="sh-cb">Pocket PC 2003 SE Emulator</span></span>
+    </span>
     <p class="sh-when" aria-hidden="true"><span><b>Yasser Awad</b> · <span data-when-place>{place}</span>, <span data-when-year>{year}</span></span></p>
   </div>
 
   <div class="sh-low">
     <button class="sh-menu" type="button" popovertarget="sh-nav" aria-label="Menu"><span class="sh-flag" aria-hidden="true"></span><span class="sh-menu-l">Menu</span></button>
     <a class="sh-start" href={`${base}/`}><span class="sh-flag" aria-hidden="true"></span>Start<span class="sr-only"> page: ARABART home</span></a>
+    <span class="sh-task" aria-hidden="true">DinarSoft - Microsoft Visual Studio</span>
     <ul class="sh-keys" aria-label="Keys">
       {all.map(it => (
         <li>
@@ -76,7 +98,7 @@ const [place, year] = when ?? ERAS[era].when;
   }
   .sh-keys { display: flex; list-style: none; min-width: 0; overflow: hidden; }
   .sh-keys span { cursor: default; }
-  .sh-banner, .sh-ico, .sh-tools, .sh-menu, .sh-start, .sh-tray, .sh-flag { display: none; }
+  .sh-banner, .sh-ico, .sh-tools, .sh-menu, .sh-start, .sh-tray, .sh-flag, .sh-vs, .sh-task { display: none; }
   .sh-when { margin-left: auto; display: flex; align-items: center; gap: 0.4em; padding: 0 8px; }
   .sh-logo { display: flex; align-items: center; padding: 0 10px; }
   .sh.redraw :is(.sh-top, .sh-low) { animation: sh-redraw 0.42s steps(6, end); }
@@ -128,21 +150,35 @@ const [place, year] = when ?? ERAS[era].when;
     .sh-low .sh-keys :is(a, button):focus-visible, .sh-start:focus-visible { outline: 1px dotted var(--w-black); outline-offset: -5px; }
   }
 
-  /* vs2005: Office 2003 style menu and toolbar on Windows XP; a status bar that says Ready */
+  /* vs2005: Visual Studio 2005 on Windows XP: its menu bar and Standard toolbar on top, the XP taskbar at the bottom */
   @scope ([data-era='vs2005']) to ([data-era]) {
-    .sh-top { background: linear-gradient(#fbfbfb, #eceae0); color: var(--w-black); font: 400 0.9375rem/1 var(--sans); border-bottom: 1px solid #c5c2b2; }
-    .sh-logo i { width: 18px; height: 18px; border-radius: 3px; background: linear-gradient(135deg, #8a6fd6, #4e2f9e); box-shadow: inset 0 0 0 2px oklch(1 0 0 / 0.35); }
+    .sh-top { background: linear-gradient(#fbfbfb, #eceae0); color: var(--w-black); font: 400 0.875rem/1 Tahoma, var(--sans); border-bottom: 1px solid #c5c2b2; }
+    .sh-logo i { display: none; }
+    .sh-vs { display: block; }
     .sh-nav .hk { text-decoration: underline; text-underline-offset: 2px; }
-    .sh-nav a { margin: 4px 0; padding: 0 9px; border: 1px solid transparent; }
+    .sh-nav a { height: calc(100% - 8px); margin: 4px 0; padding: 0 9px; border: 1px solid transparent; }
     .sh-nav a:is(:hover, :focus-visible, [aria-current='page']) { background: #c1d2ee; border-color: var(--xp-sel); color: var(--w-black); outline: 0; }
-    .sh-tools { display: flex; align-items: center; gap: 4px; padding: 0 10px; margin-left: 8px; border-left: 1px solid #c5c2b2; }
-    .sh-tools i { width: 16px; height: 16px; border-radius: 2px; background: linear-gradient(#fff, #c9d6ec); border: 1px solid #8ea2c6; }
-    .sh-tools i.go { width: 0; height: 0; margin-left: 6px; border: 7px solid transparent; border-left: 11px solid #2e9b2e; border-right: 0; border-radius: 0; background: none; }
-    .sh-low { background: linear-gradient(#f3f1e8, #e2dfd1); color: oklch(0.25 0.03 255); font: 400 0.875rem/1 var(--sans); border-top: 1px solid #c5c2b2; }
-    .sh-low::before { content: 'Ready'; display: flex; align-items: center; padding: 0 14px; border-right: 1px solid #c5c2b2; }
-    .sh-keys b { margin-right: 6px; font-weight: 600; }
-    .sh-keys :is(a, button):is(:hover, :focus-visible) { background: #c1d2ee; outline: 1px solid var(--xp-sel); outline-offset: -1px; }
-    .sh-tray { display: flex; align-items: center; margin-left: auto; padding: 0 14px; border-left: 1px solid #c5c2b2; }
+    .sh-tools { display: flex; align-items: center; margin-left: 8px; }
+    .sh-tg { display: flex; align-items: center; gap: 7px; padding: 0 9px; border-left: 1px solid #c5c2b2; box-shadow: inset 1px 0 #fff; }
+    .sh-tg svg { display: block; }
+    .sh-tools .go { width: 0; height: 0; border: 7px solid transparent; border-left: 11px solid #2e9b2e; border-right: 0; }
+    .sh-cb { position: relative; display: flex; align-items: center; height: 20px; padding: 0 22px 0 4px; font-size: 0.75rem; border: 1px solid #7f9db9;
+      background: #fff linear-gradient(#c1d3fb, #a6bdf2) right / 16px 100% no-repeat; }
+    .sh-cb::after { content: '\25BE'; position: absolute; right: 4px; color: #4d6185; }
+    .sh-low { gap: 3px; padding: 0; align-items: center; color: #fff; font: 400 0.875rem/1 Tahoma, var(--sans);
+      background: linear-gradient(#3168d5, #4993e6 8%, #2157d7 40%, #2663e0 88%, #1941a5); }
+    .sh-start { display: flex; align-self: stretch; gap: 6px; margin-right: 8px; padding: 0 22px 0 10px; font: italic 700 1.1875rem/1 'Trebuchet MS', var(--sans); text-transform: lowercase;
+      text-shadow: 1px 1px 1px #1a4d1a; border-radius: 0 10px 10px 0; background: linear-gradient(#3c9a3c, #5ec05e 12%, #34913a 50%, #2f8a2f 85%, #276f27); box-shadow: inset -2px 0 3px #1d5a1d; }
+    .sh-flag { display: block; width: 18px; height: 16px; border-radius: 3px 6px 3px 6px; transform: skewY(-6deg);
+      background: conic-gradient(from 90deg, #48b848 25%, #ffd84a 0 50%, #3a7be8 0 75%, #f05a2a 0); }
+    .sh-task, .sh-keys :is(a, button, span) { height: 26px; min-width: 150px; padding: 0 12px; border-radius: 3px; color: #fff;
+      background: linear-gradient(#2e6fe0, #1f5ad0); box-shadow: inset 1px 1px #6aa2ff, inset -1px -1px #1c48b0; }
+    .sh-task { display: flex; align-items: center; background: linear-gradient(#1e52b7, #1b49a8); box-shadow: inset 1px 1px #0d2e7a; }
+    .sh-keys { gap: 3px; align-items: center; }
+    .sh-keys b { margin-right: 6px; font-weight: 700; }
+    .sh-keys :is(a, button):is(:hover, :focus-visible), .sh-start:is(:hover, :focus-visible) { filter: brightness(1.12); outline: 1px dotted #fff; outline-offset: -4px; }
+    .sh-tray { display: flex; align-items: center; align-self: stretch; margin-left: auto; padding: 0 16px; border-left: 1px solid #0b4db0; box-shadow: inset 1px 0 #19b9f3;
+      background: linear-gradient(#0c59b9, #1384d8 10%, #0b72c9 50%, #0c59b9); }
   }
 
   /* The current page's item is already highlighted, so its keyboard focus needs its own mark */
@@ -150,6 +186,13 @@ const [place, year] = when ?? ERAS[era].when;
   /* Tablets and small laptops: every menu item stays on one line and nothing is cut; the place and year return at 1200 px */
   @media (min-width: 761px) and (max-width: 1199px) {
     .sh-top .sh-when { display: none; }
+  }
+  /* Visual Studio's toolbar gives way first: the Debug and device boxes, then Cut, Copy and Paste */
+  @media (min-width: 761px) and (max-width: 1499px) {
+    .sh-top .sh-cb { display: none; }
+  }
+  @media (min-width: 761px) and (max-width: 1299px) {
+    .sh-top .sh-t-edit { display: none; }
   }
   @media (min-width: 761px) and (max-width: 999px) {
     .sh-top .sh-tools { display: none; }
@@ -203,11 +246,14 @@ const [place, year] = when ?? ERAS[era].when;
       .sh-nav .sh-ico { display: block; width: 22px; height: 20px; margin-right: 10px; background: linear-gradient(var(--w-navy) 0 5px, var(--w-white) 5px); border: 1px solid var(--w-black); box-shadow: 2px 2px 0 var(--w-gray); }
     }
     @scope ([data-era='vs2005']) to ([data-era]) {
-      .sh-low::before { display: none; }
-      .sh-menu { border: 1px solid transparent; }
-      .sh-menu::before { content: '\2630'; }
+      .sh-task { display: none; }
+      .sh-menu { gap: 6px; padding: 0 18px 0 10px; color: #fff; font: italic 700 1.1875rem/1 'Trebuchet MS', var(--sans); text-shadow: 1px 1px 1px #1a4d1a;
+        border-radius: 0 10px 10px 0; background: linear-gradient(#3c9a3c, #5ec05e 12%, #34913a 50%, #2f8a2f 85%, #276f27); box-shadow: inset -2px 0 3px #1d5a1d; }
+      .sh-menu-l { font-size: 0; }
+      .sh-menu-l::before { content: 'start'; font-size: 1.1875rem; }
+      .sh-menu, .sh-tray { align-self: stretch; height: auto; }
       .sh-nav:popover-open { background: linear-gradient(90deg, #f1efe6 0 34px, #fcfcf9 34px); color: var(--w-black); border: 1px solid #8a867a; box-shadow: 3px 3px 6px oklch(0 0 0 / 0.25); font: 400 1.0625rem/1 var(--sans); }
-      .sh-nav .sh-ico { display: block; width: 16px; height: 16px; margin: 0 18px 0 -6px; border-radius: 2px; background: linear-gradient(#fff, #c9d6ec); border: 1px solid #8ea2c6; }
+      .sh-nav a { padding-left: 44px; }
     }
   }
 
