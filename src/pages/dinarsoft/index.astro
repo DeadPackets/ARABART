@@ -24,12 +24,12 @@ const printed = reviews.filter(r => r.print);
 const mags = new Set(printed.map(r => r.outlet)).size;
 const home = new URL(`${base}/`, Astro.site).href;
 const org = { '@type': 'Organization', '@id': `${home}dinarsoft/#org`, name: 'DinarSoft Corporation', url: `${home}dinarsoft/`, logo: new URL(logo.src, Astro.site).href,
-  foundingDate: '2002-11', founder: { '@id': `${home}#yasser` }, foundingLocation: { '@type': 'Place', name: 'Kanata, Ontario, Canada' } };
+  sameAs: 'https://web.archive.org/web/20090121235909/http://www.dinarsoft.com/', foundingDate: '2002-11', founder: [{ '@id': `${home}#yasser` }, { '@type': 'Person', name: 'Hosam Aly' }], foundingLocation: { '@type': 'Place', name: 'Kanata, Ontario, Canada' } };
 ---
 
 <BaseLayout
   title="DinarSoft: six Pocket PC apps, free since 2026 · Yasser Awad"
-  description="Yasser Awad's company: six award-winning apps for Pocket PC and Windows Mobile, built with Hosam Aly in Kanata from 2002 to 2008, and free since 2026. Run them, download them, unlock them."
+  description="The company Yasser Awad co-founded with Hosam Aly: six award-winning apps for Pocket PC and Windows Mobile, built in Kanata from 2002 to 2008, free since 2026. Run them, download them, unlock them."
   pageType="CollectionPage"
   schema={[org]}
   image={`${base}/dinarsoft/site/ds-2006-home-relaunch.webp`}
@@ -45,7 +45,7 @@ const org = { '@type': 'Organization', '@id': `${home}dinarsoft/#org`, name: 'Di
               <h1 id="dsh-h1" class="dsh-h1"><img src={logo.src} width={logo.w} height={logo.h} alt="DinarSoft" fetchpriority="high" /></h1>
               <p class="dsh-tag">{company.tagline}</p>
               <p class="dsh-big">Six apps for the smartphones before the iPhone. {awards.length} nominations, {wins} magazine wins, and all six free today.</p>
-              <p class="dsh-lead">In November 2002, Yasser Awad founded DinarSoft Corporation in Kanata, Ontario, the tech town its own website called “silicon valley north”. Alongside his work at Alcatel, he ran the company, and with his co-developer, Hosam Aly, he built its six apps for <Term id="pocket-pc">Pocket PC and Windows Mobile</Term>: the phones people carried before the iPhone. Reviewers from New Zealand to Dubai to Spain praised them. In October 2026 he released all six as freeware.</p>
+              <p class="dsh-lead">In November 2002, Yasser Awad co-founded DinarSoft Corporation with his friend Hosam Aly in Kanata, Ontario, the tech town its own website called “silicon valley north”. Alongside his work at Alcatel, he and Hosam built its six apps for <Term id="pocket-pc">Pocket PC and Windows Mobile</Term>: the phones people carried before the iPhone. Reviewers from New Zealand to Dubai to Spain praised them. In October 2026 he released all six as freeware. <a href="https://web.archive.org/web/20090121235909/http://www.dinarsoft.com/" rel="noopener">Visit dinarsoft.com as it was in January 2009</a>, saved by the Internet Archive.</p>
               <div class="dsh-acts">
                 <a class="button button--primary" href="#apps">See the six apps</a>
                 <a class="button" href="#free">Download, free</a>
