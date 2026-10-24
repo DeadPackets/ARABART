@@ -80,23 +80,25 @@ const PROGS = [['GAME.COM', 365], ['WP.EXE', 465], ['SHEET.EXE', 565]] as const;
       <g data-s="6"><rect class="box-hi" x="184" y="364" width="170" height="58" /><text class="t-bk t-lg" x="269" y="392" text-anchor="middle">JUL 29</text><text class="t-bk" x="269" y="412" text-anchor="middle">disk wiped</text></g>
     </svg>
   </Steps>
-  <p>Yasser and Ebrahim, of the KEMYAM Computer Group in Port Said, studied its code byte by byte until they knew every trick it had. Yasser’s verdict sits in KVC’s help screen: <q>It is a funny virus, all its tricks are untricky.</q></p>
+  <p>Yasser and Ebrahim, of the KEMYAM Computer Group in Port Said, studied its code byte by byte until they knew every trick it had. Ebrahim worked through the disassembly with Yasser, and the two wrote KVC together. Their verdict sits in KVC’s help screen: <q>It is a funny virus, all its tricks are untricky.</q></p>
+  <p>Koko has its own <a href="https://en.wikipedia.org/wiki/KoKo_(computer_virus)" rel="noopener">Wikipedia article</a>. It records the virus as KoKo, listed in antivirus databases as <code>Koko.1780</code>: about 1,780 bytes of assembly, first seen in March 1991, that stays in memory, takes over DOS’s request door (<code>INT 21h</code>) and writes itself onto the end of every COM and EXE program that runs. On its days it shows <q>KoKo is Sleeping in Your PC. !</q> and can erase the disk. The name, the article says, came from a nickname its author’s friends used.</p>
+  <p>Koko’s message named one person to contact for a scan: Adham H. Hammam. Adham was Yasser and Ebrahim’s colleague at university.</p>
 </section>
 
 <section id="kvc-live" class="kv">
   <h2>Watch KVC catch it</h2>
-  <p class="lead">This PC runs in your browser, with Koko in its memory and two programs that wear its marks. Type SCAN and watch Yasser’s own KVC.EXE find Koko, sound the alarm, freeze it, and repair both files.</p>
+  <p class="lead">This PC runs in your browser, with Koko in its memory and two programs that wear its marks. Type SCAN and watch Yasser and Ebrahim’s own KVC.EXE find Koko, sound the alarm, freeze it, and repair both files.</p>
   <aside class="kv-safe" aria-label="Safe by design">
     <p><b>Safe by design.</b> The real Koko is never on this site. What runs here is a harmless double built from KVC’s own checks. A 128-byte program answers KVC’s secret question and does nothing else. Two little programs carry Koko’s marks in every place KVC looks. Even those marks are stored scrambled, so no antivirus will flag this page as the virus. A 96-byte helper puts them back when the PC starts.</p>
   </aside>
   <KvcLive />
-  <p>KVC.EXE here is his 1993 program, byte for byte. When it is done, HELLO.COM and GREET.EXE are identical to their clean originals, down to the last byte. Type DIR to see their sizes shrink back to 61 and 96 bytes, or run them: all they do now is say hello.</p>
+  <p>KVC.EXE here is their 1993 program, byte for byte. When it is done, HELLO.COM and GREET.EXE are identical to their clean originals, down to the last byte. Type DIR to see their sizes shrink back to 61 and 96 bytes, or run them: all they do now is say hello.</p>
 </section>
 
 <section id="kvc-alarm" class="kv">
   <h2>Hear the alarm</h2>
   <p class="lead">When KVC finds Koko in memory, it sounds a siren on the PC’s little speaker. A high tone and a low one, twenty times in a row, with no gap.</p>
-  <p>A PC speaker can only push its cone out or pull it back in. A timer chip in the PC ticks 1,193,182 times a second. KVC tells it how many ticks make one wave: <strong>1,000</strong> for the high tone, <strong>1,600</strong> for the low one. So the pitch comes out exact on every PC. Play his alarm, then drag the number and hear what the chip makes of it.</p>
+  <p>A PC speaker can only push its cone out or pull it back in. A timer chip in the PC ticks 1,193,182 times a second. KVC tells it how many ticks make one wave: <strong>1,000</strong> for the high tone, <strong>1,600</strong> for the low one. So the pitch comes out exact on every PC. Play their alarm, then drag the number and hear what the chip makes of it.</p>
   <Siren />
   <Deep title="For engineers: the siren, line by line">
     <Listing
@@ -113,7 +115,7 @@ const PROGS = [['GAME.COM', 365], ['WP.EXE', 465], ['SHEET.EXE', 565]] as const;
         { off: '0838', code: 'loop 080F', note: 'next tone' },
         { off: '083A', code: 'in   al,61h / and al,0FCh / out 61h,al', note: 'speaker off' },
       ]}
-      foot="The pitch comes from the timer chip, so it never changes. The length comes from the waiting loop: 65 ms a tone on a 10 MHz 286, the speed the site’s emulator gives his programs."
+      foot="The pitch comes from the timer chip, so it never changes. The length comes from the waiting loop: 65 ms a tone on a 10 MHz 286, the speed the site’s emulator gives these programs."
     />
   </Deep>
 </section>
@@ -152,7 +154,7 @@ const PROGS = [['GAME.COM', 365], ['WP.EXE', 465], ['SHEET.EXE', 565]] as const;
       title="KVC.EXE 0D76-0EF0, condensed"
       lines={[
         { off: '0D76', code: 'mov  cx,1Ah / mov ah,3Fh', note: 'read the first 26 bytes' },
-        { off: '0D88', code: 'mov  di,059Fh / mov cx,15h', note: "his copy of Koko's start and name, 21 bytes" },
+        { off: '0D88', code: 'mov  di,059Fh / mov cx,15h', note: "KVC's copy of Koko's start and name, 21 bytes" },
         { off: '0D8F', code: 'repe cmpsb', note: 'mark 1', hi: true },
         { off: '0D99', code: 'mov  dl,[0514h] / mov dh,[0515h]', note: 'bytes 3 and 4: where the body starts' },
         { off: '0DA1', code: 'shl  dx,1   (4 times)', note: 'blocks of 16 bytes into a byte count' },

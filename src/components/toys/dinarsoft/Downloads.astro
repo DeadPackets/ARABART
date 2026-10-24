@@ -66,6 +66,7 @@ const all = downloads.map(d => ({ f: d.file, h: d.sha256, a: name(d.app), v: d.v
   .dsl-for b { color: var(--ds-rust); }
   .dsl-credit { display: block; margin-top: 4px; font-size: 0.8125rem; }
   .dsl-credit a { color: var(--ink-2); }
+  @media (max-width: 760px) { .dsl-credit { font-size: 0.875rem; } }
   .dsl-hash { display: block; max-width: 34ch; color: #333; font-size: 0.75rem; }
   .dsl-check { margin-top: 24px; max-width: 640px; }
   .dsl-ck-p { font-size: 0.9375rem; line-height: 1.55; }

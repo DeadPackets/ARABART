@@ -194,7 +194,7 @@ export const programs: Program[] = [
     description:
       "In 1993 a virus called Koko was spreading across PCs in Egypt, and it could wipe a hard disk. No antivirus on the market could see it. Yasser and Ebrahim El-Etr took it apart by hand and wrote KVC, the KEMYAM Virus Capture. It finds Koko in memory with Koko's own secret question, switches it off through Koko's own hiding place, and rebuilds every infected program byte for byte.",
     story:
-      "No antivirus on the market could see Koko, a virus that was wiping hard disks across Egypt. KVC could. Version 1.05 asks the virus a question only Koko answers, then freezes it in memory without a restart. It repairs each program from the original bytes Koko carried inside itself. Its help screen promises a free new version for every new virus.",
+      "No antivirus on the market could see Koko, a virus that was wiping hard disks across Egypt. KVC, by Yasser and Ebrahim El-Etr, could. Version 1.05 asks the virus a question only Koko answers, then freezes it in memory without a restart. It repairs each program from the original bytes Koko carried inside itself. Its help screen promises a free new version for every new virus.",
     year: 1993,
     language: "C, Assembly",
     category: "utility",

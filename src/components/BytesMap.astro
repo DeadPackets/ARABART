@@ -94,7 +94,8 @@ const maps = filesFor(files, id).map(f => {
   .bm-sizes { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 24px; font-size: 0.9375rem; color: var(--ink-2); }
   .bm-sizes b { font: 700 1rem var(--mono); color: var(--ink); }
   .bm-sizes .bm-his { color: var(--yellow); }
-  .bm-disk { display: flex; height: 14px; margin-top: 12px; outline: 1px solid var(--ink-2); }
+  .bm-disk { position: relative; display: flex; height: 14px; margin-top: 12px; outline: 1px solid var(--ink-2); }
+  @media (pointer: coarse) { .bm-disk::after { content: ''; position: absolute; inset: -15px 0; } }
   .bm-disk:hover, .bm-disk:focus-visible { outline: 2px solid var(--yellow); }
   .bm-disk i { min-width: 1px; }
   .bm-map { display: block; width: 100%; height: auto; margin-top: 10px; max-height: 70svh; }
