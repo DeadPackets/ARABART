@@ -140,6 +140,8 @@ const total = Object.keys(glossary).length;
   .gl-seen { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-size: 0.875rem !important; }
   .gl-seen span { font: 500 0.75rem var(--font-code); color: var(--ink-2); }
   .gl-seen a { color: var(--accent-2); text-underline-offset: 3px; }
+  @media (max-width: 760px) { .gl-now b, .gl-seen span { font-size: 0.875rem; } }
+  @media (pointer: coarse) { .gl-seen a { display: inline-flex; align-items: center; min-height: 44px; } }
   .gl-term:target, .gl-term.is-target { background: var(--vga-1); box-shadow: -14px 0 0 var(--vga-1), 14px 0 0 var(--vga-1), inset 4px 0 0 var(--vga-14); padding-left: 14px; }
   .gl-term :global(mark) { background: var(--vga-14); color: var(--vga-0); }
 

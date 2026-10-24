@@ -147,6 +147,7 @@ const short = (d: string) => longDate(d).replace(/^(\w{3})\w*/, '$1');
   .dsr-mh img { grid-row: span 2; align-self: center; }
   .dsr-from { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .dsr-date { font-size: 0.75rem; color: #555; white-space: nowrap; }
+  @media (max-width: 760px) { .dsr-date { font-size: 0.875rem; } }
   .dsr-sub { grid-column: 2 / -1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #333; }
   .dsr-mh:hover { background: #eef4fd; }
   .dsr-mh:focus-visible { outline: 1px dotted #000; outline-offset: -3px; }

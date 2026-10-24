@@ -20,6 +20,7 @@
 .dsx-cap-img img { display: block; max-width: 100%; height: auto; }
 .dsx-credit { margin-top: 6px; font: 400 0.8125rem/1.45 var(--ds-verdana); color: var(--ink-2); }
 .dsx-credit a { color: var(--accent); }
+@media (max-width: 760px) { .dsx-credit { font-size: 0.875rem; } }
 
 /* Section headings on DinarSoft pages: the site's display face, with the 1 px brick rule DinarSoft put under its own */
 .dsx-h2 { font: 800 clamp(2rem, 2.4vw + 1rem, 3.25rem)/1.02 var(--font-display); font-stretch: 80%; color: var(--ink); text-wrap: balance; }
