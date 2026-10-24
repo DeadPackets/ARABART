@@ -94,9 +94,9 @@ export const programs: Program[] = [
     title: "Digi-Test",
     subtitle: "Digital Circuit Simulator",
     description:
-      "Yasser's 1993 graduation project: draw a circuit of real 74xx logic chips with the keyboard, and Digi-Test simulates it gate by gate. With his team's own plug-in card it also tested the real circuit on the bench and led the technician to the broken chip. Load KEMYAM to see the circuit from the graduation defense.",
+      "The 1993 graduation project of Yasser's team: draw a circuit of real 74xx logic chips with the keyboard, and Digi-Test simulates it gate by gate. With a plug-in card Yasser designed it also tested the real circuit on the bench and led the technician to the broken chip. Load KEMYAM to see the circuit from the graduation defense.",
     story:
-      "Digi-Test was the heart of the KEMYAM group's graduation project, and Yasser wrote the software. It is real object-oriented C++ from 1993. You place real chips on a sheet, wire them with the keypad, and it works out what the circuit does. To test a real board it gives every wire five values: 0, 1, unknown, and two marks that carry a fault to the output. Every chip and gate it knows is a small data file, so a new chip needs no new code. With the team's plug-in card, it drove the real circuit and told the technician exactly where to place the probe next.",
+      "Digi-Test was the heart of the KEMYAM group's graduation project. Yasser's part was the GUI, the hardware interface card, the card's device driver and the interface APIs for it. It is real object-oriented C++ from 1993. You place real chips on a sheet, wire them with the keypad, and it works out what the circuit does. To test a real board it gives every wire five values: 0, 1, unknown, and two marks that carry a fault to the output. Every chip and gate it knows is a small data file, so a new chip needs no new code. With Yasser's plug-in card, it drove the real circuit and told the technician exactly where to place the probe next.",
     year: 1993,
     language: "C++, inline assembly",
     category: "tool",
@@ -125,9 +125,9 @@ export const programs: Program[] = [
     title: "Text Editor - Sample GUI",
     subtitle: "Interview Assignment Editor",
     description:
-      "Yasser's answer to the interview assignment for his first professional job: a text editor that loads, saves, scrolls, moves the cursor and switches insert mode. He built it inside Digi-Test, his graduation project, reusing its windows, menus and dialogs, and added one new class for the text.",
+      "Yasser's answer to the interview assignment for his first professional job: a text editor that loads, saves, scrolls, moves the cursor and switches insert mode. He built it inside Digi-Test, his team's graduation project, reusing the windows, menus and dialogs, and added one new class for the text.",
     story:
-      "For his first professional job, Yasser was set an assignment: a text editor that loads and saves files, scrolls, moves the cursor and switches between insert and overwrite. He wrote two. For EDIT.EXE he took the window system of Digi-Test, his graduation project, and added one new C++ class, TextEditor. The menus, dialogs and windows came along for free. The old code hands every key to the new class through one virtual method call, without ever knowing the editor exists.",
+      "For his first professional job, Yasser was set an assignment: a text editor that loads and saves files, scrolls, moves the cursor and switches between insert and overwrite. He wrote two. For EDIT.EXE he took the window system he had built for Digi-Test, his team's graduation project, and added one new C++ class, TextEditor. The menus, dialogs and windows came along for free. The old code hands every key to the new class through one virtual method call, without ever knowing the editor exists.",
     year: 1993,
     language: "C++",
     category: "tool",

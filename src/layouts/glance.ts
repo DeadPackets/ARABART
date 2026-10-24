@@ -5,7 +5,7 @@ export const glance: Record<string, string> = {
   'arabart-demo': 'The showcase for his Arabic engine: one line of Arabic in four fonts and twelve colors, stretched, then all of it again in italic.',
   'arabart-editor': 'A one-line Arabic typewriter. With every key you press, his library joins the whole line again, in the font, color and style you pick.',
   'arabart-commercial': 'A 15-slide Arabic advert for a computer services center in Port Said, played by a 152-byte player he wrote.',
-  'digi-test': 'His graduation project: put real logic chips on a board, wire them up, and watch the circuit run.',
+  'digi-test': 'His team’s graduation project: put real logic chips on a board, wire them up, and watch the circuit run.',
   'text-editor-gui': 'The text editor he wrote to get his first job, with menus and windows, built on the Digi-Test interface.',
   'text-editor-demo': 'A second editor for the same job interview, with the look of Windows 3. He built it in three evenings.',
   'formula-solver': 'A paid challenge: exact 20-digit math, written by hand in assembly for a PC with no math chip. Type a formula in x and get a table of answers.',
