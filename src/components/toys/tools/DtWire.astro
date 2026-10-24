@@ -47,12 +47,12 @@ const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
     <div class="dtw-btns">
       <button type="button" class="button k-btn" data-act="res" aria-pressed="false" disabled>Resistor</button>
       <button type="button" class="button k-btn" data-act="clear" disabled>Clear</button>
-      <button type="button" class="button button--primary k-btn" data-act="his" disabled>Play his wire</button>
+      <button type="button" class="button button--primary k-btn" data-act="his" disabled>Play a saved wire</button>
     </div>
   </div>
   <div class="dtw-out" id={`${id}-bytes`}>
     <p class="dtw-bytes" data-bytes aria-live="polite">{h0.bytes.map(b => <span>{hex(b)}</span>)}<span class="end">00</span></p>
-    <p class="dtw-meta" data-meta>{h0.say} {h0.bytes.length} bytes for {h0.bytes.length} cells. In his file this wire takes {21 + h0.bytes.length + 1} bytes: two end points, the pins it joins, then the path and the 00 that ends it.</p>
+    <p class="dtw-meta" data-meta>{h0.say} {h0.bytes.length} bytes for {h0.bytes.length} cells. In the file this wire takes {21 + h0.bytes.length + 1} bytes: two end points, the pins it joins, then the path and the 00 that ends it.</p>
     <p class="dtw-svgd"><span>The same wire as an SVG path:</span> <code data-d>M{start[0]} {start[1]} v-3 l3 -3 h3</code></p>
   </div>
 </div>
@@ -139,7 +139,7 @@ const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
         return s;
       }), Object.assign(document.createElement('span'), { textContent: '00', className: 'end' })] : [Object.assign(document.createElement('span'), { textContent: 'Draw: the bytes appear here.', className: 'dtw-none' })]));
       const cells = bytes.reduce((n, b) => n + (b >= 0x60 ? 7 : 1), 0);
-      meta.textContent = (say ? say + ' ' : '') + `${bytes.length} ${bytes.length === 1 ? 'byte' : 'bytes'} for ${cells} ${cells === 1 ? 'cell' : 'cells'}. In his file this wire takes ${21 + bytes.length + 1} bytes: two end points, the pins it joins, then the path and the 00 that ends it.`;
+      meta.textContent = (say ? say + ' ' : '') + `${bytes.length} ${bytes.length === 1 ? 'byte' : 'bytes'} for ${cells} ${cells === 1 ? 'cell' : 'cells'}. In the file this wire takes ${21 + bytes.length + 1} bytes: two end points, the pins it joins, then the path and the 00 that ends it.`;
       // The same path in SVG: runs of one direction merged into one command
       let d = `M${pts[0][0]} ${pts[0][1]}`, k = 0;
       while (k < bytes.length) {

@@ -15,8 +15,8 @@ const ASM = [
   { off: '019D', code: 'mov  byte ptr [bp-2],1', note: 'yes: decided' },
   { off: '01A6', code: 'cmp  al,[bp-7]', note: 'the other value?' },
   { off: '01AB', code: 'inc  byte ptr [bp-4]', note: 'count it' },
-  { off: '01B5', code: 'cmp  ax,6', note: '6 is his code for D' },
-  { off: '01BA', code: 'cmp  ax,9', note: '9 is his code for D̄' },
+  { off: '01B5', code: 'cmp  ax,6', note: '6 is its code for D' },
+  { off: '01BA', code: 'cmp  ax,9', note: '9 is its code for D̄' },
   { off: '01C1', code: 'inc  byte ptr [bp-5]', note: 'count a D' },
   { off: '01C6', code: 'inc  byte ptr [bp-6]', note: 'count a D̄' },
   { off: '01CB', code: 'inc  byte ptr [bp-3]', note: 'anything else: an X' },
@@ -57,7 +57,7 @@ const SHAPE = { and: 'M30 10H62A30 30 0 0 1 62 70H30Z', or: 'M26 10Q44 40 26 70Q
 ---
 
 <div class="dte" data-dteval>
-  <CodeStepper id={id} title="MAIN.EXE  his gate evaluator" asm={ASM} c={C} steps={steps} speed={0.7}>
+  <CodeStepper id={id} title="MAIN.EXE  the gate evaluator" asm={ASM} c={C} steps={steps} speed={0.7}>
     <div slot="visual" class="dte-vis">
       <div class="dte-pick" hidden data-pickers>
         <div class="dte-grp" role="radiogroup" aria-label="Gate">

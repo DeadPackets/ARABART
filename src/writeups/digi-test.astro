@@ -21,12 +21,13 @@ const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&la
 ---
 
 <section id="dt-kemyam" class="dt" aria-labelledby="dt-h-kemyam">
-  <h2 id="dt-h-kemyam">KEMYAM, the circuit he defended</h2>
-  <p class="lead">This is the circuit Yasser’s team showed at their graduation defense in 1993, drawn from the very file Digi-Test saved it in. Flip the inputs. His program’s own rules decide what lights up.</p>
+  <h2 id="dt-h-kemyam">KEMYAM, the circuit his team defended</h2>
+  <p class="lead">This is the circuit Yasser’s team showed at their graduation defense in 1993, drawn from the very file Digi-Test saved it in. Flip the inputs. Digi-Test’s own rules decide what lights up.</p>
   <DtBoard id="dt-play" mode="play" label="The KEMYAM circuit as Digi-Test draws it: a 7408, a 7404, a 7432 and a 7411 on a green sheet, eight blue inputs, a purple output P8, and 38 light green wires. Wires that carry a 1 are yellow." />
   <div class="dt-cols">
-    <p>Digi-Test was the graduation project of five students in Port Said: Ebrahim El Etr, Hatem Moustafa, Khaled Zakaria, Mohamed Asaad and Yasser. You place real <Term id="ttl">74xx logic chips</Term> on a sheet, wire them with the keyboard, and the program works out what the circuit does. With the team’s own plug-in card, it also tested the real circuit on the bench and led the technician straight to the broken chip.</p>
-    <p>Yasser wrote it in C++, with a few lines of assembly where it touches the hardware: 131,248 bytes of his own code in about 540 functions. Picture an early Logisim with a hardware test rig attached. The board above is KEMYAM, from his file FIL0.CIR. It has 4 chips, 11 gates, 8 inputs, one output, 8 nodes and 38 wires, each one exactly where he drew it.</p>
+    <p>Digi-Test was the graduation project of five students in Port Said: Ebrahim El Etr, Hatem Moustafa, Khaled Zakaria, Mohamed Asaad and Yasser. You place real <Term id="ttl">74xx logic chips</Term> on a sheet, wire them with the keyboard, and the program works out what the circuit does. With a plug-in card Yasser designed, it also tested the real circuit on the bench and led the technician straight to the broken chip.</p>
+    <p>Yasser’s part of the project was four pieces: the GUI, with its windows, menus, dialogs and the drawing sheet where you place chips and wires; the hardware interface card; the device driver for the card; and the interface APIs the program uses to talk to it.</p>
+    <p>It was written in C++, with a few lines of assembly where it touches the hardware: 131,248 bytes of code in about 540 functions. Picture an early Logisim with a hardware test rig attached. The board above is KEMYAM, from the team’s file FIL0.CIR. It has 4 chips, 11 gates, 8 inputs, one output, 8 nodes and 38 wires, each one exactly where it was drawn.</p>
   </div>
   <h3 class="dt-h3">Every row, like an odometer</h3>
   <p class="dt-p">The PRINT menu sends the circuit’s <Term id="truth-table">truth table</Term> to the printer: every combination of inputs, with the output for each. To visit them all, Digi-Test counts like a car odometer. The first input flips on every row, and when it rolls back to 0 it carries to the next one. KEMYAM has 8 inputs, so 256 rows. Press Run and watch the paper.</p>
@@ -35,11 +36,11 @@ const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&la
 
 <section id="dt-wires" class="dt" aria-labelledby="dt-h-wires">
   <h2 id="dt-h-wires">Every wire is the keys that drew it</h2>
-  <p class="lead">You draw a wire in Digi-Test with the numeric keypad. Yasser saved each wire as exactly those keys, one digit per step. Draw one yourself.</p>
+  <p class="lead">You draw a wire in Digi-Test with the numeric keypad. Digi-Test saves each wire as exactly those keys, one digit per step. Draw one yourself.</p>
   <DtWire id="dt-wire" />
   <div class="dt-cols">
     <p>8 is up, 2 is down, 4 left, 6 right, and 7, 9, 1 and 3 are the diagonals. A wire is one end point plus a short string of digits. Drawing it from the file is a loop that moves a pen one step per byte. The idea has a name today, a <Term id="chain-code">chain code</Term>, and you use it every time you write an SVG path with <code>h</code>, <code>v</code> and <code>l</code>.</p>
-    <p>One more kind of byte draws a part instead of a step. Add the direction and 4 to <code>60h</code>, and you get a resistor 7 cells long: <code>6Ah</code> is a resistor pointing right. They are the small red parts on KEMYAM’s ground line and on the way to P8. All 170 wires in his files, KEMYAM’s 38 among them, land exactly on the pins they belong to.</p>
+    <p>One more kind of byte draws a part instead of a step. Add the direction and 4 to <code>60h</code>, and you get a resistor 7 cells long: <code>6Ah</code> is a resistor pointing right. They are the small red parts on KEMYAM’s ground line and on the way to P8. All 170 wires in the team’s files, KEMYAM’s 38 among them, land exactly on the pins they belong to.</p>
   </div>
 </section>
 
@@ -63,19 +64,19 @@ const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&la
     <li class="d"><b>D</b><span>1 if the chip works, 0 if it is broken</span></li>
     <li class="d"><b>D̄</b><span>0 if it works, 1 if it is broken</span></li>
   </ol>
-  <p class="dt-p">With D and D̄, one pass simulates the working board and the broken board at the same time. It is like running both branches of an A/B test in one go. This is the heart of J. Paul Roth’s <Term id="d-algorithm">D-algorithm</Term>, the method behind the tools chip makers still use to test their chips. Yasser’s gate routine is short. It reads the inputs one by one and counts them by kind. Set up a gate and step through it.</p>
+  <p class="dt-p">With D and D̄, one pass simulates the working board and the broken board at the same time. It is like running both branches of an A/B test in one go. This is the heart of J. Paul Roth’s <Term id="d-algorithm">D-algorithm</Term>, the method behind the tools chip makers still use to test their chips. Digi-Test’s gate routine is short. It reads the inputs one by one and counts them by kind. Set up a gate and step through it.</p>
   <DtEval id="dt-eval" />
   <h3 class="dt-h3">Break a pin on KEMYAM</h3>
   <p class="dt-p">Now the same routine runs on every gate of the defense circuit. Pick a pin to break, <Term id="stuck-at-fault">stuck at 0</Term> or stuck at 1, and watch the red D travel toward P8. When P8 shows D or D̄, the working and the broken circuit disagree: these inputs are a <Term id="test-pattern">test pattern</Term> for that fault.</p>
   <DtBoard id="dt-fault" mode="fault" label="KEMYAM with one broken pin. Wires that carry D are red, D-bar magenta; small tags mark the gates whose output carries the fault." />
-  <p class="dt-after">His ANALYZE menu takes it from there. It builds a <Term id="fault-dictionary">fault dictionary</Term>: for every pattern, which broken pin changes which output. It lists the faults no pattern can reveal. Then it runs DETECT FAULT through the card, on the real board.</p>
+  <p class="dt-after">The ANALYZE menu takes it from there. It builds a <Term id="fault-dictionary">fault dictionary</Term>: for every pattern, which broken pin changes which output. It lists the faults no pattern can reveal. Then it runs DETECT FAULT through the card, on the real board.</p>
 </section>
 
 <section id="dt-probe" class="dt" aria-labelledby="dt-h-probe">
   <h2 id="dt-h-probe">The card, and a probe that knows where to go</h2>
-  <p class="lead">With the team’s plug-in card in the PC, Digi-Test tested the real circuit on the bench. Yasser wrote the few lines that talk to the card in assembly, right inside his C++.</p>
+  <p class="lead">Yasser designed the plug-in card that let Digi-Test test the real circuit on the bench. Then he wrote its device driver and the interface APIs the rest of the program calls, with the few lines that talk to the card in assembly, right inside the C++.</p>
   <DtCard id="dt-card" />
-  <p class="dt-p">The card sits in one of the PC’s expansion slots, at two <Term id="io-port">I/O ports</Term> that IBM set aside for home-made cards. There is no driver. One <code>OUT</code> instruction sets the circuit’s inputs and one <code>IN</code> reads its outputs. On an Arduino plugged into USB, the same job is <code>digitalWrite()</code> and <code>digitalRead()</code>. A second routine reads the hand probe the same way, from a single bit.</p>
+  <p class="dt-p">The card sits in one of the PC’s expansion slots, at two <Term id="io-port">I/O ports</Term> that IBM set aside for home-made cards. His driver is lean: one <code>OUT</code> instruction sets the circuit’s inputs and one <code>IN</code> reads its outputs. On an Arduino plugged into USB, the same job is <code>digitalWrite()</code> and <code>digitalRead()</code>. A second routine reads the hand probe the same way, from a single bit.</p>
   <h3 class="dt-h3">Place the guided probe here</h3>
   <p class="dt-p">When the board’s answer differs from the simulation, Digi-Test does more than flag the board. It walks back from the wrong output, one gate at a time, and tells the technician where to touch the <Term id="guided-probe">guided probe</Term> next. Those are his words on the screen. Below, one chip on KEMYAM hides a fault. Apply the pattern, then follow the probe.</p>
   <DtBoard id="dt-guided" mode="probe" label="KEMYAM with one hidden broken pin. A white ring shows where to place the probe; green dots read right, red dots read wrong." />
@@ -93,8 +94,8 @@ const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&la
   <p class="lead">C++ was young in 1993, and most DOS programs were plain C. Digi-Test is built from about 20 classes: gates, chips, wires, nodes, inputs and outputs, the drawing sheet, each one carrying its own data and its own code.</p>
   <DtVcall id="dt-vcall" />
   <div class="dt-cols">
-    <p>This is the idea that makes the whole program hang together. His fault code holds an object and calls one slot of its <Term id="vtable">method table</Term>, 15 times in all. It never asks what kind of object it is. A gate answers with gate code, a chip with chip code, a node with node code. In TypeScript you would write an interface with an <code>evaluate()</code> method; in JavaScript, the prototype chain finds the right function the same way.</p>
-    <p>He built on <Term id="borland-cpp">Borland C++</Term> and its <Term id="class-library">container classes</Term>, which he compiled from their source right inside his project. The biggest object of all is the drawing sheet, 30,105 bytes. Almost all of it is a grid of 153 by 98 cells, one for every spot where a chip, a node or a wire can go.</p>
+    <p>This is the idea that makes the whole program hang together. The fault code holds an object and calls one slot of its <Term id="vtable">method table</Term>, 15 times in all. It never asks what kind of object it is. A gate answers with gate code, a chip with chip code, a node with node code. In TypeScript you would write an interface with an <code>evaluate()</code> method; in JavaScript, the prototype chain finds the right function the same way.</p>
+    <p>It was built using <Term id="borland-cpp">Borland C++</Term> and its <Term id="class-library">container classes</Term>, compiled from their source right inside the project. The biggest object of all is the drawing sheet, 30,105 bytes. Almost all of it is a grid of 153 by 98 cells, one for every spot where a chip, a node or a wire can go.</p>
   </div>
   <Deep title="For engineers: a constructor, as Borland C++ 2.0 compiled it">
     <Listing
@@ -106,9 +107,9 @@ const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&la
         { off: '00D4', code: 'call far 0EFF:0ABB', note: 'the parent class’s constructor', hi: true },
         { off: '00E5', code: 'mov  word ptr es:[bx],0335h', note: 'write the Gate method table into the first 2 bytes', hi: true },
       ]}
-      foot="Every class constructor follows this pattern, so following the calls rebuilds his class tree. Slot 34h of the table holds 0EFF:0120 for a gate, 0EFF:06C7 for a chip and 1485:0AA7 for a simulation node."
+      foot="Every class constructor follows this pattern, so following the calls rebuilds the class tree. Slot 34h of the table holds 0EFF:0120 for a gate, 0EFF:06C7 for a chip and 1485:0AA7 for a simulation node."
     />
-    <p>The program uses Borland’s large <Term id="memory-model">memory model</Term>, so every pointer is a 4-byte <Term id="far-pointer">far pointer</Term> and every method call is a far call. Stack checks are on in every one of his functions, a safety net he chose while developing. <a href={bytes(0x0eff, 0x90)}>See the constructor in the byte map</a>, or <a href={bytes(0x0eff, 0x120)}>the gate evaluator</a>.</p>
+    <p>The program uses Borland’s large <Term id="memory-model">memory model</Term>, so every pointer is a 4-byte <Term id="far-pointer">far pointer</Term> and every method call is a far call. Stack checks are on in every function, a safety net chosen while developing. <a href={bytes(0x0eff, 0x90)}>See the constructor in the byte map</a>, or <a href={bytes(0x0eff, 0x120)}>the gate evaluator</a>.</p>
   </Deep>
 </section>
 
@@ -123,12 +124,12 @@ const bytes = (seg: number, off: number) => `${base}/bytes/?f=DIGI_T_MAIN.EXE&la
   <Deep title="For engineers: the five file formats">
     <ul>
       <li><code>GROUP.*</code> (4 catalogs): from 32h, a count, then one 13-byte entry per file: a 12-byte name and a flag. Entry n is <code>FILn</code>.</li>
-      <li><code>.GAT</code> (9 gate types): from 32h, inputs, outputs, controlling value, inversion, and 2 bytes for a second output. Values use his codes: 1 means 0, 2 means 1.</li>
+      <li><code>.GAT</code> (9 gate types): from 32h, inputs, outputs, controlling value, inversion, and 2 bytes for a second output. Values use its codes: 1 means 0, 2 means 1.</li>
       <li><code>.IC</code> (28 chips, 7400 to 7440): from 3Ch, the pin count, then 4 bytes per pin (gate number; kind: input 20h, output 40h, ground 10h, power 02h; place in the gate), then the gate type’s name and the number of gates in the package.</li>
       <li><code>.TCK</code> (2 logic families, TTL and TTL with <Term id="open-collector">open-collector</Term> outputs): one byte marks the open-collector family.</li>
       <li><code>.CIR</code> (circuits): from 3Ch, an object count, then each object: x, y, a type (0 chip, 2 wire, 3 node, 4 input or output) and its fields. Wires come last, each with its two ends, the pins it joins, and its keypad path.</li>
     </ul>
-    <p>The program writes the circuit’s objects with a raw DOS call in inline assembly (1C5C:003C) and checks the length on every load (1C5C:04E5). A decoder built from his save code reads all 70 data files to the exact byte. <a href={bytes(0x1c5c, 0x185)}>See the save routine in the byte map.</a></p>
+    <p>The program writes the circuit’s objects with a raw DOS call in inline assembly (1C5C:003C) and checks the length on every load (1C5C:04E5). A decoder built from its save code reads all 70 data files to the exact byte. <a href={bytes(0x1c5c, 0x185)}>See the save routine in the byte map.</a></p>
   </Deep>
 </section>
 

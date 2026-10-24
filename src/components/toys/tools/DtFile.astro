@@ -11,7 +11,7 @@ const gat = [...file('FIL0.GAT')];
 const hex = (b: number) => b.toString(16).padStart(2, '0').toUpperCase();
 const part = (i: number) => (i < 0x2a ? 'txt' : i < 0x2d ? 'pad' : i === 0x2d ? 'eof' : i < 0x32 ? 'gap' : i < 0x38 ? 'gate' : 'len');
 const SAY: Record<string, string> = {
-  txt: 'The copyright line: “Copyright 1993 by KEMYAM (c) For Gate Save”. Every file he saves starts with his group’s name.',
+  txt: 'The copyright line: “Copyright 1993 by KEMYAM (c) For Gate Save”. Every file Digi-Test saves starts with the group’s name.',
   pad: 'The end of the text and two spaces of padding.',
   eof: '1Ah, Ctrl-Z: the DOS mark for “end of text”. TYPE stops here, so a curious user sees the copyright and nothing else.',
   gap: '4 bytes the save steps over: the data always starts at the same place, 32h.',
