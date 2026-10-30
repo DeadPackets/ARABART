@@ -16,7 +16,6 @@ import '../../components/toys/dinarsoft/ds.css';
 
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const logo = img('logo'), mark = img('mark'), banner = img('banner');
-const his = press.filter(p => p.his).length;
 const releases = apps.reduce((n, a) => n + a.releases.length, 0);
 const mb = (totalBytes / 1e6).toFixed(1);
 const wins = awards.filter(a => a.level === 'Winner').length;
@@ -65,13 +64,13 @@ const org = { '@type': 'Organization', '@id': `${home}dinarsoft/#org`, name: 'Di
                 })}
               </ul>
               <h2 class="dsh-sp-h">DinarSoft News</h2>
-              <p class="dsh-news-p">He wrote the company’s news himself: {his} of its {press.length} press releases carry his name.</p>
+              <p class="dsh-news-p">Yasser Awad and Hosam Aly wrote the company’s news themselves: all {press.length} of its press releases.</p>
               <ol class="dsh-news" tabindex="0" aria-label={`DinarSoft's ${press.length} press releases, newest first`}>
                 {press.map(p => (
                   <li>
                     <time datetime={p.date}>{longDate(p.date)}</time>
                     <a href={p.link} rel="noopener">{p.title}</a>
-                    {p.his && <span class="dsh-by">Yasser Awad</span>}
+                    <span class="dsh-by">Yasser Awad &amp; Hosam Aly</span>
                   </li>
                 ))}
               </ol>

@@ -17,7 +17,7 @@ const name = (id: AppId) => apps.find(a => a.id === id)!.name;
 
 type Row = { y: number; d: string; app?: AppId; kind: 'rel' | 'aw' | 'hon' | 'co'; node: 'dot' | 'maj' | 'aw' | 'hon' | 'co'; tag: string; msg: string; html?: boolean; date: string; notes?: string[]; aw?: (typeof awards)[number]; link?: string };
 const rows: Row[] = [
-  { y: 2002, d: '2002-11', kind: 'co', node: 'co', tag: 'DinarSoft', msg: 'Yasser Awad founds DinarSoft Corporation in Kanata, Ontario.', date: 'November 2002' },
+  { y: 2002, d: '2002-11', kind: 'co', node: 'co', tag: 'DinarSoft', msg: 'Yasser Awad and Hosam Aly found DinarSoft Corporation in Kanata, Ontario.', date: 'November 2002' },
   { y: 2006, d: '2006-11-01', kind: 'co', node: 'co', tag: 'DinarSoft', msg: 'A new logo: two red crescents around a red dot.', date: longDate('2006-11-01') },
   { y: 2006, d: '2006-11-15', kind: 'co', node: 'co', tag: 'DinarSoft', msg: 'The new dinarsoft.com goes live, with its own store.', date: longDate('2006-11-15') },
   ...apps.flatMap(a => a.releases.map((r, i) => ({
