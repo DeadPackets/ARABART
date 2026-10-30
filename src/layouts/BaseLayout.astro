@@ -1,12 +1,13 @@
 ---
+// first, so the components' CSS (explain.css's .k-btn over .button) comes after it in every page
+import '../styles/fonts.css';
+import '../styles/global.css';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import Explain from '../components/explain/Explain.astro';
 import { ERAS, type Era } from '../lib/eras/eras';
-import '../styles/fonts.css';
-import '../styles/global.css';
 
 interface Props {
   title: string;
